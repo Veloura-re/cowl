@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-highlight: var(--surface-highlight);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-accent: var(--accent);
+  --color-text-main: var(--text-main);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  
+  --color-status-success: var(--success);
+  --color-status-warning: var(--warning);
+  --color-status-error: var(--error);
+  --color-status-info: var(--info);
+}
+
+:root {
+  /* Abyss Green Layer */
+  --background: #070E0B;
+  
+  /* Deep Forest Layer (Cards) */
+  --surface: #0E1A14;
+  
+  /* Emerald Shadow (Modals/Popovers) */
+  --surface-highlight: #142821;
+  
+  /* Brand */
+  --primary: #0FB9A8;       /* Dark Emerald Core */
+  --primary-hover: #14D9C4; /* Polished Emerald */
+  
+  /* Accents */
+  --accent: #1EF2D3;        /* Mint Surge */
+  
+  /* Text */
+  --text-main: #E6F4F1;
+  --text-secondary: #A8CFC6;
+  --text-muted: #6B9E93;
+  
+  /* Status */
+  --success: #1EF2D3;
+  --warning: #F4C430;
+  --error: #E5533D;
+  --info: #3BAEA0;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text-main);
+  font-family: var(--font-sans, ui-sans-serif, system-ui, sans-serif);
+}
+
+/* Utility Utilities */
+.glass {
+  background: rgba(14, 26, 20, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
