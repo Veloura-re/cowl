@@ -1,6 +1,8 @@
 import { createClient } from '@/utils/supabase/server'
 import PaymentForm from '@/components/ui/PaymentForm'
 
+export const dynamic = 'force-dynamic'
+
 export default async function NewFinancePage({ searchParams }: { searchParams: { type?: 'RECEIPT' | 'PAYMENT' } }) {
     const supabase = await createClient()
     const type = searchParams.type || 'RECEIPT'

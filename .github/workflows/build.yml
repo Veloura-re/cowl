@@ -28,6 +28,7 @@ jobs:
       env:
         # These are needed if the build process tries to connect to Supabase
         # Usually standard Next.js build is static or doesn't need secrets unless fetching data at build time
-        # If build fails due to missing env vars, they should be added here from secrets
-        NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+        # Use secrets if available, otherwise use dummy values to pass the build
+        # Note: If pages try to fetch data during build, this will still fail without real keys
+        NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key' }}

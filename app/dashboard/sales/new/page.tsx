@@ -1,6 +1,8 @@
 import { createClient } from '@/utils/supabase/server'
 import CompactInvoiceForm from '@/components/ui/CompactInvoiceForm'
 
+export const dynamic = 'force-dynamic'
+
 export default async function NewInvoicePage() {
     const supabase = await createClient()
 
