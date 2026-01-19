@@ -15,5 +15,5 @@ export default async function PurchasePage() {
         console.error('Error fetching purchases:', error)
     }
 
-    return <PurchasesClientView initialPurchases={purchases || []} />
+    return <PurchasesClientView initialInvoices={purchases || []} />
 }

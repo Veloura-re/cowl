@@ -1,5 +1,5 @@
 import { createClient } from '@/utils/supabase/server'
-import InvoiceForm from './invoice-form'
+import CompactInvoiceForm from '@/components/ui/CompactInvoiceForm'
 
 export default async function NewInvoicePage() {
     const supabase = await createClient()
@@ -7,7 +7,7 @@ export default async function NewInvoicePage() {
     const { data: parties } = await supabase
         .from('parties')
         .select('*')
-        .eq('type', 'CUSTOMER') // Or BOTH
+        .in('type', ['CUSTOMER', 'BOTH'])
         .order('name')
 
     const { data: items } = await supabase
@@ -15,8 +15,10 @@ export default async function NewInvoicePage() {
         .select('*')
         .order('name')
 
-    // We should also fetch next invoice number logic here or in client?
-    // Ideally server-side or DB function. For now, client can input or generate random.
+    const { data: paymentModes } = await supabase
+        .from('payment_modes')
+        .select('*')
+        .order('name')
 
-    return <InvoiceForm parties={parties || []} items={items || []} />
+    return <CompactInvoiceForm parties={parties || []} items={items || []} paymentModes={paymentModes || []} />
 }

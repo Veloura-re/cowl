@@ -1,17 +1,22 @@
 'use client'
 
-import { useState } from 'react'
-import { X, Loader2 } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { X, Loader2, User } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
+import { useBusiness } from '@/context/business-context'
 import { useRouter } from 'next/navigation'
+import PickerModal from '@/components/ui/PickerModal'
 
 type CreatePartyModalProps = {
     isOpen: boolean
     onClose: () => void
+    onSuccess?: () => void
+    initialData?: any
 }
 
-export default function CreatePartyModal({ isOpen, onClose }: CreatePartyModalProps) {
+export default function CreatePartyModal({ isOpen, onClose, onSuccess, initialData }: CreatePartyModalProps) {
     const [loading, setLoading] = useState(false)
+    const [isTypePickerOpen, setIsTypePickerOpen] = useState(false)
     const router = useRouter()
     const supabase = createClient()
 
@@ -26,66 +31,21 @@ export default function CreatePartyModal({ isOpen, onClose }: CreatePartyModalPr
         gstin: ''
     })
 
-    // Get current user to link business
-    // In a real app we'd fetch the active business ID from context/url/state
-    // For MVP/Dev, we'll fetch the first business owned by user or fail
-    // But wait, we haven't implemented "Create Business" flow yet!
-    // The schema requires a business_id.
-    // We need a way to create a business first.
+    const { activeBusinessId } = useBusiness()
 
-    // CRITICAL: We missed "Create Business" step.
-    // If user logs in new, they have no business.
-    // Parties page needs business_id.
-
-    // I should add logic to auto-create a business if none exists, or prompt user.
-    // For now, I'll allow creating a party and let the RLS/Trigger handle it?
-    // No, RLS checks business_id.
-
-    // I'll assume for this turn that I will inject a "default business" or similar logic?
-    // Or better: I'll fetch the user's business in the Page component and pass it down.
-    // If no business, redirect to "Onboarding".
-
-    // Let's implement the form logic first. Ideally we pass `businessId` as prop.
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setLoading(true)
-
-        try {
-            const { data: { user } } = await supabase.auth.getUser()
-            if (!user) throw new Error('Not authenticated')
-
-            // Fetch user's business (Dev hack: get the first one)
-            const { data: businesses } = await supabase.from('businesses').select('id').eq('owner_id', user.id).limit(1)
-
-            let businessId = businesses?.[0]?.id
-
-            // Auto-create business if missing (Dev convenience)
-            if (!businessId) {
-                const { data: newBiz, error: bizError } = await supabase
-                    .from('businesses')
-                    .insert({ name: 'My Business', owner_id: user.id })
-                    .select()
-                    .single()
-
-                if (bizError) throw bizError
-                businessId = newBiz.id
-
-                // Auto-add member
-                await supabase.from('business_members').insert({ business_id: businessId, user_id: user.id, role: 'OWNER' })
-            }
-
-            const { error } = await supabase.from('parties').insert({
-                business_id: businessId,
-                ...formData,
-                opening_balance: Number(formData.opening_balance)
+    // Update form when initialData changes
+    useEffect(() => {
+        if (initialData) {
+            setFormData({
+                name: initialData.name || '',
+                phone: initialData.phone || '',
+                email: initialData.email || '',
+                type: initialData.type || 'CUSTOMER',
+                opening_balance: initialData.opening_balance || 0,
+                address: initialData.address || '',
+                gstin: initialData.gstin || ''
             })
-
-            if (error) throw error
-
-            onClose()
-            router.refresh()
-            // Reset form
+        } else {
             setFormData({
                 name: '',
                 phone: '',
@@ -95,6 +55,51 @@ export default function CreatePartyModal({ isOpen, onClose }: CreatePartyModalPr
                 address: '',
                 gstin: ''
             })
+        }
+    }, [initialData, isOpen])
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!activeBusinessId) return
+        setLoading(true)
+
+        try {
+            if (initialData?.id) {
+                // Update
+                const { error } = await supabase
+                    .from('parties')
+                    .update({
+                        ...formData,
+                        opening_balance: Number(formData.opening_balance)
+                    })
+                    .eq('id', initialData.id)
+
+                if (error) throw error
+            } else {
+                // Insert
+                const { error } = await supabase.from('parties').insert({
+                    ...formData,
+                    business_id: activeBusinessId,
+                    opening_balance: Number(formData.opening_balance)
+                })
+
+                if (error) throw error
+            }
+
+            if (onSuccess) onSuccess()
+            onClose()
+            router.refresh()
+            if (!initialData) {
+                setFormData({
+                    name: '',
+                    phone: '',
+                    email: '',
+                    type: 'CUSTOMER',
+                    opening_balance: 0,
+                    address: '',
+                    gstin: ''
+                })
+            }
         } catch (err: any) {
             alert('Error: ' + err.message)
         } finally {
@@ -105,92 +110,104 @@ export default function CreatePartyModal({ isOpen, onClose }: CreatePartyModalPr
     if (!isOpen) return null
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-            <div className="w-full max-w-lg rounded-2xl bg-[var(--surface)] border border-[var(--surface-highlight)] shadow-2xl animate-in zoom-in-95 duration-200">
-                <div className="flex items-center justify-between border-b border-[var(--surface-highlight)] px-6 py-4">
-                    <h2 className="text-xl font-bold text-[var(--text-main)]">Add New Party</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-[2px] p-4 animate-in fade-in duration-200">
+            <div className="w-full max-w-sm glass rounded-[24px] border border-white/40 shadow-2xl relative overflow-hidden animate-in zoom-in-95 duration-200">
+                <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 bg-white/40">
+                    <div>
+                        <h2 className="text-xs font-bold text-[var(--deep-contrast)] uppercase tracking-widest">Add New Party</h2>
+                        <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-tighter">Business Contact</p>
+                    </div>
                     <button
                         onClick={onClose}
-                        className="text-[var(--text-secondary)] hover:text-[var(--text-main)] transition-colors"
+                        className="p-1 rounded-lg hover:bg-rose-50 hover:text-rose-600 text-[var(--foreground)]/40 transition-all"
                     >
-                        <X className="h-6 w-6" />
+                        <X className="h-4 w-4" />
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                <form onSubmit={handleSubmit} className="p-4 space-y-3">
                     <div>
-                        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">Party Name *</label>
+                        <label className="block text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/60 mb-1 ml-1">Party Name *</label>
                         <input
                             required
                             type="text"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            className="w-full rounded-lg bg-[var(--background)] border border-[var(--surface-highlight)] px-3 py-2 text-[var(--text-main)] focus:border-[var(--primary)] focus:outline-none"
-                            placeholder="Enter name"
+                            className="w-full h-8 rounded-xl bg-white/50 border border-white/20 px-3 text-[10px] font-bold text-[var(--deep-contrast)] placeholder:text-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:ring-1 focus:ring-[var(--primary-green)]/20 focus:outline-none transition-all shadow-inner"
+                            placeholder="Full Name"
                         />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">Phone Number</label>
+                            <label className="block text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/60 mb-1 ml-1">Phone</label>
                             <input
                                 type="text"
                                 value={formData.phone}
                                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                className="w-full rounded-lg bg-[var(--background)] border border-[var(--surface-highlight)] px-3 py-2 text-[var(--text-main)] focus:border-[var(--primary)] focus:outline-none"
-                                placeholder="+1 234..."
+                                className="w-full h-8 rounded-xl bg-white/50 border border-white/20 px-3 text-[10px] font-bold text-[var(--deep-contrast)] placeholder:text-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none shadow-inner"
+                                placeholder="+123..."
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">Party Type</label>
-                            <select
-                                value={formData.type}
-                                onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
-                                className="w-full rounded-lg bg-[var(--background)] border border-[var(--surface-highlight)] px-3 py-2 text-[var(--text-main)] focus:border-[var(--primary)] focus:outline-none"
+                            <label className="block text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/60 mb-1 ml-1">Type</label>
+                            <button
+                                type="button"
+                                onClick={() => setIsTypePickerOpen(true)}
+                                className="w-full h-8 rounded-xl bg-white/50 border border-white/20 px-3 text-[10px] font-bold text-[var(--deep-contrast)] hover:border-[var(--primary-green)] transition-all flex items-center justify-between shadow-inner"
                             >
-                                <option value="CUSTOMER">Customer</option>
-                                <option value="SUPPLIER">Supplier</option>
-                            </select>
+                                <span className="truncate">{formData.type}</span>
+                            </button>
+                            <PickerModal
+                                isOpen={isTypePickerOpen}
+                                onClose={() => setIsTypePickerOpen(false)}
+                                onSelect={(type) => setFormData({ ...formData, type })}
+                                title="Party Type"
+                                options={[
+                                    { id: 'CUSTOMER', label: 'Customer' },
+                                    { id: 'SUPPLIER', label: 'Supplier' }
+                                ]}
+                                selectedValue={formData.type}
+                            />
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">Opening Balance</label>
+                            <label className="block text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/60 mb-1 ml-1">Opening Bal</label>
                             <input
                                 type="number"
                                 value={formData.opening_balance}
                                 onChange={(e) => setFormData({ ...formData, opening_balance: Number(e.target.value) })}
-                                className="w-full rounded-lg bg-[var(--background)] border border-[var(--surface-highlight)] px-3 py-2 text-[var(--text-main)] focus:border-[var(--primary)] focus:outline-none"
+                                className="w-full h-8 rounded-xl bg-white/50 border border-white/20 px-3 text-[10px] font-bold text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none shadow-inner"
                             />
-                            <p className="text-xs text-[var(--text-muted)] mt-1">Positive: You gather from them</p>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">Email (Optional)</label>
+                            <label className="block text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/60 mb-1 ml-1">Email</label>
                             <input
                                 type="email"
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                className="w-full rounded-lg bg-[var(--background)] border border-[var(--surface-highlight)] px-3 py-2 text-[var(--text-main)] focus:border-[var(--primary)] focus:outline-none"
-                                placeholder="email@example.com"
+                                className="w-full h-8 rounded-xl bg-white/50 border border-white/20 px-3 text-[10px] font-bold text-[var(--deep-contrast)] placeholder:text-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none shadow-inner"
+                                placeholder="Optional"
                             />
                         </div>
                     </div>
 
-                    <div className="flex justify-end pt-4 gap-3">
+                    <div className="flex justify-end pt-3 gap-2 border-t border-[var(--primary-green)]/5">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-highlight)] hover:text-[var(--text-main)] transition-colors"
+                            className="px-3 py-1.5 rounded-xl text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 hover:bg-white/40 transition-all"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-[var(--primary)] text-[var(--background)] hover:bg-[var(--primary-hover)] transition-colors disabled:opacity-50"
+                            className="flex items-center px-4 py-1.5 rounded-xl bg-[var(--deep-contrast)] text-white text-[9px] font-bold uppercase tracking-[0.2em] hover:bg-[var(--primary-green)] active:scale-95 transition-all disabled:opacity-50 shadow-lg shadow-[var(--deep-contrast)]/10"
                         >
-                            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {loading && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
                             Save Party
                         </button>
                     </div>

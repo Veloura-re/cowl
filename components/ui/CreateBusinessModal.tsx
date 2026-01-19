@@ -1,0 +1,113 @@
+'use client'
+
+import { useState } from 'react'
+import { X, Loader2, Building2 } from 'lucide-react'
+import { createClient } from '@/utils/supabase/client'
+import { useRouter } from 'next/navigation'
+import { useBusiness } from '@/context/business-context'
+import ErrorModal from '@/components/ui/ErrorModal'
+
+type CreateBusinessModalProps = {
+    isOpen: boolean
+    onClose: () => void
+}
+
+export default function CreateBusinessModal({ isOpen, onClose }: CreateBusinessModalProps) {
+    const [loading, setLoading] = useState(false)
+    const supabase = createClient()
+    const { refreshBusinesses, setActiveBusinessId } = useBusiness()
+    const [name, setName] = useState('')
+    const [errorModal, setErrorModal] = useState<{ open: boolean, message: string }>({ open: false, message: '' })
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setLoading(true)
+
+        try {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) throw new Error('Not authenticated')
+
+            const { data, error } = await supabase
+                .from('businesses')
+                .insert({ name, owner_id: user.id })
+                .select()
+                .single()
+
+            if (error) throw error
+
+            await refreshBusinesses()
+            if (data) setActiveBusinessId(data.id)
+            onClose()
+            setName('')
+        } catch (err: any) {
+            setErrorModal({ open: true, message: 'Failed to create business: ' + err.message })
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    if (!isOpen) return null
+
+    return (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose} />
+            <div className="glass w-full max-w-sm rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 relative z-10 border border-white/40">
+                <div className="flex items-center justify-between border-b border-white/20 bg-white/40 px-6 py-4">
+                    <div className="flex items-center gap-2.5">
+                        <div className="p-2 rounded-xl bg-[var(--primary-green)] text-white shadow-lg">
+                            <Building2 className="h-4 w-4" />
+                        </div>
+                        <div>
+                            <h2 className="text-sm font-bold text-[var(--deep-contrast)] tracking-tight">New Business</h2>
+                            <p className="text-[10px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest leading-none">Create Profile</p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="p-1.5 rounded-full hover:bg-white/50 transition-colors"
+                    >
+                        <X className="h-4 w-4" />
+                    </button>
+                </div>
+
+                <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                    <div>
+                        <label className="block text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-1.5 ml-1">Business Name</label>
+                        <input
+                            required
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            className="w-full h-9 rounded-xl bg-white/50 border border-white/20 px-4 text-[11px] font-bold text-[var(--deep-contrast)] focus:outline-none transition-all shadow-inner"
+                            placeholder="e.g. Acme Corp"
+                        />
+                    </div>
+
+                    <div className="flex justify-end pt-4 gap-2 border-t border-black/5">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="flex-1 h-10 rounded-xl text-[10px] font-bold uppercase tracking-widest text-[var(--foreground)]/40 hover:bg-white/50 transition-all active:scale-95"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={loading || !name}
+                            className="flex-1 h-10 flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] text-white shadow-lg text-[10px] font-bold uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50"
+                        >
+                            {loading && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
+                            Create
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <ErrorModal
+                isOpen={errorModal.open}
+                onClose={() => setErrorModal({ ...errorModal, open: false })}
+                message={errorModal.message}
+            />
+        </div>
+    )
+}

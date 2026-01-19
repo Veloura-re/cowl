@@ -1,102 +1,177 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Search, ShoppingCart } from 'lucide-react'
+import { Plus, Search, ShoppingCart, Calendar, User, Filter, ArrowUpDown } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import clsx from 'clsx'
+import { useBusiness } from '@/context/business-context'
+import Dropdown from '@/components/ui/dropdown'
+import PickerModal from '@/components/ui/PickerModal'
 
-export default function PurchasesClientView({ initialPurchases }: { initialPurchases: any[] }) {
-    const [purchases, setPurchases] = useState(initialPurchases)
-    const [search, setSearch] = useState('')
+export default function PurchasesClientView({ initialInvoices }: { initialInvoices: any[] }) {
+    const router = useRouter()
+    const { activeBusinessId, formatCurrency } = useBusiness()
+    const [invoices, setInvoices] = useState(initialInvoices || [])
+    const [searchQuery, setSearchQuery] = useState('')
+    const [statusFilter, setStatusFilter] = useState<string>('ALL')
+    const [sortBy, setSortBy] = useState<'date' | 'amount'>('date')
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
+    const [isSortPickerOpen, setIsSortPickerOpen] = useState(false)
+    const [isFilterPickerOpen, setIsFilterPickerOpen] = useState(false)
 
-    const filteredPurchases = purchases.filter((inv) =>
-        inv.invoice_number.toLowerCase().includes(search.toLowerCase()) ||
-        inv.party?.name.toLowerCase().includes(search.toLowerCase())
+    const handleEdit = (invoice: any) => {
+        router.push(`/dashboard/purchases/${invoice.id}/edit`)
+    }
+
+    let filteredPurchases = invoices.filter((inv) =>
+        inv.business_id === activeBusinessId && (
+            inv.invoice_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (inv.party?.name && inv.party.name.toLowerCase().includes(searchQuery.toLowerCase()))
+        ) && (statusFilter === 'ALL' || inv.status === statusFilter)
     )
 
+    // Sort
+    filteredPurchases = [...filteredPurchases].sort((a, b) => {
+        const multiplier = sortOrder === 'asc' ? 1 : -1
+        if (sortBy === 'date') {
+            return multiplier * (new Date(a.date).getTime() - new Date(b.date).getTime())
+        } else {
+            return multiplier * (a.total_amount - b.total_amount)
+        }
+    })
+
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-4 animate-in fade-in duration-500 pb-20">
+            {/* Header - Compact */}
+            <div className="flex items-center justify-between pb-3 border-b border-[var(--primary-green)]/10">
                 <div>
-                    <h1 className="text-3xl font-bold text-[var(--text-main)]">Purchases</h1>
-                    <p className="mt-1 text-[var(--text-secondary)]">
-                        Track business expenses and bills
-                    </p>
+                    <h1 className="text-xl font-bold text-[var(--deep-contrast)] tracking-tight">Purchases</h1>
+                    <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-widest leading-none">Stock Inward Log</p>
                 </div>
                 <Link
                     href="/dashboard/purchases/new"
-                    className="flex items-center justify-center rounded-lg bg-[var(--primary)] px-4 py-2.5 text-sm font-semibold text-[var(--background)] hover:bg-[var(--primary-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-all"
+                    className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white hover:bg-[var(--primary-green)] transition-all shadow-lg active:scale-95"
                 >
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Purchase
+                    <Plus className="mr-1 h-3 w-3" />
+                    New Bill
                 </Link>
             </div>
 
-            {/* Filters */}
-            <div className="flex items-center gap-4 bg-[var(--surface)] p-4 rounded-xl border border-[var(--surface-highlight)]">
+            <div className="flex items-center gap-2">
                 <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--foreground)]/40" />
                     <input
                         type="text"
-                        placeholder="Search invoice or supplier..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="w-full rounded-lg bg-[var(--background)] py-2 pl-10 pr-4 text-sm text-[var(--text-main)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-1 focus:ring-[var(--primary)] border border-transparent focus:border-[var(--primary)]"
+                        placeholder="Search bills..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full h-9 rounded-xl bg-white/50 border border-white/20 pl-9 pr-4 text-[10px] font-bold text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:ring-1 focus:ring-[var(--primary-green)]/20 focus:outline-none transition-all shadow-inner placeholder:text-[var(--foreground)]/20"
                     />
                 </div>
+                <button
+                    onClick={() => setIsSortPickerOpen(true)}
+                    className="h-9 px-3 rounded-xl bg-white/50 border border-white/20 flex items-center gap-2 text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-widest hover:bg-white/10 transition-all shadow-sm"
+                >
+                    <ArrowUpDown className="h-3 w-3 opacity-40" />
+                    <span>Sort</span>
+                </button>
+                <button
+                    onClick={() => setIsFilterPickerOpen(true)}
+                    className="h-9 px-3 rounded-xl bg-white/50 border border-white/20 flex items-center gap-2 text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-widest hover:bg-white/10 transition-all shadow-sm"
+                >
+                    <Filter className="h-3 w-3 opacity-40" />
+                    <span>Filter</span>
+                </button>
             </div>
 
-            {/* List */}
-            <div className="rounded-xl border border-[var(--surface-highlight)] bg-[var(--surface)] overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm">
-                        <thead className="bg-[var(--surface-highlight)]">
-                            <tr>
-                                <th className="px-6 py-4 font-semibold text-[var(--text-secondary)]">Date</th>
-                                <th className="px-6 py-4 font-semibold text-[var(--text-secondary)]">Bill #</th>
-                                <th className="px-6 py-4 font-semibold text-[var(--text-secondary)]">Supplier</th>
-                                <th className="px-6 py-4 font-semibold text-[var(--text-secondary)] text-right">Amount</th>
-                                <th className="px-6 py-4 font-semibold text-[var(--text-secondary)] text-center">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-[var(--surface-highlight)]">
-                            {filteredPurchases.length > 0 ? (
-                                filteredPurchases.map((inv) => (
-                                    <tr key={inv.id} className="group hover:bg-[var(--surface-highlight)]/50 transition-colors">
-                                        <td className="px-6 py-4 text-[var(--text-secondary)]">
-                                            {new Date(inv.date).toLocaleDateString()}
-                                        </td>
-                                        <td className="px-6 py-4 text-[var(--text-main)] font-medium">
-                                            {inv.invoice_number}
-                                        </td>
-                                        <td className="px-6 py-4 text-[var(--text-main)]">
-                                            {inv.party?.name || 'Cash Purchase'}
-                                        </td>
-                                        <td className="px-6 py-4 text-right font-bold text-[var(--text-main)]">
-                                            {inv.total_amount}
-                                        </td>
-                                        <td className="px-6 py-4 text-center">
-                                            <span className={
-                                                "px-2 py-1 rounded text-xs font-semibold " +
-                                                (inv.status === 'PAID' ? "bg-[var(--color-status-success)]/10 text-[var(--color-status-success)]" :
-                                                    inv.status === 'UNPAID' ? "bg-[var(--color-status-error)]/10 text-[var(--color-status-error)]" :
-                                                        "bg-[var(--color-status-warning)]/10 text-[var(--color-status-warning)]")
-                                            }>
-                                                {inv.status}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center text-[var(--text-muted)]">
-                                        No purchase bills found.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+
+            <PickerModal
+                isOpen={isSortPickerOpen}
+                onClose={() => setIsSortPickerOpen(false)}
+                onSelect={(val) => {
+                    const [by, order] = val.split('-')
+                    setSortBy(by as 'date' | 'amount')
+                    setSortOrder(order as 'asc' | 'desc')
+                    setIsSortPickerOpen(false)
+                }}
+                title="Sort Purchase Bills"
+                options={[
+                    { id: 'date-desc', label: 'DATE (NEWEST FIRST)' },
+                    { id: 'date-asc', label: 'DATE (OLDEST FIRST)' },
+                    { id: 'amount-high', label: 'AMOUNT (HIGH TO LOW)' },
+                    { id: 'amount-low', label: 'AMOUNT (LOW TO HIGH)' },
+                ]}
+                selectedValue={`${sortBy}-${sortOrder === 'desc' && sortBy === 'amount' ? 'high' : sortOrder === 'asc' && sortBy === 'amount' ? 'low' : sortOrder}`}
+            />
+
+            <PickerModal
+                isOpen={isFilterPickerOpen}
+                onClose={() => setIsFilterPickerOpen(false)}
+                onSelect={(val) => {
+                    setStatusFilter(val)
+                    setIsFilterPickerOpen(false)
+                }}
+                title="Filter by Status"
+                options={[
+                    { id: 'ALL', label: 'ALL STATUS' },
+                    { id: 'PAID', label: 'PAID' },
+                    { id: 'PARTIAL', label: 'PARTIAL' },
+                    { id: 'UNPAID', label: 'UNPAID' }
+                ]}
+                selectedValue={statusFilter}
+            />
+
+            {/* Grid - Ultra Compact Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                {filteredPurchases.map((inv: any) => (
+                    <div
+                        key={inv.id}
+                        onClick={() => handleEdit(inv)}
+                        className="glass p-2.5 rounded-xl group hover:bg-white/60 transition-all duration-300 border border-white/40 cursor-pointer active:scale-[0.98]"
+                    >
+                        <div className="flex justify-between items-start mb-1.5">
+                            <div className="flex items-center gap-2">
+                                <div className="h-7 w-7 rounded-lg bg-orange-100/50 text-orange-600 flex items-center justify-center shadow-inner transition-transform group-hover:rotate-3">
+                                    <ShoppingCart className="h-3.5 w-3.5" />
+                                </div>
+                                <div className="space-y-0.5">
+                                    <h3 className="text-[10px] font-bold text-[var(--deep-contrast)] leading-tight">#{inv.invoice_number}</h3>
+                                    <div className="flex items-center gap-1 opacity-40">
+                                        <User className="h-2 w-2" />
+                                        <span className="text-[8px] font-bold uppercase tracking-widest">{inv.party?.name || 'Walk-in'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <span className={clsx(
+                                "text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md border",
+                                inv.status === 'PAID' ? "bg-emerald-100/50 text-emerald-700 border-emerald-200" :
+                                    inv.status === 'PARTIAL' ? "bg-amber-100/50 text-amber-700 border-amber-200" :
+                                        "bg-rose-100/50 text-red-700 border-rose-200"
+                            )}>
+                                {inv.status}
+                            </span>
+                        </div>
+
+                        <div className="flex justify-between items-end mt-1.5 pt-1.5 border-t border-[var(--primary-green)]/5">
+                            <div>
+                                <p className="text-[7px] font-bold text-[var(--foreground)]/30 uppercase tracking-widest leading-none mb-1 flex items-center gap-1">
+                                    <Calendar className="h-2 w-2" /> {inv.date}
+                                </p>
+                                <p className="text-xs font-bold text-[var(--deep-contrast)] tracking-tight">{formatCurrency(inv.total_amount)}</p>
+                            </div>
+                        </div>
+                    </div>
+                ))}
             </div>
-        </div>
+
+            {
+                filteredPurchases.length === 0 && (
+                    <div className="text-center py-10 opacity-30">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.3em]">No bills found</p>
+                    </div>
+                )
+            }
+        </div >
     )
 }

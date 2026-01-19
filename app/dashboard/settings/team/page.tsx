@@ -1,0 +1,278 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { UserPlus, Shield, Trash2, Loader2, ArrowLeft, ShieldCheck, Users } from 'lucide-react'
+import { createClient } from '@/utils/supabase/client'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import clsx from 'clsx'
+import { useBusiness } from '@/context/business-context'
+import AddTeamMemberModal from '@/components/ui/AddTeamMemberModal'
+import ErrorModal from '@/components/ui/ErrorModal'
+import ConfirmModal from '@/components/ui/ConfirmModal'
+
+const ROLES = [
+    { id: 'ADMIN', label: 'ADMIN', subLabel: 'Full access to manage business & team' },
+    { id: 'PARTNER', label: 'PARTNER', subLabel: 'Co-owner access with critical permissions' },
+    { id: 'STAFF', label: 'STAFF', subLabel: 'Read/Write access for sales & stock' },
+    { id: 'VIEWER', label: 'VIEWER', subLabel: 'Read-only access to all records' },
+]
+
+export default function TeamManagementPage() {
+    const supabase = createClient()
+    const router = useRouter()
+    const { activeBusinessId, isLoading: businessLoading } = useBusiness()
+
+    const [loading, setLoading] = useState(true)
+    const [fetchingMembers, setFetchingMembers] = useState(false)
+    const [members, setMembers] = useState<any[]>([])
+    const [currentUser, setCurrentUser] = useState<any>(null)
+    const [isOwner, setIsOwner] = useState(false)
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+    const [errorModal, setErrorModal] = useState<{ open: boolean, message: string }>({ open: false, message: '' })
+    const [confirmModal, setConfirmModal] = useState<{ open: boolean, userId: string }>({ open: false, userId: '' })
+    const [isDeleting, setIsDeleting] = useState(false)
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) return router.push('/login')
+            setCurrentUser(user)
+
+            if (activeBusinessId) {
+                fetchMembers(user.id)
+            } else if (!businessLoading) {
+                // If business loading is done and we still have no activeBusinessId, stop loading
+                setLoading(false)
+            }
+        }
+
+        if (!businessLoading) {
+            checkAuth()
+        }
+    }, [activeBusinessId, businessLoading])
+
+    const fetchMembers = async (currentUserId: string) => {
+        if (!activeBusinessId) return
+        setFetchingMembers(true)
+        try {
+            const { data, error } = await supabase
+                .from('business_members')
+                .select(`
+                    id,
+                    role,
+                    user_id,
+                    profiles (id, full_name, email, avatar_url, username)
+                `)
+                .eq('business_id', activeBusinessId)
+
+            if (error) throw error
+            setMembers(data || [])
+
+            const myMembership = data?.find(m => m.user_id === currentUserId)
+            setIsOwner(myMembership?.role === 'OWNER')
+        } catch (error: any) {
+            console.error('Error fetching members:', error)
+        } finally {
+            setLoading(false)
+            setFetchingMembers(false)
+        }
+    }
+
+    const handleUpdateRole = async (memberUserId: string, newRole: string) => {
+        if (!isOwner) return
+        try {
+            const { error } = await supabase
+                .from('business_members')
+                .update({ role: newRole })
+                .eq('business_id', activeBusinessId)
+                .eq('user_id', memberUserId)
+
+            if (error) throw error
+            fetchMembers(currentUser.id)
+        } catch (error: any) {
+            setErrorModal({ open: true, message: 'Failed to update role: ' + error.message })
+        }
+    }
+
+    const handleRemoveMember = async (memberUserId: string) => {
+        if (!isOwner) return
+        setConfirmModal({ open: true, userId: memberUserId })
+    }
+
+    const executeRemoveMember = async (memberUserId: string) => {
+        setIsDeleting(true)
+        try {
+            const { error } = await supabase
+                .from('business_members')
+                .delete()
+                .eq('business_id', activeBusinessId)
+                .eq('user_id', memberUserId)
+
+            if (error) throw error
+            setConfirmModal({ ...confirmModal, open: false })
+            fetchMembers(currentUser.id)
+        } catch (error: any) {
+            setErrorModal({ open: true, message: 'Failed to remove member: ' + error.message })
+        } finally {
+            setIsDeleting(false)
+        }
+    }
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center p-20 text-[var(--foreground)]/50 text-[10px] font-bold uppercase tracking-widest">
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Loading Team...
+            </div>
+        )
+    }
+
+    if (!activeBusinessId && !businessLoading) {
+        return (
+            <div className="flex flex-col items-center justify-center p-20 text-center space-y-4">
+                <div className="h-16 w-16 rounded-[24px] bg-rose-500/10 flex items-center justify-center text-rose-500 mb-2">
+                    <Shield className="h-8 w-8" />
+                </div>
+                <h2 className="text-sm font-bold text-[var(--deep-contrast)] uppercase tracking-widest">No Active Business</h2>
+                <p className="text-[10px] font-bold text-[var(--foreground)]/40 uppercase tracking-tighter max-w-[200px]">
+                    You need an active business profile to manage team members.
+                </p>
+                <Link href="/dashboard/settings" className="px-6 py-2.5 rounded-xl bg-[var(--deep-contrast)] text-white text-[9px] font-bold uppercase tracking-widest hover:bg-[var(--primary-green)] transition-all active:scale-95 shadow-lg">
+                    Go to Settings
+                </Link>
+            </div>
+        )
+    }
+
+    return (
+        <div className="space-y-4 pb-20 max-w-2xl mx-auto">
+            <div className="flex items-center gap-3 pb-3 border-b border-[var(--primary-green)]/10">
+                <Link href="/dashboard/settings" className="p-2 rounded-xl bg-white/40 border border-white/10 hover:bg-white/60 transition-all active:scale-95">
+                    <ArrowLeft className="h-4 w-4 text-[var(--deep-contrast)]" />
+                </Link>
+                <div className="flex-1">
+                    <h1 className="text-xl font-bold text-[var(--deep-contrast)] tracking-tight">Team Management</h1>
+                    <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-widest leading-none">Add partners, admins, and viewers</p>
+                </div>
+                {isOwner && (
+                    <button
+                        onClick={() => setIsAddModalOpen(true)}
+                        className="p-3 rounded-2xl bg-[var(--deep-contrast)] text-white shadow-xl shadow-[var(--deep-contrast)]/20 active:scale-95 transition-all flex items-center gap-2 group"
+                    >
+                        <UserPlus className="h-4 w-4" />
+                        <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Add Member</span>
+                    </button>
+                )}
+            </div>
+
+            {/* Add Modal */}
+            <AddTeamMemberModal
+                isOpen={isAddModalOpen}
+                onClose={() => setIsAddModalOpen(false)}
+                businessId={activeBusinessId}
+                onSuccess={() => fetchMembers(currentUser?.id)}
+            />
+
+            {/* Members List */}
+            <div className="glass rounded-[28px] border border-white/40 overflow-hidden shadow-sm shadow-[var(--primary-green)]/5">
+                <div className="px-5 py-4 border-b border-white/20 bg-white/40 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <div className="h-7 w-7 rounded-xl bg-[var(--deep-contrast)]/5 text-[var(--deep-contrast)] flex items-center justify-center">
+                            <Users className="h-4 w-4" />
+                        </div>
+                        <h3 className="text-xs font-bold text-[var(--deep-contrast)]">Team Members ({members.length})</h3>
+                    </div>
+                    {fetchingMembers && <Loader2 className="h-3 w-3 animate-spin text-[var(--foreground)]/40" />}
+                </div>
+
+                <div className="divide-y divide-white/10">
+                    {members.map((member) => (
+                        <div key={member.id} className="p-4 hover:bg-white/20 transition-all flex items-center justify-between group">
+                            <div className="flex items-center gap-3">
+                                <div className="h-10 w-10 rounded-xl bg-white border border-black/5 flex items-center justify-center text-[var(--deep-contrast)] font-bold text-sm shadow-inner overflow-hidden">
+                                    {member.profiles?.avatar_url ? (
+                                        <img src={member.profiles.avatar_url} alt="" className="h-full w-full object-cover" />
+                                    ) : (
+                                        member.profiles?.full_name?.charAt(0).toUpperCase() || member.profiles?.email?.charAt(0).toUpperCase() || '?'
+                                    )}
+                                </div>
+                                <div>
+                                    <p className="text-xs font-bold text-[var(--deep-contrast)] flex items-center gap-1.5">
+                                        {member.profiles?.full_name || 'Pending...'}
+                                        {member.user_id === currentUser?.id && (
+                                            <span className="text-[7px] font-bold bg-[var(--primary-green)]/10 text-[var(--primary-green)] px-1.5 py-0.5 rounded-full uppercase tracking-tighter">You</span>
+                                        )}
+                                    </p>
+                                    <p className="text-[9px] font-bold text-[var(--foreground)]/40 lowercase tracking-tight">
+                                        {member.profiles?.username ? `@${member.profiles.username}` : (member.profiles?.email || 'No email synced')}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <div className="text-right">
+                                    <div className={clsx(
+                                        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest",
+                                        member.role === 'OWNER' ? "bg-amber-100 text-amber-700" :
+                                            member.role === 'ADMIN' ? "bg-blue-100 text-blue-700" :
+                                                member.role === 'PARTNER' ? "bg-purple-100 text-purple-700" :
+                                                    "bg-slate-100 text-slate-500"
+                                    )}>
+                                        {member.role === 'OWNER' && <ShieldCheck className="h-2.5 w-2.5" />}
+                                        {member.role}
+                                    </div>
+                                </div>
+
+                                {isOwner && member.role !== 'OWNER' && (
+                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button
+                                            onClick={() => {
+                                                const currentRoleIndex = ROLES.findIndex(r => r.id === member.role)
+                                                const nextRoleIndex = (currentRoleIndex + 1) % ROLES.length
+                                                handleUpdateRole(member.user_id, ROLES[nextRoleIndex].id)
+                                            }}
+                                            className="p-2 rounded-xl bg-white/40 border border-white/20 hover:bg-white/60 text-[var(--foreground)]/50 hover:text-[var(--deep-contrast)] transition-all shadow-sm"
+                                            title="Update Role"
+                                        >
+                                            <Shield className="h-3.5 w-3.5" />
+                                        </button>
+                                        <button
+                                            onClick={() => handleRemoveMember(member.user_id)}
+                                            className="p-2 rounded-xl bg-rose-50 border border-rose-100 hover:bg-rose-500 hover:text-white text-rose-400 transition-all shadow-sm"
+                                            title="Remove Member"
+                                        >
+                                            <Trash2 className="h-3.5 w-3.5" />
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                    {members.length === 0 && (
+                        <div className="p-10 text-center">
+                            <p className="text-[10px] font-bold text-[var(--foreground)]/20 uppercase tracking-[0.2em]">No team members found</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            <ConfirmModal
+                isOpen={confirmModal.open}
+                onClose={() => setConfirmModal({ ...confirmModal, open: false })}
+                onConfirm={() => executeRemoveMember(confirmModal.userId)}
+                isLoading={isDeleting}
+                title="Remove Member?"
+                message="This user will lose all access to this business profile immediately."
+                confirmText="Remove"
+                cancelText="Keep"
+            />
+
+            <ErrorModal
+                isOpen={errorModal.open}
+                onClose={() => setErrorModal({ ...errorModal, open: false })}
+                message={errorModal.message}
+            />
+        </div>
+    )
+}

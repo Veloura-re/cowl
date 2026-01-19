@@ -34,26 +34,26 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-[var(--background)] p-4">
-            <div className="w-full max-w-md space-y-8 rounded-2xl bg-[var(--surface)] p-8 shadow-2xl border border-[var(--surface-highlight)]">
+        <div className="flex min-h-screen items-center justify-center p-6 sm:p-4">
+            <div className="glass w-full max-w-sm space-y-6 rounded-[32px] p-6 relative overflow-hidden border border-white/40 shadow-2xl">
                 <div className="text-center">
-                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--surface-highlight)] mb-4">
-                        <Lock className="h-8 w-8 text-[var(--primary)]" />
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--primary-green)]/10 mb-4 shadow-inner">
+                        <Lock className="h-6 w-6 text-[var(--primary-green)]" />
                     </div>
-                    <h2 className="text-3xl font-bold tracking-tight text-[var(--text-main)]">
+                    <h2 className="text-xl font-bold tracking-tight text-[var(--deep-contrast)] uppercase">
                         Welcome Back
                     </h2>
-                    <p className="mt-2 text-sm text-[var(--text-secondary)]">
-                        Sign in to access your business OS
+                    <p className="mt-1 text-[10px] font-bold text-[var(--foreground)]/50 uppercase tracking-widest">
+                        Access your business OS
                     </p>
                 </div>
 
-                <form className="mt-8 space-y-6" onSubmit={handleLogin}>
-                    <div className="space-y-4">
+                <form className="space-y-4" onSubmit={handleLogin}>
+                    <div className="space-y-3">
                         <div>
                             <label
                                 htmlFor="email"
-                                className="block text-sm font-medium text-[var(--text-secondary)]"
+                                className="block text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/60 mb-1.5 ml-1"
                             >
                                 Email address
                             </label>
@@ -65,14 +65,14 @@ export default function LoginPage() {
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="mt-1 block w-full rounded-lg border border-[var(--surface-highlight)] bg-[var(--background)] px-4 py-3 text-[var(--text-main)] placeholder-[var(--text-muted)] focus:border-[var(--primary)] focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
+                                className="block w-full h-10 rounded-xl border border-white/20 bg-white/50 px-4 text-xs font-bold text-[var(--deep-contrast)] placeholder-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none focus:ring-1 focus:ring-[var(--primary-green)] transition-all shadow-inner"
                                 placeholder="you@company.com"
                             />
                         </div>
                         <div>
                             <label
                                 htmlFor="password"
-                                className="block text-sm font-medium text-[var(--text-secondary)]"
+                                className="block text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/60 mb-1.5 ml-1"
                             >
                                 Password
                             </label>
@@ -84,14 +84,14 @@ export default function LoginPage() {
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="mt-1 block w-full rounded-lg border border-[var(--surface-highlight)] bg-[var(--background)] px-4 py-3 text-[var(--text-main)] placeholder-[var(--text-muted)] focus:border-[var(--primary)] focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
+                                className="block w-full h-10 rounded-xl border border-white/20 bg-white/50 px-4 text-xs font-bold text-[var(--deep-contrast)] placeholder-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none focus:ring-1 focus:ring-[var(--primary-green)] transition-all shadow-inner"
                                 placeholder="••••••••"
                             />
                         </div>
                     </div>
 
                     {error && (
-                        <div className="rounded-md bg-[var(--color-status-error)]/10 p-3 text-sm text-[var(--color-status-error)] border border-[var(--color-status-error)]/20">
+                        <div className="rounded-xl bg-red-50 p-2.5 text-[10px] font-bold text-red-600 border border-red-100 uppercase tracking-wider text-center">
                             {error}
                         </div>
                     )}
@@ -99,27 +99,29 @@ export default function LoginPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="group relative flex w-full justify-center rounded-lg bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-[var(--background)] hover:bg-[var(--primary-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2 focus:ring-offset-[var(--background)] disabled:opacity-70 transition-all duration-200"
+                        className="group relative flex w-full justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-3 text-[10px] font-bold text-white uppercase tracking-[0.2em] hover:bg-[var(--primary-green)] active:scale-95 disabled:opacity-70 transition-all duration-300 shadow-xl shadow-[var(--deep-contrast)]/20"
                     >
                         {loading ? (
-                            <Loader2 className="h-5 w-5 animate-spin" />
+                            <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
                             <span className="flex items-center">
-                                Sign in
-                                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                SIGN IN
+                                <ArrowRight className="ml-2 h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                             </span>
                         )}
                     </button>
                 </form>
 
-                <div className="text-center text-sm text-[var(--text-secondary)]">
-                    Don't have an account?{' '}
-                    <Link
-                        href="/register"
-                        className="font-medium text-[var(--primary)] hover:text-[var(--primary-hover)] transition-colors"
-                    >
-                        Create one today
-                    </Link>
+                <div className="text-center">
+                    <p className="text-[9px] font-bold text-[var(--foreground)]/60 uppercase tracking-widest">
+                        Don't have an account?{' '}
+                        <Link
+                            href="/register"
+                            className="text-[var(--primary-green)] hover:text-[var(--deep-contrast)] transition-colors underline decoration-2 underline-offset-4 decoration-[var(--primary-green)]/30"
+                        >
+                            Create one
+                        </Link>
+                    </p>
                 </div>
             </div>
         </div>

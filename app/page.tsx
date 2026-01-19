@@ -1,82 +1,78 @@
+'use client'
+
 import Link from "next/link";
 import { ArrowRight, Hexagon, ShieldCheck, Zap } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--text-main)] overflow-hidden relative selection:bg-[var(--primary)] selection:text-[var(--background)]">
+    <div className="min-h-screen text-[var(--foreground)] overflow-hidden relative selection:bg-[var(--primary-green)] selection:text-white">
 
-      {/* Background Gradients */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-[var(--primary)]/5 blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-[var(--primary)]/5 blur-[120px]" />
-      </div>
-
-      <div className="relative z-10">
-        {/* Navigation */}
-        <nav className="container mx-auto px-6 py-6 flex items-center justify-between">
-          <div className="flex items-center gap-2 font-bold text-2xl tracking-tighter">
-            <div className="text-[var(--primary)]">
-              <Hexagon className="h-8 w-8 fill-current" />
+      <div className="relative z-10 max-w-5xl mx-auto">
+        {/* Navigation - Compact */}
+        <nav className="px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-1.5 font-bold text-lg tracking-tighter">
+            <div className="text-[var(--primary-green)]">
+              <Hexagon className="h-5 w-5 fill-current" />
             </div>
-            <span>LUCY</span>
+            <span className="text-[var(--deep-contrast)]">LUCY</span>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-main)] transition-colors">
+            <Link href="/login" className="text-[10px] font-bold uppercase tracking-widest text-[var(--foreground)] opacity-50 hover:opacity-100 transition-opacity">
               Login
             </Link>
             <Link
               href="/register"
-              className="flex items-center gap-2 bg-[var(--primary)] text-[var(--background)] px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[var(--primary-hover)] transition-all shadow-[0_0_20px_-5px_var(--primary)]"
+              className="flex items-center gap-1.5 bg-[var(--deep-contrast)] text-white px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-[var(--primary-green)] transition-all shadow-lg active:scale-95"
             >
-              Get Started <ArrowRight className="h-4 w-4" />
+              Get Started <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
         </nav>
 
-        {/* Hero Section */}
-        <main className="container mx-auto px-6 py-20 lg:py-32 flex flex-col items-center text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[var(--surface-highlight)] bg-[var(--surface)] text-[var(--primary)] text-sm font-medium mb-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
-            <Zap className="h-4 w-4 fill-current" />
-            <span>The Business OS for winners</span>
+        {/* Hero Section - Compact */}
+        <main className="px-6 py-12 lg:py-20 flex flex-col items-center text-center">
+          <div className="glass inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[var(--primary-green)] text-[9px] font-bold uppercase tracking-[0.2em] mb-6 border border-white/40 shadow-sm">
+            <Zap className="h-3 w-3 fill-current" />
+            <span>The Business OS</span>
           </div>
 
-          <h1 className="text-5xl lg:text-7xl font-bold tracking-tight max-w-4xl mb-6 animate-in fade-in slide-in-from-bottom-5 duration-700 delay-100">
-            Manage your empire with <span className="text-[var(--primary)]">absolute precision</span>.
+          <h1 className="text-3xl lg:text-5xl font-bold tracking-tight max-w-2xl mb-4 text-[var(--deep-contrast)] uppercase leading-[1.1]">
+            Manage your empire with <span className="text-[var(--primary-green)] underline decoration-4 decoration-[var(--primary-green)]/20 underline-offset-4">absolute precision</span>.
           </h1>
 
-          <p className="text-lg text-[var(--text-secondary)] max-w-2xl mb-10 animate-in fade-in slide-in-from-bottom-5 duration-700 delay-200">
-            LUCY is the all-in-one platform for sales, inventory, and finance.
-            Designed for speed, built for control, and styled for those who demand excellence.
+          <p className="text-xs font-bold text-[var(--foreground)]/50 uppercase tracking-widest max-w-lg mb-8 leading-relaxed">
+            All-in-one platform for sales, inventory, and finance.
+            Built for speed, styled for excellence.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 animate-in fade-in slide-in-from-bottom-5 duration-700 delay-300">
+          <div className="flex flex-col sm:flex-row gap-3">
             <Link
               href="/register"
-              className="flex items-center justify-center gap-2 bg-[var(--text-main)] text-[var(--background)] px-8 py-4 rounded-lg text-base font-bold hover:bg-[var(--primary)] hover:text-[var(--background)] transition-all"
+              className="flex items-center justify-center gap-2 bg-[var(--deep-contrast)] text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-[var(--primary-green)] transition-all shadow-xl active:scale-95"
             >
               Start for Free
             </Link>
             <Link
               href="/login"
-              className="flex items-center justify-center gap-2 border border-[var(--surface-highlight)] bg-[var(--surface)] text-[var(--text-main)] px-8 py-4 rounded-lg text-base font-medium hover:border-[var(--primary)] transition-all"
+              className="glass flex items-center justify-center gap-2 text-[var(--deep-contrast)] px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-white/60 transition-all border border-white/40"
             >
               Live Demo
             </Link>
           </div>
 
-          {/* Feature Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-24 w-full max-w-6xl animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-500">
+          {/* Feature Grid - Ultra Compact */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-16 w-full max-w-4xl">
             {[
-              { title: 'Inventory Control', icon: Hexagon, desc: 'Real-time tracking of every stock item with low-stock alerts.' },
-              { title: 'Smart Invoicing', icon: Zap, desc: 'Create beautiful invoices in seconds and track payments automatically.' },
-              { title: 'Secure Finance', icon: ShieldCheck, desc: 'Bank-grade security for your financial data and transaction history.' }
+              { title: 'Inventory Control', icon: Hexagon, desc: 'Real-time tracking with low-stock alerts.' },
+              { title: 'Smart Invoicing', icon: Zap, desc: 'Create beautiful invoices in seconds.' },
+              { title: 'Secure Finance', icon: ShieldCheck, desc: 'Bank-grade security for your empire.' }
             ].map((feature, i) => (
-              <div key={i} className="p-8 rounded-2xl border border-[var(--surface-highlight)] bg-[var(--surface)] hover:border-[var(--primary)]/50 transition-colors text-left group">
-                <div className="h-12 w-12 rounded-lg bg-[var(--surface-highlight)] flex items-center justify-center mb-6 group-hover:bg-[var(--primary)] group-hover:text-[var(--background)] transition-colors">
-                  <feature.icon className="h-6 w-6" />
+              <div key={i} className="glass p-5 rounded-3xl hover:border-[var(--primary-green)]/30 transition-all text-left group border border-white/40 shadow-sm hover:shadow-md">
+                <div className="h-9 w-9 rounded-xl bg-[var(--primary-green)]/10 text-[var(--primary-green)] flex items-center justify-center mb-3 group-hover:bg-[var(--primary-green)] group-hover:text-white transition-colors shadow-inner">
+                  <feature.icon className="h-4 w-4" />
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-[var(--text-main)]">{feature.title}</h3>
-                <p className="text-[var(--text-secondary)] leading-relaxed">
+                <h3 className="text-xs font-bold mb-1.5 text-[var(--deep-contrast)] uppercase tracking-tight">{feature.title}</h3>
+                <p className="text-[10px] font-bold text-[var(--foreground)]/50 uppercase tracking-tight leading-normal">
                   {feature.desc}
                 </p>
               </div>
@@ -84,8 +80,10 @@ export default function Home() {
           </div>
         </main>
 
-        <footer className="container mx-auto px-6 py-12 border-t border-[var(--surface-highlight)] mt-12 text-center text-[var(--text-muted)] text-sm">
-          <p>&copy; {new Date().getFullYear()} LUCY Business OS. All rights reserved.</p>
+        <footer className="px-6 py-8 border-t border-[var(--primary-green)]/5 mt-8 text-center">
+          <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-[var(--foreground)]/30">
+            &copy; {new Date().getFullYear()} LUCY Business OS
+          </p>
         </footer>
       </div>
     </div>

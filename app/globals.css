@@ -2,59 +2,93 @@
 
 @theme inline {
   --color-background: var(--background);
-  --color-surface: var(--surface);
-  --color-surface-highlight: var(--surface-highlight);
-  --color-primary: var(--primary);
-  --color-primary-hover: var(--primary-hover);
-  --color-accent: var(--accent);
-  --color-text-main: var(--text-main);
-  --color-text-secondary: var(--text-secondary);
-  --color-text-muted: var(--text-muted);
-  
-  --color-status-success: var(--success);
-  --color-status-warning: var(--warning);
-  --color-status-error: var(--error);
-  --color-status-info: var(--info);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary-green);
+  --color-glass-highlight: var(--glass-highlight);
+  --color-deep-contrast: var(--deep-contrast);
+  --color-glass-bg: var(--glass-bg);
+
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-calibri);
+  --font-display: var(--font-poppins);
 }
 
 :root {
-  /* Abyss Green Layer */
-  --background: #070E0B;
-  
-  /* Deep Forest Layer (Cards) */
-  --surface: #0E1A14;
-  
-  /* Emerald Shadow (Modals/Popovers) */
-  --surface-highlight: #142821;
-  
-  /* Brand */
-  --primary: #0FB9A8;       /* Dark Emerald Core */
-  --primary-hover: #14D9C4; /* Polished Emerald */
-  
-  /* Accents */
-  --accent: #1EF2D3;        /* Mint Surge */
-  
-  /* Text */
-  --text-main: #E6F4F1;
-  --text-secondary: #A8CFC6;
-  --text-muted: #6B9E93;
-  
-  /* Status */
-  --success: #1EF2D3;
-  --warning: #F4C430;
-  --error: #E5533D;
-  --info: #3BAEA0;
+  /* Core Palette */
+  --background: #ffffff;
+  --foreground: #052e16;
+  /* Deep Green */
+
+  /* Brand Colors */
+  --primary-green: #064e3b;
+  /* Dark Green */
+  --glass-highlight: #10b981;
+  /* Emerald Highlight */
+  --deep-contrast: #022c22;
+
+  /* Effects */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+
+  /* Fonts */
+  --font-inter: "Inter", sans-serif;
+  --font-calibri: "Calibri", "Inter", sans-serif;
+  /* Poppins variable is injected by Next.js in layout.tsx */
 }
 
 body {
   background-color: var(--background);
-  color: var(--text-main);
-  font-family: var(--font-sans, ui-sans-serif, system-ui, sans-serif);
+  color: var(--foreground);
+  font-family: var(--font-poppins);
+  font-weight: 500;
+  /* Medium default */
 }
 
-/* Utility Utilities */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-poppins);
+  color: var(--deep-contrast);
+  font-weight: 600;
+  /* Semibold, not 'fat' */
+}
+
+/* Glassmorphism Utility */
 .glass {
-  background: rgba(14, 26, 20, 0.7);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+/* Animations */
+@keyframes pulse-slow {
+
+  0%,
+  100% {
+    opacity: 0.08;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.12;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes pulse-slower {
+
+  0%,
+  100% {
+    opacity: 0.05;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.08;
+    transform: scale(1.2);
+  }
 }

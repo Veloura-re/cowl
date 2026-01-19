@@ -1,5 +1,5 @@
 import { createClient } from '@/utils/supabase/server'
-import PurchaseForm from './purchase-form'
+import CompactInvoiceForm from '@/components/ui/CompactInvoiceForm'
 
 export default async function NewPurchasePage() {
     const supabase = await createClient()
@@ -16,5 +16,17 @@ export default async function NewPurchasePage() {
         .select('*')
         .order('name')
 
-    return <PurchaseForm parties={parties || []} items={items || []} />
+    const { data: paymentModes } = await supabase
+        .from('payment_modes')
+        .select('*')
+        .order('name')
+
+    return (
+        <CompactInvoiceForm
+            parties={parties || []}
+            items={items || []}
+            paymentModes={paymentModes || []}
+            initialData={{ type: 'PURCHASE' }}
+        />
+    )
 }
