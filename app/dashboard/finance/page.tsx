@@ -1,6 +1,8 @@
 import { createClient } from '@/utils/supabase/server'
 import FinanceClientView from './client-view'
 
+export const dynamic = 'force-dynamic'
+
 export default async function FinancePage() {
     const supabase = await createClient()
 
