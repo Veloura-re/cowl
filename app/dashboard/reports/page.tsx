@@ -6,7 +6,7 @@ import clsx from 'clsx'
 import { useBusiness } from '@/context/business-context'
 import { createClient } from '@/utils/supabase/client'
 import { ReportGenerator, ReportType } from '@/utils/report-generator'
-import { fetchReportData } from './actions'
+import { fetchReportDataService } from '@/utils/report-service'
 import { format } from 'date-fns'
 import SignaturePad, { SignaturePadHandle } from '@/components/ui/signature-pad'
 import Dropdown from '@/components/ui/dropdown'
@@ -115,7 +115,7 @@ export default function ReportsPage() {
             }
 
             // 1. Fetch Detailed Data
-            const reportData = await fetchReportData(
+            const reportData = await fetchReportDataService(
                 activeBusinessId,
                 selectedReport as any,
                 dateRange.start,

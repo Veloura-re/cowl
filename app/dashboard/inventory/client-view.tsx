@@ -98,7 +98,7 @@ export default function InventoryClientView({ initialItems }: { initialItems: an
                     <div
                         key={item.id}
                         onClick={() => {
-                            router.push(`/dashboard/inventory/${item.id}/edit`)
+                            router.push(`/dashboard/inventory/edit?id=${item.id}`)
                         }}
                         className="glass p-2.5 rounded-xl group hover:bg-white/60 transition-all duration-300 border border-white/40 cursor-pointer active:scale-[0.98]"
                     >

@@ -51,7 +51,7 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
 
     const handleEdit = (e: React.MouseEvent, transaction: any) => {
         e.stopPropagation()
-        router.push(`/dashboard/finance/${transaction.id}/edit`)
+        router.push(`/dashboard/finance/edit?id=${transaction.id}`)
     }
 
     const businessTransactions = (transactions || []).filter(t => t.business_id === activeBusinessId)

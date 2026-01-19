@@ -25,7 +25,7 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices: 
     const supabase = createClient()
 
     const handleEdit = (invoice: any) => {
-        router.push(`/dashboard/sales/${invoice.id}/edit`)
+        router.push(`/dashboard/sales/edit?id=${invoice.id}`)
     }
 
     let filteredInvoices = invoices.filter((inv) =>

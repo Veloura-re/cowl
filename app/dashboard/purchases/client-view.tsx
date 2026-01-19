@@ -21,7 +21,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
     const [isFilterPickerOpen, setIsFilterPickerOpen] = useState(false)
 
     const handleEdit = (invoice: any) => {
-        router.push(`/dashboard/purchases/${invoice.id}/edit`)
+        router.push(`/dashboard/purchases/edit?id=${invoice.id}`)
     }
 
     let filteredPurchases = invoices.filter((inv) =>

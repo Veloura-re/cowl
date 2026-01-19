@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { currencies } from '@/lib/currencies'
+import { useRouter } from 'next/navigation'
 
 type Business = {
     id: string
@@ -28,10 +29,18 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
     const [activeBusinessId, setActiveBusinessIdState] = useState<string | null>(null)
     const [isLoading, setIsLoading] = useState(true)
     const supabase = createClient()
+    const router = useRouter()
 
     const fetchBusinesses = async () => {
         setIsLoading(true)
         const { data: { user } } = await supabase.auth.getUser()
+
+        if (!user) {
+            router.push('/login')
+            setIsLoading(false)
+            return
+        }
+
         if (user) {
             const { data } = await supabase
                 .from('businesses')
