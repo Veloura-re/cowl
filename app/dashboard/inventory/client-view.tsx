@@ -1,24 +1,36 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, Search, Package, ShoppingBag, AlertTriangle, Boxes, Filter, SortAsc, ChevronDown } from 'lucide-react'
 import PickerModal from '@/components/ui/PickerModal'
 import clsx from 'clsx'
 import { useBusiness } from '@/context/business-context'
 import Link from 'next/link'
+import { createClient } from '@/utils/supabase/client'
 
 import { useRouter } from 'next/navigation'
 
-export default function InventoryClientView({ initialItems }: { initialItems: any[] }) {
+export default function InventoryClientView({ initialItems }: { initialItems?: any[] }) {
     const router = useRouter()
     const { activeBusinessId, formatCurrency } = useBusiness()
-    const [items, setItems] = useState(initialItems)
+    const [items, setItems] = useState<any[]>(initialItems || [])
     const [searchQuery, setSearchQuery] = useState('')
-    const [sortBy, setSortBy] = useState('name-asc')
-    const [filterCategory, setFilterCategory] = useState('all')
+    const [filterCategory, setFilterCategory] = useState<string>('ALL')
+    const [sortBy, setSortBy] = useState<string>('name-asc')
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
     const [isSortPickerOpen, setIsSortPickerOpen] = useState(false)
     const [isFilterPickerOpen, setIsFilterPickerOpen] = useState(false)
+    const supabase = createClient()
 
+    useEffect(() => {
+        if (!initialItems) {
+            const fetchItems = async () => {
+                const { data } = await supabase.from('items').select('*').order('name')
+                if (data) setItems(data)
+            }
+            fetchItems()
+        }
+    }, [initialItems])
     // Derived Categories
     const categories = ['all', ...Array.from(new Set(items.map(i => i.category).filter(Boolean)))]
 

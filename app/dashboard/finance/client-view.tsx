@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Wallet, ArrowUpRight, ArrowDownRight, Plus, TrendingUp, TrendingDown, Receipt, ArrowRightLeft, Search, Filter, ArrowUpDown, Trash2, Edit2, Calendar } from 'lucide-react'
 import clsx from 'clsx'
@@ -12,10 +12,10 @@ import PickerModal from '@/components/ui/PickerModal'
 import ConfirmModal from '@/components/ui/ConfirmModal'
 import FeedbackModal from '@/components/ui/FeedbackModal'
 
-export default function FinanceClientView({ initialTransactions }: { initialTransactions: any[] }) {
+export default function FinanceClientView({ initialTransactions }: { initialTransactions?: any[] }) {
     const router = useRouter()
     const { activeBusinessId, formatCurrency } = useBusiness()
-    const [transactions, setTransactions] = useState(initialTransactions)
+    const [transactions, setTransactions] = useState(initialTransactions || [])
     const [searchQuery, setSearchQuery] = useState('')
     const [typeFilter, setTypeFilter] = useState<string>('ALL')
     const [modeFilter, setModeFilter] = useState<string>('ALL')
@@ -28,6 +28,20 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
     const [isTypePickerOpen, setIsTypePickerOpen] = useState(false)
     const [isModePickerOpen, setIsModePickerOpen] = useState(false)
     const supabase = createClient()
+
+    useEffect(() => {
+        if (!initialTransactions) {
+            const fetchTransactions = async () => {
+                const { data } = await supabase
+                    .from('transactions')
+                    .select('*, party:parties(name)')
+                    .order('date', { ascending: false })
+                    .limit(50) // reasonable limit for client side fetch
+                if (data) setTransactions(data)
+            }
+            fetchTransactions()
+        }
+    }, [initialTransactions])
 
     const handleDelete = async (e: React.MouseEvent, id: string) => {
         e.stopPropagation()

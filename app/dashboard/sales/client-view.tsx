@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Search, Plus, Calendar, FileText, User, Filter, ArrowUpDown, Trash2, Edit2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -12,10 +12,10 @@ import ConfirmModal from '@/components/ui/ConfirmModal'
 import FeedbackModal from '@/components/ui/FeedbackModal'
 import { Loader2 } from 'lucide-react'
 
-export default function SalesClientView({ initialInvoices }: { initialInvoices: any[] }) {
+export default function SalesClientView({ initialInvoices }: { initialInvoices?: any[] }) {
     const router = useRouter()
     const { activeBusinessId, formatCurrency } = useBusiness()
-    const [invoices, setInvoices] = useState(initialInvoices)
+    const [invoices, setInvoices] = useState(initialInvoices || [])
     const [searchQuery, setSearchQuery] = useState('')
     const [statusFilter, setStatusFilter] = useState<string>('ALL')
     const [sortBy, setSortBy] = useState<'date' | 'amount'>('date')
@@ -23,6 +23,20 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices: 
     const [isSortPickerOpen, setIsSortPickerOpen] = useState(false)
     const [isFilterPickerOpen, setIsFilterPickerOpen] = useState(false)
     const supabase = createClient()
+
+    useEffect(() => {
+        if (!initialInvoices) {
+            const fetchInvoices = async () => {
+                const { data } = await supabase
+                    .from('invoices')
+                    .select('*, party:parties(name)')
+                    .eq('type', 'SALE')
+                    .order('date', { ascending: false })
+                if (data) setInvoices(data)
+            }
+            fetchInvoices()
+        }
+    }, [initialInvoices])
 
     const handleEdit = (invoice: any) => {
         router.push(`/dashboard/sales/edit?id=${invoice.id}`)

@@ -12,9 +12,9 @@ import AddSalesItemModal from '@/components/ui/AddSalesItemModal'
 import ConfirmModal from '@/components/ui/ConfirmModal'
 
 type InvoiceFormProps = {
-    parties: any[]
-    items: any[]
-    paymentModes: any[]
+    parties?: any[]
+    items?: any[]
+    paymentModes?: any[]
     initialData?: any
     initialLineItems?: any[]
 }
@@ -30,7 +30,7 @@ type InvoiceItem = {
     amount: number
 }
 
-export default function CompactInvoiceForm({ parties, items, paymentModes, initialData, initialLineItems }: InvoiceFormProps) {
+export default function CompactInvoiceForm({ parties = [], items = [], paymentModes = [], initialData, initialLineItems }: InvoiceFormProps) {
     const router = useRouter()
     const supabase = createClient()
     const isEdit = !!initialData
@@ -44,6 +44,42 @@ export default function CompactInvoiceForm({ parties, items, paymentModes, initi
     const [isModePickerOpen, setIsModePickerOpen] = useState(false)
     const [isConfirmOpen, setIsConfirmOpen] = useState(false)
     const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null)
+
+    // Data State (Client-side fetch if props missing)
+    const [fetchedParties, setFetchedParties] = useState<any[]>(parties)
+    const [fetchedItems, setFetchedItems] = useState<any[]>(items)
+    const [fetchedModes, setFetchedModes] = useState<any[]>(paymentModes)
+
+    useEffect(() => {
+        async function loadLookupData() {
+            if (parties.length === 0 || items.length === 0 || paymentModes.length === 0) {
+                // Only fetch if initial props were empty (likely static export)
+                // Note: This logic assumes if one is empty, we might need all or just specific ones.
+                // For safety/simplicity, we can check each or just re-fetch all if any major one is missing & we expect them.
+                // Better: Check individually.
+            }
+
+            if (parties.length === 0) {
+                const { data } = await supabase.from('parties').select('*').in('type', ['CUSTOMER', 'BOTH']).order('name')
+                if (data) setFetchedParties(data)
+            }
+            if (items.length === 0) {
+                const { data } = await supabase.from('items').select('*').order('name')
+                if (data) setFetchedItems(data)
+            }
+            if (paymentModes.length === 0) {
+                const { data } = await supabase.from('payment_modes').select('*').order('name')
+                if (data) setFetchedModes(data)
+            }
+        }
+
+        loadLookupData()
+    }, [parties.length, items.length, paymentModes.length])
+
+    // Use fetched data preferentially if props were empty
+    const displayParties = parties.length > 0 ? parties : fetchedParties
+    const displayItems = items.length > 0 ? items : fetchedItems
+    const displayModes = paymentModes.length > 0 ? paymentModes : fetchedModes
 
     // Form State
     const [partyId, setPartyId] = useState(initialData?.party_id || '')
@@ -76,9 +112,9 @@ export default function CompactInvoiceForm({ parties, items, paymentModes, initi
     const { activeBusinessId, formatCurrency } = useBusiness()
 
     // Filter data by active business
-    const filteredParties = parties.filter(p => p.business_id === activeBusinessId)
-    const filteredItems = items.filter(i => i.business_id === activeBusinessId)
-    const filteredPaymentModes = paymentModes.filter(m => m.business_id === activeBusinessId)
+    const filteredParties = displayParties.filter(p => p.business_id === activeBusinessId)
+    const filteredItems = displayItems.filter(i => i.business_id === activeBusinessId)
+    const filteredPaymentModes = displayModes.filter(m => m.business_id === activeBusinessId)
 
     const subtotal = rows.reduce((sum, row) => sum + (row.quantity * row.rate), 0)
     const itemTax = rows.reduce((sum, row) => sum + ((row.quantity * row.rate) * (row.tax / 100)), 0)

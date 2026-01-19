@@ -16,18 +16,18 @@ type PaymentFormProps = {
     type?: 'RECEIPT' | 'PAYMENT'
     initialData?: any
     initialBillingEntries?: any[]
-    parties: any[]
-    allItems: any[]
-    paymentModes: any[]
+    parties?: any[]
+    allItems?: any[]
+    paymentModes?: any[]
 }
 
 export default function PaymentForm({
     type: propType,
     initialData,
     initialBillingEntries,
-    parties,
-    allItems,
-    paymentModes
+    parties = [],
+    allItems = [],
+    paymentModes = []
 }: PaymentFormProps) {
     const router = useRouter()
     const supabase = createClient()
@@ -61,6 +61,33 @@ export default function PaymentForm({
     const [billingEntries, setBillingEntries] = useState<any[]>(initialBillingEntries || [])
     const [givenAmount, setGivenAmount] = useState<number | string>('')
     const [modeBalances, setModeBalances] = useState<Record<string, number>>({})
+
+    // Data State (Client-side fetch if props missing)
+    const [fetchedParties, setFetchedParties] = useState<any[]>(parties)
+    const [fetchedItems, setFetchedItems] = useState<any[]>(allItems)
+    const [fetchedModes, setFetchedModes] = useState<any[]>(paymentModes)
+
+    useEffect(() => {
+        async function loadLookupData() {
+            if (parties.length === 0) {
+                const { data } = await supabase.from('parties').select('*').in('type', ['CUSTOMER', 'BOTH']).order('name')
+                if (data) setFetchedParties(data)
+            }
+            if (allItems.length === 0) {
+                const { data } = await supabase.from('items').select('*').order('name')
+                if (data) setFetchedItems(data)
+            }
+            if (paymentModes.length === 0) {
+                const { data } = await supabase.from('payment_modes').select('*').order('name')
+                if (data) setFetchedModes(data)
+            }
+        }
+        loadLookupData()
+    }, [parties.length, allItems.length, paymentModes.length])
+
+    const displayParties = parties.length > 0 ? parties : fetchedParties
+    const displayItems = allItems.length > 0 ? allItems : fetchedItems
+    const displayModes = paymentModes.length > 0 ? paymentModes : fetchedModes
 
     // Fetch Mode Balances
     useEffect(() => {
@@ -287,7 +314,7 @@ export default function PaymentForm({
                                 onClick={() => setIsPartyPickerOpen(true)}
                                 className="w-full h-11 rounded-xl bg-white/50 border border-white/20 px-4 text-[12px] font-bold text-left flex items-center justify-between hover:border-[var(--primary-green)] transition-all shadow-inner"
                             >
-                                <span>{parties.find(p => p.id === formData.party_id)?.name || 'General Transaction (No Party)'}</span>
+                                <span>{displayParties.find(p => p.id === formData.party_id)?.name || 'General Transaction (No Party)'}</span>
                                 <User className="h-4 w-4 opacity-20" />
                             </button>
                         </div>
@@ -466,7 +493,7 @@ export default function PaymentForm({
                 onClose={() => setIsPartyPickerOpen(false)}
                 onSelect={(id) => setFormData({ ...formData, party_id: id })}
                 title="Select Party"
-                options={[{ id: '', label: 'General Transaction (No Party)' }, ...parties.map(p => ({ id: p.id, label: p.name }))]}
+                options={[{ id: '', label: 'General Transaction (No Party)' }, ...displayParties.map(p => ({ id: p.id, label: p.name }))]}
                 selectedValue={formData.party_id}
             />
 
@@ -479,7 +506,7 @@ export default function PaymentForm({
                     { id: 'CASH', label: 'CASH', subLabel: formatCurrency(modeBalances['CASH'] || 0) },
                     { id: 'BANK', label: 'BANK', subLabel: formatCurrency(modeBalances['BANK'] || 0) },
                     { id: 'ONLINE', label: 'ONLINE', subLabel: formatCurrency(modeBalances['ONLINE'] || 0) },
-                    ...paymentModes.map(m => ({
+                    ...displayModes.map(m => ({
                         id: m.name,
                         label: m.name,
                         subLabel: formatCurrency(modeBalances[m.name] || 0)
@@ -505,7 +532,7 @@ export default function PaymentForm({
                     isOpen={isItemModalOpen}
                     onClose={() => setIsItemModalOpen(false)}
                     onAdd={handleUpdateEntry}
-                    items={allItems}
+                    items={displayItems}
                     initialData={editingEntryIndex !== null ? billingEntries[editingEntryIndex] : null}
                 />
             ) : (
@@ -513,7 +540,7 @@ export default function PaymentForm({
                     isOpen={isItemModalOpen}
                     onClose={() => setIsItemModalOpen(false)}
                     onAdd={handleUpdateEntry}
-                    items={allItems}
+                    items={displayItems}
                     initialData={editingEntryIndex !== null ? billingEntries[editingEntryIndex] : null}
                 />
             )}

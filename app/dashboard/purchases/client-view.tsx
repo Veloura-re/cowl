@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, Search, ShoppingCart, Calendar, User, Filter, ArrowUpDown } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -8,12 +8,28 @@ import clsx from 'clsx'
 import { useBusiness } from '@/context/business-context'
 import Dropdown from '@/components/ui/dropdown'
 import PickerModal from '@/components/ui/PickerModal'
+import { createClient } from '@/utils/supabase/client'
 
-export default function PurchasesClientView({ initialInvoices }: { initialInvoices: any[] }) {
+export default function PurchasesClientView({ initialInvoices }: { initialInvoices?: any[] }) {
     const router = useRouter()
     const { activeBusinessId, formatCurrency } = useBusiness()
     const [invoices, setInvoices] = useState(initialInvoices || [])
     const [searchQuery, setSearchQuery] = useState('')
+    const supabase = createClient() // Create client instance here if not existing, or use existing
+
+    useEffect(() => {
+        if (!initialInvoices) {
+            const fetchInvoices = async () => {
+                const { data } = await supabase
+                    .from('invoices')
+                    .select('*, party:parties(name)')
+                    .eq('type', 'PURCHASE')
+                    .order('date', { ascending: false })
+                if (data) setInvoices(data)
+            }
+            fetchInvoices()
+        }
+    }, [initialInvoices])
     const [statusFilter, setStatusFilter] = useState<string>('ALL')
     const [sortBy, setSortBy] = useState<'date' | 'amount'>('date')
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
