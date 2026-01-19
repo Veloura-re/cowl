@@ -1,4 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
+
+export const dynamic = 'force-dynamic'
 import InventoryClientView from './client-view'
 
 export default async function InventoryPage() {

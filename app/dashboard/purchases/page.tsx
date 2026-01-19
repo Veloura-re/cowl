@@ -1,4 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
+
+export const dynamic = 'force-dynamic'
 import PurchasesClientView from './client-view'
 
 export default async function PurchasePage() {
