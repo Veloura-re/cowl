@@ -57,49 +57,59 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
             {/* Desktop Sidebar (Glassmorphic) - Compact */}
             <div className="hidden lg:flex w-60 flex-col fixed inset-y-0 z-50 p-2">
                 <div className="flex flex-col flex-grow glass rounded-[24px] overflow-hidden shadow-2xl border border-white/30 ring-1 ring-white/20">
-                    <div className="relative border-b border-white/10 bg-white/5">
+                    <div className="relative border-b border-white/10 bg-white/5 flex items-center h-16">
                         <button
                             onClick={() => setIsSwitcherOpen(true)}
-                            className="flex items-center w-full h-16 px-5 gap-3 hover:bg-white/10 transition-colors group"
+                            className="flex-1 flex items-center h-full pl-5 pr-2 gap-3 hover:bg-white/10 transition-colors group text-left min-w-0"
                         >
-                            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--primary-green)] to-[var(--deep-contrast)] text-white shadow-lg shadow-[var(--primary-green)]/30">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--primary-green)] to-[var(--deep-contrast)] text-white shadow-lg shadow-[var(--primary-green)]/30 shrink-0">
                                 <Building2 className="h-4 w-4" />
                             </div>
                             <div className="flex-1 text-left min-w-0">
                                 <h1 className="text-sm font-bold text-[var(--deep-contrast)] tracking-tight truncate uppercase">{activeBusiness?.name || 'SELECT BIZ'}</h1>
                                 <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest leading-none mt-0.5">Switch Identity</p>
                             </div>
-                            <div className="flex items-center gap-1">
-                                <NotificationCenter />
-                                <Plus className="h-3 w-3 opacity-20" />
-                            </div>
                         </button>
 
-                        <PickerModal
-                            isOpen={isSwitcherOpen}
-                            onClose={() => setIsSwitcherOpen(false)}
-                            onSelect={(id) => setActiveBusinessId(id)}
-                            title="Switch Business"
-                            options={businesses.map(b => ({
-                                id: b.id,
-                                label: b.name.toUpperCase(),
-                                subLabel: b.isOwner ? 'OWNER' : 'JOINED TEAM'
-                            }))}
-                            selectedValue={activeBusinessId}
-                            footer={(
-                                <button
-                                    onClick={() => {
-                                        setIsCreateModalOpen(true)
-                                        setIsSwitcherOpen(false)
-                                    }}
-                                    className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest text-[var(--primary-green)] bg-white/40 border border-[var(--primary-green)]/10 hover:bg-[var(--primary-green)] hover:text-white transition-all active:scale-[0.98]"
-                                >
-                                    <Plus className="h-3 w-3" />
-                                    Add Business
-                                </button>
-                            )}
-                        />
+                        <div className="flex items-center gap-1 pr-5 h-full">
+                            {/* NotificationCenter has its own button, so it handles clicks separately */}
+                            <NotificationCenter />
+                            {/* The Plus was previously just visual, or maybe for adding business? 
+                                If it's for adding business, it should be part of the switcher or a separate button. 
+                                Since it was just an icon before, I'll leave it here as a visual indicator or make it open the switcher too if clicked?
+                                For now, just rendering it. To act as switcher trigger it needs to be in the button or have same onclick.
+                            */}
+                            <button onClick={() => setIsSwitcherOpen(true)} className="hover:bg-black/5 p-1 rounded-full transition-colors">
+                                <Plus className="h-3 w-3 opacity-20" />
+                            </button>
+                        </div>
                     </div>
+
+                    <PickerModal
+                        isOpen={isSwitcherOpen}
+                        onClose={() => setIsSwitcherOpen(false)}
+                        onSelect={(id) => setActiveBusinessId(id)}
+                        title="Switch Business"
+                        options={businesses.map(b => ({
+                            id: b.id,
+                            label: b.name.toUpperCase(),
+                            subLabel: b.isOwner ? 'OWNER' : 'JOINED TEAM'
+                        }))}
+                        selectedValue={activeBusinessId}
+                        footer={(
+                            <button
+                                onClick={() => {
+                                    setIsCreateModalOpen(true)
+                                    setIsSwitcherOpen(false)
+                                }}
+                                className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest text-[var(--primary-green)] bg-white/40 border border-[var(--primary-green)]/10 hover:bg-[var(--primary-green)] hover:text-white transition-all active:scale-[0.98]"
+                            >
+                                <Plus className="h-3 w-3" />
+                                Add Business
+                            </button>
+                        )}
+                    />
+
 
                     <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto scrollbar-hide">
                         {navigation.map((item) => {
@@ -226,7 +236,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                 businessId={activeBusinessId}
                 onSuccess={() => router.refresh()}
             />
-        </div>
+        </div >
     )
 }
 

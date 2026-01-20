@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 import { QuillBackground } from "@/components/ui/QuillBackground";
+import AppInitializer from "@/components/AppInitializer";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -19,6 +20,14 @@ export const metadata: Metadata = {
   description: "Manage your empire with precision.",
 };
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#000000', // Set your theme color here
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -29,8 +38,9 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${poppins.variable} antialiased`}
       >
+        <AppInitializer />
         <QuillBackground />
-        <div className="relative z-10 w-full min-h-screen">
+        <div className="relative z-10 w-full min-h-screen pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
           {children}
         </div>
       </body>
