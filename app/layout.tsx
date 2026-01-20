@@ -16,12 +16,12 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "LUCY | Business OS",
+  title: "LUCY-ex | Business OS",
   description: "Manage your empire with precision.",
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: "LUCY",
+    title: "LUCY-ex",
   },
   manifest: '/manifest.json',
 };

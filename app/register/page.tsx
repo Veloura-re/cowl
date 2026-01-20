@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Loader2, ArrowRight, UserPlus } from 'lucide-react'
+import { Loader2, ArrowRight } from 'lucide-react'
+import { BrandLogo } from '@/components/ui/BrandLogo'
 
 export default function RegisterPage() {
     const [fullName, setFullName] = useState('')
@@ -43,14 +44,14 @@ export default function RegisterPage() {
         <div className="flex min-h-screen items-center justify-center p-6 sm:p-4">
             <div className="glass w-full max-w-sm space-y-6 rounded-[32px] p-6 relative overflow-hidden border border-white/40 shadow-2xl">
                 <div className="text-center">
-                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--primary-green)]/10 mb-4 shadow-inner">
-                        <UserPlus className="h-6 w-6 text-[var(--primary-green)]" />
+                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/40 mb-4 shadow-xl border border-white/40">
+                        <BrandLogo size="lg" />
                     </div>
                     <h2 className="text-xl font-bold tracking-tight text-[var(--deep-contrast)] uppercase">
                         Create Account
                     </h2>
                     <p className="mt-1 text-[10px] font-bold text-[var(--foreground)]/50 uppercase tracking-widest">
-                        Start managing your business
+                        Start managing with LUCY-ex
                     </p>
                 </div>
 

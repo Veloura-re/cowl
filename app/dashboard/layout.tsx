@@ -14,6 +14,7 @@ import PickerModal from '@/components/ui/PickerModal'
 import AddTeamMemberModal from '@/components/ui/AddTeamMemberModal'
 import { UserPlus } from 'lucide-react'
 import NotificationCenter from '@/components/ui/NotificationCenter'
+import { BrandLogo } from '@/components/ui/BrandLogo'
 
 const navigation = [
     { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
@@ -62,8 +63,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                             onClick={() => setIsSwitcherOpen(true)}
                             className="flex-1 flex items-center h-full pl-5 pr-2 gap-3 hover:bg-white/10 transition-colors group text-left min-w-0"
                         >
-                            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--primary-green)] to-[var(--deep-contrast)] text-white shadow-lg shadow-[var(--primary-green)]/30 shrink-0">
-                                <Building2 className="h-4 w-4" />
+                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/40 shadow-xl border border-white/40 shrink-0">
+                                <BrandLogo size="md" />
                             </div>
                             <div className="flex-1 text-left min-w-0">
                                 <h1 className="text-sm font-bold text-[var(--deep-contrast)] tracking-tight truncate uppercase">{activeBusiness?.name || 'SELECT BIZ'}</h1>
@@ -188,7 +189,9 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     )} />
 
                     <div className="relative z-10 flex h-14 items-center justify-between px-4 pt-[env(safe-area-inset-top)] box-content">
-                        <div className="w-10" /> {/* Spacer */}
+                        <div className="w-10 flex items-center justify-center">
+                            <BrandLogo size="sm" />
+                        </div>
                         <h2 className="text-[10px] font-bold text-[var(--deep-contrast)] uppercase tracking-widest">{activeBusiness?.name || 'MEMBER'}</h2>
                         <div className="flex items-center gap-1">
                             <NotificationCenter />

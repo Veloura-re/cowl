@@ -1,6 +1,6 @@
 {
-    "name": "LUCY",
-    "short_name": "LUCY",
+    "name": "LUCY-ex",
+    "short_name": "LUCY-ex",
     "icons": [
         {
             "src": "/next.svg",
@@ -15,6 +15,6 @@
     ],
     "start_url": "/",
     "display": "standalone",
-    "theme_color": "#000000",
-    "background_color": "#000000"
+    "theme_color": "#ffffff",
+    "background_color": "#ffffff"
 }
