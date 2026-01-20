@@ -106,7 +106,10 @@ export const BottomNav = () => {
             </AnimatePresence>
 
             {/* Bottom Dock - Jewel-like Glassmorphism */}
-            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+            <div
+                className="fixed left-1/2 -translate-x-1/2 z-50"
+                style={{ bottom: `calc(1.5rem + env(safe-area-inset-bottom, 0px))` }}
+            >
                 <LayoutGroup>
                     <div className="flex items-center gap-1 px-1.5 py-1.5 rounded-full border border-white/40 shadow-[0_15px_35px_-10px_rgba(0,0,0,0.2)] bg-white/70 backdrop-blur-2xl relative">
 

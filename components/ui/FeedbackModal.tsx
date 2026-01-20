@@ -54,14 +54,14 @@ export default function FeedbackModal({
                             {title || (isError ? 'Action Failed' : 'Success!')}
                         </h3>
 
-                        <p className="text-[11px] font-bold text-[var(--foreground)]/60 leading-relaxed max-w-[220px] mx-auto uppercase tracking-wider mb-8">
+                        <p className="text-xs lg:text-[11px] font-bold text-[var(--foreground)]/60 leading-relaxed max-w-[220px] mx-auto uppercase tracking-wider mb-8">
                             {message}
                         </p>
 
                         <button
                             onClick={onClose}
                             className={clsx(
-                                "w-full h-12 rounded-2xl text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-xl transition-all active:scale-95",
+                                "w-full h-12 rounded-2xl text-white text-[11px] lg:text-[10px] font-black uppercase tracking-[0.2em] shadow-xl transition-all active:scale-95",
                                 isError ? "bg-[var(--deep-contrast)] hover:bg-black" : "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20"
                             )}
                         >

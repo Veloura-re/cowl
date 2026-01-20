@@ -91,8 +91,8 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                             <Plus className="h-4 w-4" />
                         </div>
                         <div>
-                            <h2 className="text-sm font-bold text-[var(--deep-contrast)] tracking-tight">Add Sale Item</h2>
-                            <p className="text-[10px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest leading-none">Line Detail</p>
+                            <h2 className="text-sm lg:text-[13px] font-bold text-[var(--deep-contrast)] tracking-tight">Add Sale Item</h2>
+                            <p className="text-[10px] lg:text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest leading-none">Line Detail</p>
                         </div>
                     </div>
                     <button
@@ -106,11 +106,11 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
                     {/* Item Selection */}
                     <div>
-                        <label className="block text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-1.5 ml-1">Select Product *</label>
+                        <label className="block text-xs lg:text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-2 ml-1">Select Product *</label>
                         <button
                             type="button"
                             onClick={() => setIsItemPickerOpen(true)}
-                            className="w-full h-11 flex items-center justify-between rounded-xl bg-white/50 border border-white/20 px-4 text-[11px] font-bold text-[var(--deep-contrast)] hover:border-[var(--primary-green)] transition-all shadow-inner"
+                            className="w-full h-12 lg:h-11 flex items-center justify-between rounded-xl bg-white/50 border border-white/20 px-4 text-xs lg:text-[11px] font-bold text-[var(--deep-contrast)] hover:border-[var(--primary-green)] transition-all shadow-inner"
                         >
                             <span className="truncate">{selectedItem ? selectedItem.name : 'Choose an item...'}</span>
                             <Package className="h-4 w-4 opacity-20" />
@@ -122,26 +122,26 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                             <div className="grid grid-cols-2 gap-3">
                                 {/* Quantity */}
                                 <div>
-                                    <label className="block text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-1.5 ml-1">Quantity ({selectedItem.unit})</label>
+                                    <label className="block text-xs lg:text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-2 ml-1">Quantity ({selectedItem.unit})</label>
                                     <input
                                         type="number"
                                         step="any"
                                         required
                                         value={quantity}
                                         onChange={(e) => setQuantity(Number(e.target.value))}
-                                        className="w-full h-11 rounded-xl bg-white/50 border border-white/20 px-4 text-[13px] font-bold text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] transition-all shadow-inner"
+                                        className="w-full h-12 lg:h-11 rounded-xl bg-white/50 border border-white/20 px-4 text-sm lg:text-[13px] font-bold text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] transition-all shadow-inner"
                                     />
                                 </div>
                                 {/* Rate */}
                                 <div>
-                                    <label className="block text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-1.5 ml-1">Rate ({selectedItem.unit})</label>
+                                    <label className="block text-xs lg:text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-2 ml-1">Rate ({selectedItem.unit})</label>
                                     <input
                                         type="number"
                                         step="any"
                                         required
                                         value={rate}
                                         onChange={(e) => setRate(Number(e.target.value))}
-                                        className="w-full h-11 rounded-xl bg-white/50 border border-white/20 px-4 text-[13px] font-bold text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] transition-all shadow-inner"
+                                        className="w-full h-12 lg:h-11 rounded-xl bg-white/50 border border-white/20 px-4 text-sm lg:text-[13px] font-bold text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] transition-all shadow-inner"
                                     />
                                 </div>
                             </div>

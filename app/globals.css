@@ -41,11 +41,14 @@ body {
   font-family: var(--font-poppins);
   font-weight: 500;
   /* Medium default */
-  /* Padding top removed as status bar is now solid black and not overlaying */
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
   min-height: 100vh;
+  min-height: 100dvh;
+  /* Dynamic viewport height for modern browsers */
+  overflow-x: hidden;
+  /* Prevent horizontal scroll on mobile */
 }
 
 h1,
@@ -69,7 +72,7 @@ h6 {
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
 }
 
-/* Animations */
+/* Animations - Optimized for Mobile */
 @keyframes pulse-slow {
 
   0%,
@@ -80,7 +83,8 @@ h6 {
 
   50% {
     opacity: 0.12;
-    transform: scale(1.1);
+    transform: scale(1.05);
+    /* Reduced scale for performance */
   }
 }
 
@@ -94,6 +98,39 @@ h6 {
 
   50% {
     opacity: 0.08;
-    transform: scale(1.2);
+    transform: scale(1.1);
+    /* Reduced scale for performance */
+  }
+}
+
+/* Apply slower animations on mobile to save CPU/GPU */
+@media (max-width: 768px) {
+  .animate-pulse-slow {
+    animation-duration: 12s;
+  }
+
+  .animate-pulse-slower {
+    animation-duration: 20s;
+  }
+
+  /* Mobile Touch Target & Font Normalization */
+  input,
+  button,
+  select,
+  textarea {
+    font-size: 16px !important;
+    /* Prevent iOS zoom on focus */
+  }
+
+  .text-mobile-xs {
+    font-size: 10px;
+  }
+
+  .text-mobile-sm {
+    font-size: 12px;
+  }
+
+  .h-mobile-touch {
+    height: 40px !important;
   }
 }

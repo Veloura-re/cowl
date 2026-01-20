@@ -273,7 +273,7 @@ export default function PaymentForm({
                         <h1 className="text-xl font-bold text-[var(--deep-contrast)] tracking-tight">
                             {isEdit ? 'Update' : 'New'} {isReceipt ? 'Deposit' : 'Expense'}
                         </h1>
-                        <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-widest leading-none">
+                        <p className="text-[11px] lg:text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-widest leading-none mt-1">
                             {isReceipt ? 'Credit entry to ledger' : 'Debit entry from ledger'}
                         </p>
                     </div>
@@ -283,17 +283,17 @@ export default function PaymentForm({
                         <button
                             type="button"
                             onClick={() => setIsConfirmOpen(true)}
-                            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-50 text-rose-500 text-[10px] font-bold uppercase tracking-wider hover:bg-rose-100 transition-all shadow-sm active:scale-95"
+                            className="flex items-center gap-1.5 px-4 py-2.5 lg:py-2 rounded-xl bg-rose-50 text-rose-500 text-[11px] lg:text-[10px] font-bold uppercase tracking-wider hover:bg-rose-100 transition-all shadow-sm active:scale-95"
                         >
-                            <Trash2 className="h-4 w-4" />
-                            Delete
+                            <Trash2 className="h-4 w-4 lg:h-4 lg:w-4" />
+                            <span className="hidden sm:inline">Delete</span>
                         </button>
                     )}
                     <button
                         type="submit"
                         disabled={loading || formData.amount <= 0}
                         className={clsx(
-                            "flex items-center gap-1.5 px-6 py-2 rounded-xl text-white text-[10px] font-bold uppercase tracking-wider transition-all shadow-lg active:scale-95 disabled:opacity-50",
+                            "flex items-center gap-1.5 px-6 py-2.5 lg:py-2 rounded-xl text-white text-[11px] lg:text-[10px] font-bold uppercase tracking-wider transition-all shadow-lg active:scale-95 disabled:opacity-50",
                             isReceipt ? "bg-emerald-600 hover:bg-emerald-700" : "bg-rose-600 hover:bg-rose-700"
                         )}
                     >
@@ -308,46 +308,46 @@ export default function PaymentForm({
                 <div className="space-y-4">
                     <div className="glass rounded-2xl border border-white/40 p-5 space-y-4">
                         <div>
-                            <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-2 ml-1">Entity / Party Reference</label>
+                            <label className="block text-xs lg:text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-2 ml-1">Entity / Party Reference</label>
                             <button
                                 type="button"
                                 onClick={() => setIsPartyPickerOpen(true)}
-                                className="w-full h-11 rounded-xl bg-white/50 border border-white/20 px-4 text-[12px] font-bold text-left flex items-center justify-between hover:border-[var(--primary-green)] transition-all shadow-inner"
+                                className="w-full h-12 lg:h-11 rounded-xl bg-white/50 border border-white/20 px-4 text-sm lg:text-[12px] font-bold text-left flex items-center justify-between hover:border-[var(--primary-green)] transition-all shadow-inner"
                             >
                                 <span>{displayParties.find(p => p.id === formData.party_id)?.name || 'General Transaction (No Party)'}</span>
-                                <User className="h-4 w-4 opacity-20" />
+                                <User className="h-5 w-5 lg:h-4 lg:w-4 opacity-20" />
                             </button>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-2 ml-1">Date</label>
+                                <label className="block text-xs lg:text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-2 ml-1">Date</label>
                                 <input
                                     type="date"
                                     value={formData.date}
                                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                    className="w-full h-11 rounded-xl bg-white/50 border border-white/20 px-4 text-[11px] font-bold focus:border-[var(--primary-green)] focus:outline-none transition-all"
+                                    className="w-full h-12 lg:h-11 rounded-xl bg-white/50 border border-white/20 px-4 text-sm lg:text-[11px] font-bold focus:border-[var(--primary-green)] focus:outline-none transition-all"
                                 />
                             </div>
                             <div>
-                                <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-2 ml-1">Fiscal Amount ({activeCurrencySymbol})</label>
+                                <label className="block text-xs lg:text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-2 ml-1">Fiscal Amount ({activeCurrencySymbol})</label>
                                 <input
                                     type="number"
                                     required
                                     value={formData.amount}
                                     onChange={(e) => setFormData({ ...formData, amount: Number(e.target.value) })}
-                                    className="w-full h-11 rounded-xl bg-[var(--primary-green)]/5 border border-[var(--primary-green)]/20 px-4 text-lg font-bold text-center text-[var(--primary-green)] focus:outline-none transition-all"
+                                    className="w-full h-12 lg:h-11 rounded-xl bg-[var(--primary-green)]/5 border border-[var(--primary-green)]/20 px-4 text-xl lg:text-lg font-bold text-center text-[var(--primary-green)] focus:outline-none transition-all"
                                     placeholder="0.00"
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-2 ml-1">Notation / Memo</label>
+                            <label className="block text-xs lg:text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-2 ml-1">Notation / Memo</label>
                             <textarea
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                className="w-full h-24 rounded-xl bg-white/50 border border-white/20 p-4 text-[11px] font-bold focus:border-[var(--primary-green)] focus:outline-none transition-all placeholder:text-black/10"
+                                className="w-full h-32 lg:h-24 rounded-xl bg-white/50 border border-white/20 p-4 text-sm lg:text-[11px] font-bold focus:border-[var(--primary-green)] focus:outline-none transition-all placeholder:text-black/10"
                                 placeholder="Enter transaction details..."
                             />
                         </div>
@@ -388,13 +388,13 @@ export default function PaymentForm({
                         <button
                             type="button"
                             onClick={() => setIsModePickerOpen(true)}
-                            className="w-full h-11 rounded-xl bg-white/50 border border-white/20 px-4 flex items-center justify-between hover:border-[var(--primary-green)] transition-all"
+                            className="w-full h-12 lg:h-11 rounded-xl bg-white/50 border border-white/20 px-4 flex items-center justify-between hover:border-[var(--primary-green)] transition-all shadow-sm"
                         >
                             <div className="flex items-center gap-2">
-                                <Wallet className="h-4 w-4 opacity-20" />
-                                <span className="text-[11px] font-bold uppercase tracking-widest">{formData.mode}</span>
+                                <Wallet className="h-5 w-5 lg:h-4 lg:w-4 opacity-20" />
+                                <span className="text-xs lg:text-[11px] font-bold uppercase tracking-widest">{formData.mode}</span>
                             </div>
-                            <span className="text-[10px] font-bold text-[var(--primary-green)]">{formatCurrency(modeBalances[formData.mode] || 0)}</span>
+                            <span className="text-xs lg:text-[10px] font-bold text-[var(--primary-green)]">{formatCurrency(modeBalances[formData.mode] || 0)}</span>
                         </button>
                     </div>
                 </div>
@@ -405,12 +405,12 @@ export default function PaymentForm({
                         <h3 className="text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 ml-1">Cashier Calculator</h3>
                         <div className="space-y-3">
                             <div>
-                                <label className="block text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/30 mb-1 ml-1">Cash Given / Received</label>
+                                <label className="block text-xs lg:text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/30 mb-2 ml-1">Cash Given / Received</label>
                                 <input
                                     type="number"
                                     value={givenAmount}
                                     onChange={(e) => setGivenAmount(e.target.value)}
-                                    className="w-full h-11 rounded-xl bg-white/60 border border-white/30 px-4 text-lg font-bold text-center focus:outline-none transition-all shadow-inner"
+                                    className="w-full h-12 lg:h-11 rounded-xl bg-white/60 border border-white/30 px-4 text-xl lg:text-lg font-bold text-center focus:outline-none transition-all shadow-inner"
                                     placeholder="0.00"
                                 />
                             </div>
@@ -428,11 +428,11 @@ export default function PaymentForm({
                     {(initialData?.invoice_id || billingEntries.length > 0) && (
                         <div className="glass rounded-2xl border border-white/40 p-5 space-y-3">
                             <div className="flex items-center justify-between ml-1">
-                                <h3 className="text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40">Billing Entries</h3>
+                                <h3 className="text-xs lg:text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40">Billing Entries</h3>
                                 <button
                                     type="button"
                                     onClick={() => { setEditingEntryIndex(null); setIsItemModalOpen(true); }}
-                                    className="p-1 px-2 rounded-lg bg-[var(--primary-green)]/10 text-[9px] font-bold uppercase text-[var(--primary-green)] hover:bg-[var(--primary-green)]/20 transition-all"
+                                    className="p-1 px-3 h-8 lg:h-auto rounded-lg bg-[var(--primary-green)]/10 text-[10px] lg:text-[9px] font-bold uppercase text-[var(--primary-green)] hover:bg-[var(--primary-green)]/20 transition-all border border-[var(--primary-green)]/20 shadow-sm"
                                 >
                                     + Add Item
                                 </button>
@@ -443,13 +443,13 @@ export default function PaymentForm({
                                         key={idx}
                                         className="p-3 rounded-2xl bg-white/50 border border-white/30 flex justify-between items-center group shadow-sm"
                                     >
-                                        <div className="flex items-center gap-3">
-                                            <div className="h-8 w-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400">
-                                                <Plus className="h-4 w-4" />
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-10 w-10 lg:h-8 lg:w-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 border border-slate-200">
+                                                <Plus className="h-5 w-5 lg:h-4 lg:w-4" />
                                             </div>
                                             <div>
-                                                <p className="text-[10px] font-black uppercase text-[var(--deep-contrast)]">{e.name}</p>
-                                                <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest">
+                                                <p className="text-[11px] lg:text-[10px] font-black uppercase text-[var(--deep-contrast)]">{e.name}</p>
+                                                <p className="text-[10px] lg:text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">
                                                     {e.quantity} Units × {formatCurrency(e.rate)}
                                                 </p>
                                             </div>

@@ -41,7 +41,7 @@ export default function ErrorModal({
                         <div className="bg-rose-500/10 px-6 py-3 flex items-center justify-between border-b border-rose-500/10">
                             <div className="flex items-center gap-2">
                                 <AlertCircle className="h-4 w-4 text-rose-500 font-bold" />
-                                <span className="text-[10px] font-black uppercase tracking-widest text-rose-600">
+                                <span className="text-xs lg:text-[10px] font-black uppercase tracking-widest text-rose-600">
                                     {title}
                                 </span>
                             </div>
@@ -65,7 +65,7 @@ export default function ErrorModal({
 
                             <button
                                 onClick={onClose}
-                                className="w-full py-4 rounded-2xl bg-[var(--deep-contrast)] text-white text-[11px] font-black uppercase tracking-[0.2em] shadow-xl shadow-black/10 hover:bg-rose-600 transition-all active:scale-95"
+                                className="w-full h-14 lg:h-12 rounded-2xl bg-[var(--deep-contrast)] text-white text-xs lg:text-[11px] font-black uppercase tracking-[0.2em] shadow-xl shadow-black/10 hover:bg-rose-600 transition-all active:scale-95"
                             >
                                 Dismiss
                             </button>

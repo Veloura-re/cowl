@@ -59,7 +59,7 @@ export default function CreateBusinessModal({ isOpen, onClose }: CreateBusinessM
                         </div>
                         <div>
                             <h2 className="text-sm font-bold text-[var(--deep-contrast)] tracking-tight">New Business</h2>
-                            <p className="text-[10px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest leading-none">Create Profile</p>
+                            <p className="text-xs lg:text-[10px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest leading-none mt-1.5">Create Profile</p>
                         </div>
                     </div>
                     <button
@@ -72,31 +72,31 @@ export default function CreateBusinessModal({ isOpen, onClose }: CreateBusinessM
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
                     <div>
-                        <label className="block text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-1.5 ml-1">Business Name</label>
+                        <label className="block text-xs lg:text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-2 ml-1">Business Name</label>
                         <input
                             required
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="w-full h-9 rounded-xl bg-white/50 border border-white/20 px-4 text-[11px] font-bold text-[var(--deep-contrast)] focus:outline-none transition-all shadow-inner"
+                            className="w-full h-11 lg:h-9 rounded-xl bg-white/50 border border-white/20 px-4 text-sm lg:text-[11px] font-bold text-[var(--deep-contrast)] focus:outline-none transition-all shadow-inner"
                             placeholder="e.g. Acme Corp"
                         />
                     </div>
 
-                    <div className="flex justify-end pt-4 gap-2 border-t border-black/5">
+                    <div className="flex justify-end pt-5 gap-3 border-t border-black/5">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 h-10 rounded-xl text-[10px] font-bold uppercase tracking-widest text-[var(--foreground)]/40 hover:bg-white/50 transition-all active:scale-95"
+                            className="flex-1 h-12 lg:h-10 rounded-xl text-[11px] lg:text-[10px] font-bold uppercase tracking-widest text-[var(--foreground)]/40 hover:bg-white/50 transition-all active:scale-95"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={loading || !name}
-                            className="flex-1 h-10 flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] text-white shadow-lg text-[10px] font-bold uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50"
+                            className="flex-1 h-12 lg:h-10 flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] text-white shadow-lg text-[11px] lg:text-[10px] font-bold uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50"
                         >
-                            {loading && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
+                            {loading && <Loader2 className="mr-2 h-4 w-4 lg:h-3 lg:w-3 animate-spin" />}
                             Create
                         </button>
                     </div>

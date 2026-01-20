@@ -40,7 +40,7 @@ export default function RootLayout({
       >
         <AppInitializer />
         <QuillBackground />
-        <div className="relative z-10 w-full min-h-screen pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
+        <div className="relative z-10 w-full min-h-[100dvh] pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
           {children}
         </div>
       </body>

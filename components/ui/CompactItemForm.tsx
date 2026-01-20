@@ -145,8 +145,8 @@ export default function CompactItemForm({ initialData }: CompactItemFormProps) {
                         <ArrowLeft className="h-3 w-3" />
                     </Link>
                     <div>
-                        <h1 className="text-[11px] font-bold text-[var(--deep-contrast)] uppercase tracking-tight">{isEdit ? 'Edit Item' : 'New Item'}</h1>
-                        <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest">Inventory {isEdit ? 'Update' : 'Entry'}</p>
+                        <h1 className="text-[12px] font-bold text-[var(--deep-contrast)] uppercase tracking-tight">{isEdit ? 'Edit Item' : 'New Item'}</h1>
+                        <p className="text-[10px] lg:text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest mt-1">Inventory {isEdit ? 'Update' : 'Entry'}</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -154,18 +154,18 @@ export default function CompactItemForm({ initialData }: CompactItemFormProps) {
                         <button
                             type="button"
                             onClick={() => setIsConfirmOpen(true)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 text-rose-500 text-[9px] font-bold uppercase tracking-wider hover:bg-rose-100 transition-all shadow-sm active:scale-95"
+                            className="flex items-center gap-1.5 px-3 py-2 lg:py-1.5 rounded-xl bg-rose-50 text-rose-500 text-[11px] lg:text-[9px] font-bold uppercase tracking-wider hover:bg-rose-100 transition-all shadow-sm active:scale-95"
                         >
-                            <Trash2 className="h-3 w-3" />
-                            Delete
+                            <Trash2 className="h-4 w-4 lg:h-3 lg:w-3" />
+                            <span className="hidden sm:inline">Delete</span>
                         </button>
                     )}
                     <button
                         type="submit"
                         disabled={loading || !formData.name}
-                        className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-[var(--primary-green)] text-white text-[9px] font-bold uppercase tracking-wider hover:bg-[var(--primary-hover)] transition-all disabled:opacity-50 shadow-lg active:scale-95"
+                        className="flex items-center gap-1.5 px-5 py-2 lg:px-4 lg:py-1.5 rounded-xl bg-[var(--primary-green)] text-white text-[11px] lg:text-[9px] font-bold uppercase tracking-wider hover:bg-[var(--primary-hover)] transition-all disabled:opacity-50 shadow-lg active:scale-95"
                     >
-                        {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
+                        {loading ? <Loader2 className="h-4 w-4 lg:h-3 lg:w-3 animate-spin" /> : <Save className="h-4 w-4 lg:h-3 lg:w-3" />}
                         {isEdit ? 'Update' : 'Save'}
                     </button>
                 </div>
@@ -177,13 +177,13 @@ export default function CompactItemForm({ initialData }: CompactItemFormProps) {
                     <h3 className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-3">Basic Information</h3>
                     <div className="space-y-2">
                         <div>
-                            <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">Name *</label>
+                            <label className="block text-xs lg:text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-2 ml-1">Name *</label>
                             <input
                                 required
                                 type="text"
                                 value={formData.name}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                className="w-full h-7 rounded-lg bg-white/50 border border-white/20 px-2 text-[9px] font-bold focus:border-[var(--primary-green)] focus:outline-none"
+                                className="w-full h-10 lg:h-7 rounded-lg bg-white/50 border border-white/20 px-3 text-[11px] lg:text-[9px] font-bold focus:border-[var(--primary-green)] focus:outline-none"
                                 placeholder="e.g., Premium Cotton"
                             />
                         </div>
@@ -198,48 +198,48 @@ export default function CompactItemForm({ initialData }: CompactItemFormProps) {
                                 )}
                             >
                                 <Package className={clsx("h-4 w-4 mb-1", formData.type === 'PRODUCT' ? "text-[var(--primary-green)]" : "text-[var(--foreground)]/40")} />
-                                <div className="text-[8px] font-bold text-[var(--deep-contrast)]">Product</div>
+                                <div className="text-[10px] lg:text-[8px] font-bold text-[var(--deep-contrast)]">Product</div>
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setFormData({ ...formData, type: 'SERVICE' })}
                                 className={clsx(
-                                    "p-2 rounded-lg border transition-all text-left",
+                                    "p-3 lg:p-2 rounded-lg border transition-all text-left",
                                     formData.type === 'SERVICE' ? "bg-white/60 border-[var(--primary-green)]" : "bg-white/20 border-white/30"
                                 )}
                             >
-                                <Tag className={clsx("h-4 w-4 mb-1", formData.type === 'SERVICE' ? "text-[var(--primary-green)]" : "text-[var(--foreground)]/40")} />
-                                <div className="text-[8px] font-bold text-[var(--deep-contrast)]">Service</div>
+                                <Tag className={clsx("h-5 w-5 lg:h-4 lg:w-4 mb-1", formData.type === 'SERVICE' ? "text-[var(--primary-green)]" : "text-[var(--foreground)]/40")} />
+                                <div className="text-[10px] lg:text-[8px] font-bold text-[var(--deep-contrast)]">Service</div>
                             </button>
                         </div>
 
                         <div className="grid grid-cols-2 gap-2">
                             <div>
-                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">Category</label>
+                                <label className="block text-xs lg:text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-2 ml-1">Category</label>
                                 <input
                                     type="text"
                                     value={formData.category}
                                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                    className="w-full h-7 rounded-lg bg-white/50 border border-white/20 px-2 text-[9px] font-bold focus:border-[var(--primary-green)] focus:outline-none"
+                                    className="w-full h-10 lg:h-7 rounded-lg bg-white/50 border border-white/20 px-3 text-[11px] lg:text-[9px] font-bold focus:border-[var(--primary-green)] focus:outline-none"
                                 />
                             </div>
                             <div>
-                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">SKU</label>
+                                <label className="block text-xs lg:text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-2 ml-1">SKU</label>
                                 <input
                                     type="text"
                                     value={formData.sku}
                                     onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-                                    className="w-full h-7 rounded-lg bg-white/50 border border-white/20 px-2 text-[9px] font-bold focus:border-[var(--primary-green)] focus:outline-none"
+                                    className="w-full h-10 lg:h-7 rounded-lg bg-white/50 border border-white/20 px-3 text-[11px] lg:text-[9px] font-bold focus:border-[var(--primary-green)] focus:outline-none"
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">Description</label>
+                            <label className="block text-xs lg:text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-2 ml-1">Description</label>
                             <textarea
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                className="w-full h-16 rounded-lg bg-white/50 border border-white/20 p-2 text-[9px] font-bold focus:border-[var(--primary-green)] focus:outline-none resize-none"
+                                className="w-full h-24 lg:h-16 rounded-lg bg-white/50 border border-white/20 p-3 text-[11px] lg:text-[9px] font-bold focus:border-[var(--primary-green)] focus:outline-none resize-none"
                                 placeholder="Item details..."
                             />
                         </div>
@@ -251,11 +251,11 @@ export default function CompactItemForm({ initialData }: CompactItemFormProps) {
                     <h3 className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-3">Pricing</h3>
                     <div className="space-y-2">
                         <div>
-                            <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">Unit</label>
+                            <label className="block text-xs lg:text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-2 ml-1">Unit</label>
                             <button
                                 type="button"
                                 onClick={() => setIsUnitPickerOpen(true)}
-                                className="w-full h-7 rounded-lg bg-white/50 border border-white/20 px-2 text-[9px] font-bold text-left hover:border-[var(--primary-green)] transition-all"
+                                className="w-full h-10 lg:h-7 rounded-lg bg-white/50 border border-white/20 px-3 text-[11px] lg:text-[9px] font-bold text-left hover:border-[var(--primary-green)] transition-all"
                             >
                                 {formData.unit}
                             </button>
@@ -263,23 +263,23 @@ export default function CompactItemForm({ initialData }: CompactItemFormProps) {
 
                         <div className="grid grid-cols-2 gap-2">
                             <div>
-                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">Sell / {formData.unit}</label>
+                                <label className="block text-xs lg:text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-2 ml-1">Sell / {formData.unit}</label>
                                 <input
                                     type="number"
                                     step="any"
                                     value={formData.selling_price}
                                     onChange={(e) => setFormData({ ...formData, selling_price: Number(e.target.value) })}
-                                    className="w-full h-7 rounded-lg bg-white/50 border border-white/20 px-2 text-[9px] font-bold text-center focus:border-[var(--primary-green)] focus:outline-none"
+                                    className="w-full h-10 lg:h-7 rounded-lg bg-white/50 border border-white/20 px-3 text-[11px] lg:text-[9px] font-bold text-center focus:border-[var(--primary-green)] focus:outline-none"
                                 />
                             </div>
                             <div>
-                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">Buy / {formData.unit}</label>
+                                <label className="block text-xs lg:text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-2 ml-1">Buy / {formData.unit}</label>
                                 <input
                                     type="number"
                                     step="any"
                                     value={formData.purchase_price}
                                     onChange={(e) => setFormData({ ...formData, purchase_price: Number(e.target.value) })}
-                                    className="w-full h-7 rounded-lg bg-white/50 border border-white/20 px-2 text-[9px] font-bold text-center focus:border-[var(--primary-green)] focus:outline-none"
+                                    className="w-full h-10 lg:h-7 rounded-lg bg-white/50 border border-white/20 px-3 text-[11px] lg:text-[9px] font-bold text-center focus:border-[var(--primary-green)] focus:outline-none"
                                 />
                             </div>
                         </div>
@@ -292,16 +292,16 @@ export default function CompactItemForm({ initialData }: CompactItemFormProps) {
                     {formData.type === 'PRODUCT' ? (
                         <div className="grid grid-cols-2 gap-2">
                             <div>
-                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">Current Qty</label>
-                                <div className="flex items-center gap-1">
+                                <label className="block text-xs lg:text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-2 ml-1">Current Qty</label>
+                                <div className="flex items-center gap-2">
                                     <input
                                         type="number"
                                         step="any"
                                         value={formData.stock_quantity}
                                         onChange={(e) => setFormData({ ...formData, stock_quantity: Number(e.target.value) })}
-                                        className="flex-1 h-7 rounded-lg bg-white/50 border border-white/20 px-2 text-[9px] font-bold text-center focus:border-[var(--primary-green)] focus:outline-none"
+                                        className="flex-1 h-10 lg:h-7 rounded-lg bg-white/50 border border-white/20 px-3 text-[11px] lg:text-[9px] font-bold text-center focus:border-[var(--primary-green)] focus:outline-none"
                                     />
-                                    <span className="text-[8px] font-bold text-[var(--foreground)]/40">{formData.unit}</span>
+                                    <span className="text-[10px] lg:text-[8px] font-bold text-[var(--foreground)]/40">{formData.unit}</span>
                                 </div>
                             </div>
 

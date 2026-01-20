@@ -58,14 +58,14 @@ export default function ConfirmModal({
                             {title}
                         </h3>
 
-                        <p className="text-[11px] font-bold text-[var(--foreground)]/60 leading-relaxed max-w-[240px] mx-auto uppercase tracking-wide">
+                        <p className="text-xs lg:text-[11px] font-bold text-[var(--foreground)]/60 leading-relaxed max-w-[240px] mx-auto uppercase tracking-wide">
                             {message}
                         </p>
 
                         <div className="flex gap-3 mt-8">
                             <button
                                 onClick={onClose}
-                                className="flex-1 h-12 rounded-2xl bg-white border border-black/5 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 hover:bg-black/5 hover:text-[var(--deep-contrast)] transition-all active:scale-95"
+                                className="flex-1 h-12 rounded-2xl bg-white border border-black/5 text-[11px] lg:text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 hover:bg-black/5 hover:text-[var(--deep-contrast)] transition-all active:scale-95"
                             >
                                 {cancelText}
                             </button>
@@ -73,7 +73,7 @@ export default function ConfirmModal({
                                 onClick={onConfirm}
                                 disabled={isLoading}
                                 className={clsx(
-                                    "flex-1 h-12 rounded-2xl text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2",
+                                    "flex-1 h-12 rounded-2xl text-white text-[11px] lg:text-[10px] font-black uppercase tracking-[0.2em] shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2",
                                     variant === 'danger' ? "bg-rose-500 hover:bg-rose-600 shadow-rose-500/20" :
                                         variant === 'warning' ? "bg-amber-500 hover:bg-amber-600 shadow-amber-500/20" :
                                             "bg-[var(--deep-contrast)] hover:bg-black shadow-black/20"
