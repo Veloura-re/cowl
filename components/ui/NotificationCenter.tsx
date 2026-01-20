@@ -149,7 +149,7 @@ export default function NotificationCenter() {
                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        className="absolute right-0 mt-2 w-[calc(100vw-32px)] sm:w-80 glass rounded-[24px] border border-white/40 shadow-2xl z-[100] overflow-hidden"
+                        className="fixed sm:absolute top-20 sm:top-full right-4 sm:right-0 w-[calc(100vw-32px)] sm:w-80 glass rounded-[24px] border border-white/40 shadow-2xl z-[100] overflow-hidden"
                     >
                         <div className="px-5 py-4 border-b border-white/10 bg-white/40 flex items-center justify-between">
                             <div>
