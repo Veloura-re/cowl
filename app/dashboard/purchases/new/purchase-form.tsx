@@ -267,7 +267,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                 <button
                     onClick={handleSubmit}
                     disabled={loading}
-                    className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white hover:bg-[var(--primary-green)] transition-all disabled:opacity-50 shadow-lg active:scale-95"
+                    className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white hover:bg-[var(--primary-green)] transition-all disabled:opacity-50 shadow-lg active:scale-95"
                 >
                     {loading ? <Loader2 className="mr-1.5 h-3 w-3 animate-spin" /> : <Save className="mr-1.5 h-3 w-3" />}
                     Save Bill
@@ -283,7 +283,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                         </div>
                         <div className="p-4 space-y-3">
                             <div>
-                                <label className="block text-[8px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-1 ml-1">Supplier</label>
+                                <label className="block text-[8px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-1 ml-1">Supplier</label>
                                 <button
                                     type="button"
                                     onClick={() => setIsPartyPickerOpen(true)}
@@ -294,7 +294,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                                 </button>
                             </div>
                             <div>
-                                <label className="block text-[8px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-1 ml-1">Bill Reference</label>
+                                <label className="block text-[8px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-1 ml-1">Bill Reference</label>
                                 <input
                                     type="text"
                                     value={invoiceNumber}
@@ -304,7 +304,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                                 />
                             </div>
                             <div>
-                                <label className="block text-[8px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-1 ml-1">Date</label>
+                                <label className="block text-[8px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-1 ml-1">Date</label>
                                 <input
                                     type="date"
                                     value={date}
@@ -313,7 +313,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                                 />
                             </div>
                             <div>
-                                <label className="block text-[8px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-1 ml-1">Due Date</label>
+                                <label className="block text-[8px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-1 ml-1">Due Date</label>
                                 <input
                                     type="date"
                                     value={dueDate}
@@ -326,7 +326,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
 
                     <div className="glass rounded-[24px] border border-white/40 p-4 space-y-3">
                         <div>
-                            <label className="block text-[8px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-1 ml-1">Payment Mode</label>
+                            <label className="block text-[8px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-1 ml-1">Payment Mode</label>
                             <div className="flex gap-1.5">
                                 <button
                                     type="button"
@@ -384,7 +384,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
 
                         {paymentMode !== 'UNPAID' && (
                             <div className="pt-2 animate-in slide-in-from-top-2 duration-300">
-                                <label className="block text-[8px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-1 ml-1">Amount Paid</label>
+                                <label className="block text-[8px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-1 ml-1">Amount Paid</label>
                                 <div className="space-y-1.5">
                                     <input
                                         type="number"
@@ -517,7 +517,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                             {rows.length === 0 ? (
                                 <div className="p-20 text-center opacity-20">
                                     <Plus className="h-10 w-10 mx-auto mb-3 opacity-10" />
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.3em]">No line items added</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-widest">No line items added</p>
                                 </div>
                             ) : (
                                 rows.map((row, index) => (

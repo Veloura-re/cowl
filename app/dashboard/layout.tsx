@@ -189,7 +189,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
                     <div className="relative z-10 flex h-14 items-center justify-between px-4 pt-[env(safe-area-inset-top)] box-content">
                         <div className="w-10" /> {/* Spacer */}
-                        <h2 className="text-[10px] font-bold text-[var(--deep-contrast)] uppercase tracking-[0.2em]">{activeBusiness?.name || 'MEMBER'}</h2>
+                        <h2 className="text-[10px] font-bold text-[var(--deep-contrast)] uppercase tracking-widest">{activeBusiness?.name || 'MEMBER'}</h2>
                         <div className="flex items-center gap-1">
                             <NotificationCenter />
                             <button

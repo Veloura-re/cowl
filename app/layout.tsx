@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   description: "Manage your empire with precision.",
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'black',
+    statusBarStyle: 'default',
     title: "LUCY",
   },
   manifest: '/manifest.json',
@@ -32,7 +32,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: 'cover',
-  themeColor: '#000000',
+  themeColor: '#ffffff',
 };
 
 export default function RootLayout({
@@ -47,9 +47,6 @@ export default function RootLayout({
       >
         <AppInitializer />
         <QuillBackground />
-
-        {/* Status Bar Backdrop (Mobile Only) */}
-        <div className="fixed top-0 left-0 right-0 h-[env(safe-area-inset-top)] bg-black z-[100] lg:hidden" />
 
         <div className="relative z-10 w-full min-h-[100dvh] pb-[env(safe-area-inset-bottom)]">
           {children}

@@ -106,7 +106,7 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
                     {/* Item Selection */}
                     <div>
-                        <label className="block text-xs lg:text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-2 ml-1">Select Product *</label>
+                        <label className="block text-xs lg:text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-2 ml-1">Select Product *</label>
                         <button
                             type="button"
                             onClick={() => setIsItemPickerOpen(true)}
@@ -122,7 +122,7 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                             <div className="grid grid-cols-2 gap-3">
                                 {/* Quantity */}
                                 <div>
-                                    <label className="block text-xs lg:text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-2 ml-1">Quantity ({selectedItem.unit})</label>
+                                    <label className="block text-xs lg:text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-2 ml-1">Quantity ({selectedItem.unit})</label>
                                     <input
                                         type="number"
                                         step="any"
@@ -134,7 +134,7 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                                 </div>
                                 {/* Rate */}
                                 <div>
-                                    <label className="block text-xs lg:text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-2 ml-1">Rate ({selectedItem.unit})</label>
+                                    <label className="block text-xs lg:text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-2 ml-1">Rate ({selectedItem.unit})</label>
                                     <input
                                         type="number"
                                         step="any"

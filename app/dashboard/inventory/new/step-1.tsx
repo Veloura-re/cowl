@@ -32,7 +32,7 @@ export default function Step1BasicInfo({ onNext }: Step1Props) {
             <div className="p-5 space-y-4">
                 {/* Item Name - Large Input */}
                 <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-2">
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-2">
                         Item Name *
                     </label>
                     <input
@@ -55,7 +55,7 @@ export default function Step1BasicInfo({ onNext }: Step1Props) {
 
                 {/* Type Selection */}
                 <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-3">
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-3">
                         Item Type
                     </label>
                     <div className="grid grid-cols-2 gap-3">
@@ -100,7 +100,7 @@ export default function Step1BasicInfo({ onNext }: Step1Props) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Category */}
                     <div>
-                        <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-2">
+                        <label className="block text-[10px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-2">
                             Category
                         </label>
                         <input
@@ -114,7 +114,7 @@ export default function Step1BasicInfo({ onNext }: Step1Props) {
 
                     {/* SKU */}
                     <div>
-                        <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-2">
+                        <label className="block text-[10px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-2">
                             SKU / Reference ID
                         </label>
                         <input
@@ -129,7 +129,7 @@ export default function Step1BasicInfo({ onNext }: Step1Props) {
 
                 {/* Description */}
                 <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-2">
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-2">
                         Description (Optional)
                     </label>
                     <textarea

@@ -61,7 +61,7 @@ export const BottomNav = () => {
                             <div className="flex justify-between items-center mb-8">
                                 <div>
                                     <h3 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight">Management</h3>
-                                    <p className="text-[10px] font-bold text-[var(--foreground)]/40 uppercase tracking-[0.2em] mt-1">Advanced Controls</p>
+                                    <p className="text-[10px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest mt-1">Advanced Controls</p>
                                 </div>
                                 <button
                                     onClick={() => setIsMenuOpen(false)}
@@ -92,7 +92,7 @@ export const BottomNav = () => {
                                             )}>
                                                 <item.icon size={22} strokeWidth={2.5} />
                                             </div>
-                                            <span className="text-[10px] font-black uppercase tracking-[0.15em]">{item.label}</span>
+                                            <span className="text-[10px] font-black uppercase tracking-wider">{item.label}</span>
                                         </Link>
                                     )
                                 })}

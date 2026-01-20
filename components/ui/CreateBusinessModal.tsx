@@ -72,7 +72,7 @@ export default function CreateBusinessModal({ isOpen, onClose }: CreateBusinessM
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
                     <div>
-                        <label className="block text-xs lg:text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-2 ml-1">Business Name</label>
+                        <label className="block text-xs lg:text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-2 ml-1">Business Name</label>
                         <input
                             required
                             type="text"

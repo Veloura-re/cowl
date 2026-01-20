@@ -154,7 +154,7 @@ export default function NotificationCenter() {
                         <div className="px-5 py-4 border-b border-white/10 bg-white/40 flex items-center justify-between">
                             <div>
                                 <h3 className="text-sm lg:text-xs font-bold text-[var(--deep-contrast)]">Alert Center</h3>
-                                <p className="text-[9px] lg:text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.2em] leading-none mt-1">Activities & Updates</p>
+                                <p className="text-[9px] lg:text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest leading-none mt-1">Activities & Updates</p>
                             </div>
                             {unreadCount > 0 && (
                                 <button

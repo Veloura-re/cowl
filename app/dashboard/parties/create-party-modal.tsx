@@ -205,7 +205,7 @@ export default function CreatePartyModal({ isOpen, onClose, onSuccess, initialDa
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex items-center px-4 py-1.5 rounded-xl bg-[var(--deep-contrast)] text-white text-[9px] font-bold uppercase tracking-[0.2em] hover:bg-[var(--primary-green)] active:scale-95 transition-all disabled:opacity-50 shadow-lg shadow-[var(--deep-contrast)]/10"
+                            className="flex items-center px-4 py-1.5 rounded-xl bg-[var(--deep-contrast)] text-white text-[9px] font-bold uppercase tracking-widest hover:bg-[var(--primary-green)] active:scale-95 transition-all disabled:opacity-50 shadow-lg shadow-[var(--deep-contrast)]/10"
                         >
                             {loading && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
                             Save Party

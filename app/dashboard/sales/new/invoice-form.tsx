@@ -158,7 +158,7 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                 <button
                     onClick={handleSubmit}
                     disabled={loading}
-                    className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white hover:bg-[var(--primary-green)] transition-all disabled:opacity-50 shadow-lg active:scale-95"
+                    className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white hover:bg-[var(--primary-green)] transition-all disabled:opacity-50 shadow-lg active:scale-95"
                 >
                     <Save className="mr-1.5 h-3 w-3" />
                     Save Invoice
@@ -232,7 +232,7 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                             <span>{formatCurrency(totalTax)}</span>
                         </div>
                         <div className="flex justify-between text-base font-bold text-[var(--deep-contrast)] pt-2 border-t border-[var(--primary-green)]/5 mt-1 px-1">
-                            <span className="text-[10px] uppercase tracking-[0.2em] pt-1">Total</span>
+                            <span className="text-[10px] uppercase tracking-widest pt-1">Total</span>
                             <span>{formatCurrency(totalAmount)}</span>
                         </div>
                     </div>
@@ -243,7 +243,7 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                     <div className="glass rounded-[24px] border border-white/40 overflow-hidden">
                         <div className="px-5 py-2.5 border-b border-white/10 bg-[var(--primary-green)]/5 flex justify-between items-center">
                             <h3 className="text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-widest">Line Items</h3>
-                            <button onClick={addRow} className="flex items-center text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--primary-green)] hover:text-[var(--deep-contrast)] transition-all bg-white/40 px-3 py-1 rounded-full border border-white/50">
+                            <button onClick={addRow} className="flex items-center text-[9px] font-bold uppercase tracking-widest text-[var(--primary-green)] hover:text-[var(--deep-contrast)] transition-all bg-white/40 px-3 py-1 rounded-full border border-white/50">
                                 <Plus className="h-3 w-3 mr-1" /> Add Row
                             </button>
                         </div>
