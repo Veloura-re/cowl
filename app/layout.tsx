@@ -18,14 +18,21 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "LUCY | Business OS",
   description: "Manage your empire with precision.",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: "LUCY",
+  },
+  manifest: '/manifest.json',
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
+  userScalable: false,
   viewportFit: 'cover',
-  themeColor: '#000000', // Set your theme color here
+  themeColor: '#000000',
 }
 
 export default function RootLayout({
@@ -40,7 +47,7 @@ export default function RootLayout({
       >
         <AppInitializer />
         <QuillBackground />
-        <div className="relative z-10 w-full min-h-[100dvh] pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
+        <div className="relative z-10 w-full min-h-[100dvh] pb-[env(safe-area-inset-bottom)]">
           {children}
         </div>
       </body>

@@ -179,15 +179,15 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
             {/* Main Content Area - Compact */}
             <div className="flex-1 flex flex-col lg:pl-60 w-full transition-all duration-300">
                 {/* Mobile Header (Minimalist) - Compact */}
-                <header className="lg:hidden flex h-14 items-center justify-between px-4 sticky top-0 z-40 transition-all duration-300">
+                <header className="lg:hidden sticky top-0 z-[60] transition-all duration-300">
                     <div className={clsx(
-                        "absolute inset-0 transition-all duration-500",
-                        scrollingUp ? "bg-white/95 backdrop-blur-xl border-b border-[var(--primary-green)]/10 shadow-sm opacity-100" :
-                            scrolled ? "glass border-b border-white/20 !rounded-none !border-x-0 !border-t-0 shadow-sm opacity-100" :
-                                "bg-transparent opacity-0"
+                        "absolute inset-0 transition-all duration-300",
+                        scrolled
+                            ? "bg-white border-b border-black/5 shadow-md"
+                            : "bg-transparent"
                     )} />
 
-                    <div className="relative z-10 flex h-full items-center justify-between w-full">
+                    <div className="relative z-10 flex h-14 items-center justify-between px-4 pt-[env(safe-area-inset-top)] box-content">
                         <div className="w-10" /> {/* Spacer */}
                         <h2 className="text-[10px] font-bold text-[var(--deep-contrast)] uppercase tracking-[0.2em]">{activeBusiness?.name || 'MEMBER'}</h2>
                         <div className="flex items-center gap-1">
@@ -202,7 +202,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     </div>
                 </header>
 
-                <main className="flex-1 overflow-y-auto lg:overflow-visible p-3 lg:p-6 pb-24 lg:pb-6 scrollbar-hide relative">
+                <main className="flex-1 overflow-y-auto lg:overflow-visible p-3 lg:p-6 pb-24 lg:pb-6 scrollbar-hide relative pt-4">
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={pathname}

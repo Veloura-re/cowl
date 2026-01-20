@@ -73,10 +73,10 @@ export default function PickerModal({ isOpen, onClose, onSelect, options, title,
                                     )}
                                 >
                                     <div>
-                                        <p className="text-xs lg:text-[11px] font-bold tracking-tight leading-tight">{opt.label}</p>
+                                        <p className="text-[11px] lg:text-[10px] font-bold tracking-tight leading-tight">{opt.label}</p>
                                         {opt.subLabel && (
                                             <p className={clsx(
-                                                "text-[9px] lg:text-[8px] font-black uppercase tracking-widest leading-none mt-1.5 px-2 py-1 lg:py-0.5 rounded-full inline-block border",
+                                                "text-[8px] lg:text-[7px] font-black uppercase tracking-widest leading-none mt-1.5 px-2 py-1 lg:py-0.5 rounded-full inline-block border",
                                                 selectedValue === opt.id
                                                     ? "bg-white/20 text-white border-white/20"
                                                     : opt.subLabel === 'OWNER'
