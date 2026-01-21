@@ -24,7 +24,7 @@ export default function CompactItemForm({ initialData }: CompactItemFormProps) {
     const [isUnitPickerOpen, setIsUnitPickerOpen] = useState(false)
     const [isConfirmOpen, setIsConfirmOpen] = useState(false)
 
-    const isEdit = !!initialData
+    const isEdit = !!initialData?.id
 
     const [formData, setFormData] = useState({
         name: initialData?.name || '',

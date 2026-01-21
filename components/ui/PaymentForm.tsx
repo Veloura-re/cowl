@@ -33,7 +33,7 @@ export default function PaymentForm({
     const supabase = createClient()
     const { activeBusinessId, activeCurrencySymbol, formatCurrency } = useBusiness()
 
-    const isEdit = !!initialData
+    const isEdit = !!initialData?.id
     const type = initialData?.type || propType || 'RECEIPT'
     const isReceipt = type === 'RECEIPT'
 
@@ -138,8 +138,12 @@ export default function PaymentForm({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!activeBusinessId) return
+        const cleanUUID = (id: any) => (id && id !== 'undefined' && id !== '') ? id : null
+        if (!activeBusinessId || activeBusinessId === 'undefined') return
         setLoading(true)
+
+        const party_id = cleanUUID(formData.party_id)
+        const business_id = cleanUUID(activeBusinessId)
 
         try {
             if (isEdit) {
@@ -147,7 +151,7 @@ export default function PaymentForm({
                 const { error } = await supabase
                     .from('transactions')
                     .update({
-                        party_id: formData.party_id || null,
+                        party_id,
                         amount: Number(formData.amount),
                         mode: formData.mode,
                         date: formData.date,
@@ -158,13 +162,14 @@ export default function PaymentForm({
                 if (error) throw error
 
                 // Update Invoice Items if linked
-                if (initialData.invoice_id && billingEntries.length > 0) {
+                const invoice_id = cleanUUID(initialData.invoice_id)
+                if (invoice_id && billingEntries.length > 0) {
                     // Logic from PaymentModal: delete and re-insert
-                    await supabase.from('invoice_items').delete().eq('invoice_id', initialData.invoice_id)
+                    await supabase.from('invoice_items').delete().eq('invoice_id', invoice_id)
 
                     const itemsToInsert = billingEntries.map(e => ({
-                        invoice_id: initialData.invoice_id,
-                        item_id: e.itemId || null,
+                        invoice_id,
+                        item_id: cleanUUID(e.itemId),
                         description: e.name,
                         quantity: e.quantity,
                         rate: e.rate,
@@ -184,8 +189,8 @@ export default function PaymentForm({
             } else {
                 // Insert Transaction
                 const { error } = await supabase.from('transactions').insert({
-                    business_id: activeBusinessId,
-                    party_id: formData.party_id || null,
+                    business_id,
+                    party_id,
                     amount: Number(formData.amount),
                     type: type,
                     mode: formData.mode,

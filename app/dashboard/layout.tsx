@@ -23,7 +23,7 @@ const navigation = [
     { name: 'Sales', href: '/dashboard/sales', icon: FileText },
     { name: 'Purchases', href: '/dashboard/purchases', icon: ShoppingCart },
     { name: 'Inventory', href: '/dashboard/inventory', icon: Package },
-    { name: 'Finance', href: '/dashboard/finance', icon: Wallet },
+    { name: 'Payments', href: '/dashboard/finance', icon: Wallet },
     { name: 'Reports', href: '/dashboard/reports', icon: BarChart3 },
     { name: 'Parties', href: '/dashboard/parties', icon: Users },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },

@@ -37,7 +37,7 @@ type InvoiceItem = {
 export default function CompactInvoiceForm({ parties = [], items = [], paymentModes = [], initialData, initialLineItems }: InvoiceFormProps) {
     const router = useRouter()
     const supabase = createClient()
-    const isEdit = !!initialData
+    const isEdit = !!initialData?.id
     const isSale = initialData ? initialData.type === 'SALE' : true // Default to true if creating from sales route
 
     const [loading, setLoading] = useState(false)
@@ -352,7 +352,11 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!activeBusinessId || !partyId || rows.length === 0) return
+        const cleanUUID = (id: any) => (id && id !== 'undefined' && id !== '') ? id : null
+        const currentPartyId = cleanUUID(partyId)
+        const business_id = cleanUUID(activeBusinessId)
+
+        if (!business_id || !currentPartyId || rows.length === 0) return
         setLoading(true)
 
         try {
@@ -361,21 +365,21 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                 // 1. Reverse old stock
                 for (const item of initialLineItems || []) {
                     if (item.item_id) {
-                        const { data: dbItem } = await supabase.from('items').select('stock_quantity').eq('id', item.item_id).single()
+                        const { data: dbItem } = await supabase.from('items').select('stock_quantity').eq('id', cleanUUID(item.item_id)).single()
                         if (dbItem) {
                             const multiplier = isSale ? 1 : -1
                             const newStock = (dbItem.stock_quantity || 0) + (item.quantity * multiplier)
-                            await supabase.from('items').update({ stock_quantity: newStock }).eq('id', item.item_id)
+                            await supabase.from('items').update({ stock_quantity: newStock }).eq('id', cleanUUID(item.item_id))
                         }
                     }
                 }
 
                 // 2. Delete old items
-                const { error: deleteError } = await supabase.from('invoice_items').delete().eq('invoice_id', initialData.id)
+                const { error: deleteError } = await supabase.from('invoice_items').delete().eq('invoice_id', cleanUUID(initialData.id))
                 if (deleteError) throw deleteError
 
                 // 3. Recalculate Balance
-                const { data: transactions } = await supabase.from('transactions').select('amount, type').eq('invoice_id', initialData.id)
+                const { data: transactions } = await supabase.from('transactions').select('amount, type').eq('invoice_id', cleanUUID(initialData.id))
                 const netPaidOrReceived = transactions?.reduce((acc, t) => {
                     const amount = Number(t.amount) || 0
                     if (isSale) {
@@ -394,7 +398,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                 const { error: invoiceError } = await supabase
                     .from('invoices')
                     .update({
-                        party_id: partyId,
+                        party_id: currentPartyId,
                         invoice_number: invoiceNumber,
                         date: date,
                         due_date: dueDate || null,
@@ -406,14 +410,14 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                         tax_amount: invoiceTaxAmount,
                         attachments: attachments
                     })
-                    .eq('id', initialData.id)
+                    .eq('id', cleanUUID(initialData.id))
 
                 if (invoiceError) throw invoiceError
 
                 // 5. Insert new items
                 const newInvoiceItems = rows.map(row => ({
-                    invoice_id: initialData.id,
-                    item_id: row.itemId,
+                    invoice_id: cleanUUID(initialData.id),
+                    item_id: cleanUUID(row.itemId),
                     description: row.name,
                     quantity: row.quantity,
                     rate: row.rate,
@@ -428,11 +432,11 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                 // 6. Apply new stock
                 for (const row of rows) {
                     if (row.itemId) {
-                        const { data: item } = await supabase.from('items').select('stock_quantity').eq('id', row.itemId).single()
+                        const { data: item } = await supabase.from('items').select('stock_quantity').eq('id', cleanUUID(row.itemId)).single()
                         if (item) {
                             const multiplier = isSale ? -1 : 1
                             const newStock = (item.stock_quantity || 0) + (row.quantity * multiplier)
-                            await supabase.from('items').update({ stock_quantity: newStock }).eq('id', row.itemId)
+                            await supabase.from('items').update({ stock_quantity: newStock }).eq('id', cleanUUID(row.itemId))
                         }
                     }
                 }
@@ -452,8 +456,8 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                 const { data: invoice, error: invoiceError } = await supabase
                     .from('invoices')
                     .insert({
-                        business_id: activeBusinessId,
-                        party_id: partyId,
+                        business_id,
+                        party_id: currentPartyId,
                         invoice_number: finalInvoiceNumber,
                         date: date,
                         due_date: dueDate || null,
@@ -473,7 +477,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
 
                 const invoiceItems = rows.map(row => ({
                     invoice_id: invoice.id,
-                    item_id: row.itemId,
+                    item_id: cleanUUID(row.itemId),
                     description: row.name,
                     quantity: row.quantity,
                     rate: row.rate,
@@ -487,8 +491,8 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
 
                 if (isPaid && actualReceived > 0) {
                     const { error: txError } = await supabase.from('transactions').insert({
-                        business_id: activeBusinessId,
-                        party_id: partyId,
+                        business_id,
+                        party_id: currentPartyId,
                         invoice_id: invoice.id,
                         amount: Math.min(actualReceived, totalAmount),
                         type: isSale ? 'RECEIPT' : 'PAYMENT',
@@ -501,11 +505,11 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
 
                 for (const row of rows) {
                     if (row.itemId) {
-                        const { data: item } = await supabase.from('items').select('stock_quantity').eq('id', row.itemId).single()
+                        const { data: item } = await supabase.from('items').select('stock_quantity').eq('id', cleanUUID(row.itemId)).single()
                         if (item) {
                             const multiplier = isSale ? -1 : 1
                             const newStock = (item.stock_quantity || 0) + (row.quantity * multiplier)
-                            await supabase.from('items').update({ stock_quantity: newStock }).eq('id', row.itemId)
+                            await supabase.from('items').update({ stock_quantity: newStock }).eq('id', cleanUUID(row.itemId))
                         }
                     }
                 }
@@ -716,7 +720,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                         )}>
                                             {isFullyReceived && <div className="h-1 w-1 bg-white rounded-full" />}
                                         </div>
-                                        <span className="text-[7px] font-black uppercase tracking-wider">Fully Received</span>
+                                        <span className="text-[7px] font-black uppercase tracking-wider">{isSale ? 'Fully Received' : 'Fully Paid'}</span>
                                     </button>
                                 </div>
                                 <div className="space-y-1.5">

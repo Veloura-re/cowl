@@ -78,9 +78,9 @@ export default function PickerModal({
                         {filteredOptions.length > 0 ? (
                             filteredOptions.map((opt) => (
                                 <button
-                                    key={opt.id}
+                                    key={opt.id ?? 'undefined-opt'}
                                     onClick={() => {
-                                        onSelect(opt.id)
+                                        onSelect(opt.id ?? '')
                                         setSearchQuery('')
                                         onClose()
                                     }}

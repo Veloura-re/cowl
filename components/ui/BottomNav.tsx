@@ -19,7 +19,7 @@ const dockItems = [
 // Items in the hamburger menu
 const menuItems = [
     { icon: Home, label: "Dashboard", path: "/dashboard" },
-    { icon: CreditCard, label: "Finance", path: "/dashboard/finance" },
+    { icon: CreditCard, label: "Payments", path: "/dashboard/finance" },
     { icon: BarChart3, label: "Reports", path: "/dashboard/reports" },
     { icon: Settings, label: "Settings", path: "/dashboard/settings" },
 ];

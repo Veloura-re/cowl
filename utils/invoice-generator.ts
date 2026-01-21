@@ -1,7 +1,6 @@
-/**
- * Invoice Generator Utility
- * Generates printable HTML invoices that can be saved or printed
- */
+import { jsPDF } from 'jspdf'
+import 'jspdf-autotable'
+
 
 export type InvoiceData = {
     invoiceNumber: string
@@ -61,43 +60,68 @@ export function generateInvoiceHTML(data: InvoiceData): string {
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding: 40px;
-            background: #f5f5f5;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+            line-height: 1.5;
         }
-        .invoice {
-            max-width: 800px;
+        .invoice-page {
+            width: 210mm;
+            min-height: 297mm;
             margin: 0 auto;
             background: white;
-            padding: 40px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            padding: 20mm;
+            box-shadow: 0 0 10mm rgba(0,0,0,0.1);
+            display: flex;
+            flex-column;
+            flex-direction: column;
         }
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        @media print {
+            body { background: white; padding: 0; }
+            .invoice-page { box-shadow: none; margin: 0; width: 210mm; height: 297mm; }
+        }
+        
         .header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 3px solid #10b981;
+            align-items: flex-start;
+            border-bottom: 4px solid #10b981;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
         }
         .header h1 {
             color: #10b981;
-            font-size: 28px;
-            font-weight: 700;
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -1px;
         }
-        .header .invoice-number {
+        .header .biz-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .header .doc-info {
             text-align: right;
         }
-        .header .invoice-number h2 {
-            font-size: 16px;
-            color: #666;
-            font-weight: 600;
+        .header .doc-info p.label {
+            font-size: 10px;
+            font-weight: 900;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
         }
-        .header .invoice-number p {
+        .header .doc-info p.val {
             font-size: 24px;
-            color: #000;
-            font-weight: 700;
-            margin-top: 5px;
+            font-weight: 900;
+            color: #0f172a;
         }
+
         .parties {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -105,216 +129,190 @@ export function generateInvoiceHTML(data: InvoiceData): string {
             margin-bottom: 40px;
         }
         .party h3 {
-            font-size: 12px;
-            color: #666;
+            font-size: 10px;
+            font-weight: 900;
+            color: #94a3b8;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 5px;
             margin-bottom: 10px;
         }
-        .party p {
-            font-size: 14px;
-            color: #000;
-            line-height: 1.6;
-        }
         .party .name {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-        .dates {
-            display: flex;
-            gap: 30px;
-            margin-bottom: 30px;
-            padding: 15px;
-            background: #f9fafb;
-            border-radius: 8px;
-        }
-        .date-item {
-            flex: 1;
-        }
-        .date-item label {
-            font-size: 11px;
-            color: #666;
+            font-size: 16px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 4px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: block;
-            margin-bottom: 5px;
         }
-        .date-item span {
-            font-size: 14px;
-            font-weight: 600;
-            color: #000;
+        .party .detail {
+            font-size: 12px;
+            color: #64748b;
+            line-height: 1.4;
         }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid #e2e8f0;
+        }
+        .meta-item { text-align: center; }
+        .meta-item p.label {
+            font-size: 9px;
+            font-weight: 900;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+        .meta-item p.val {
+            font-size: 12px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 30px;
         }
-        thead {
+        th {
             background: #10b981;
             color: white;
-        }
-        th {
             padding: 12px;
-            text-align: left;
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 11px;
+            font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            text-align: left;
         }
-        th.right, td.right {
-            text-align: right;
-        }
-        th.center, td.center {
-            text-align: center;
-        }
-        tbody tr {
-            border-bottom: 1px solid #e5e7eb;
-        }
-        tbody tr:hover {
-            background: #f9fafb;
-        }
+        th:first-child { border-radius: 8px 0 0 0; }
+        th:last-child { border-radius: 0 8px 0 0; }
         td {
             padding: 12px;
-            font-size: 13px;
-            color: #374151;
-        }
-        .totals {
-            margin-left: auto;
-            width: 350px;
-        }
-        .totals-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            font-size: 14px;
-        }
-        .totals-row.subtotal {
-            color: #666;
-        }
-        .totals-row.total {
-            border-top: 2px solid #10b981;
-            margin-top: 10px;
-            padding-top: 15px;
-            font-size: 18px;
-            font-weight: 700;
-            color: #000;
-        }
-        .totals-row.discount {
-            color: #f59e0b;
-        }
-        .status {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .status.paid {
-            background: #d1fae5;
-            color: #065f46;
-        }
-        .status.unpaid {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-        .status.partial {
-            background: #fef3c7;
-            color: #92400e;
-        }
-        .notes {
-            margin-top: 30px;
-            padding: 20px;
-            background: #f9fafb;
-            border-left: 4px solid #10b981;
-            border-radius: 4px;
-        }
-        .notes h4 {
             font-size: 12px;
-            color: #666;
-            text-transform: uppercase;
-            margin-bottom: 8px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
         }
-        .notes p {
-            font-size: 13px;
-            color: #374151;
-            line-height: 1.6;
-        }
-        .footer {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #e5e7eb;
-            text-align: center;
-            color: #9ca3af;
-            font-size: 11px;
-        }
-        .signature-container {
-            margin-top: 40px;
+        td.bold { font-weight: 700; }
+        td.right { text-align: right; }
+        td.center { text-align: center; }
+
+        .summary-container {
             display: flex;
             justify-content: flex-end;
-            align-items: center;
-            gap: 20px;
+            margin-bottom: 40px;
         }
-        .signature-box {
-            text-align: center;
-            width: 200px;
+        .summary-box {
+            width: 250px;
         }
-        .signature-image {
-            width: 150px;
-            height: auto;
-            border-bottom: 2px solid #000;
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 13px;
+        }
+        .summary-row.total {
+            border-top: 2px solid #10b981;
+            margin-top: 10px;
+            padding-top: 12px;
+            font-size: 18px;
+            font-weight: 900;
+            color: #0f172a;
+        }
+        .summary-row.accent { color: #10b981; font-weight: 700; }
+        .summary-row.danger { color: #ef4444; font-weight: 700; }
+
+        .notes {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #10b981;
+            margin-top: 20px;
+        }
+        .notes h4 {
+            font-size: 10px;
+            font-weight: 900;
+            color: #94a3b8;
+            text-transform: uppercase;
             margin-bottom: 5px;
         }
-        .signature-label {
+        .notes p {
             font-size: 12px;
-            color: #666;
-            font-weight: 600;
+            color: #475569;
+            line-height: 1.5;
+        }
+
+        .footer {
+            margin-top: auto;
+            padding-top: 30px;
+            border-top: 1px solid #f1f5f9;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+        
+        .signature-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 40px;
+        }
+        .sig-box {
+            text-align: center;
+            width: 180px;
+        }
+        .sig-line {
+            border-bottom: 2px solid #0f172a;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+        .sig-image { height: 50px; width: auto; }
+        .sig-label {
+            font-size: 10px;
+            font-weight: 900;
+            color: #94a3b8;
             text-transform: uppercase;
         }
+
+        .attachments { margin-top: 40px; }
         .attachments-grid {
-            margin-top: 40px;
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: 1fr 1fr;
             gap: 15px;
+            margin-top: 15px;
         }
-        .attachment-item {
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
+        .attachment-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
             overflow: hidden;
-            background: #f9fafb;
+            background: #f8fafc;
         }
-        .attachment-image {
+        .attachment-img {
             width: 100%;
-            height: 200px;
+            height: 180px;
             object-fit: contain;
-        }
-        .attachment-label {
-            padding: 8px;
-            font-size: 10px;
-            color: #666;
-            background: #fff;
-            border-top: 1px solid #e5e7eb;
-            text-align: center;
-        }
-        @media print {
-            body { padding: 0; background: white; }
-            .invoice { box-shadow: none; width: 100%; max-width: none; border: none; padding: 20px; }
-            .attachment-item { break-inside: avoid; }
+            background: white;
         }
     </style>
 </head>
 <body>
-    <div class="invoice">
+    <div class="invoice-page">
         <div class="header">
             <div>
                 <h1>${title}</h1>
-                <p style="color: #666; font-size: 14px; margin-top: 5px;">${data.businessName}</p>
+                <p class="biz-name">${data.businessName}</p>
             </div>
-            <div class="invoice-number">
-                <h2>Invoice Number</h2>
-                <p>${data.invoiceNumber}</p>
+            <div class="doc-info">
+                <p class="label">Document No.</p>
+                <p class="val">${data.invoiceNumber}</p>
             </div>
         </div>
         
@@ -322,31 +320,29 @@ export function generateInvoiceHTML(data: InvoiceData): string {
             <div class="party">
                 <h3>From</h3>
                 <p class="name">${data.businessName}</p>
-                ${data.businessAddress ? `<p>${data.businessAddress}</p>` : ''}
-                ${data.businessPhone ? `<p>${data.businessPhone}</p>` : ''}
+                <p class="detail">${data.businessAddress || ''}</p>
+                <p class="detail">${data.businessPhone || ''}</p>
             </div>
             <div class="party">
                 <h3>${isSale ? 'Bill To' : 'Supplier'}</h3>
                 <p class="name">${data.partyName}</p>
-                ${data.partyAddress ? `<p>${data.partyAddress}</p>` : ''}
-                ${data.partyPhone ? `<p>${data.partyPhone}</p>` : ''}
+                <p class="detail">${data.partyAddress || ''}</p>
+                <p class="detail">${data.partyPhone || ''}</p>
             </div>
         </div>
         
-        <div class="dates">
-            <div class="date-item">
-                <label>Invoice Date</label>
-                <span>${new Date(data.date).toLocaleDateString()}</span>
+        <div class="meta-grid">
+            <div class="meta-item">
+                <p class="label">Date</p>
+                <p class="val">${new Date(data.date).toLocaleDateString()}</p>
             </div>
-            ${data.dueDate ? `
-            <div class="date-item">
-                <label>Due Date</label>
-                <span>${new Date(data.dueDate).toLocaleDateString()}</span>
+            <div class="meta-item">
+                <p class="label">Due Date</p>
+                <p class="val">${data.dueDate ? new Date(data.dueDate).toLocaleDateString() : 'N/A'}</p>
             </div>
-            ` : ''}
-            <div class="date-item">
-                <label>Status</label>
-                <span class="status ${data.status.toLowerCase()}">${data.status}</span>
+            <div class="meta-item">
+                <p class="label">Status</p>
+                <p class="val" style="color: ${data.status === 'PAID' ? '#10b981' : '#ef4444'}">${data.status}</p>
             </div>
         </div>
         
@@ -354,7 +350,7 @@ export function generateInvoiceHTML(data: InvoiceData): string {
             <thead>
                 <tr>
                     <th>Description</th>
-                    <th class="center">Quantity</th>
+                    <th class="center">Qty</th>
                     <th class="right">Rate</th>
                     <th class="right">Tax</th>
                     <th class="right">Amount</th>
@@ -363,47 +359,49 @@ export function generateInvoiceHTML(data: InvoiceData): string {
             <tbody>
                 ${data.items.map(item => `
                 <tr>
-                    <td>${item.description}</td>
+                    <td class="bold">${item.description}</td>
                     <td class="center">${item.quantity}</td>
-                    <td class="right">${data.currencySymbol} ${item.rate.toFixed(2)}</td>
+                    <td class="right">${data.currencySymbol}${item.rate.toFixed(2)}</td>
                     <td class="right">${item.tax}%</td>
-                    <td class="right">${data.currencySymbol} ${item.total.toFixed(2)}</td>
+                    <td class="right" style="font-weight: 900">${data.currencySymbol}${item.total.toFixed(2)}</td>
                 </tr>
                 `).join('')}
             </tbody>
         </table>
         
-        <div class="totals">
-            <div class="totals-row subtotal">
-                <span>Subtotal</span>
-                <span>${data.currencySymbol} ${data.subtotal.toFixed(2)}</span>
+        <div class="summary-container">
+            <div class="summary-box">
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span>${data.currencySymbol}${data.subtotal.toFixed(2)}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Taxation</span>
+                    <span>${data.currencySymbol}${data.taxAmount.toFixed(2)}</span>
+                </div>
+                ${data.discountAmount && data.discountAmount > 0 ? `
+                <div class="summary-row" style="color: #f59e0b">
+                    <span>Discount</span>
+                    <span>-${data.currencySymbol}${data.discountAmount.toFixed(2)}</span>
+                </div>
+                ` : ''}
+                <div class="summary-row total">
+                    <span>Total Amount</span>
+                    <span>${data.currencySymbol}${data.totalAmount.toFixed(2)}</span>
+                </div>
+                ${data.paidAmount && data.paidAmount > 0 ? `
+                <div class="summary-row accent">
+                    <span>Amount Paid</span>
+                    <span>${data.currencySymbol}${data.paidAmount.toFixed(2)}</span>
+                </div>
+                ` : ''}
+                ${data.balanceAmount && data.balanceAmount > 0 ? `
+                <div class="summary-row danger">
+                    <span>Balance Due</span>
+                    <span>${data.currencySymbol}${data.balanceAmount.toFixed(2)}</span>
+                </div>
+                ` : ''}
             </div>
-            <div class="totals-row subtotal">
-                <span>Tax</span>
-                <span>${data.currencySymbol} ${data.taxAmount.toFixed(2)}</span>
-            </div>
-            ${data.discountAmount && data.discountAmount > 0 ? `
-            <div class="totals-row discount">
-                <span>Discount</span>
-                <span>- ${data.currencySymbol} ${data.discountAmount.toFixed(2)}</span>
-            </div>
-            ` : ''}
-            <div class="totals-row total">
-                <span>Total Amount</span>
-                <span>${data.currencySymbol} ${data.totalAmount.toFixed(2)}</span>
-            </div>
-            ${data.paidAmount && data.paidAmount > 0 ? `
-            <div class="totals-row subtotal" style="color: #10b981;">
-                <span>Paid</span>
-                <span>${data.currencySymbol} ${data.paidAmount.toFixed(2)}</span>
-            </div>
-            ` : ''}
-            ${data.balanceAmount && data.balanceAmount > 0 ? `
-            <div class="totals-row subtotal" style="color: #dc2626;">
-                <span>Balance Due</span>
-                <span>${data.currencySymbol} ${data.balanceAmount.toFixed(2)}</span>
-            </div>
-            ` : ''}
         </div>
         
         ${data.notes ? `
@@ -413,37 +411,31 @@ export function generateInvoiceHTML(data: InvoiceData): string {
         </div>
         ` : ''}
 
+        <div class="signature-section">
+            <div class="sig-box">
+                <div class="sig-line">
+                    ${data.signature ? `<img src="${data.signature}" class="sig-image">` : ''}
+                </div>
+                <p class="sig-label">Authorized Signature</p>
+            </div>
+        </div>
+
         ${data.attachments && data.attachments.length > 0 ? `
-        <div style="margin-top: 30px;">
-            <h4 style="font-size: 12px; color: #666; text-transform: uppercase; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Attachments / Proof</h4>
+        <div class="attachments">
+            <h4 style="font-size: 10px; color: #94a3b8; text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px;">Recorded Proof</h4>
             <div class="attachments-grid">
                 ${data.attachments.map((url, idx) => `
-                <div class="attachment-item">
-                    <img src="${url}" class="attachment-image" onerror="this.src='https://via.placeholder.com/200?text=Attachment+${idx + 1}'">
-                    <div class="attachment-label">Proof Document #${idx + 1}</div>
+                <div class="attachment-card">
+                    <img src="${url}" class="attachment-img" onerror="this.src='https://via.placeholder.com/200?text=Attachment+${idx + 1}'">
                 </div>
                 `).join('')}
             </div>
         </div>
         ` : ''}
-
-        <div class="signature-container">
-            ${data.signature ? `
-            <div class="signature-box">
-                <img src="${data.signature}" class="signature-image" alt="Signature">
-                <div class="signature-label">Authorized Signature</div>
-            </div>
-            ` : `
-            <div class="signature-box" style="visibility: hidden;">
-                <div class="signature-image"></div>
-                <div class="signature-label">Authorized Signature</div>
-            </div>
-            `}
-        </div>
         
         <div class="footer">
-            <p>Generated by LUCY-ex on ${new Date().toLocaleString()}</p>
-            <p>Phone: ${data.businessPhone || 'N/A'} | Address: ${data.businessAddress || 'N/A'}</p>
+            <p>GENERATED BY LUCY-EX CLOUD SYSTEM • ${new Date().toLocaleString()}</p>
+            <p>${data.businessAddress || ''} • ${data.businessPhone || ''}</p>
         </div>
     </div>
 </body>
@@ -467,18 +459,171 @@ export function printInvoice(data: InvoiceData) {
     }
 }
 
+
 /**
- * Download invoice as HTML file
+ * Download invoice as PDF file using jsPDF
  */
 export function downloadInvoice(data: InvoiceData) {
-    const html = generateInvoiceHTML(data)
-    const blob = new Blob([html], { type: 'text/html' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${data.invoiceNumber}.html`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
+    const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+    })
+
+    const isSale = data.type === 'SALE'
+    const title = isSale ? 'SALES INVOICE' : 'PURCHASE BILL'
+
+    // Colors
+    const primaryColor = [16, 185, 129] // #10b981
+    const darkColor = [15, 23, 42] // #0f172a
+    const grayColor = [100, 116, 139] // #64748b
+
+    // Header
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(28)
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
+    doc.text(title, 20, 25)
+
+    doc.setFontSize(10)
+    doc.setTextColor(grayColor[0], grayColor[1], grayColor[2])
+    doc.text(data.businessName.toUpperCase(), 20, 32)
+
+    // Document No
+    doc.setFontSize(8)
+    doc.text('DOCUMENT NO.', 190, 20, { align: 'right' })
+    doc.setFontSize(18)
+    doc.setTextColor(darkColor[0], darkColor[1], darkColor[2])
+    doc.text(data.invoiceNumber, 190, 28, { align: 'right' })
+
+    // Divider
+    doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2])
+    doc.setLineWidth(1)
+    doc.line(20, 38, 190, 38)
+
+    // Parties
+    let y = 50
+
+    // FROM
+    doc.setFontSize(8)
+    doc.setTextColor(grayColor[0], grayColor[1], grayColor[2])
+    doc.text('FROM', 20, y)
+    doc.text(isSale ? 'BILL TO' : 'SUPPLIER', 110, y)
+
+    y += 5
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(darkColor[0], darkColor[1], darkColor[2])
+    doc.text(data.businessName, 20, y)
+    doc.text(data.partyName, 110, y)
+
+    y += 5
+    doc.setFontSize(9)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(grayColor[0], grayColor[1], grayColor[2])
+    doc.text(data.businessAddress || '', 20, y, { maxWidth: 70 })
+    doc.text(data.partyAddress || '', 110, y, { maxWidth: 70 })
+
+    y += 10
+    doc.text(data.businessPhone || '', 20, y)
+    doc.text(data.partyPhone || '', 110, y)
+
+    // Meta Grid
+    y += 15
+    doc.setFillColor(248, 250, 252)
+    doc.roundedRect(20, y, 170, 15, 3, 3, 'F')
+
+    doc.setFontSize(8)
+    doc.setFont('helvetica', 'bold')
+    doc.text('DATE', 35, y + 6, { align: 'center' })
+    doc.text('DUE DATE', 105, y + 6, { align: 'center' })
+    doc.text('STATUS', 175, y + 6, { align: 'center' })
+
+    doc.setFontSize(10)
+    doc.setTextColor(darkColor[0], darkColor[1], darkColor[2])
+    doc.text(new Date(data.date).toLocaleDateString(), 35, y + 11, { align: 'center' })
+    doc.text(data.dueDate ? new Date(data.dueDate).toLocaleDateString() : 'N/A', 105, y + 11, { align: 'center' })
+    doc.text(data.status, 175, y + 11, { align: 'center' })
+
+    // Table
+    y += 25
+    const tableBody = data.items.map(item => [
+        item.description,
+        item.quantity.toString(),
+        `${data.currencySymbol}${item.rate.toFixed(2)}`,
+        `${item.tax}%`,
+        `${data.currencySymbol}${item.total.toFixed(2)}`
+    ])
+
+        ; (doc as any).autoTable({
+            startY: y,
+            head: [['Description', 'Qty', 'Rate', 'Tax', 'Amount']],
+            body: tableBody,
+            theme: 'grid',
+            headStyles: {
+                fillColor: [16, 185, 129],
+                textColor: 255,
+                fontSize: 9,
+                fontStyle: 'bold',
+                halign: 'left'
+            },
+            columnStyles: {
+                1: { halign: 'center' },
+                2: { halign: 'right' },
+                3: { halign: 'right' },
+                4: { halign: 'right', fontStyle: 'bold' }
+            },
+            styles: {
+                fontSize: 9,
+                cellPadding: 5
+            }
+        })
+
+    // Totals
+    const finalY = (doc as any).lastAutoTable.finalY + 10
+    doc.setFontSize(10)
+    doc.setTextColor(grayColor[0], grayColor[1], grayColor[2])
+
+    let ty = finalY
+    doc.text('Subtotal:', 140, ty)
+    doc.setTextColor(darkColor[0], darkColor[1], darkColor[2])
+    doc.text(`${data.currencySymbol}${data.subtotal.toFixed(2)}`, 190, ty, { align: 'right' })
+
+    ty += 7
+    doc.setTextColor(grayColor[0], grayColor[1], grayColor[2])
+    doc.text('Taxation:', 140, ty)
+    doc.setTextColor(darkColor[0], darkColor[1], darkColor[2])
+    doc.text(`${data.currencySymbol}${data.taxAmount.toFixed(2)}`, 190, ty, { align: 'right' })
+
+    if (data.discountAmount && data.discountAmount > 0) {
+        ty += 7
+        doc.setTextColor(245, 158, 11) // Amber
+        doc.text('Discount:', 140, ty)
+        doc.text(`-${data.currencySymbol}${data.discountAmount.toFixed(2)}`, 190, ty, { align: 'right' })
+    }
+
+    ty += 10
+    doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2])
+    doc.line(140, ty - 5, 190, ty - 5)
+    doc.setFontSize(14)
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
+    doc.text('TOTAL:', 140, ty)
+    doc.setTextColor(darkColor[0], darkColor[1], darkColor[2])
+    doc.text(`${data.currencySymbol}${data.totalAmount.toFixed(2)}`, 190, ty, { align: 'right' })
+
+    // Signature Area
+    if (data.signature) {
+        doc.addImage(data.signature, 'PNG', 140, ty + 10, 40, 20)
+    }
+    doc.setFontSize(8)
+    doc.setTextColor(grayColor[0], grayColor[1], grayColor[2])
+    doc.line(140, ty + 30, 185, ty + 30)
+    doc.text('AUTHORIZED SIGNATURE', 162.5, ty + 34, { align: 'center' })
+
+    // Footer
+    doc.setFontSize(8)
+    doc.setTextColor(grayColor[0], grayColor[1], grayColor[2])
+    doc.text(`GENERATED BY LUCY-EX CLOUD SYSTEM • ${new Date().toLocaleString()}`, 105, 285, { align: 'center' })
+
+    doc.save(`${data.invoiceNumber}.pdf`)
 }
+

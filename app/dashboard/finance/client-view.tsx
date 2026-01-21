@@ -126,7 +126,7 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
             {/* Header - Sophisticated */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-[var(--primary-green)]/10">
                 <div>
-                    <h1 className="text-2xl font-black text-[var(--deep-contrast)] tracking-tight">Finance</h1>
+                    <h1 className="text-2xl font-black text-[var(--deep-contrast)] tracking-tight">Payments</h1>
                     <p className="text-[10px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-none">Financial Intelligence & Ledger</p>
                 </div>
                 <div className="flex gap-2">

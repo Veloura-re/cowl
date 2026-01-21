@@ -29,6 +29,31 @@ export default function NotificationCenter() {
     const dropdownRef = useRef<HTMLDivElement>(null)
 
     const [userId, setUserId] = useState<string | null>(null)
+    const [permission, setPermission] = useState<NotificationPermission>('default')
+
+    useEffect(() => {
+        if ('Notification' in window) {
+            setPermission(Notification.permission)
+            if (Notification.permission === 'default') {
+                Notification.requestPermission().then(setPermission)
+            }
+        }
+    }, [])
+
+    const sendBrowserNotification = (notif: Notification) => {
+        if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+            const n = new window.Notification(notif.title, {
+                body: notif.message,
+                icon: '/logo.png',
+                tag: notif.id // Prevent duplicates
+            })
+            n.onclick = () => {
+                window.focus()
+                setIsOpen(true)
+                n.close()
+            }
+        }
+    }
 
     const fetchNotifications = async () => {
         if (!activeBusinessId) return
@@ -83,6 +108,7 @@ export default function NotificationCenter() {
                     if (user && newNotif.user_id === user.id) {
                         setNotifications(prev => [newNotif, ...prev.slice(0, 19)])
                         setUnreadCount(prev => prev + 1)
+                        sendBrowserNotification(newNotif)
                     }
                 })
             })
@@ -149,7 +175,7 @@ export default function NotificationCenter() {
                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        className="fixed sm:absolute top-20 sm:top-full right-4 sm:right-0 w-[calc(100vw-32px)] sm:w-80 glass rounded-[24px] border border-white/40 shadow-2xl z-[100] overflow-hidden"
+                        className="fixed sm:absolute top-20 sm:top-full right-4 sm:right-0 w-[calc(100vw-32px)] sm:w-80 bg-white/95 backdrop-blur-xl rounded-[24px] border border-white/40 shadow-2xl z-[100] overflow-hidden"
                     >
                         <div className="px-5 py-4 border-b border-white/10 bg-white/40 flex items-center justify-between">
                             <div>

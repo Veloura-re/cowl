@@ -160,13 +160,17 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
 
     const handleSubmit = async (e: React.FormEvent, shouldPrint = false) => {
         if (e) e.preventDefault()
-        if (!partyId) return alert('Select a supplier')
+        const cleanUUID = (id: any) => (id && id !== 'undefined' && id !== '') ? id : null
+        const currentPartyId = cleanUUID(partyId)
+        const business_id = cleanUUID(activeBusinessId)
+
+        if (!currentPartyId) return alert('Select a supplier')
 
         // Auto-generate bill number if not provided
         const finalInvoiceNumber = invoiceNumber.trim() || 'BILL-' + Math.floor(Math.random() * 100000)
 
         if (rows.length === 0) return showError('Add at least one item')
-        if (!activeBusinessId) return
+        if (!business_id) return
         setLoading(true)
         setIsGlobalLoading(true)
 
@@ -186,8 +190,8 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
             const { data: bill, error: billError } = await supabase
                 .from('invoices')
                 .insert({
-                    business_id: activeBusinessId,
-                    party_id: partyId,
+                    business_id,
+                    party_id: currentPartyId,
                     invoice_number: finalInvoiceNumber,
                     date: date,
                     due_date: dueDate || null,
@@ -208,7 +212,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
             // 2. Create Items
             const invoiceItems = rows.map(row => ({
                 invoice_id: bill.id,
-                item_id: row.itemId || null,
+                item_id: cleanUUID(row.itemId),
                 description: row.name,
                 quantity: row.quantity,
                 rate: row.rate,
@@ -222,8 +226,8 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
             // 3. Create Transaction if Paid
             if (isPaid && actualPaid > 0) {
                 const { error: txError } = await supabase.from('transactions').insert({
-                    business_id: activeBusinessId,
-                    party_id: partyId,
+                    business_id,
+                    party_id: currentPartyId,
                     invoice_id: bill.id,
                     amount: Math.min(actualPaid, totalAmount),
                     type: 'PAYMENT',
@@ -237,10 +241,10 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
             // 4. Update Stock
             for (const row of rows) {
                 if (row.itemId) {
-                    const { data: item } = await supabase.from('items').select('stock_quantity').eq('id', row.itemId).single()
+                    const { data: item } = await supabase.from('items').select('stock_quantity').eq('id', cleanUUID(row.itemId)).single()
                     if (item) {
                         const newStock = (item.stock_quantity || 0) + row.quantity
-                        await supabase.from('items').update({ stock_quantity: newStock }).eq('id', row.itemId)
+                        await supabase.from('items').update({ stock_quantity: newStock }).eq('id', cleanUUID(row.itemId))
                     }
                 }
             }
