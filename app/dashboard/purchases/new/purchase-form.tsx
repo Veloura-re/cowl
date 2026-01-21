@@ -27,7 +27,7 @@ type InvoiceItem = {
 }
 
 export default function PurchaseForm({ parties, items, paymentModes }: PurchaseFormProps) {
-    const { activeBusinessId, formatCurrency } = useBusiness()
+    const { activeBusinessId, formatCurrency, setIsGlobalLoading, showSuccess, showError } = useBusiness()
 
     // Filter data by active business
     const filteredParties = parties.filter(p => p.business_id === activeBusinessId)
@@ -163,9 +163,10 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
         // Auto-generate bill number if not provided
         const finalInvoiceNumber = invoiceNumber.trim() || 'BILL-' + Math.floor(Math.random() * 100000)
 
-        if (rows.length === 0) return alert('Add at least one item')
+        if (rows.length === 0) return showError('Add at least one item')
         if (!activeBusinessId) return
         setLoading(true)
+        setIsGlobalLoading(true)
 
         try {
             const isPaid = paymentMode !== 'UNPAID'
@@ -242,10 +243,13 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                 }
             }
 
+            setIsGlobalLoading(false)
+            showSuccess(`Bill ${finalInvoiceNumber} recorded successfully.`)
             router.push('/dashboard/purchases')
             router.refresh()
         } catch (err: any) {
-            alert(err.message)
+            setIsGlobalLoading(false)
+            showError(err.message, 'Bill Failure')
         } finally {
             setLoading(false)
         }

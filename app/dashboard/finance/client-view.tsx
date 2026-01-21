@@ -15,7 +15,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
 export default function FinanceClientView({ initialTransactions }: { initialTransactions?: any[] }) {
     const router = useRouter()
-    const { activeBusinessId, formatCurrency } = useBusiness()
+    const { activeBusinessId, formatCurrency, isLoading: isContextLoading, setIsGlobalLoading, showSuccess, showError } = useBusiness()
     const [transactions, setTransactions] = useState(initialTransactions || [])
     const [searchQuery, setSearchQuery] = useState('')
     const [typeFilter, setTypeFilter] = useState<string>('ALL')
@@ -24,7 +24,6 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
     const [confirmModal, setConfirmModal] = useState<{ open: boolean, transactionId: string }>({ open: false, transactionId: '' })
     const [isDeleting, setIsDeleting] = useState(false)
-    const [feedbackModal, setFeedbackModal] = useState<{ open: boolean, message: string, variant: 'success' | 'error' }>({ open: false, message: '', variant: 'success' })
     const [loading, setLoading] = useState(!initialTransactions)
     const [isSortPickerOpen, setIsSortPickerOpen] = useState(false)
     const [isTypePickerOpen, setIsTypePickerOpen] = useState(false)
@@ -32,20 +31,22 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
     const supabase = createClient()
 
     useEffect(() => {
-        if (!initialTransactions) {
-            const fetchTransactions = async () => {
-                setLoading(true)
-                const { data } = await supabase
-                    .from('transactions')
-                    .select('*, party:parties(name)')
-                    .order('date', { ascending: false })
-                    .limit(50) // reasonable limit for client side fetch
-                if (data) setTransactions(data)
-                setLoading(false)
+        const fetchTransactions = async () => {
+            setLoading(true)
+            console.log('FinanceClientView: Fetching fresh ledger...')
+            const { data, error } = await supabase
+                .from('transactions')
+                .select('*, party:parties(name)')
+                .order('date', { ascending: false })
+                .limit(50)
+            if (error) {
+                console.error('FinanceClientView: Error fetching transactions', error)
             }
-            fetchTransactions()
+            if (data) setTransactions(data)
+            setLoading(false)
         }
-    }, [initialTransactions])
+        fetchTransactions()
+    }, [activeBusinessId])
 
     const handleDelete = async (e: React.MouseEvent, id: string) => {
         e.stopPropagation()
@@ -54,16 +55,18 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
 
     const executeDelete = async (id: string) => {
         setIsDeleting(true)
+        setIsGlobalLoading(true)
         try {
             const { error } = await supabase.from('transactions').delete().eq('id', id)
             if (error) throw error
             setTransactions(transactions.filter(t => t.id !== id))
-            setFeedbackModal({ open: true, message: 'Transaction removed from ledger.', variant: 'success' })
+            showSuccess('Transaction removed from ledger.')
             setConfirmModal({ open: false, transactionId: '' })
         } catch (err: any) {
-            setFeedbackModal({ open: true, message: 'Failed to delete transaction: ' + err.message, variant: 'error' })
+            showError('Failed to delete transaction: ' + err.message)
         } finally {
             setIsDeleting(false)
+            setIsGlobalLoading(false)
         }
     }
 
@@ -335,13 +338,14 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                     <div className="px-2 py-0.5 rounded-full bg-[var(--primary-green)]/10 border border-[var(--primary-green)]/20 text-[7px] font-black uppercase tracking-wider text-[var(--primary-green)]">Live Feed</div>
                 </div>
                 <div className="divide-y divide-white/5">
-                    {loading ? (
-                        <div className="py-20">
-                            <LoadingSpinner label="Fetching Ledger..." />
+                    {(loading || isContextLoading) ? (
+                        <div className="py-24 flex flex-col items-center justify-center animate-pulse">
+                            <LoadingSpinner size="lg" label="Synchronizing Wallet..." />
+                            <p className="text-[8px] font-bold text-[var(--foreground)]/20 uppercase tracking-[0.3em] mt-3">Vault Connection Established</p>
                         </div>
                     ) : (
                         <>
-                            {filteredTransactions.map((t) => (
+                            {!isContextLoading && filteredTransactions.map((t) => (
                                 <div
                                     key={t.id}
                                     onClick={(e) => handleEdit(e, t)}
@@ -421,13 +425,6 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                 message="This will permanently remove the transaction from your financial history."
                 confirmText="Delete"
                 cancelText="Abort"
-            />
-
-            <FeedbackModal
-                isOpen={feedbackModal.open}
-                onClose={() => setFeedbackModal({ ...feedbackModal, open: false })}
-                message={feedbackModal.message}
-                variant={feedbackModal.variant}
             />
         </div>
     )
