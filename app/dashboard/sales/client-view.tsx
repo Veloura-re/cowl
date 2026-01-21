@@ -28,17 +28,28 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
 
     useEffect(() => {
         const fetchInvoices = async () => {
+            if (!activeBusinessId) {
+                console.log('SalesClientView: No active business, skipping fetch')
+                setLoading(false)
+                return
+            }
+
             setLoading(true)
-            console.log('SalesClientView: Fetching fresh invoices...')
+            console.log('SalesClientView: Fetching fresh invoices for business:', activeBusinessId)
             const { data, error } = await supabase
                 .from('invoices')
                 .select('*, party:parties(name)')
+                .eq('business_id', activeBusinessId)
                 .eq('type', 'SALE')
                 .order('date', { ascending: false })
+
             if (error) {
                 console.error('SalesClientView: Error fetching invoices', error)
             }
-            if (data) setInvoices(data)
+            if (data) {
+                console.log('SalesClientView: Fetched', data.length, 'invoices')
+                setInvoices(data)
+            }
             setLoading(false)
         }
         fetchInvoices()
@@ -48,9 +59,9 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
         router.push(`/dashboard/sales/edit?id=${invoice.id}`)
     }
 
+    // Invoices are already filtered by business_id at the database level
     let filteredInvoices = invoices.filter((inv) =>
-        inv.business_id === activeBusinessId && (
-            inv.invoice_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (inv.invoice_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
             (inv.party?.name && inv.party.name.toLowerCase().includes(searchQuery.toLowerCase()))
         ) && (statusFilter === 'ALL' || inv.status === statusFilter)
     )

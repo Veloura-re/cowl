@@ -26,13 +26,27 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
 
     useEffect(() => {
         const fetchItems = async () => {
+            if (!activeBusinessId) {
+                console.log('InventoryClientView: No active business, skipping fetch')
+                setLoading(false)
+                return
+            }
+
             setLoading(true)
-            console.log('InventoryClientView: Fetching fresh items...')
-            const { data, error } = await supabase.from('items').select('*').order('name')
+            console.log('InventoryClientView: Fetching fresh items for business:', activeBusinessId)
+            const { data, error } = await supabase
+                .from('items')
+                .select('*')
+                .eq('business_id', activeBusinessId)
+                .order('name')
+
             if (error) {
                 console.error('InventoryClientView: Error fetching items', error)
             }
-            if (data) setItems(data)
+            if (data) {
+                console.log('InventoryClientView: Fetched', data.length, 'items')
+                setItems(data)
+            }
             setLoading(false)
         }
         fetchItems()
@@ -40,10 +54,8 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
     // Derived Categories
     const categories = ['all', ...Array.from(new Set(items.map(i => i.category).filter(Boolean)))]
 
-    // Filter by Active Business FIRST
-    const businessItems = items.filter(item => item.business_id === activeBusinessId)
-
-    const filteredItems = businessItems
+    // Items are already filtered by business_id at the database level
+    const filteredItems = items
         .filter((item) => {
             const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 (item.sku && item.sku.toLowerCase().includes(searchQuery.toLowerCase()))

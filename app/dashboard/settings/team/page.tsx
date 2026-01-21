@@ -27,10 +27,11 @@ export default function TeamManagementPage() {
     const [fetchingMembers, setFetchingMembers] = useState(false)
     const [members, setMembers] = useState<any[]>([])
     const [currentUser, setCurrentUser] = useState<any>(null)
+    const [currentUserRole, setCurrentUserRole] = useState<string>('')
     const [isOwner, setIsOwner] = useState(false)
     const [isAddModalOpen, setIsAddModalOpen] = useState(false)
     const [errorModal, setErrorModal] = useState<{ open: boolean, message: string }>({ open: false, message: '' })
-    const [confirmModal, setConfirmModal] = useState<{ open: boolean, userId: string }>({ open: false, userId: '' })
+    const [confirmModal, setConfirmModal] = useState<{ open: boolean, userId: string, action: 'remove' | 'leave' }>({ open: false, userId: '', action: 'remove' })
     const [isDeleting, setIsDeleting] = useState(false)
 
     useEffect(() => {
@@ -62,6 +63,7 @@ export default function TeamManagementPage() {
                     id,
                     role,
                     user_id,
+                    invited_by,
                     profiles (id, full_name, email, avatar_url, username)
                 `)
                 .eq('business_id', activeBusinessId)
@@ -71,6 +73,7 @@ export default function TeamManagementPage() {
 
             const myMembership = data?.find(m => m.user_id === currentUserId)
             setIsOwner(myMembership?.role === 'OWNER')
+            setCurrentUserRole(myMembership?.role || '')
         } catch (error: any) {
             console.error('Error fetching members:', error)
         } finally {
@@ -97,7 +100,12 @@ export default function TeamManagementPage() {
 
     const handleRemoveMember = async (memberUserId: string) => {
         if (!isOwner) return
-        setConfirmModal({ open: true, userId: memberUserId })
+        setConfirmModal({ open: true, userId: memberUserId, action: 'remove' })
+    }
+
+    const handleLeaveTeam = () => {
+        if (isOwner) return // Owners can't leave
+        setConfirmModal({ open: true, userId: currentUser?.id, action: 'leave' })
     }
 
     const executeRemoveMember = async (memberUserId: string) => {
@@ -111,7 +119,14 @@ export default function TeamManagementPage() {
 
             if (error) throw error
             setConfirmModal({ ...confirmModal, open: false })
-            fetchMembers(currentUser.id)
+
+            // If leaving, redirect to dashboard
+            if (confirmModal.action === 'leave') {
+                router.push('/dashboard')
+                router.refresh()
+            } else {
+                fetchMembers(currentUser.id)
+            }
         } catch (error: any) {
             setErrorModal({ open: true, message: 'Failed to remove member: ' + error.message })
         } finally {
@@ -155,15 +170,26 @@ export default function TeamManagementPage() {
                     <h1 className="text-xl font-bold text-[var(--deep-contrast)] tracking-tight">Team Management</h1>
                     <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Add partners, admins, and viewers</p>
                 </div>
-                {isOwner && (
-                    <button
-                        onClick={() => setIsAddModalOpen(true)}
-                        className="p-3 rounded-2xl bg-[var(--deep-contrast)] text-white shadow-xl shadow-[var(--deep-contrast)]/20 active:scale-95 transition-all flex items-center gap-2 group"
-                    >
-                        <UserPlus className="h-4 w-4" />
-                        <span className="text-[10px] font-black uppercase tracking-wider hidden sm:inline">Add Member</span>
-                    </button>
-                )}
+                <div className="flex gap-2">
+                    {!isOwner && (
+                        <button
+                            onClick={handleLeaveTeam}
+                            className="p-3 rounded-2xl bg-rose-500 text-white shadow-xl shadow-rose-500/20 active:scale-95 transition-all flex items-center gap-2 group"
+                        >
+                            <ArrowLeft className="h-4 w-4" />
+                            <span className="text-[10px] font-black uppercase tracking-wider hidden sm:inline">Leave Team</span>
+                        </button>
+                    )}
+                    {isOwner && (
+                        <button
+                            onClick={() => setIsAddModalOpen(true)}
+                            className="p-3 rounded-2xl bg-[var(--deep-contrast)] text-white shadow-xl shadow-[var(--deep-contrast)]/20 active:scale-95 transition-all flex items-center gap-2 group"
+                        >
+                            <UserPlus className="h-4 w-4" />
+                            <span className="text-[10px] font-black uppercase tracking-wider hidden sm:inline">Add Member</span>
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* Add Modal */}
@@ -224,19 +250,22 @@ export default function TeamManagementPage() {
                                     </div>
                                 </div>
 
-                                {isOwner && member.role !== 'OWNER' && (
+                                {/* Show controls for owner or if current user invited this member */}
+                                {(isOwner || (member.invited_by === currentUser?.id && member.role !== 'OWNER')) && member.role !== 'OWNER' && (
                                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button
-                                            onClick={() => {
-                                                const currentRoleIndex = ROLES.findIndex(r => r.id === member.role)
-                                                const nextRoleIndex = (currentRoleIndex + 1) % ROLES.length
-                                                handleUpdateRole(member.user_id, ROLES[nextRoleIndex].id)
-                                            }}
-                                            className="p-2 rounded-xl bg-white/40 border border-white/20 hover:bg-white/60 text-[var(--foreground)]/50 hover:text-[var(--deep-contrast)] transition-all shadow-sm"
-                                            title="Update Role"
-                                        >
-                                            <Shield className="h-3.5 w-3.5" />
-                                        </button>
+                                        {isOwner && (
+                                            <button
+                                                onClick={() => {
+                                                    const currentRoleIndex = ROLES.findIndex(r => r.id === member.role)
+                                                    const nextRoleIndex = (currentRoleIndex + 1) % ROLES.length
+                                                    handleUpdateRole(member.user_id, ROLES[nextRoleIndex].id)
+                                                }}
+                                                className="p-2 rounded-xl bg-white/40 border border-white/20 hover:bg-white/60 text-[var(--foreground)]/50 hover:text-[var(--deep-contrast)] transition-all shadow-sm"
+                                                title="Update Role"
+                                            >
+                                                <Shield className="h-3.5 w-3.5" />
+                                            </button>
+                                        )}
                                         <button
                                             onClick={() => handleRemoveMember(member.user_id)}
                                             className="p-2 rounded-xl bg-rose-50 border border-rose-100 hover:bg-rose-500 hover:text-white text-rose-400 transition-all shadow-sm"
@@ -262,10 +291,12 @@ export default function TeamManagementPage() {
                 onClose={() => setConfirmModal({ ...confirmModal, open: false })}
                 onConfirm={() => executeRemoveMember(confirmModal.userId)}
                 isLoading={isDeleting}
-                title="Remove Member?"
-                message="This user will lose all access to this business profile immediately."
-                confirmText="Remove"
-                cancelText="Keep"
+                title={confirmModal.action === 'leave' ? 'Leave Team?' : 'Remove Member?'}
+                message={confirmModal.action === 'leave'
+                    ? 'You will lose all access to this business profile immediately.'
+                    : 'This user will lose all access to this business profile immediately.'}
+                confirmText={confirmModal.action === 'leave' ? 'Leave' : 'Remove'}
+                cancelText={confirmModal.action === 'leave' ? 'Stay' : 'Keep'}
             />
 
             <ErrorModal

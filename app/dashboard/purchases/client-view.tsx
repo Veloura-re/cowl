@@ -19,20 +19,33 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
     const supabase = createClient() // Create client instance here if not existing, or use existing
 
     useEffect(() => {
-        if (!initialInvoices) {
-            const fetchInvoices = async () => {
-                setLoading(true)
-                const { data } = await supabase
-                    .from('invoices')
-                    .select('*, party:parties(name)')
-                    .eq('type', 'PURCHASE')
-                    .order('date', { ascending: false })
-                if (data) setInvoices(data)
+        const fetchInvoices = async () => {
+            if (!activeBusinessId) {
+                console.log('PurchasesClientView: No active business, skipping fetch')
                 setLoading(false)
+                return
             }
-            fetchInvoices()
+
+            setLoading(true)
+            console.log('PurchasesClientView: Fetching fresh purchases for business:', activeBusinessId)
+            const { data, error } = await supabase
+                .from('invoices')
+                .select('*, party:parties(name)')
+                .eq('business_id', activeBusinessId)
+                .eq('type', 'PURCHASE')
+                .order('date', { ascending: false })
+
+            if (error) {
+                console.error('PurchasesClientView: Error fetching purchases', error)
+            }
+            if (data) {
+                console.log('PurchasesClientView: Fetched', data.length, 'purchases')
+                setInvoices(data)
+            }
+            setLoading(false)
         }
-    }, [initialInvoices])
+        fetchInvoices()
+    }, [activeBusinessId])
     const [statusFilter, setStatusFilter] = useState<string>('ALL')
     const [sortBy, setSortBy] = useState<'date' | 'amount'>('date')
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
@@ -44,9 +57,9 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
         router.push(`/dashboard/purchases/edit?id=${invoice.id}`)
     }
 
+    // Purchases are already filtered by business_id at the database level
     let filteredPurchases = invoices.filter((inv) =>
-        inv.business_id === activeBusinessId && (
-            inv.invoice_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (inv.invoice_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
             (inv.party?.name && inv.party.name.toLowerCase().includes(searchQuery.toLowerCase()))
         ) && (statusFilter === 'ALL' || inv.status === statusFilter)
     )
