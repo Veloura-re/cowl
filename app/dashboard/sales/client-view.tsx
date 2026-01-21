@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, Plus, Calendar, FileText, User, Filter, ArrowUpDown, Trash2, Edit2, AlertTriangle } from 'lucide-react'
+import { Search, Plus, Calendar, FileText, User, Filter, ArrowUpDown, Trash2, Edit2, AlertTriangle, Printer } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/context/business-context'
@@ -12,10 +12,13 @@ import ConfirmModal from '@/components/ui/ConfirmModal'
 import FeedbackModal from '@/components/ui/FeedbackModal'
 import { Loader2 } from 'lucide-react'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import { printInvoice, InvoiceData, downloadInvoice } from '@/utils/invoice-generator'
+import { currencies } from '@/lib/currencies'
+import InvoicePreviewModal from '@/components/ui/InvoicePreviewModal'
 
 export default function SalesClientView({ initialInvoices }: { initialInvoices?: any[] }) {
     const router = useRouter()
-    const { activeBusinessId, formatCurrency, isLoading: isContextLoading } = useBusiness()
+    const { activeBusinessId, formatCurrency, isLoading: isContextLoading, businesses } = useBusiness()
     const [invoices, setInvoices] = useState(initialInvoices || [])
     const [searchQuery, setSearchQuery] = useState('')
     const [statusFilter, setStatusFilter] = useState<string>('ALL')
@@ -24,6 +27,8 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
     const [isSortPickerOpen, setIsSortPickerOpen] = useState(false)
     const [isFilterPickerOpen, setIsFilterPickerOpen] = useState(false)
     const [loading, setLoading] = useState(!initialInvoices)
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+    const [previewData, setPreviewData] = useState<InvoiceData | null>(null)
     const supabase = createClient()
 
     useEffect(() => {
@@ -38,7 +43,7 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
             console.log('SalesClientView: Fetching fresh invoices for business:', activeBusinessId)
             const { data, error } = await supabase
                 .from('invoices')
-                .select('*, party:parties(name)')
+                .select('*, party:parties(name, phone, address)')
                 .eq('business_id', activeBusinessId)
                 .eq('type', 'SALE')
                 .order('date', { ascending: false })
@@ -57,6 +62,70 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
 
     const handleEdit = (invoice: any) => {
         router.push(`/dashboard/sales/edit?id=${invoice.id}`)
+    }
+
+    const handlePrintInvoice = async (e: React.MouseEvent, invoice: any) => {
+        e.stopPropagation() // Prevent card click
+
+        try {
+            // Fetch invoice items
+            const { data: items } = await supabase
+                .from('invoice_items')
+                .select('*')
+                .eq('invoice_id', invoice.id)
+
+            // Get business info
+            const activeBusiness = businesses.find(b => b.id === activeBusinessId)
+            const currencyCode = (activeBusiness as any)?.currency || 'USD'
+            const currencySymbol = currencies.find(c => c.code === currencyCode)?.symbol || '$'
+
+            const invoiceData: InvoiceData = {
+                invoiceNumber: invoice.invoice_number,
+                date: invoice.date,
+                dueDate: invoice.due_date,
+                type: 'SALE',
+                businessName: activeBusiness?.name || 'Business',
+                businessAddress: (activeBusiness as any)?.address,
+                businessPhone: (activeBusiness as any)?.phone,
+                partyName: invoice.party?.name || 'Walk-in Customer',
+                partyAddress: invoice.party?.address,
+                partyPhone: invoice.party?.phone,
+                items: items?.map(item => ({
+                    description: item.description,
+                    quantity: item.quantity,
+                    rate: item.rate,
+                    tax: ((item.tax_amount / (item.quantity * item.rate)) * 100) || 0,
+                    total: item.total
+                })) || [],
+                subtotal: items?.reduce((sum, item) => sum + (item.quantity * item.rate), 0) || 0,
+                taxAmount: invoice.tax_amount || 0,
+                discountAmount: invoice.discount_amount || 0,
+                totalAmount: invoice.total_amount,
+                status: invoice.status,
+                paidAmount: invoice.total_amount - invoice.balance_amount,
+                balanceAmount: invoice.balance_amount,
+                notes: invoice.notes,
+                currency: currencyCode,
+                currencySymbol: currencySymbol
+            }
+
+            setPreviewData(invoiceData)
+            setIsPreviewOpen(true)
+        } catch (error) {
+            console.error('Error generating invoice:', error)
+        }
+    }
+
+    const handlePrint = () => {
+        if (previewData) {
+            printInvoice(previewData)
+        }
+    }
+
+    const handleDownload = () => {
+        if (previewData) {
+            downloadInvoice(previewData)
+        }
     }
 
     // Invoices are already filtered by business_id at the database level
@@ -183,6 +252,15 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                                 </div>
                             </div>
                             <div className="flex flex-col items-end gap-1">
+                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button
+                                        onClick={(e) => handlePrintInvoice(e, invoice)}
+                                        className="p-1.5 rounded-lg bg-white/50 border border-white/20 text-[var(--foreground)]/40 hover:text-[var(--primary-green)] hover:bg-white transition-all shadow-sm"
+                                        title="Print Invoice"
+                                    >
+                                        <Printer className="h-3 w-3" />
+                                    </button>
+                                </div>
                                 <span className={clsx(
                                     "text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md border",
                                     invoice.status === 'PAID' ? "bg-emerald-100/50 text-emerald-700 border-emerald-200" :
@@ -228,6 +306,15 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                     <p className="text-[8px] font-bold uppercase tracking-widest mt-1 opacity-50">Generate an invoice to start tracking</p>
                 </div>
             ) : null}
+            {isPreviewOpen && previewData && (
+                <InvoicePreviewModal
+                    isOpen={isPreviewOpen}
+                    onClose={() => setIsPreviewOpen(false)}
+                    data={previewData}
+                    onPrint={handlePrint}
+                    onDownload={handleDownload}
+                />
+            )}
         </div>
     )
 }

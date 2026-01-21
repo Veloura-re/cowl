@@ -7,9 +7,10 @@ import { useBusiness } from '@/context/business-context'
 import { createClient } from '@/utils/supabase/client'
 import { ReportGenerator, ReportType } from '@/utils/report-generator'
 import { fetchReportDataService } from '@/utils/report-service'
-import { format } from 'date-fns'
+import { format, parseISO } from 'date-fns'
 import SignaturePad, { SignaturePadHandle } from '@/components/ui/signature-pad'
 import Dropdown from '@/components/ui/dropdown'
+import DatePickerModal from '@/components/ui/DatePickerModal'
 
 export default function ReportsPage() {
     const { formatCurrency, activeBusinessId, businesses } = useBusiness()
@@ -23,6 +24,8 @@ export default function ReportsPage() {
         end: format(new Date(), 'yyyy-MM-dd')
     })
     const [selectedReport, setSelectedReport] = useState<ReportType>('SALES')
+    const [isStartOpen, setIsStartOpen] = useState(false)
+    const [isEndOpen, setIsEndOpen] = useState(false)
 
     // Refs
     const sigPadRef = useRef<SignaturePadHandle>(null)
@@ -235,32 +238,46 @@ export default function ReportsPage() {
                     {/* Start Date */}
                     <div className="space-y-1">
                         <label className="text-[9px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider">From</label>
-                        <div className="relative">
-                            <input
-                                type="date"
-                                value={dateRange.start}
-                                onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
-                                disabled={selectedReport === 'INVENTORY'}
-                                className="w-full text-xs font-medium bg-white/50 border border-white/40 rounded-lg p-2.5 pl-8 focus:outline-none focus:ring-2 focus:ring-[var(--primary-green)]/20 disabled:opacity-50"
-                            />
-                            <Calendar className="h-3.5 w-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--foreground)]/40" />
-                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setIsStartOpen(true)}
+                            disabled={selectedReport === 'INVENTORY'}
+                            className="w-full h-10 flex items-center gap-2.5 px-3 bg-white/50 border border-white/40 rounded-lg text-xs font-bold text-[var(--deep-contrast)] hover:border-[var(--primary-green)]/40 transition-all disabled:opacity-50"
+                        >
+                            <Calendar className="h-3.5 w-3.5 opacity-40" />
+                            {format(parseISO(dateRange.start), 'MMM dd, yyyy')}
+                        </button>
                     </div>
 
                     {/* End Date */}
                     <div className="space-y-1">
                         <label className="text-[9px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider">To</label>
-                        <div className="relative">
-                            <input
-                                type="date"
-                                value={dateRange.end}
-                                onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
-                                disabled={selectedReport === 'INVENTORY'}
-                                className="w-full text-xs font-medium bg-white/50 border border-white/40 rounded-lg p-2.5 pl-8 focus:outline-none focus:ring-2 focus:ring-[var(--primary-green)]/20 disabled:opacity-50"
-                            />
-                            <Calendar className="h-3.5 w-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--foreground)]/40" />
-                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setIsEndOpen(true)}
+                            disabled={selectedReport === 'INVENTORY'}
+                            className="w-full h-10 flex items-center gap-2.5 px-3 bg-white/50 border border-white/40 rounded-lg text-xs font-bold text-[var(--deep-contrast)] hover:border-[var(--primary-green)]/40 transition-all disabled:opacity-50"
+                        >
+                            <Calendar className="h-3.5 w-3.5 opacity-40" />
+                            {format(parseISO(dateRange.end), 'MMM dd, yyyy')}
+                        </button>
                     </div>
+
+                    <DatePickerModal
+                        isOpen={isStartOpen}
+                        onClose={() => setIsStartOpen(false)}
+                        onSelect={(date) => setDateRange(prev => ({ ...prev, start: date }))}
+                        selectedValue={dateRange.start}
+                        title="Start Date"
+                    />
+
+                    <DatePickerModal
+                        isOpen={isEndOpen}
+                        onClose={() => setIsEndOpen(false)}
+                        onSelect={(date) => setDateRange(prev => ({ ...prev, end: date }))}
+                        selectedValue={dateRange.end}
+                        title="End Date"
+                    />
 
                     {/* Signature Pad */}
                     <div className="space-y-1">

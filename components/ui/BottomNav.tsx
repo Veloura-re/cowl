@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
-import { Home, Plus, Settings, User, Package, Menu, ShoppingCart, Users, BarChart3, X, CreditCard } from "lucide-react";
+import { Home, Plus, Settings, User, Package, Menu, ShoppingCart, Users, BarChart3, X, CreditCard, LogOut } from "lucide-react";
+import { createClient } from '@/utils/supabase/client'
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
@@ -24,6 +25,7 @@ const menuItems = [
 ];
 
 export const BottomNav = () => {
+    const supabase = createClient()
     const pathname = usePathname();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
@@ -96,6 +98,24 @@ export const BottomNav = () => {
                                         </Link>
                                     )
                                 })}
+
+                                <button
+                                    onClick={async () => {
+                                        try {
+                                            await supabase.auth.signOut()
+                                            localStorage.clear()
+                                            window.location.href = '/login'
+                                        } catch (error) {
+                                            window.location.href = '/login'
+                                        }
+                                    }}
+                                    className="col-span-2 relative flex items-center justify-center gap-3 p-5 rounded-[28px] transition-all border bg-rose-50 border-rose-100 hover:bg-rose-500 hover:text-white group text-rose-600"
+                                >
+                                    <div className="p-3 rounded-2xl bg-rose-500/10 text-rose-600 group-hover:bg-white/20 group-hover:text-white transition-all shadow-lg">
+                                        <LogOut size={22} strokeWidth={2.5} />
+                                    </div>
+                                    <span className="text-[10px] font-black uppercase tracking-wider">Sign Out</span>
+                                </button>
                             </div>
 
                             {/* Bottom decorative handle */}

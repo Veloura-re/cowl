@@ -104,7 +104,8 @@ export default function TeamManagementPage() {
     }
 
     const handleLeaveTeam = () => {
-        if (isOwner) return // Owners can't leave
+        const canLeave = ['PARTNER', 'STAFF', 'VIEWER'].includes(currentUserRole)
+        if (!canLeave) return // Only partners, staff, and viewers can leave
         setConfirmModal({ open: true, userId: currentUser?.id, action: 'leave' })
     }
 
@@ -171,7 +172,7 @@ export default function TeamManagementPage() {
                     <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Add partners, admins, and viewers</p>
                 </div>
                 <div className="flex gap-2">
-                    {!isOwner && (
+                    {['PARTNER', 'STAFF', 'VIEWER'].includes(currentUserRole) && (
                         <button
                             onClick={handleLeaveTeam}
                             className="p-3 rounded-2xl bg-rose-500 text-white shadow-xl shadow-rose-500/20 active:scale-95 transition-all flex items-center gap-2 group"

@@ -1,19 +1,21 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Search, ShoppingCart, Calendar, User, Filter, ArrowUpDown } from 'lucide-react'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import { Plus, Search, ShoppingCart, Calendar, User, Filter, ArrowUpDown, Printer } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import clsx from 'clsx'
 import { useBusiness } from '@/context/business-context'
-import Dropdown from '@/components/ui/dropdown'
 import PickerModal from '@/components/ui/PickerModal'
 import { createClient } from '@/utils/supabase/client'
-import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import { printInvoice, InvoiceData, downloadInvoice } from '@/utils/invoice-generator'
+import { currencies } from '@/lib/currencies'
+import InvoicePreviewModal from '@/components/ui/InvoicePreviewModal'
 
 export default function PurchasesClientView({ initialInvoices }: { initialInvoices?: any[] }) {
     const router = useRouter()
-    const { activeBusinessId, formatCurrency } = useBusiness()
+    const { activeBusinessId, formatCurrency, businesses } = useBusiness()
     const [invoices, setInvoices] = useState(initialInvoices || [])
     const [searchQuery, setSearchQuery] = useState('')
     const supabase = createClient() // Create client instance here if not existing, or use existing
@@ -30,7 +32,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
             console.log('PurchasesClientView: Fetching fresh purchases for business:', activeBusinessId)
             const { data, error } = await supabase
                 .from('invoices')
-                .select('*, party:parties(name)')
+                .select('*, party:parties(name, phone, address)')
                 .eq('business_id', activeBusinessId)
                 .eq('type', 'PURCHASE')
                 .order('date', { ascending: false })
@@ -52,9 +54,75 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
     const [isSortPickerOpen, setIsSortPickerOpen] = useState(false)
     const [isFilterPickerOpen, setIsFilterPickerOpen] = useState(false)
     const [loading, setLoading] = useState(!initialInvoices)
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+    const [previewData, setPreviewData] = useState<InvoiceData | null>(null)
 
     const handleEdit = (invoice: any) => {
         router.push(`/dashboard/purchases/edit?id=${invoice.id}`)
+    }
+
+    const handlePrintInvoice = async (e: React.MouseEvent, invoice: any) => {
+        e.stopPropagation() // Prevent card click
+
+        try {
+            // Fetch invoice items
+            const { data: items } = await supabase
+                .from('invoice_items')
+                .select('*')
+                .eq('invoice_id', invoice.id)
+
+            // Get business info
+            const activeBusiness = businesses.find(b => b.id === activeBusinessId)
+            const currencyCode = (activeBusiness as any)?.currency || 'USD'
+            const currencySymbol = currencies.find(c => c.code === currencyCode)?.symbol || '$'
+
+            const invoiceData: InvoiceData = {
+                invoiceNumber: invoice.invoice_number,
+                date: invoice.date,
+                dueDate: invoice.due_date,
+                type: 'PURCHASE',
+                businessName: activeBusiness?.name || 'Business',
+                businessAddress: (activeBusiness as any)?.address,
+                businessPhone: (activeBusiness as any)?.phone,
+                partyName: invoice.party?.name || 'Walk-in Customer',
+                partyAddress: invoice.party?.address,
+                partyPhone: invoice.party?.phone,
+                items: items?.map(item => ({
+                    description: item.description,
+                    quantity: item.quantity,
+                    rate: item.rate,
+                    tax: ((item.tax_amount / (item.quantity * item.rate)) * 100) || 0,
+                    total: item.total
+                })) || [],
+                subtotal: items?.reduce((sum, item) => sum + (item.quantity * item.rate), 0) || 0,
+                taxAmount: invoice.tax_amount || 0,
+                discountAmount: invoice.discount_amount || 0,
+                totalAmount: invoice.total_amount,
+                status: invoice.status,
+                paidAmount: invoice.total_amount - invoice.balance_amount,
+                balanceAmount: invoice.balance_amount,
+                notes: invoice.notes,
+                currency: currencyCode,
+                currencySymbol: currencySymbol
+            }
+
+            setPreviewData(invoiceData)
+            setIsPreviewOpen(true)
+        } catch (error) {
+            console.error('Error generating invoice:', error)
+        }
+    }
+
+    const handlePrint = () => {
+        if (previewData) {
+            printInvoice(previewData)
+        }
+    }
+
+    const handleDownload = () => {
+        if (previewData) {
+            downloadInvoice(previewData)
+        }
     }
 
     // Purchases are already filtered by business_id at the database level
@@ -178,14 +246,25 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                                     </div>
                                 </div>
                             </div>
-                            <span className={clsx(
-                                "text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md border",
-                                inv.status === 'PAID' ? "bg-emerald-100/50 text-emerald-700 border-emerald-200" :
-                                    inv.status === 'PARTIAL' ? "bg-amber-100/50 text-amber-700 border-amber-200" :
-                                        "bg-rose-100/50 text-red-700 border-rose-200"
-                            )}>
-                                {inv.status}
-                            </span>
+                            <div className="flex flex-col items-end gap-1">
+                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button
+                                        onClick={(e) => handlePrintInvoice(e, inv)}
+                                        className="p-1.5 rounded-lg bg-white/50 border border-white/20 text-[var(--foreground)]/40 hover:text-[var(--primary-green)] hover:bg-white transition-all shadow-sm"
+                                        title="Print Bill"
+                                    >
+                                        <Printer className="h-3 w-3" />
+                                    </button>
+                                </div>
+                                <span className={clsx(
+                                    "text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md border",
+                                    inv.status === 'PAID' ? "bg-emerald-100/50 text-emerald-700 border-emerald-200" :
+                                        inv.status === 'PARTIAL' ? "bg-amber-100/50 text-amber-700 border-amber-200" :
+                                            "bg-rose-100/50 text-red-700 border-rose-200"
+                                )}>
+                                    {inv.status}
+                                </span>
+                            </div>
                         </div>
 
                         <div className="flex justify-between items-end mt-1.5 pt-1.5 border-t border-[var(--primary-green)]/5">
@@ -208,6 +287,15 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                 <div className="text-center py-10 opacity-30">
                     <p className="text-[10px] font-bold uppercase tracking-wider">No bills found</p>
                 </div>
+            )}
+            {isPreviewOpen && previewData && (
+                <InvoicePreviewModal
+                    isOpen={isPreviewOpen}
+                    onClose={() => setIsPreviewOpen(false)}
+                    data={previewData}
+                    onPrint={handlePrint}
+                    onDownload={handleDownload}
+                />
             )}
         </div >
     )

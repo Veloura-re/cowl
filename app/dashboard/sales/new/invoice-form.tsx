@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Save, Plus, Trash2 } from 'lucide-react'
+import { ArrowLeft, Save, Plus, Trash2, Printer } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/context/business-context'
 import Link from 'next/link'
@@ -9,6 +9,8 @@ import { createClient } from '@/utils/supabase/client'
 import clsx from 'clsx'
 import PickerModal, { Option } from '@/components/ui/PickerModal'
 import ErrorModal from '@/components/ui/ErrorModal'
+import { printInvoice, InvoiceData } from '@/utils/invoice-generator'
+import { currencies } from '@/lib/currencies'
 
 type InvoiceFormProps = {
     parties: any[]
@@ -82,10 +84,10 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
         }
     }
 
-    const { activeBusinessId, formatCurrency, setIsGlobalLoading, showSuccess, showError } = useBusiness()
+    const { activeBusinessId, formatCurrency, setIsGlobalLoading, showSuccess, showError, businesses } = useBusiness()
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
+    const handleSubmit = async (e: React.FormEvent, shouldPrint = false) => {
+        if (e) e.preventDefault()
         if (!activeBusinessId) return
         setLoading(true)
         setIsGlobalLoading(true)
@@ -134,6 +136,41 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                 }
             }
 
+            if (shouldPrint) {
+                const activeBusiness = businesses.find(b => b.id === activeBusinessId)
+                const currencyCode = (activeBusiness as any)?.currency || 'USD'
+                const currencySymbol = currencies.find(c => c.code === currencyCode)?.symbol || '$'
+                const selectedParty = parties.find(p => p.id === partyId)
+
+                const invoiceData: InvoiceData = {
+                    invoiceNumber: invoice.invoice_number,
+                    date: invoice.date,
+                    type: 'SALE',
+                    businessName: activeBusiness?.name || 'Business',
+                    businessAddress: (activeBusiness as any)?.address,
+                    businessPhone: (activeBusiness as any)?.phone,
+                    partyName: selectedParty?.name || 'Walk-in Customer',
+                    partyAddress: selectedParty?.address,
+                    partyPhone: selectedParty?.phone,
+                    items: rows.map(row => ({
+                        description: row.name,
+                        quantity: row.quantity,
+                        rate: row.rate,
+                        tax: row.tax,
+                        total: row.amount
+                    })),
+                    subtotal: subtotal,
+                    taxAmount: totalTax,
+                    totalAmount: totalAmount,
+                    status: 'UNPAID',
+                    balanceAmount: totalAmount,
+                    notes: notes,
+                    currency: currencyCode,
+                    currencySymbol: currencySymbol
+                }
+                printInvoice(invoiceData)
+            }
+
             setIsGlobalLoading(false)
             showSuccess(`Invoice ${invoiceNumber} saved successfully.`)
             router.push('/dashboard/sales')
@@ -159,14 +196,24 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                         <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-none mt-0.5">Invoice Creation</p>
                     </div>
                 </div>
-                <button
-                    onClick={handleSubmit}
-                    disabled={loading}
-                    className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white hover:bg-[var(--primary-green)] transition-all disabled:opacity-50 shadow-lg active:scale-95"
-                >
-                    <Save className="mr-1.5 h-3 w-3" />
-                    Save Invoice
-                </button>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={(e) => handleSubmit(e, true)}
+                        disabled={loading}
+                        className="flex items-center justify-center rounded-xl bg-white/50 border border-white/40 px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--deep-contrast)] hover:bg-white transition-all disabled:opacity-50 shadow-sm active:scale-95"
+                    >
+                        <Printer className="mr-1.5 h-3 w-3" />
+                        Save & Print
+                    </button>
+                    <button
+                        onClick={(e) => handleSubmit(e as any)}
+                        disabled={loading}
+                        className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white hover:bg-[var(--primary-green)] transition-all disabled:opacity-50 shadow-lg active:scale-95"
+                    >
+                        <Save className="mr-1.5 h-3 w-3" />
+                        Save Invoice
+                    </button>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

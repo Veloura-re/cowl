@@ -197,10 +197,8 @@ export default function PaymentForm({
             }
 
             setSuccess(true)
-            setTimeout(() => {
-                router.push('/dashboard/finance')
-                router.refresh()
-            }, 1000)
+            router.refresh()
+            setTimeout(() => setSuccess(false), 2000)
         } catch (err: any) {
             alert(err.message)
         } finally {
@@ -215,10 +213,8 @@ export default function PaymentForm({
             const { error } = await supabase.from('transactions').delete().eq('id', initialData.id)
             if (error) throw error
             setSuccess(true)
-            setTimeout(() => {
-                router.push('/dashboard/finance')
-                router.refresh()
-            }, 1000)
+            router.refresh()
+            setTimeout(() => setSuccess(false), 2000)
         } catch (err: any) {
             alert('Error deleting: ' + err.message)
         } finally {

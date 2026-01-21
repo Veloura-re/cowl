@@ -63,6 +63,17 @@ export default function AddTeamMemberModal({ isOpen, onClose, businessId, onSucc
                     })
                 } else throw error
             } else {
+                // Get current user to prevent self-adding
+                const { data: { user: currentUser } } = await supabase.auth.getUser()
+
+                if (data.id === currentUser?.id) {
+                    setErrorModal({
+                        open: true,
+                        message: "You cannot add yourself to your own team. You already have full access."
+                    })
+                    return
+                }
+
                 // Check if user is already a member
                 const { data: memberData } = await supabase
                     .from('business_members')

@@ -16,7 +16,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
     const { activeBusinessId, formatCurrency, isLoading: isContextLoading } = useBusiness()
     const [items, setItems] = useState<any[]>(initialItems || [])
     const [searchQuery, setSearchQuery] = useState('')
-    const [filterCategory, setFilterCategory] = useState<string>('ALL')
+    const [filterCategory, setFilterCategory] = useState<string>('all')
     const [sortBy, setSortBy] = useState<string>('name-asc')
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
     const [isSortPickerOpen, setIsSortPickerOpen] = useState(false)

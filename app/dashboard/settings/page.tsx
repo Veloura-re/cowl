@@ -233,9 +233,16 @@ export default function SettingsPage() {
     }
 
     const handleSignOut = async () => {
-        await supabase.auth.signOut()
-        router.push('/login')
-        router.refresh()
+        setLoading(true)
+        try {
+            await supabase.auth.signOut()
+            localStorage.clear()
+            sessionStorage.clear()
+            window.location.href = '/login'
+        } catch (error: any) {
+            console.error('Sign out error:', error)
+            window.location.href = '/login'
+        }
     }
 
     if (loading) {

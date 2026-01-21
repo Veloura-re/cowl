@@ -78,6 +78,15 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
                 isOwner: b.owner_id === session.user.id
             }))
             setBusinesses(formattedBusinesses)
+
+            // If user has no businesses, redirect to onboarding
+            if (data.length === 0 && window.location.pathname !== '/onboarding') {
+                console.log('BusinessContext: No businesses found, redirecting to onboarding')
+                router.replace('/onboarding')
+                setIsLoading(false)
+                return
+            }
+
             // Restore from localStorage if possible
             const savedId = localStorage.getItem('activeBusinessId')
             if (savedId && data.find(b => b.id === savedId)) {

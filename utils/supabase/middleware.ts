@@ -40,17 +40,19 @@ export async function updateSession(request: NextRequest) {
     } = await supabase.auth.getUser()
 
     const isDashboardPath = request.nextUrl.pathname.startsWith('/dashboard')
+    const isOnboardingPath = request.nextUrl.pathname === '/onboarding'
     const isLoginPath = request.nextUrl.pathname === '/login'
+    const isRegisterPath = request.nextUrl.pathname === '/register'
 
-    // If no session but on dashboard -> login
-    if (!session && isDashboardPath) {
+    // If no session but on protected routes (dashboard or onboarding) -> login
+    if (!session && (isDashboardPath || isOnboardingPath)) {
         const url = request.nextUrl.clone()
         url.pathname = '/login'
         return NextResponse.redirect(url)
     }
 
-    // If session exists but on login -> dashboard
-    if (session && isLoginPath) {
+    // If session exists but on login/register -> dashboard
+    if (session && (isLoginPath || isRegisterPath)) {
         const url = request.nextUrl.clone()
         url.pathname = '/dashboard'
         return NextResponse.redirect(url)

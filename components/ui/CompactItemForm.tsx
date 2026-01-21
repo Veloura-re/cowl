@@ -94,10 +94,8 @@ export default function CompactItemForm({ initialData }: CompactItemFormProps) {
             }
 
             setSuccess(true)
-            setTimeout(() => {
-                router.push('/dashboard/inventory')
-                router.refresh()
-            }, 1000)
+            router.refresh()
+            setTimeout(() => setSuccess(false), 2000)
         } catch (err: any) {
             alert('Error: ' + err.message)
         } finally {
@@ -112,10 +110,8 @@ export default function CompactItemForm({ initialData }: CompactItemFormProps) {
             const { error } = await supabase.from('items').delete().eq('id', initialData.id)
             if (error) throw error
             setSuccess(true)
-            setTimeout(() => {
-                router.push('/dashboard/inventory')
-                router.refresh()
-            }, 1000)
+            router.refresh()
+            setTimeout(() => setSuccess(false), 2000)
         } catch (err: any) {
             alert('Error deleting item: ' + err.message)
         } finally {

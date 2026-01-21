@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ArrowLeft, Save, Plus, Trash2, Calculator, Wallet, Paperclip, Image, X, Building, Loader2 } from 'lucide-react'
+import { ArrowLeft, Save, Plus, Trash2, Calculator, Wallet, Paperclip, Image, X, Building, Loader2, Printer } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useBusiness } from '@/context/business-context'
@@ -9,6 +9,8 @@ import { createClient } from '@/utils/supabase/client'
 import clsx from 'clsx'
 import PickerModal from '@/components/ui/PickerModal'
 import AddPurchaseItemModal from '@/components/ui/AddPurchaseItemModal'
+import { printInvoice, InvoiceData } from '@/utils/invoice-generator'
+import { currencies } from '@/lib/currencies'
 
 type PurchaseFormProps = {
     parties: any[]
@@ -27,7 +29,7 @@ type InvoiceItem = {
 }
 
 export default function PurchaseForm({ parties, items, paymentModes }: PurchaseFormProps) {
-    const { activeBusinessId, formatCurrency, setIsGlobalLoading, showSuccess, showError } = useBusiness()
+    const { activeBusinessId, formatCurrency, setIsGlobalLoading, showSuccess, showError, businesses } = useBusiness()
 
     // Filter data by active business
     const filteredParties = parties.filter(p => p.business_id === activeBusinessId)
@@ -156,8 +158,8 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
         setAttachments(attachments.filter((_, i) => i !== index))
     }
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
+    const handleSubmit = async (e: React.FormEvent, shouldPrint = false) => {
+        if (e) e.preventDefault()
         if (!partyId) return alert('Select a supplier')
 
         // Auto-generate bill number if not provided
@@ -243,6 +245,44 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                 }
             }
 
+            if (shouldPrint) {
+                const activeBusiness = businesses.find(b => b.id === activeBusinessId)
+                const currencyCode = (activeBusiness as any)?.currency || 'USD'
+                const currencySymbol = currencies.find(c => c.code === currencyCode)?.symbol || '$'
+                const selectedParty = parties.find(p => p.id === partyId)
+
+                const invoiceData: InvoiceData = {
+                    invoiceNumber: bill.invoice_number,
+                    date: bill.date,
+                    dueDate: bill.due_date,
+                    type: 'PURCHASE',
+                    businessName: activeBusiness?.name || 'Business',
+                    businessAddress: (activeBusiness as any)?.address,
+                    businessPhone: (activeBusiness as any)?.phone,
+                    partyName: selectedParty?.name || 'Walk-in Customer',
+                    partyAddress: selectedParty?.address,
+                    partyPhone: selectedParty?.phone,
+                    items: rows.map(row => ({
+                        description: row.name,
+                        quantity: row.quantity,
+                        rate: row.rate,
+                        tax: row.tax,
+                        total: row.amount
+                    })),
+                    subtotal: subtotal,
+                    taxAmount: totalTax,
+                    discountAmount: discountAmount,
+                    totalAmount: totalAmount,
+                    status: status,
+                    paidAmount: actualPaid,
+                    balanceAmount: currentBalance,
+                    notes: notes,
+                    currency: currencyCode,
+                    currencySymbol: currencySymbol
+                }
+                printInvoice(invoiceData)
+            }
+
             setIsGlobalLoading(false)
             showSuccess(`Bill ${finalInvoiceNumber} recorded successfully.`)
             router.push('/dashboard/purchases')
@@ -268,14 +308,24 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                         <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-none mt-0.5">Stock Entry</p>
                     </div>
                 </div>
-                <button
-                    onClick={handleSubmit}
-                    disabled={loading}
-                    className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white hover:bg-[var(--primary-green)] transition-all disabled:opacity-50 shadow-lg active:scale-95"
-                >
-                    {loading ? <Loader2 className="mr-1.5 h-3 w-3 animate-spin" /> : <Save className="mr-1.5 h-3 w-3" />}
-                    Save Bill
-                </button>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={(e) => handleSubmit(e, true)}
+                        disabled={loading}
+                        className="flex items-center justify-center rounded-xl bg-white/50 border border-white/40 px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--deep-contrast)] hover:bg-white transition-all disabled:opacity-50 shadow-sm active:scale-95"
+                    >
+                        <Printer className="mr-1.5 h-3 w-3" />
+                        Save & Print
+                    </button>
+                    <button
+                        onClick={(e) => handleSubmit(e as any)}
+                        disabled={loading}
+                        className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white hover:bg-[var(--primary-green)] transition-all disabled:opacity-50 shadow-lg active:scale-95"
+                    >
+                        {loading ? <Loader2 className="mr-1.5 h-3 w-3 animate-spin" /> : <Save className="mr-1.5 h-3 w-3" />}
+                        Save Bill
+                    </button>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

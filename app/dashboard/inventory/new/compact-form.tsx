@@ -98,14 +98,23 @@ export default function CompactItemForm() {
                         <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider">Inventory Entry</p>
                     </div>
                 </div>
-                <button
-                    type="submit"
-                    disabled={loading || !formData.name}
-                    className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-[var(--primary-green)] text-white text-[9px] font-bold uppercase tracking-wider hover:bg-[var(--primary-hover)] transition-all disabled:opacity-50 shadow-lg active:scale-95"
-                >
-                    {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
-                    Save
-                </button>
+                <div className="flex items-center gap-2">
+                    <Link
+                        href="/dashboard/inventory"
+                        className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-white/50 border border-white/20 text-[var(--deep-contrast)] text-[9px] font-bold uppercase tracking-wider hover:bg-white/70 transition-all shadow-sm active:scale-95"
+                    >
+                        <Package className="h-3 w-3" />
+                        View Inventory
+                    </Link>
+                    <button
+                        type="submit"
+                        disabled={loading || !formData.name}
+                        className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-[var(--primary-green)] text-white text-[9px] font-bold uppercase tracking-wider hover:bg-[var(--primary-hover)] transition-all disabled:opacity-50 shadow-lg active:scale-95"
+                    >
+                        {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
+                        Save
+                    </button>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">

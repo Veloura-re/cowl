@@ -165,9 +165,15 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                         </Link>
                         <button
                             onClick={async () => {
-                                await supabase.auth.signOut()
-                                router.push('/login')
-                                router.refresh()
+                                try {
+                                    await supabase.auth.signOut()
+                                    localStorage.clear()
+                                    sessionStorage.clear()
+                                    window.location.href = '/login'
+                                } catch (error) {
+                                    console.error('Sign out error:', error)
+                                    window.location.href = '/login'
+                                }
                             }}
                             className="w-full flex items-center px-4 py-2.5 text-xs font-bold text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
                         >

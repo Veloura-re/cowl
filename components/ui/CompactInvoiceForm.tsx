@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { ArrowLeft, Save, Plus, Trash2, Loader2, CheckCircle2, Wallet, Calculator, Paperclip, Image, X, Building } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { ArrowLeft, Save, Plus, Trash2, Loader2, CheckCircle2, Wallet, Calculator, Paperclip, Image as ImageIcon, X, Building, Printer } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/context/business-context'
 import Link from 'next/link'
@@ -10,6 +10,10 @@ import clsx from 'clsx'
 import PickerModal from '@/components/ui/PickerModal'
 import AddSalesItemModal from '@/components/ui/AddSalesItemModal'
 import ConfirmModal from '@/components/ui/ConfirmModal'
+import { printInvoice, InvoiceData, downloadInvoice } from '@/utils/invoice-generator'
+import { currencies } from '@/lib/currencies'
+import SignaturePad, { SignaturePadHandle } from '@/components/ui/signature-pad'
+import InvoicePreviewModal from '@/components/ui/InvoicePreviewModal'
 
 type InvoiceFormProps = {
     parties?: any[]
@@ -44,6 +48,8 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
     const [isModePickerOpen, setIsModePickerOpen] = useState(false)
     const [isConfirmOpen, setIsConfirmOpen] = useState(false)
     const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null)
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+    const [previewData, setPreviewData] = useState<InvoiceData | null>(null)
 
     // Data State (Client-side fetch if props missing)
     const [fetchedParties, setFetchedParties] = useState<any[]>(parties)
@@ -108,8 +114,9 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
     const [dueDate, setDueDate] = useState(initialData?.due_date || '')
     const [isFullyReceived, setIsFullyReceived] = useState(false)
     const [modeBalances, setModeBalances] = useState<Record<string, number>>({})
+    const sigPadRef = useRef<SignaturePadHandle>(null)
 
-    const { activeBusinessId, formatCurrency } = useBusiness()
+    const { activeBusinessId, formatCurrency, businesses } = useBusiness()
 
     // Filter data by active business
     const filteredParties = displayParties.filter(p => p.business_id === activeBusinessId)
@@ -255,6 +262,60 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
         setAttachments(attachments.filter((_, i) => i !== index))
     }
 
+    const handlePreview = () => {
+        const activeBusiness = businesses.find(b => b.id === activeBusinessId)
+        const currencyCode = (activeBusiness as any)?.currency || 'USD'
+        const currencySymbol = currencies.find(c => c.code === currencyCode)?.symbol || '$'
+        const selectedParty = displayParties.find(p => p.id === partyId)
+        const signature = sigPadRef.current?.toDataURL() || undefined
+
+        const invoiceData: InvoiceData = {
+            invoiceNumber: invoiceNumber,
+            date: date,
+            dueDate: dueDate,
+            type: isSale ? 'SALE' : 'PURCHASE',
+            businessName: activeBusiness?.name || 'Business',
+            businessAddress: (activeBusiness as any)?.address,
+            businessPhone: (activeBusiness as any)?.phone,
+            partyName: selectedParty?.name || 'Walk-in Customer',
+            partyAddress: selectedParty?.address,
+            partyPhone: selectedParty?.phone,
+            items: rows.map(row => ({
+                description: row.name,
+                quantity: row.quantity,
+                rate: row.rate,
+                tax: row.tax,
+                total: row.amount
+            })),
+            subtotal: subtotal,
+            taxAmount: totalTax,
+            discountAmount: discountAmount,
+            totalAmount: totalAmount,
+            status: initialData?.status || 'UNPAID',
+            paidAmount: totalAmount - balanceDue,
+            balanceAmount: balanceDue,
+            notes: notes,
+            currency: currencyCode,
+            currencySymbol: currencySymbol,
+            signature: signature || undefined,
+            attachments: attachments
+        }
+        setPreviewData(invoiceData)
+        setIsPreviewOpen(true)
+    }
+
+    const handlePrint = () => {
+        if (previewData) {
+            printInvoice(previewData)
+        }
+    }
+
+    const handleDownload = () => {
+        if (previewData) {
+            downloadInvoice(previewData)
+        }
+    }
+
     const handleDelete = async () => {
         if (!initialData?.id || !activeBusinessId) return
         setDeleting(true)
@@ -276,9 +337,10 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
             if (error) throw error
 
             setSuccess(true)
+            router.refresh()
             setTimeout(() => {
+                setSuccess(false)
                 router.push(isSale ? '/dashboard/sales' : '/dashboard/purchases')
-                router.refresh()
             }, 1000)
         } catch (err: any) {
             alert('Error deleting: ' + err.message)
@@ -450,9 +512,10 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
             }
 
             setSuccess(true)
+            router.refresh()
             setTimeout(() => {
+                setSuccess(false)
                 router.push(isSale ? '/dashboard/sales' : '/dashboard/purchases')
-                router.refresh()
             }, 1000)
         } catch (err: any) {
             alert(err.message)
@@ -492,6 +555,14 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={handlePreview}
+                            className="flex items-center gap-1.5 px-3 py-2 lg:py-1.5 rounded-xl bg-white border border-white/20 text-[var(--deep-contrast)] text-[10px] lg:text-[9px] font-bold uppercase tracking-wider hover:bg-gray-50 transition-all shadow-sm active:scale-95"
+                        >
+                            <Printer className="h-3.5 w-3.5" />
+                            <span className="hidden sm:inline">Preview</span>
+                        </button>
                         {isEdit && (
                             <button
                                 type="button"
@@ -703,13 +774,21 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                             </div>
                         </div>
 
+                        {/* Signature */}
+                        <div className="pt-2 border-t border-black/5">
+                            <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1.5 ml-1">Authorized Person Signature</label>
+                            <div className="rounded-xl overflow-hidden border border-dashed border-[var(--primary-green)]/30 bg-white/30 backdrop-blur-sm">
+                                <SignaturePad ref={sigPadRef} className="h-32" />
+                            </div>
+                        </div>
+
                         {/* Attachments */}
                         <div className="pt-2 border-t border-black/5">
-                            <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1.5 ml-1">Attachments</label>
+                            <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1.5 ml-1">Pictures / Proof Documents</label>
                             <div className="flex flex-wrap gap-1.5">
                                 {attachments.map((url, i) => (
                                     <div key={i} className="relative group">
-                                        <div className="h-10 w-10 rounded-lg bg-white/60 border border-white/20 overflow-hidden">
+                                        <div className="h-10 w-10 lg:h-12 lg:w-12 rounded-lg bg-white/60 border border-white/20 overflow-hidden shadow-sm">
                                             {url.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
                                                 <img src={url} alt="" className="w-full h-full object-cover" />
                                             ) : (
@@ -721,14 +800,14 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                         <button
                                             type="button"
                                             onClick={() => removeAttachment(i)}
-                                            className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-rose-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                            className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-rose-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
                                         >
                                             <X className="h-2.5 w-2.5" />
                                         </button>
                                     </div>
                                 ))}
-                                <label className="h-10 w-10 rounded-lg border border-dashed border-gray-300 bg-white/30 flex items-center justify-center cursor-pointer hover:bg-white/50 transition-all">
-                                    <Plus className="h-4 w-4 text-gray-400" />
+                                <label className="h-10 w-10 lg:h-12 lg:w-12 rounded-lg border border-dashed border-gray-300 bg-white/30 flex items-center justify-center cursor-pointer hover:bg-white/50 transition-all group">
+                                    <ImageIcon className="h-4 w-4 text-gray-400 group-hover:text-[var(--primary-green)]" />
                                     <input
                                         type="file"
                                         multiple
@@ -920,6 +999,16 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                 confirmText="Delete"
                 cancelText="Keep It"
             />
+
+            {isPreviewOpen && previewData && (
+                <InvoicePreviewModal
+                    isOpen={isPreviewOpen}
+                    onClose={() => setIsPreviewOpen(false)}
+                    data={previewData}
+                    onPrint={handlePrint}
+                    onDownload={handleDownload}
+                />
+            )}
         </>
     )
 }
