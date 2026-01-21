@@ -486,7 +486,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                             <h1 className="text-xs lg:text-[11px] font-bold text-[var(--deep-contrast)] uppercase tracking-tight">
                                 {isEdit ? 'Edit' : 'New'} {isSale ? 'Sale' : 'Purchase'}
                             </h1>
-                            <p className="text-[10px] lg:text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest mt-1">
+                            <p className="text-[10px] lg:text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mt-1">
                                 {isEdit ? 'Update existing record' : 'Invoice Creation'}
                             </p>
                         </div>
@@ -645,7 +645,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                         )}>
                                             {isFullyReceived && <div className="h-1 w-1 bg-white rounded-full" />}
                                         </div>
-                                        <span className="text-[7px] font-black uppercase tracking-widest">Fully Received</span>
+                                        <span className="text-[7px] font-black uppercase tracking-wider">Fully Received</span>
                                     </button>
                                 </div>
                                 <div className="space-y-1.5">
@@ -741,23 +741,23 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                         </div>
 
                         <div className="space-y-2 pt-3 border-t border-black/5">
-                            <div className="flex justify-between text-[9px] font-bold uppercase tracking-widest">
+                            <div className="flex justify-between text-[9px] font-bold uppercase tracking-wider">
                                 <span className="text-[var(--foreground)]/40">Subtotal</span>
                                 <span className="text-[var(--deep-contrast)]">{formatCurrency(subtotal)}</span>
                             </div>
-                            <div className="flex justify-between text-[9px] font-bold uppercase tracking-widest">
+                            <div className="flex justify-between text-[9px] font-bold uppercase tracking-wider">
                                 <span className="text-[var(--foreground)]/40">Taxation</span>
                                 <span className="text-[var(--deep-contrast)]">{formatCurrency(totalTax)}</span>
                             </div>
                             {discountAmount > 0 && (
-                                <div className="flex justify-between text-[9px] font-bold uppercase tracking-widest text-orange-500">
+                                <div className="flex justify-between text-[9px] font-bold uppercase tracking-wider text-orange-500">
                                     <span>Discount</span>
                                     <span>-{formatCurrency(discountAmount)}</span>
                                 </div>
                             )}
                             {isSale && (
                                 <div className={clsx(
-                                    "flex justify-between text-[9px] font-bold uppercase tracking-widest p-2 rounded-lg bg-black/5 mt-1",
+                                    "flex justify-between text-[9px] font-bold uppercase tracking-wider p-2 rounded-lg bg-black/5 mt-1",
                                     isTotalLoss ? "text-rose-600" : "text-blue-600"
                                 )}>
                                     <span>{isTotalLoss ? 'Projected Loss' : 'Projected Profit'}</span>
@@ -765,7 +765,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                 </div>
                             )}
                             <div className="flex justify-between items-center text-lg font-bold text-[var(--deep-contrast)] pt-3 border-t border-[var(--primary-green)]/10 mt-2">
-                                <span className="text-[10px] font-bold uppercase tracking-[0.3em] pt-0.5">Grand Total</span>
+                                <span className="text-[10px] font-bold uppercase tracking-wider pt-0.5">Grand Total</span>
                                 <span className={clsx(
                                     "px-3 py-1 rounded-xl bg-[var(--primary-green)]/10",
                                     paymentMode !== 'UNPAID' ? "text-[var(--primary-green)]" : "text-[var(--deep-contrast)]"
@@ -794,7 +794,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                             <div className="p-3 space-y-3 lg:space-y-2 max-h-[500px] overflow-y-auto custom-scrollbar">
                                 {rows.length === 0 ? (
                                     <div className="text-center py-12 lg:py-8 opacity-30">
-                                        <p className="text-[10px] lg:text-[8px] font-bold uppercase tracking-widest">No items added yet</p>
+                                        <p className="text-[10px] lg:text-[8px] font-bold uppercase tracking-wider">No items added yet</p>
                                     </div>
                                 ) : (
                                     rows.map((row, index) => (

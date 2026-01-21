@@ -92,7 +92,7 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                         </div>
                         <div>
                             <h2 className="text-sm lg:text-[13px] font-bold text-[var(--deep-contrast)] tracking-tight">Add Sale Item</h2>
-                            <p className="text-[10px] lg:text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest leading-none">Line Detail</p>
+                            <p className="text-[10px] lg:text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-none">Line Detail</p>
                         </div>
                     </div>
                     <button
@@ -106,7 +106,7 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
                     {/* Item Selection */}
                     <div>
-                        <label className="block text-xs lg:text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-2 ml-1">Select Product *</label>
+                        <label className="block text-xs lg:text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-2 ml-1">Select Product *</label>
                         <button
                             type="button"
                             onClick={() => setIsItemPickerOpen(true)}
@@ -122,7 +122,7 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                             <div className="grid grid-cols-2 gap-3">
                                 {/* Quantity */}
                                 <div>
-                                    <label className="block text-xs lg:text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-2 ml-1">Quantity ({selectedItem.unit})</label>
+                                    <label className="block text-xs lg:text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-2 ml-1">Quantity ({selectedItem.unit})</label>
                                     <input
                                         type="number"
                                         step="any"
@@ -134,7 +134,7 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                                 </div>
                                 {/* Rate */}
                                 <div>
-                                    <label className="block text-xs lg:text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-2 ml-1">Rate ({selectedItem.unit})</label>
+                                    <label className="block text-xs lg:text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-2 ml-1">Rate ({selectedItem.unit})</label>
                                     <input
                                         type="number"
                                         step="any"
@@ -152,7 +152,7 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                                     <div className="flex justify-between items-center">
                                         <div className="flex items-center gap-2">
                                             <Calculator className="h-3 w-3 text-[var(--primary-green)]" />
-                                            <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/60">Line Total</span>
+                                            <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/60">Line Total</span>
                                         </div>
                                         <span className="text-sm font-bold text-[var(--primary-green)]">{formatCurrency(total)}</span>
                                     </div>
@@ -165,7 +165,7 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                                     <div className="flex justify-between items-center">
                                         <div className="flex items-center gap-2">
                                             <Calculator className={clsx("h-3 w-3", isLoss ? "text-rose-500" : "text-blue-500")} />
-                                            <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/60">
+                                            <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/60">
                                                 {isLoss ? 'Loss' : 'Profit'}
                                             </span>
                                         </div>
@@ -185,14 +185,14 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 h-11 rounded-xl text-[10px] font-bold uppercase tracking-widest text-[var(--foreground)]/40 hover:bg-white/50 transition-all active:scale-95"
+                            className="flex-1 h-11 rounded-xl text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 hover:bg-white/50 transition-all active:scale-95"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={!selectedItem || quantity <= 0}
-                            className="flex-1 h-11 flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] text-white shadow-lg text-[10px] font-bold uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50"
+                            className="flex-1 h-11 flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] text-white shadow-lg text-[10px] font-bold uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50"
                         >
                             <Plus className="mr-2 h-3 w-3" />
                             {initialData ? 'Save Changes' : 'Add to Sale'}

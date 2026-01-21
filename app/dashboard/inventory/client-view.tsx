@@ -7,12 +7,13 @@ import clsx from 'clsx'
 import { useBusiness } from '@/context/business-context'
 import Link from 'next/link'
 import { createClient } from '@/utils/supabase/client'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
 import { useRouter } from 'next/navigation'
 
 export default function InventoryClientView({ initialItems }: { initialItems?: any[] }) {
     const router = useRouter()
-    const { activeBusinessId, formatCurrency } = useBusiness()
+    const { activeBusinessId, formatCurrency, isLoading: isContextLoading } = useBusiness()
     const [items, setItems] = useState<any[]>(initialItems || [])
     const [searchQuery, setSearchQuery] = useState('')
     const [filterCategory, setFilterCategory] = useState<string>('ALL')
@@ -20,17 +21,22 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
     const [isSortPickerOpen, setIsSortPickerOpen] = useState(false)
     const [isFilterPickerOpen, setIsFilterPickerOpen] = useState(false)
+    const [loading, setLoading] = useState(!initialItems)
     const supabase = createClient()
 
     useEffect(() => {
-        if (!initialItems) {
-            const fetchItems = async () => {
-                const { data } = await supabase.from('items').select('*').order('name')
-                if (data) setItems(data)
+        const fetchItems = async () => {
+            setLoading(true)
+            console.log('InventoryClientView: Fetching fresh items...')
+            const { data, error } = await supabase.from('items').select('*').order('name')
+            if (error) {
+                console.error('InventoryClientView: Error fetching items', error)
             }
-            fetchItems()
+            if (data) setItems(data)
+            setLoading(false)
         }
-    }, [initialItems])
+        fetchItems()
+    }, [activeBusinessId]) // Re-fetch if business changes
     // Derived Categories
     const categories = ['all', ...Array.from(new Set(items.map(i => i.category).filter(Boolean)))]
 
@@ -65,11 +71,11 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-xl font-bold text-[var(--deep-contrast)] tracking-tight">Inventory</h1>
-                        <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-widest leading-none">Stock Management</p>
+                        <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Stock Management</p>
                     </div>
                     <Link
                         href="/dashboard/inventory/new"
-                        className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white hover:bg-[var(--primary-green)] transition-all shadow-lg active:scale-95"
+                        className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white hover:bg-[var(--primary-green)] transition-all shadow-lg active:scale-95"
                     >
                         <Plus className="mr-1 h-3 w-3" />
                         New Item
@@ -89,14 +95,14 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                     </div>
                     <button
                         onClick={() => setIsSortPickerOpen(true)}
-                        className="h-9 px-3 rounded-xl bg-white/50 border border-white/20 flex items-center gap-2 text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-widest hover:bg-white/10 transition-all shadow-sm"
+                        className="h-9 px-3 rounded-xl bg-white/50 border border-white/20 flex items-center gap-2 text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-wider hover:bg-white/10 transition-all shadow-sm"
                     >
                         <SortAsc className="h-3 w-3 opacity-40" />
                         <span>Sort</span>
                     </button>
                     <button
                         onClick={() => setIsFilterPickerOpen(true)}
-                        className="h-9 px-3 rounded-xl bg-white/50 border border-white/20 flex items-center gap-2 text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-widest hover:bg-white/10 transition-all shadow-sm"
+                        className="h-9 px-3 rounded-xl bg-white/50 border border-white/20 flex items-center gap-2 text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-wider hover:bg-white/10 transition-all shadow-sm"
                     >
                         <Filter className="h-3 w-3 opacity-40" />
                         <span>Filter</span>
@@ -106,7 +112,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
 
             {/* Grid - Ultra Compact Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                {filteredItems.map((item) => (
+                {!isContextLoading && filteredItems.map((item) => (
                     <div
                         key={item.id}
                         onClick={() => {
@@ -128,18 +134,18 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                                     <div className="flex items-center gap-2">
                                         <h3 className="text-[10px] font-bold text-[var(--deep-contrast)] leading-tight">{item.name}</h3>
                                         {item.category && (
-                                            <span className="text-[6px] font-bold uppercase tracking-widest bg-[var(--primary-green)]/10 text-[var(--primary-green)] px-1 py-0.5 rounded border border-[var(--primary-green)]/10">
+                                            <span className="text-[6px] font-bold uppercase tracking-wider bg-[var(--primary-green)]/10 text-[var(--primary-green)] px-1 py-0.5 rounded border border-[var(--primary-green)]/10">
                                                 {item.category}
                                             </span>
                                         )}
                                     </div>
                                     <div className="flex items-center gap-1 opacity-40">
                                         <Boxes className="h-2 w-2" />
-                                        <span className="text-[8px] font-bold uppercase tracking-widest">{item.unit || 'Units'}</span>
+                                        <span className="text-[8px] font-bold uppercase tracking-wider">{item.unit || 'Units'}</span>
                                         {item.sku && (
                                             <>
                                                 <span className="mx-1">•</span>
-                                                <span className="text-[6px] font-bold tracking-widest bg-black/5 px-1 rounded">#{item.sku}</span>
+                                                <span className="text-[6px] font-bold tracking-wider bg-black/5 px-1 rounded">#{item.sku}</span>
                                             </>
                                         )}
                                     </div>
@@ -162,7 +168,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                         )}
 
                         <div className="mt-3 space-y-1.5">
-                            <div className="flex justify-between items-center text-[8px] font-bold uppercase tracking-widest text-[var(--foreground)]/30">
+                            <div className="flex justify-between items-center text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/30">
                                 <span>Stock Level</span>
                                 <span className={clsx(
                                     item.stock_quantity <= item.min_stock ? "text-amber-600" : "text-[var(--foreground)]/30"
@@ -185,12 +191,12 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
 
                         <div className="flex justify-between items-end mt-2 pt-2 border-t border-[var(--primary-green)]/5">
                             <div>
-                                <p className="text-[8px] font-bold text-[var(--foreground)]/30 uppercase tracking-widest leading-none mb-1">Selling Rate</p>
+                                <p className="text-[8px] font-bold text-[var(--foreground)]/30 uppercase tracking-wider leading-none mb-1">Selling Rate</p>
                                 <p className="text-sm font-bold text-[var(--deep-contrast)] tracking-tight">{formatCurrency(item.selling_price)}</p>
                             </div>
                             {item.stock_quantity <= item.min_stock && (
                                 <div className={clsx(
-                                    "flex items-center gap-1.5 px-2 py-0.5 rounded-lg border text-[8px] font-bold uppercase tracking-widest",
+                                    "flex items-center gap-1.5 px-2 py-0.5 rounded-lg border text-[8px] font-bold uppercase tracking-wider",
                                     item.stock_quantity > 0 ? "bg-amber-100/50 text-amber-600 border-amber-200 animate-pulse" : "bg-rose-100/50 text-rose-600 border-rose-200"
                                 )}>
                                     <AlertTriangle className="h-3 w-3" />
@@ -202,11 +208,24 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                 ))}
             </div>
 
-            {filteredItems.length === 0 && (
-                <div className="text-center py-10 opacity-30">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.3em]">Empty cache</p>
+            {(loading || isContextLoading) ? (
+                <div className="flex flex-col items-center justify-center py-32 animate-in fade-in zoom-in duration-500">
+                    <LoadingSpinner size="lg" label="Synchronizing Inventory..." />
+                    <p className="text-[8px] font-bold text-[var(--foreground)]/20 uppercase tracking-widest mt-2">Checking your secure vault</p>
                 </div>
-            )}
+            ) : (!activeBusinessId) ? (
+                <div className="text-center py-24 opacity-30 animate-in fade-in duration-700">
+                    <AlertTriangle className="h-10 w-10 mx-auto mb-3 text-amber-500 opacity-20" />
+                    <p className="text-[10px] font-bold uppercase tracking-wider">No active business</p>
+                    <p className="text-[8px] font-bold uppercase tracking-widest mt-1 opacity-50">Please select a business from the sidebar</p>
+                </div>
+            ) : filteredItems.length === 0 ? (
+                <div className="text-center py-24 opacity-30 animate-in fade-in duration-700">
+                    <Package className="h-10 w-10 mx-auto mb-3 opacity-20" />
+                    <p className="text-[10px] font-bold uppercase tracking-wider">No items in this warehouse</p>
+                    <p className="text-[8px] font-bold uppercase tracking-widest mt-1 opacity-50">Add a new item to get started</p>
+                </div>
+            ) : null}
 
 
             <PickerModal
@@ -217,6 +236,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                     setIsSortPickerOpen(false)
                 }}
                 title="Sort Inventory"
+                showSearch={false}
                 options={[
                     { id: 'name-asc', label: 'NAME (A-Z)' },
                     { id: 'name-desc', label: 'NAME (Z-A)' },
@@ -236,6 +256,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                     setIsFilterPickerOpen(false)
                 }}
                 title="Filter by Category"
+                showSearch={false}
                 options={categories.map(cat => ({
                     id: cat,
                     label: cat.toUpperCase()

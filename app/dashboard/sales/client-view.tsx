@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, Plus, Calendar, FileText, User, Filter, ArrowUpDown, Trash2, Edit2 } from 'lucide-react'
+import { Search, Plus, Calendar, FileText, User, Filter, ArrowUpDown, Trash2, Edit2, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/context/business-context'
@@ -11,10 +11,11 @@ import PickerModal from '@/components/ui/PickerModal'
 import ConfirmModal from '@/components/ui/ConfirmModal'
 import FeedbackModal from '@/components/ui/FeedbackModal'
 import { Loader2 } from 'lucide-react'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
 export default function SalesClientView({ initialInvoices }: { initialInvoices?: any[] }) {
     const router = useRouter()
-    const { activeBusinessId, formatCurrency } = useBusiness()
+    const { activeBusinessId, formatCurrency, isLoading: isContextLoading } = useBusiness()
     const [invoices, setInvoices] = useState(initialInvoices || [])
     const [searchQuery, setSearchQuery] = useState('')
     const [statusFilter, setStatusFilter] = useState<string>('ALL')
@@ -22,21 +23,26 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
     const [isSortPickerOpen, setIsSortPickerOpen] = useState(false)
     const [isFilterPickerOpen, setIsFilterPickerOpen] = useState(false)
+    const [loading, setLoading] = useState(!initialInvoices)
     const supabase = createClient()
 
     useEffect(() => {
-        if (!initialInvoices) {
-            const fetchInvoices = async () => {
-                const { data } = await supabase
-                    .from('invoices')
-                    .select('*, party:parties(name)')
-                    .eq('type', 'SALE')
-                    .order('date', { ascending: false })
-                if (data) setInvoices(data)
+        const fetchInvoices = async () => {
+            setLoading(true)
+            console.log('SalesClientView: Fetching fresh invoices...')
+            const { data, error } = await supabase
+                .from('invoices')
+                .select('*, party:parties(name)')
+                .eq('type', 'SALE')
+                .order('date', { ascending: false })
+            if (error) {
+                console.error('SalesClientView: Error fetching invoices', error)
             }
-            fetchInvoices()
+            if (data) setInvoices(data)
+            setLoading(false)
         }
-    }, [initialInvoices])
+        fetchInvoices()
+    }, [activeBusinessId])
 
     const handleEdit = (invoice: any) => {
         router.push(`/dashboard/sales/edit?id=${invoice.id}`)
@@ -66,12 +72,12 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-xl font-bold text-[var(--deep-contrast)] tracking-tight">Sales</h1>
-                        <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-widest leading-none">Invoice Log</p>
+                        <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Invoice Log</p>
 
                     </div>
                     <Link
                         href="/dashboard/sales/new"
-                        className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white hover:bg-[var(--primary-green)] transition-all shadow-lg active:scale-95"
+                        className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white hover:bg-[var(--primary-green)] transition-all shadow-lg active:scale-95"
                     >
                         <Plus className="mr-1 h-3 w-3" />
                         New Sale
@@ -91,14 +97,14 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                     </div>
                     <button
                         onClick={() => setIsSortPickerOpen(true)}
-                        className="h-9 px-3 rounded-xl bg-white/50 border border-white/20 flex items-center gap-2 text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-widest hover:bg-white/10 transition-all shadow-sm"
+                        className="h-9 px-3 rounded-xl bg-white/50 border border-white/20 flex items-center gap-2 text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-wider hover:bg-white/10 transition-all shadow-sm"
                     >
                         <ArrowUpDown className="h-3 w-3 opacity-40" />
                         <span>Sort</span>
                     </button>
                     <button
                         onClick={() => setIsFilterPickerOpen(true)}
-                        className="h-9 px-3 rounded-xl bg-white/50 border border-white/20 flex items-center gap-2 text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-widest hover:bg-white/10 transition-all shadow-sm"
+                        className="h-9 px-3 rounded-xl bg-white/50 border border-white/20 flex items-center gap-2 text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-wider hover:bg-white/10 transition-all shadow-sm"
                     >
                         <Filter className="h-3 w-3 opacity-40" />
                         <span>Filter</span>
@@ -116,6 +122,7 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                     setIsSortPickerOpen(false)
                 }}
                 title="Sort Sales"
+                showSearch={false}
                 options={[
                     { id: 'date-desc', label: 'DATE (NEWEST FIRST)' },
                     { id: 'date-asc', label: 'DATE (OLDEST FIRST)' },
@@ -133,6 +140,7 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                     setIsFilterPickerOpen(false)
                 }}
                 title="Filter by Status"
+                showSearch={false}
                 options={[
                     { id: 'ALL', label: 'ALL STATUS' },
                     { id: 'PAID', label: 'PAID' },
@@ -159,13 +167,13 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                                     <h3 className="text-[10px] font-bold text-[var(--deep-contrast)] leading-none">{invoice.invoice_number}</h3>
                                     <div className="flex items-center gap-1 opacity-40">
                                         <Calendar className="h-2 w-2" />
-                                        <span className="text-[8px] font-bold uppercase tracking-widest">{new Date(invoice.date).toLocaleDateString()}</span>
+                                        <span className="text-[8px] font-bold uppercase tracking-wider">{new Date(invoice.date).toLocaleDateString()}</span>
                                     </div>
                                 </div>
                             </div>
                             <div className="flex flex-col items-end gap-1">
                                 <span className={clsx(
-                                    "text-[7px] font-bold uppercase tracking-[0.2em] px-1.5 py-0.5 rounded-md border",
+                                    "text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md border",
                                     invoice.status === 'PAID' ? "bg-emerald-100/50 text-emerald-700 border-emerald-200" :
                                         invoice.status === 'PENDING' ? "bg-amber-100/50 text-amber-700 border-amber-200" :
                                             "bg-slate-100/50 text-slate-700 border-slate-200"
@@ -183,7 +191,7 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                                 <span className="text-[9px] font-bold text-[var(--foreground)]/60 truncate max-w-[100px]">{invoice.party?.name || 'Walk-in Customer'}</span>
                             </div>
                             <div className="text-right">
-                                <p className="text-[7px] font-bold uppercase tracking-widest text-[var(--foreground)]/30 mb-0.5">Grand Total</p>
+                                <p className="text-[7px] font-bold uppercase tracking-wider text-[var(--foreground)]/30 mb-0.5">Grand Total</p>
                                 <p className="text-xs font-bold text-[var(--deep-contrast)] tracking-tight">{formatCurrency(invoice.total_amount)}</p>
                             </div>
                         </div>
@@ -191,11 +199,24 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                 ))}
             </div>
 
-            {filteredInvoices.length === 0 && (
-                <div className="text-center py-10 opacity-30">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.3em]">No invoices found</p>
+            {(loading || isContextLoading) ? (
+                <div className="flex flex-col items-center justify-center py-32 animate-in fade-in zoom-in duration-500">
+                    <LoadingSpinner size="lg" label="Retrieving Sales Ledger..." />
+                    <p className="text-[8px] font-bold text-[var(--foreground)]/20 uppercase tracking-widest mt-2">Checking your secure archives</p>
                 </div>
-            )}
+            ) : (!activeBusinessId) ? (
+                <div className="text-center py-24 opacity-30 animate-in fade-in duration-700">
+                    <AlertTriangle className="h-10 w-10 mx-auto mb-3 text-amber-500 opacity-20" />
+                    <p className="text-[10px] font-bold uppercase tracking-wider">No active business</p>
+                    <p className="text-[8px] font-bold uppercase tracking-widest mt-1 opacity-50">Please select a business from the sidebar</p>
+                </div>
+            ) : filteredInvoices.length === 0 ? (
+                <div className="text-center py-24 opacity-30 animate-in fade-in duration-700">
+                    <FileText className="h-10 w-10 mx-auto mb-3 opacity-20" />
+                    <p className="text-[10px] font-bold uppercase tracking-wider">No sales recorded today</p>
+                    <p className="text-[8px] font-bold uppercase tracking-widest mt-1 opacity-50">Generate an invoice to start tracking</p>
+                </div>
+            ) : null}
         </div>
     )
 }

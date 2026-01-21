@@ -52,13 +52,13 @@ export const ConfirmationModal = ({
                         <div className="flex items-center gap-3">
                             <button
                                 onClick={onClose}
-                                className="flex-1 py-3.5 lg:py-3 px-4 rounded-xl bg-gray-50 text-gray-600 text-[11px] lg:text-[10px] uppercase font-black tracking-widest hover:bg-gray-100 transition-colors"
+                                className="flex-1 py-3.5 lg:py-3 px-4 rounded-xl bg-gray-50 text-gray-600 text-[11px] lg:text-[10px] uppercase font-black tracking-wider hover:bg-gray-100 transition-colors"
                             >
                                 {cancelLabel}
                             </button>
                             <button
                                 onClick={onConfirm}
-                                className="flex-1 py-3.5 lg:py-3 px-4 rounded-xl bg-[var(--primary-green)] text-white shadow-lg shadow-[var(--primary-green)]/20 text-[11px] lg:text-[10px] uppercase font-black tracking-widest hover:bg-[var(--primary-green)]/90 transition-all transform active:scale-95"
+                                className="flex-1 py-3.5 lg:py-3 px-4 rounded-xl bg-[var(--primary-green)] text-white shadow-lg shadow-[var(--primary-green)]/20 text-[11px] lg:text-[10px] uppercase font-black tracking-wider hover:bg-[var(--primary-green)]/90 transition-all transform active:scale-95"
                             >
                                 {confirmLabel}
                             </button>

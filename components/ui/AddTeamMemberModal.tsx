@@ -137,7 +137,7 @@ export default function AddTeamMemberModal({ isOpen, onClose, businessId, onSucc
                         </div>
                         <div>
                             <h3 className="text-sm font-black text-[var(--deep-contrast)] tracking-tight">Invite Member</h3>
-                            <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest leading-none">Add by email or username</p>
+                            <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-none">Add by email or username</p>
                         </div>
                     </div>
                     <button onClick={onClose} className="p-2 rounded-xl hover:bg-black/5 transition-colors">
@@ -188,7 +188,7 @@ export default function AddTeamMemberModal({ isOpen, onClose, businessId, onSucc
                             <button
                                 onClick={handleSearch}
                                 disabled={searching || !searchQuery.trim()}
-                                className="px-6 h-12 rounded-[20px] bg-[var(--deep-contrast)] text-white font-black text-[10px] uppercase tracking-widest hover:bg-[var(--primary-green)] transition-all shadow-lg active:scale-95 disabled:opacity-50 flex items-center gap-2"
+                                className="px-6 h-12 rounded-[20px] bg-[var(--deep-contrast)] text-white font-black text-[10px] uppercase tracking-wider hover:bg-[var(--primary-green)] transition-all shadow-lg active:scale-95 disabled:opacity-50 flex items-center gap-2"
                             >
                                 {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
                                 Find
@@ -222,7 +222,7 @@ export default function AddTeamMemberModal({ isOpen, onClose, businessId, onSucc
 
                                 <div className="space-y-4">
                                     <div className="space-y-2">
-                                        <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 ml-1">Assign Business Role</label>
+                                        <label className="block text-[9px] font-black uppercase tracking-wider text-[var(--foreground)]/40 ml-1">Assign Business Role</label>
                                         <button
                                             onClick={() => setIsRolePickerOpen(true)}
                                             className="w-full h-12 rounded-[18px] bg-white border border-black/5 px-5 text-xs font-bold text-[var(--deep-contrast)] flex items-center justify-between hover:border-[var(--primary-green)] transition-all shadow-sm"

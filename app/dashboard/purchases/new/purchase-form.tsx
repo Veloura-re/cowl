@@ -261,13 +261,13 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                     </Link>
                     <div>
                         <h1 className="text-sm font-bold text-[var(--deep-contrast)] uppercase tracking-tight">Record Bill</h1>
-                        <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest leading-none mt-0.5">Stock Entry</p>
+                        <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-none mt-0.5">Stock Entry</p>
                     </div>
                 </div>
                 <button
                     onClick={handleSubmit}
                     disabled={loading}
-                    className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white hover:bg-[var(--primary-green)] transition-all disabled:opacity-50 shadow-lg active:scale-95"
+                    className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white hover:bg-[var(--primary-green)] transition-all disabled:opacity-50 shadow-lg active:scale-95"
                 >
                     {loading ? <Loader2 className="mr-1.5 h-3 w-3 animate-spin" /> : <Save className="mr-1.5 h-3 w-3" />}
                     Save Bill
@@ -279,11 +279,11 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                 <div className="md:col-span-1 space-y-3">
                     <div className="glass rounded-[24px] border border-white/40 overflow-hidden">
                         <div className="px-4 py-2 border-b border-white/10 bg-white/40">
-                            <h3 className="text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-widest">Metadata</h3>
+                            <h3 className="text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-wider">Metadata</h3>
                         </div>
                         <div className="p-4 space-y-3">
                             <div>
-                                <label className="block text-[8px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-1 ml-1">Supplier</label>
+                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Supplier</label>
                                 <button
                                     type="button"
                                     onClick={() => setIsPartyPickerOpen(true)}
@@ -294,7 +294,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                                 </button>
                             </div>
                             <div>
-                                <label className="block text-[8px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-1 ml-1">Bill Reference</label>
+                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Bill Reference</label>
                                 <input
                                     type="text"
                                     value={invoiceNumber}
@@ -304,7 +304,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                                 />
                             </div>
                             <div>
-                                <label className="block text-[8px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-1 ml-1">Date</label>
+                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Date</label>
                                 <input
                                     type="date"
                                     value={date}
@@ -313,7 +313,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                                 />
                             </div>
                             <div>
-                                <label className="block text-[8px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-1 ml-1">Due Date</label>
+                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Due Date</label>
                                 <input
                                     type="date"
                                     value={dueDate}
@@ -326,7 +326,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
 
                     <div className="glass rounded-[24px] border border-white/40 p-4 space-y-3">
                         <div>
-                            <label className="block text-[8px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-1 ml-1">Payment Mode</label>
+                            <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Payment Mode</label>
                             <div className="flex gap-1.5">
                                 <button
                                     type="button"
@@ -384,7 +384,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
 
                         {paymentMode !== 'UNPAID' && (
                             <div className="pt-2 animate-in slide-in-from-top-2 duration-300">
-                                <label className="block text-[8px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-1 ml-1">Amount Paid</label>
+                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Amount Paid</label>
                                 <div className="space-y-1.5">
                                     <input
                                         type="number"
@@ -395,7 +395,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                                         className="w-full h-8 rounded-xl bg-white/60 border border-[var(--primary-green)]/20 px-3 text-[10px] font-bold focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner"
                                     />
                                     <div className="flex justify-between px-1">
-                                        <span className="text-[7px] font-bold uppercase tracking-widest text-black/30">
+                                        <span className="text-[7px] font-bold uppercase tracking-wider text-black/30">
                                             {numPaid >= totalAmount ? 'Change' : 'Balance Due'}
                                         </span>
                                         <span className={clsx(
@@ -475,22 +475,22 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                         </div>
 
                         <div className="space-y-1.5 pt-2 border-t border-black/5">
-                            <div className="flex justify-between text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/40 px-1">
+                            <div className="flex justify-between text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 px-1">
                                 <span>Subtotal</span>
                                 <span className="text-[var(--deep-contrast)]">{formatCurrency(subtotal)}</span>
                             </div>
-                            <div className="flex justify-between text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/40 px-1">
+                            <div className="flex justify-between text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 px-1">
                                 <span>Taxation</span>
                                 <span className="text-[var(--deep-contrast)]">{formatCurrency(totalTax)}</span>
                             </div>
                             {discountAmount > 0 && (
-                                <div className="flex justify-between text-[9px] font-bold uppercase tracking-widest text-orange-500 px-1">
+                                <div className="flex justify-between text-[9px] font-bold uppercase tracking-wider text-orange-500 px-1">
                                     <span>Discount</span>
                                     <span>-{formatCurrency(discountAmount)}</span>
                                 </div>
                             )}
                             <div className="flex justify-between text-base font-bold text-[var(--deep-contrast)] pt-2 border-t border-[var(--primary-green)]/10 mt-1 px-1">
-                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] pt-0.5">Total</span>
+                                <span className="text-[10px] font-bold uppercase tracking-wider pt-0.5">Total</span>
                                 <span className={clsx(paymentMode !== 'UNPAID' ? "text-[var(--primary-green)]" : "")}>
                                     {formatCurrency(totalAmount)}
                                 </span>
@@ -503,11 +503,11 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                 <div className="md:col-span-3">
                     <div className="glass rounded-[24px] border border-white/40 overflow-hidden min-h-[400px]">
                         <div className="px-5 py-2.5 border-b border-white/10 bg-[var(--primary-green)]/5 flex justify-between items-center">
-                            <h3 className="text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-widest">Billing Entries ({rows.length})</h3>
+                            <h3 className="text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-wider">Billing Entries ({rows.length})</h3>
                             <button
                                 type="button"
                                 onClick={() => setIsItemModalOpen(true)}
-                                className="flex items-center text-[9px] font-bold uppercase tracking-[0.2em] text-white bg-[var(--deep-contrast)] hover:bg-[var(--primary-green)] transition-all px-4 py-1.5 rounded-xl shadow-lg hover:scale-105 active:scale-95"
+                                className="flex items-center text-[9px] font-bold uppercase tracking-wider text-white bg-[var(--deep-contrast)] hover:bg-[var(--primary-green)] transition-all px-4 py-1.5 rounded-xl shadow-lg hover:scale-105 active:scale-95"
                             >
                                 <Plus className="h-3.5 w-3.5 mr-1" /> Add Item
                             </button>
@@ -517,7 +517,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                             {rows.length === 0 ? (
                                 <div className="p-20 text-center opacity-20">
                                     <Plus className="h-10 w-10 mx-auto mb-3 opacity-10" />
-                                    <p className="text-[10px] font-bold uppercase tracking-widest">No line items added</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-wider">No line items added</p>
                                 </div>
                             ) : (
                                 rows.map((row, index) => (
@@ -532,14 +532,14 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                                             </div>
                                             <div>
                                                 <h4 className="text-[11px] font-bold text-[var(--deep-contrast)] uppercase">{row.name}</h4>
-                                                <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest">
+                                                <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider">
                                                     {row.quantity} × {formatCurrency(row.rate)}
                                                 </p>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-4">
                                             <div className="text-right">
-                                                <p className="text-[8px] font-bold uppercase tracking-widest text-[var(--foreground)]/30">Subtotal</p>
+                                                <p className="text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/30">Subtotal</p>
                                                 <p className="text-[11px] font-bold text-[var(--primary-green)]">{formatCurrency(row.amount)}</p>
                                             </div>
                                             <button

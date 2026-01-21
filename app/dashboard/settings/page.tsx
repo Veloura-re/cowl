@@ -250,7 +250,7 @@ export default function SettingsPage() {
         <div className="space-y-4 pb-20 max-w-3xl mx-auto">
             <div className="pb-3 border-b border-[var(--primary-green)]/10">
                 <h1 className="text-xl font-bold text-[var(--deep-contrast)] tracking-tight">Settings</h1>
-                <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-widest leading-none">Manage your business & account</p>
+                <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Manage your business & account</p>
             </div>
 
             <div className="grid gap-3">
@@ -263,7 +263,7 @@ export default function SettingsPage() {
                             </div>
                             <h3 className="text-xs font-bold text-[var(--deep-contrast)]">Personal Profile</h3>
                         </div>
-                        <span className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest">Account Metadata</span>
+                        <span className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider">Account Metadata</span>
                     </div>
 
                     <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -304,7 +304,7 @@ export default function SettingsPage() {
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => setIsSwitcherOpen(true)}
-                                className="px-3 py-1.5 rounded-xl bg-white/40 border border-white/10 text-[9px] font-bold uppercase tracking-widest text-[var(--deep-contrast)] hover:bg-white/60 transition-all active:scale-95"
+                                className="px-3 py-1.5 rounded-xl bg-white/40 border border-white/10 text-[9px] font-bold uppercase tracking-wider text-[var(--deep-contrast)] hover:bg-white/60 transition-all active:scale-95"
                             >
                                 Switch
                             </button>
@@ -406,7 +406,7 @@ export default function SettingsPage() {
                             <button
                                 onClick={handleSave}
                                 disabled={saving}
-                                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--deep-contrast)] text-white font-bold text-[10px] uppercase tracking-widest hover:bg-[var(--primary-green)] transition-all shadow-lg active:scale-95 disabled:opacity-50"
+                                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--deep-contrast)] text-white font-bold text-[10px] uppercase tracking-wider hover:bg-[var(--primary-green)] transition-all shadow-lg active:scale-95 disabled:opacity-50"
                             >
                                 {saving ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
                                 Save Profile
@@ -426,7 +426,7 @@ export default function SettingsPage() {
                         </div>
                         <h3 className="text-xs font-bold text-[var(--deep-contrast)]">Payment Modes</h3>
                     </div>
-                    <span className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest">Global Methods</span>
+                    <span className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider">Global Methods</span>
                 </div>
                 <div className="p-4 space-y-4">
                     <div className="flex gap-2">
@@ -441,7 +441,7 @@ export default function SettingsPage() {
                         <button
                             onClick={handleAddMode}
                             disabled={addingMode || !newModeName.trim()}
-                            className="px-4 h-9 rounded-xl bg-[var(--deep-contrast)] text-white font-bold text-[10px] uppercase tracking-widest hover:bg-[var(--primary-green)] transition-all shadow-lg active:scale-95 disabled:opacity-50"
+                            className="px-4 h-9 rounded-xl bg-[var(--deep-contrast)] text-white font-bold text-[10px] uppercase tracking-wider hover:bg-[var(--primary-green)] transition-all shadow-lg active:scale-95 disabled:opacity-50"
                         >
                             {addingMode ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Add'}
                         </button>
@@ -468,7 +468,7 @@ export default function SettingsPage() {
                     </div>
 
                     <div className="pt-2 border-t border-black/5">
-                        <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest leading-relaxed">
+                        <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-relaxed">
                             Note: Default modes (CASH, BANK, ONLINE) are always available.
                         </p>
                     </div>
@@ -484,7 +484,7 @@ export default function SettingsPage() {
                         </div>
                         <h3 className="text-xs font-bold text-[var(--deep-contrast)]">Security</h3>
                     </div>
-                    <span className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest">Access Control</span>
+                    <span className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider">Access Control</span>
                 </div>
                 <div className="p-4 space-y-3">
                     <div className="flex items-center justify-between">
@@ -497,7 +497,7 @@ export default function SettingsPage() {
                         </div>
                         <button
                             onClick={() => setIsChangePasswordModalOpen(true)}
-                            className="px-3 py-1.5 rounded-xl border border-[var(--primary-green)]/20 hover:bg-[var(--primary-green)] hover:text-white text-[10px] font-bold uppercase tracking-widest text-[var(--deep-contrast)] transition-all"
+                            className="px-3 py-1.5 rounded-xl border border-[var(--primary-green)]/20 hover:bg-[var(--primary-green)] hover:text-white text-[10px] font-bold uppercase tracking-wider text-[var(--deep-contrast)] transition-all"
                         >
                             Change
                         </button>
@@ -538,7 +538,7 @@ export default function SettingsPage() {
                             onClick={handleSignOut}
                             className="w-full flex items-center justify-between px-4 py-2 text-[10px] font-bold text-rose-600/60 rounded-xl bg-white/5 border border-white/10 hover:bg-rose-600 hover:text-white transition-all active:scale-95 group"
                         >
-                            <span className="uppercase tracking-[0.2em]">Terminate Session</span>
+                            <span className="uppercase tracking-wider">Terminate Session</span>
                             <LogOut className="h-3.5 w-3.5 opacity-50 group-hover:opacity-100 transition-opacity" />
                         </button>
                     </div>
@@ -554,7 +554,7 @@ export default function SettingsPage() {
                         </div>
                         <h3 className="text-xs font-bold text-[var(--deep-contrast)]">Notifications</h3>
                     </div>
-                    <span className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest">Alert Settings</span>
+                    <span className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider">Alert Settings</span>
                 </div>
                 <div className="p-4 space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -586,7 +586,7 @@ export default function SettingsPage() {
                         ))}
                     </div>
                     <div className="pt-2 border-t border-black/5">
-                        <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest leading-relaxed">
+                        <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-relaxed">
                             Team members set their own notification preferences.
                         </p>
                     </div>

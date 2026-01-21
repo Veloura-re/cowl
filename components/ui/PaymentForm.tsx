@@ -273,7 +273,7 @@ export default function PaymentForm({
                         <h1 className="text-xl font-bold text-[var(--deep-contrast)] tracking-tight">
                             {isEdit ? 'Update' : 'New'} {isReceipt ? 'Deposit' : 'Expense'}
                         </h1>
-                        <p className="text-[11px] lg:text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-widest leading-none mt-1">
+                        <p className="text-[11px] lg:text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider leading-none mt-1">
                             {isReceipt ? 'Credit entry to ledger' : 'Debit entry from ledger'}
                         </p>
                     </div>
@@ -392,7 +392,7 @@ export default function PaymentForm({
                         >
                             <div className="flex items-center gap-2">
                                 <Wallet className="h-5 w-5 lg:h-4 lg:w-4 opacity-20" />
-                                <span className="text-xs lg:text-[11px] font-bold uppercase tracking-widest">{formData.mode}</span>
+                                <span className="text-xs lg:text-[11px] font-bold uppercase tracking-wider">{formData.mode}</span>
                             </div>
                             <span className="text-xs lg:text-[10px] font-bold text-[var(--primary-green)]">{formatCurrency(modeBalances[formData.mode] || 0)}</span>
                         </button>
@@ -416,7 +416,7 @@ export default function PaymentForm({
                             </div>
                             {Number(givenAmount) > formData.amount && (
                                 <div className="p-4 rounded-2xl bg-[var(--primary-green)]/10 border border-[var(--primary-green)]/20 text-center animate-in zoom-in-95">
-                                    <p className="text-[9px] font-bold text-[var(--primary-green)] uppercase tracking-[0.2em] mb-1">Return Balance</p>
+                                    <p className="text-[9px] font-bold text-[var(--primary-green)] uppercase tracking-wider mb-1">Return Balance</p>
                                     <p className="text-2xl font-black text-[var(--primary-green)] tracking-tight">
                                         {formatCurrency(Number(givenAmount) - formData.amount)}
                                     </p>
@@ -449,7 +449,7 @@ export default function PaymentForm({
                                             </div>
                                             <div>
                                                 <p className="text-[11px] lg:text-[10px] font-black uppercase text-[var(--deep-contrast)]">{e.name}</p>
-                                                <p className="text-[10px] lg:text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">
+                                                <p className="text-[10px] lg:text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mt-0.5">
                                                     {e.quantity} Units × {formatCurrency(e.rate)}
                                                 </p>
                                             </div>
@@ -478,7 +478,7 @@ export default function PaymentForm({
                                 {billingEntries.length === 0 && (
                                     <div className="flex flex-col items-center justify-center py-8 text-[var(--foreground)]/20 border-2 border-dashed border-black/5 rounded-2xl">
                                         <Plus className="h-6 w-6 mb-1 opacity-10" />
-                                        <p className="text-[9px] font-bold uppercase tracking-widest">No detailed items</p>
+                                        <p className="text-[9px] font-bold uppercase tracking-wider">No detailed items</p>
                                     </div>
                                 )}
                             </div>

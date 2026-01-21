@@ -61,7 +61,7 @@ export const BottomNav = () => {
                             <div className="flex justify-between items-center mb-8">
                                 <div>
                                     <h3 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight">Management</h3>
-                                    <p className="text-[10px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest mt-1">Advanced Controls</p>
+                                    <p className="text-[10px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mt-1">Advanced Controls</p>
                                 </div>
                                 <button
                                     onClick={() => setIsMenuOpen(false)}
@@ -145,7 +145,7 @@ export const BottomNav = () => {
 
                                     {/* Tooltip on long press/hover could go here */}
                                     {!isActive && (
-                                        <div className="absolute -top-10 scale-0 group-hover:scale-100 transition-all px-2 py-1 rounded-lg bg-black text-white text-[8px] font-black uppercase tracking-widest pointer-events-none">
+                                        <div className="absolute -top-10 scale-0 group-hover:scale-100 transition-all px-2 py-1 rounded-lg bg-black text-white text-[8px] font-black uppercase tracking-wider pointer-events-none">
                                             {item.label}
                                         </div>
                                     )}

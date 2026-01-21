@@ -50,7 +50,7 @@ export default function RegisterPage() {
                     <h2 className="text-xl font-bold tracking-tight text-[var(--deep-contrast)] uppercase">
                         Create Account
                     </h2>
-                    <p className="mt-1 text-[10px] font-bold text-[var(--foreground)]/50 uppercase tracking-widest">
+                    <p className="mt-1 text-[10px] font-bold text-[var(--foreground)]/50 uppercase tracking-wider">
                         Start managing with LUCY-ex
                     </p>
                 </div>
@@ -60,7 +60,7 @@ export default function RegisterPage() {
                         <div>
                             <label
                                 htmlFor="fullName"
-                                className="block text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/60 mb-1.5 ml-1"
+                                className="block text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-1.5 ml-1"
                             >
                                 Full Name
                             </label>
@@ -79,7 +79,7 @@ export default function RegisterPage() {
                         <div>
                             <label
                                 htmlFor="email"
-                                className="block text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/60 mb-1.5 ml-1"
+                                className="block text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-1.5 ml-1"
                             >
                                 Email address
                             </label>
@@ -98,7 +98,7 @@ export default function RegisterPage() {
                         <div>
                             <label
                                 htmlFor="password"
-                                className="block text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/60 mb-1.5 ml-1"
+                                className="block text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-1.5 ml-1"
                             >
                                 Password
                             </label>
@@ -125,7 +125,7 @@ export default function RegisterPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="group relative flex w-full justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-3 text-[10px] font-bold text-white uppercase tracking-widest hover:bg-[var(--primary-green)] active:scale-95 disabled:opacity-70 transition-all duration-300 shadow-xl shadow-[var(--deep-contrast)]/20"
+                        className="group relative flex w-full justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-3 text-[10px] font-bold text-white uppercase tracking-wider hover:bg-[var(--primary-green)] active:scale-95 disabled:opacity-70 transition-all duration-300 shadow-xl shadow-[var(--deep-contrast)]/20"
                     >
                         {loading ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -139,7 +139,7 @@ export default function RegisterPage() {
                 </form>
 
                 <div className="text-center">
-                    <p className="text-[9px] font-bold text-[var(--foreground)]/60 uppercase tracking-widest">
+                    <p className="text-[9px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider">
                         Already have an account?{' '}
                         <Link
                             href="/login"

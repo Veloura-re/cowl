@@ -29,18 +29,30 @@ export async function updateSession(request: NextRequest) {
         }
     )
 
-    // IMPORTANT: DO NOT REMOVE auth.getUser()
+    // 1. Get Session first (faster)
+    const {
+        data: { session },
+    } = await supabase.auth.getSession()
+
+    // 2. Refresh/Verify User (secure)
     const {
         data: { user },
     } = await supabase.auth.getUser()
 
-    if (
-        !user &&
-        request.nextUrl.pathname.startsWith('/dashboard')
-    ) {
-        // no user, potentially respond by redirecting the user to the login page
+    const isDashboardPath = request.nextUrl.pathname.startsWith('/dashboard')
+    const isLoginPath = request.nextUrl.pathname === '/login'
+
+    // If no session but on dashboard -> login
+    if (!session && isDashboardPath) {
         const url = request.nextUrl.clone()
         url.pathname = '/login'
+        return NextResponse.redirect(url)
+    }
+
+    // If session exists but on login -> dashboard
+    if (session && isLoginPath) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/dashboard'
         return NextResponse.redirect(url)
     }
 

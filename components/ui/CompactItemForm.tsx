@@ -146,7 +146,7 @@ export default function CompactItemForm({ initialData }: CompactItemFormProps) {
                     </Link>
                     <div>
                         <h1 className="text-[12px] font-bold text-[var(--deep-contrast)] uppercase tracking-tight">{isEdit ? 'Edit Item' : 'New Item'}</h1>
-                        <p className="text-[10px] lg:text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest mt-1">Inventory {isEdit ? 'Update' : 'Entry'}</p>
+                        <p className="text-[10px] lg:text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mt-1">Inventory {isEdit ? 'Update' : 'Entry'}</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">

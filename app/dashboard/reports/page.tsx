@@ -202,7 +202,7 @@ export default function ReportsPage() {
             <div className="flex items-center justify-between pb-3 border-b border-[var(--primary-green)]/10">
                 <div>
                     <h1 className="text-xl font-bold text-[var(--deep-contrast)] tracking-tight">Reports</h1>
-                    <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-widest leading-none">Business Performance</p>
+                    <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Business Performance</p>
                 </div>
                 {loading && <Activity className="h-4 w-4 text-[var(--primary-green)] animate-spin" />}
             </div>
@@ -310,7 +310,7 @@ export default function ReportsPage() {
                             <span className="text-xs font-bold text-[var(--deep-contrast)]">{formatCurrency(data.expenses)}</span>
                         </div>
                         <div className="pt-2 border-t border-[var(--primary-green)]/5 flex justify-between items-center">
-                            <span className="text-[10px] font-bold text-[var(--primary-green)] uppercase tracking-widest">Net Profit</span>
+                            <span className="text-[10px] font-bold text-[var(--primary-green)] uppercase tracking-wider">Net Profit</span>
                             <span className="text-lg font-bold text-emerald-600 tracking-tight">{formatCurrency(data.revenue - data.expenses)}</span>
                         </div>
                     </div>
@@ -338,7 +338,7 @@ export default function ReportsPage() {
                             </div>
                         ))}
                     </div>
-                    <div className="flex justify-between text-[8px] font-bold uppercase tracking-widest text-[var(--foreground)]/20 px-1">
+                    <div className="flex justify-between text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/20 px-1">
                         <span>L7D</span>
                         <span>Today</span>
                     </div>
@@ -355,7 +355,7 @@ export default function ReportsPage() {
                     <div className="space-y-3">
                         {data.expenseBreakdown.map((item, i) => (
                             <div key={i} className="space-y-1">
-                                <div className="flex justify-between text-[9px] font-bold uppercase tracking-widest leading-none">
+                                <div className="flex justify-between text-[9px] font-bold uppercase tracking-wider leading-none">
                                     <span className="text-[var(--foreground)]/40">{item.label}</span>
                                     <span className="text-[var(--deep-contrast)]">{item.value}%</span>
                                 </div>

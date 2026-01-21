@@ -114,7 +114,7 @@ export default function CreatePartyModal({ isOpen, onClose, onSuccess, initialDa
             <div className="w-full max-w-sm glass rounded-[24px] border border-white/40 shadow-2xl relative overflow-hidden animate-in zoom-in-95 duration-200">
                 <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 bg-white/40">
                     <div>
-                        <h2 className="text-xs font-bold text-[var(--deep-contrast)] uppercase tracking-widest">Add New Party</h2>
+                        <h2 className="text-xs font-bold text-[var(--deep-contrast)] uppercase tracking-wider">Add New Party</h2>
                         <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-tighter">Business Contact</p>
                     </div>
                     <button
@@ -127,7 +127,7 @@ export default function CreatePartyModal({ isOpen, onClose, onSuccess, initialDa
 
                 <form onSubmit={handleSubmit} className="p-4 space-y-3">
                     <div>
-                        <label className="block text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/60 mb-1 ml-1">Party Name *</label>
+                        <label className="block text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-1 ml-1">Party Name *</label>
                         <input
                             required
                             type="text"
@@ -140,7 +140,7 @@ export default function CreatePartyModal({ isOpen, onClose, onSuccess, initialDa
 
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className="block text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/60 mb-1 ml-1">Phone</label>
+                            <label className="block text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-1 ml-1">Phone</label>
                             <input
                                 type="text"
                                 value={formData.phone}
@@ -150,7 +150,7 @@ export default function CreatePartyModal({ isOpen, onClose, onSuccess, initialDa
                             />
                         </div>
                         <div>
-                            <label className="block text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/60 mb-1 ml-1">Type</label>
+                            <label className="block text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-1 ml-1">Type</label>
                             <button
                                 type="button"
                                 onClick={() => setIsTypePickerOpen(true)}
@@ -174,7 +174,7 @@ export default function CreatePartyModal({ isOpen, onClose, onSuccess, initialDa
 
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className="block text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/60 mb-1 ml-1">Opening Bal</label>
+                            <label className="block text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-1 ml-1">Opening Bal</label>
                             <input
                                 type="number"
                                 value={formData.opening_balance}
@@ -183,7 +183,7 @@ export default function CreatePartyModal({ isOpen, onClose, onSuccess, initialDa
                             />
                         </div>
                         <div>
-                            <label className="block text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/60 mb-1 ml-1">Email</label>
+                            <label className="block text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-1 ml-1">Email</label>
                             <input
                                 type="email"
                                 value={formData.email}
@@ -198,14 +198,14 @@ export default function CreatePartyModal({ isOpen, onClose, onSuccess, initialDa
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-3 py-1.5 rounded-xl text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 hover:bg-white/40 transition-all"
+                            className="px-3 py-1.5 rounded-xl text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 hover:bg-white/40 transition-all"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex items-center px-4 py-1.5 rounded-xl bg-[var(--deep-contrast)] text-white text-[9px] font-bold uppercase tracking-widest hover:bg-[var(--primary-green)] active:scale-95 transition-all disabled:opacity-50 shadow-lg shadow-[var(--deep-contrast)]/10"
+                            className="flex items-center px-4 py-1.5 rounded-xl bg-[var(--deep-contrast)] text-white text-[9px] font-bold uppercase tracking-wider hover:bg-[var(--primary-green)] active:scale-95 transition-all disabled:opacity-50 shadow-lg shadow-[var(--deep-contrast)]/10"
                         >
                             {loading && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
                             Save Party

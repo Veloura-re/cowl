@@ -3,14 +3,23 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, Hexagon, ShieldCheck, Zap } from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
 
 export default function Home() {
   const router = useRouter();
+  const supabase = createClient();
 
   useEffect(() => {
-    router.replace("/login");
-  }, [router]);
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        router.replace("/dashboard");
+      } else {
+        router.replace("/login");
+      }
+    };
+    checkSession();
+  }, [router, supabase]);
 
   return (
     <div className="min-h-screen bg-white" />

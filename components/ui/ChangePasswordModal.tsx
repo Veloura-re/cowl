@@ -169,7 +169,7 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
                                         type="submit"
                                         disabled={loading || success}
                                         className={clsx(
-                                            "w-full h-11 rounded-xl font-bold uppercase tracking-widest text-[11px] shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2",
+                                            "w-full h-11 rounded-xl font-bold uppercase tracking-wider text-[11px] shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2",
                                             success
                                                 ? "bg-emerald-500 text-white shadow-emerald-500/20"
                                                 : "bg-[var(--deep-contrast)] text-white hover:bg-[var(--primary-green)] shadow-[var(--deep-contrast)]/10"

@@ -21,13 +21,13 @@ export default function Step2PricingStock({ onNext, onBack }: Step2Props) {
         <div className="glass rounded-[24px] border border-white/40 overflow-hidden">
             <div className="px-6 py-4 border-b border-white/10 bg-[var(--primary-green)]/5">
                 <h2 className="text-sm font-bold text-[var(--deep-contrast)] uppercase tracking-tight">Pricing & Stock</h2>
-                <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Set rates and inventory levels</p>
+                <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mt-0.5">Set rates and inventory levels</p>
             </div>
 
             <div className="p-8 space-y-6">
                 {/* Unit Selection */}
                 <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-2">
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-2">
                         Unit of Measurement
                     </label>
                     <button
@@ -53,7 +53,7 @@ export default function Step2PricingStock({ onNext, onBack }: Step2Props) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Selling Price */}
                         <div>
-                            <label className="block text-[10px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-2">
+                            <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-2">
                                 Selling Price per {data.unit}
                             </label>
                             <input
@@ -67,7 +67,7 @@ export default function Step2PricingStock({ onNext, onBack }: Step2Props) {
 
                         {/* Purchase Price */}
                         <div>
-                            <label className="block text-[10px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-2">
+                            <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-2">
                                 Purchase Price per {data.unit}
                             </label>
                             <input
@@ -92,7 +92,7 @@ export default function Step2PricingStock({ onNext, onBack }: Step2Props) {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {/* Initial Stock */}
                             <div>
-                                <label className="block text-[10px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-2">
+                                <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-2">
                                     Initial Stock Quantity
                                 </label>
                                 <div className="flex items-center gap-2">
@@ -109,7 +109,7 @@ export default function Step2PricingStock({ onNext, onBack }: Step2Props) {
 
                             {/* Min Stock Alert */}
                             <div>
-                                <label className="block text-[10px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-2">
+                                <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-2">
                                     Low Stock Alert Level
                                 </label>
                                 <div className="flex items-center gap-2">

@@ -82,12 +82,13 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
         }
     }
 
-    const { activeBusinessId, formatCurrency } = useBusiness()
+    const { activeBusinessId, formatCurrency, setIsGlobalLoading, showSuccess, showError } = useBusiness()
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!activeBusinessId) return
         setLoading(true)
+        setIsGlobalLoading(true)
 
         try {
             // 1. Create Invoice
@@ -133,10 +134,13 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                 }
             }
 
+            setIsGlobalLoading(false)
+            showSuccess(`Invoice ${invoiceNumber} saved successfully.`)
             router.push('/dashboard/sales')
             router.refresh()
         } catch (err: any) {
-            setErrorModal({ open: true, message: 'Failed to save invoice: ' + err.message })
+            setIsGlobalLoading(false)
+            showError(err.message, 'Sales Failure')
         } finally {
             setLoading(false)
         }
@@ -152,13 +156,13 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                     </Link>
                     <div>
                         <h1 className="text-sm font-bold text-[var(--deep-contrast)] uppercase tracking-tight">New Sale</h1>
-                        <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest leading-none mt-0.5">Invoice Creation</p>
+                        <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-none mt-0.5">Invoice Creation</p>
                     </div>
                 </div>
                 <button
                     onClick={handleSubmit}
                     disabled={loading}
-                    className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white hover:bg-[var(--primary-green)] transition-all disabled:opacity-50 shadow-lg active:scale-95"
+                    className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white hover:bg-[var(--primary-green)] transition-all disabled:opacity-50 shadow-lg active:scale-95"
                 >
                     <Save className="mr-1.5 h-3 w-3" />
                     Save Invoice
@@ -170,11 +174,11 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                 <div className="md:col-span-1 space-y-3">
                     <div className="glass rounded-[24px] border border-white/40 overflow-hidden">
                         <div className="px-4 py-2 border-b border-white/10 bg-white/40">
-                            <h3 className="text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-widest">Metadata</h3>
+                            <h3 className="text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-wider">Metadata</h3>
                         </div>
                         <div className="p-4 space-y-3">
                             <div>
-                                <label className="block text-[8px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-1 ml-1">Customer</label>
+                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Customer</label>
                                 <button
                                     type="button"
                                     onClick={() => setIsPartyPickerOpen(true)}
@@ -193,7 +197,7 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                                 />
                             </div>
                             <div>
-                                <label className="block text-[8px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-1 ml-1">Invoice ID</label>
+                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Invoice ID</label>
                                 <input
                                     type="text"
                                     value={invoiceNumber}
@@ -202,7 +206,7 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                                 />
                             </div>
                             <div>
-                                <label className="block text-[8px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-1 ml-1">Entry Date</label>
+                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Entry Date</label>
                                 <input
                                     type="date"
                                     value={date}
@@ -211,7 +215,7 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                                 />
                             </div>
                             <div>
-                                <label className="block text-[8px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-1 ml-1">Internal Notes</label>
+                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Internal Notes</label>
                                 <textarea
                                     value={notes}
                                     onChange={(e) => setNotes(e.target.value)}
@@ -223,16 +227,16 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                     </div>
 
                     <div className="glass rounded-[24px] border border-white/40 p-4 space-y-1.5">
-                        <div className="flex justify-between text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/40 px-1">
+                        <div className="flex justify-between text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 px-1">
                             <span>Subtotal</span>
                             <span>{formatCurrency(subtotal)}</span>
                         </div>
-                        <div className="flex justify-between text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/40 px-1">
+                        <div className="flex justify-between text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 px-1">
                             <span>Taxation</span>
                             <span>{formatCurrency(totalTax)}</span>
                         </div>
                         <div className="flex justify-between text-base font-bold text-[var(--deep-contrast)] pt-2 border-t border-[var(--primary-green)]/5 mt-1 px-1">
-                            <span className="text-[10px] uppercase tracking-widest pt-1">Total</span>
+                            <span className="text-[10px] uppercase tracking-wider pt-1">Total</span>
                             <span>{formatCurrency(totalAmount)}</span>
                         </div>
                     </div>
@@ -242,8 +246,8 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                 <div className="md:col-span-3">
                     <div className="glass rounded-[24px] border border-white/40 overflow-hidden">
                         <div className="px-5 py-2.5 border-b border-white/10 bg-[var(--primary-green)]/5 flex justify-between items-center">
-                            <h3 className="text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-widest">Line Items</h3>
-                            <button onClick={addRow} className="flex items-center text-[9px] font-bold uppercase tracking-widest text-[var(--primary-green)] hover:text-[var(--deep-contrast)] transition-all bg-white/40 px-3 py-1 rounded-full border border-white/50">
+                            <h3 className="text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-wider">Line Items</h3>
+                            <button onClick={addRow} className="flex items-center text-[9px] font-bold uppercase tracking-wider text-[var(--primary-green)] hover:text-[var(--deep-contrast)] transition-all bg-white/40 px-3 py-1 rounded-full border border-white/50">
                                 <Plus className="h-3 w-3 mr-1" /> Add Row
                             </button>
                         </div>
@@ -259,7 +263,7 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                                     </button>
 
                                     <div className="flex-1 min-w-[200px]">
-                                        <label className="block text-[8px] font-bold uppercase tracking-widest text-[var(--foreground)]/30 mb-1">Stock Item</label>
+                                        <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/30 mb-1">Stock Item</label>
                                         <button
                                             type="button"
                                             onClick={() => {
@@ -275,7 +279,7 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
 
                                     <div className="grid grid-cols-4 gap-2 sm:w-[320px]">
                                         <div className="col-span-1">
-                                            <label className="block text-[8px] font-bold uppercase tracking-widest text-[var(--foreground)]/30 mb-1 text-center">Qty {row.unit && `(${row.unit})`}</label>
+                                            <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/30 mb-1 text-center">Qty {row.unit && `(${row.unit})`}</label>
                                             <input
                                                 type="number"
                                                 step="any"
@@ -285,7 +289,7 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                                             />
                                         </div>
                                         <div className="col-span-1">
-                                            <label className="block text-[8px] font-bold uppercase tracking-widest text-[var(--foreground)]/30 mb-1 text-center">Rate</label>
+                                            <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/30 mb-1 text-center">Rate</label>
                                             <input
                                                 type="number"
                                                 value={row.rate}
@@ -294,13 +298,13 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                                             />
                                         </div>
                                         <div className="col-span-1">
-                                            <label className="block text-[8px] font-bold uppercase tracking-widest text-[var(--foreground)]/30 mb-1 text-center">Tax %</label>
+                                            <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/30 mb-1 text-center">Tax %</label>
                                             <div className="h-8 flex items-center justify-center text-[10px] font-bold text-[var(--foreground)]/40">
                                                 {row.tax}%
                                             </div>
                                         </div>
                                         <div className="col-span-1">
-                                            <label className="block text-[8px] font-bold uppercase tracking-widest text-[var(--foreground)]/30 mb-1 text-right">Sum</label>
+                                            <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/30 mb-1 text-right">Sum</label>
                                             <div className="h-8 flex items-center justify-end px-1 text-[10px] font-bold text-[var(--primary-green)]">
                                                 {formatCurrency(row.amount)}
                                             </div>
@@ -312,7 +316,7 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
 
                         {rows.length === 0 && (
                             <div className="p-10 text-center opacity-30">
-                                <p className="text-[10px] font-bold uppercase tracking-[0.3em]">No line items added</p>
+                                <p className="text-[10px] font-bold uppercase tracking-wider">No line items added</p>
                             </div>
                         )}
                     </div>

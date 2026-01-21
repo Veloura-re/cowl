@@ -15,6 +15,8 @@ import AddTeamMemberModal from '@/components/ui/AddTeamMemberModal'
 import { UserPlus } from 'lucide-react'
 import NotificationCenter from '@/components/ui/NotificationCenter'
 import { BrandLogo } from '@/components/ui/BrandLogo'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import FeedbackModal from '@/components/ui/FeedbackModal'
 
 const navigation = [
     { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
@@ -31,7 +33,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     const router = useRouter()
     const pathname = usePathname()
     const supabase = createClient()
-    const { businesses, activeBusinessId, setActiveBusinessId } = useBusiness()
+    const { businesses, activeBusinessId, setActiveBusinessId, isGlobalLoading, feedback, setFeedback } = useBusiness()
 
     const [scrolled, setScrolled] = useState(false)
     const [scrollingUp, setScrollingUp] = useState(false)
@@ -68,7 +70,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                             </div>
                             <div className="flex-1 text-left min-w-0">
                                 <h1 className="text-sm font-bold text-[var(--deep-contrast)] tracking-tight truncate uppercase">{activeBusiness?.name || 'SELECT BIZ'}</h1>
-                                <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest leading-none mt-0.5">Switch Identity</p>
+                                <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-none mt-0.5">Switch Identity</p>
                             </div>
                         </button>
 
@@ -103,7 +105,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                                     setIsCreateModalOpen(true)
                                     setIsSwitcherOpen(false)
                                 }}
-                                className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest text-[var(--primary-green)] bg-white/40 border border-[var(--primary-green)]/10 hover:bg-[var(--primary-green)] hover:text-white transition-all active:scale-[0.98]"
+                                className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider text-[var(--primary-green)] bg-white/40 border border-[var(--primary-green)]/10 hover:bg-[var(--primary-green)] hover:text-white transition-all active:scale-[0.98]"
                             >
                                 <Plus className="h-3 w-3" />
                                 Add Business
@@ -192,7 +194,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                         <div className="w-10 flex items-center justify-center">
                             <BrandLogo size="sm" />
                         </div>
-                        <h2 className="text-[10px] font-bold text-[var(--deep-contrast)] uppercase tracking-widest">{activeBusiness?.name || 'MEMBER'}</h2>
+                        <h2 className="text-[10px] font-bold text-[var(--deep-contrast)] uppercase tracking-wider">{activeBusiness?.name || 'MEMBER'}</h2>
                         <div className="flex items-center gap-1">
                             <NotificationCenter />
                             <button
@@ -239,6 +241,30 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                 businessId={activeBusinessId}
                 onSuccess={() => router.refresh()}
             />
+            <FeedbackModal
+                isOpen={feedback.isOpen}
+                onClose={() => setFeedback({ ...feedback, isOpen: false })}
+                message={feedback.message}
+                variant={feedback.variant}
+                title={feedback.title}
+            />
+
+            {/* Global Loading Overlay */}
+            <AnimatePresence>
+                {isGlobalLoading && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] flex items-center justify-center bg-white/60 backdrop-blur-sm shadow-2xl"
+                    >
+                        <div className="glass p-8 rounded-3xl border border-white/50 flex flex-col items-center gap-4">
+                            <LoadingSpinner size="lg" label="Processing..." />
+                            <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-[0.3em] animate-pulse">Lucy-ex OS is working</p>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div >
     )
 }

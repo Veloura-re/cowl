@@ -154,7 +154,7 @@ export default function NotificationCenter() {
                         <div className="px-5 py-4 border-b border-white/10 bg-white/40 flex items-center justify-between">
                             <div>
                                 <h3 className="text-sm lg:text-xs font-bold text-[var(--deep-contrast)]">Alert Center</h3>
-                                <p className="text-[9px] lg:text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest leading-none mt-1">Activities & Updates</p>
+                                <p className="text-[9px] lg:text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-wider leading-none mt-1">Activities & Updates</p>
                             </div>
                             {unreadCount > 0 && (
                                 <button
@@ -171,7 +171,7 @@ export default function NotificationCenter() {
                             {loading ? (
                                 <div className="p-10 flex flex-col items-center justify-center space-y-2 opacity-20">
                                     <Loader2 className="h-5 w-5 animate-spin" />
-                                    <span className="text-[9px] font-bold uppercase tracking-widest">Syncing...</span>
+                                    <span className="text-[9px] font-bold uppercase tracking-wider">Syncing...</span>
                                 </div>
                             ) : notifications.length > 0 ? (
                                 <div className="divide-y divide-white/5">
@@ -215,14 +215,14 @@ export default function NotificationCenter() {
                             ) : (
                                 <div className="p-16 flex flex-col items-center justify-center text-center space-y-3 opacity-20">
                                     <Bell className="h-10 w-10" />
-                                    <p className="text-[10px] font-bold uppercase tracking-widest">No Alerts Yet</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-wider">No Alerts Yet</p>
                                 </div>
                             )}
                         </div>
 
                         {notifications.length > 0 && (
                             <div className="p-3 border-t border-white/10 bg-white/20 text-center">
-                                <button className="text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/40 hover:text-[var(--deep-contrast)] transition-colors">
+                                <button className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 hover:text-[var(--deep-contrast)] transition-colors">
                                     View Detailed History
                                 </button>
                             </div>

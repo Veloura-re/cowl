@@ -43,7 +43,7 @@ export default function PartyLedgerView({ party, initialInvoices, initialTransac
                             <div>
                                 <h1 className="text-3xl font-black text-[var(--deep-contrast)] tracking-tight">{party.name}</h1>
                                 <span className={clsx(
-                                    "px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-widest border",
+                                    "px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border",
                                     party.type === 'CUSTOMER' ? "bg-blue-50 text-blue-600 border-blue-100" :
                                         party.type === 'SUPPLIER' ? "bg-orange-50 text-orange-600 border-orange-100" :
                                             "bg-purple-50 text-purple-600 border-purple-100"
@@ -75,7 +75,7 @@ export default function PartyLedgerView({ party, initialInvoices, initialTransac
                         </div>
 
                         <div className="flex flex-col items-end justify-center">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--foreground)]/40 mb-1">Current Balance</p>
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">Current Balance</p>
                             <div className={clsx(
                                 "text-4xl font-black tracking-tighter",
                                 party.opening_balance > 0 ? "text-emerald-600" :
@@ -137,7 +137,7 @@ export default function PartyLedgerView({ party, initialInvoices, initialTransac
                                 </div>
                                 <div>
                                     <h3 className="text-sm font-bold text-[var(--deep-contrast)]">{inv.invoice_number}</h3>
-                                    <p className="text-[10px] font-bold text-[var(--foreground)]/50 uppercase tracking-widest">
+                                    <p className="text-[10px] font-bold text-[var(--foreground)]/50 uppercase tracking-wider">
                                         {format(new Date(inv.date), 'MMM dd, yyyy')}
                                     </p>
                                 </div>
@@ -145,7 +145,7 @@ export default function PartyLedgerView({ party, initialInvoices, initialTransac
                             <div className="text-right">
                                 <p className="text-sm font-bold text-[var(--deep-contrast)]">{formatCurrency(inv.total_amount)}</p>
                                 <span className={clsx(
-                                    "text-[8px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded border",
+                                    "text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border",
                                     inv.status === 'PAID' ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
                                         inv.status === 'UNPAID' ? "bg-rose-50 text-rose-600 border-rose-100" :
                                             "bg-amber-50 text-amber-600 border-amber-100"
@@ -154,7 +154,7 @@ export default function PartyLedgerView({ party, initialInvoices, initialTransac
                                 </span>
                             </div>
                         </div>
-                    )) : <div className="text-center py-10 opacity-40 text-xs font-bold uppercase tracking-widest">No Invoices Found</div>
+                    )) : <div className="text-center py-10 opacity-40 text-xs font-bold uppercase tracking-wider">No Invoices Found</div>
                 ) : (
                     filteredTransactions.length > 0 ? filteredTransactions.map((tx) => (
                         <div key={tx.id} className="glass p-4 rounded-2xl border border-white/40 flex items-center justify-between group hover:bg-white/60 transition-all">
@@ -167,7 +167,7 @@ export default function PartyLedgerView({ party, initialInvoices, initialTransac
                                 </div>
                                 <div>
                                     <h3 className="text-sm font-bold text-[var(--deep-contrast)]">{tx.number || 'Transaction'}</h3>
-                                    <p className="text-[10px] font-bold text-[var(--foreground)]/50 uppercase tracking-widest">
+                                    <p className="text-[10px] font-bold text-[var(--foreground)]/50 uppercase tracking-wider">
                                         {format(new Date(tx.date), 'MMM dd, yyyy')}
                                     </p>
                                 </div>
@@ -179,12 +179,12 @@ export default function PartyLedgerView({ party, initialInvoices, initialTransac
                                 )}>
                                     {tx.type === 'PAYMENT_IN' ? '+' : '-'}{formatCurrency(tx.amount)}
                                 </p>
-                                <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest">
+                                <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider">
                                     {tx.mode || 'Cash'}
                                 </p>
                             </div>
                         </div>
-                    )) : <div className="text-center py-10 opacity-40 text-xs font-bold uppercase tracking-widest">No Transactions Found</div>
+                    )) : <div className="text-center py-10 opacity-40 text-xs font-bold uppercase tracking-wider">No Transactions Found</div>
                 )}
             </div>
         </div>

@@ -30,18 +30,19 @@ export default function CompactItemForm() {
         min_stock: 0
     })
 
-    const { activeBusinessId, formatCurrency } = useBusiness()
+    const { activeBusinessId, formatCurrency, setIsGlobalLoading, showSuccess, showError } = useBusiness()
 
 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!activeBusinessId) {
-            alert('No active business found. Please select or create a business first.')
+            showError('No active business found. Please select or create a business first.')
             return
         }
         if (!formData.name) return
         setLoading(true)
+        setIsGlobalLoading(true)
 
         try {
             const { error } = await supabase.from('items').insert({
@@ -60,13 +61,13 @@ export default function CompactItemForm() {
 
             if (error) throw error
 
-            setSuccess(true)
-            setTimeout(() => {
-                router.push('/dashboard/inventory')
-                router.refresh()
-            }, 1500)
+            setIsGlobalLoading(false)
+            showSuccess(`${formData.name} added to inventory successfully!`)
+            router.push('/dashboard/inventory')
+            router.refresh()
         } catch (err: any) {
-            alert('Error: ' + err.message)
+            setIsGlobalLoading(false)
+            showError(err.message, 'Save Failed')
         } finally {
             setLoading(false)
         }
@@ -94,7 +95,7 @@ export default function CompactItemForm() {
                     </Link>
                     <div>
                         <h1 className="text-[11px] font-bold text-[var(--deep-contrast)] uppercase tracking-tight">New Item</h1>
-                        <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest">Inventory Entry</p>
+                        <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider">Inventory Entry</p>
                     </div>
                 </div>
                 <button

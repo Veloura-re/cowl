@@ -137,7 +137,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between pb-3 border-b border-[var(--primary-green)]/10">
                 <div>
                     <h1 className="text-xl font-bold text-[var(--deep-contrast)] tracking-tight">Overview</h1>
-                    <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-widest leading-none">Business Snapshot</p>
+                    <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Business Snapshot</p>
                 </div>
                 <div className="flex items-center gap-2 px-2.5 py-1 bg-white/50 border border-white/20 rounded-xl shadow-inner">
                     <span className="relative flex h-2 w-2">
@@ -150,7 +150,7 @@ export default function DashboardPage() {
                             loading ? "bg-amber-500" : "bg-emerald-500"
                         )}></span>
                     </span>
-                    <span className="text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-widest">
+                    <span className="text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-wider">
                         {loading ? 'Sync' : 'Live'}
                     </span>
                 </div>
@@ -176,7 +176,7 @@ export default function DashboardPage() {
                             )}>
                                 <s.icon className="h-3.5 w-3.5" />
                             </div>
-                            <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/30 group-hover:text-[var(--foreground)]/50 transition-colors">{s.label}</span>
+                            <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/30 group-hover:text-[var(--foreground)]/50 transition-colors">{s.label}</span>
                         </div>
                         <div>
                             <p className="text-xl font-bold text-[var(--deep-contrast)] tracking-tight">{s.value}</p>
@@ -199,8 +199,8 @@ export default function DashboardPage() {
                 <div className="lg:col-span-2 space-y-3">
                     <div className="glass rounded-[24px] border border-white/40 overflow-hidden shadow-sm">
                         <div className="px-5 py-3 border-b border-white/10 bg-white/40 flex justify-between items-center">
-                            <h3 className="text-[10px] font-bold text-[var(--deep-contrast)] uppercase tracking-widest">Recent Activity</h3>
-                            <Link href="/dashboard/reports" className="text-[9px] font-bold text-[var(--primary-green)] uppercase tracking-widest hover:underline">View All</Link>
+                            <h3 className="text-[10px] font-bold text-[var(--deep-contrast)] uppercase tracking-wider">Recent Activity</h3>
+                            <Link href="/dashboard/reports" className="text-[9px] font-bold text-[var(--primary-green)] uppercase tracking-wider hover:underline">View All</Link>
                         </div>
                         <div className="p-2 space-y-1">
                             {data.activities.length > 0 ? data.activities.map((act) => (
@@ -216,12 +216,12 @@ export default function DashboardPage() {
                                 </div>
                             )) : (
                                 <div className="py-12 text-center opacity-30">
-                                    <p className="text-[9px] font-bold uppercase tracking-[0.3em]">{loading ? 'Fetching...' : 'No activity yet'}</p>
+                                    <p className="text-[9px] font-bold uppercase tracking-wider">{loading ? 'Fetching...' : 'No activity yet'}</p>
                                 </div>
                             )}
                             {data.activities.length > 0 && (
                                 <div className="py-6 text-center opacity-30">
-                                    <p className="text-[9px] font-bold uppercase tracking-[0.3em]">End of history</p>
+                                    <p className="text-[9px] font-bold uppercase tracking-wider">End of history</p>
                                 </div>
                             )}
                         </div>
@@ -232,14 +232,14 @@ export default function DashboardPage() {
                 <div className="space-y-3">
                     <div className="glass rounded-[24px] border border-white/40 overflow-hidden shadow-sm">
                         <div className="px-5 py-3 border-b border-white/10 bg-[var(--primary-green)]/5">
-                            <h3 className="text-[10px] font-bold text-[var(--deep-contrast)] uppercase tracking-widest">Quick Actions</h3>
+                            <h3 className="text-[10px] font-bold text-[var(--deep-contrast)] uppercase tracking-wider">Quick Actions</h3>
                         </div>
                         <div className="p-3 grid gap-2">
                             {actions.map((action) => (
                                 <Link
                                     key={action.name}
                                     href={action.href}
-                                    className="group w-full h-10 rounded-xl bg-white/30 border border-white/40 px-4 text-[10px] font-bold text-[var(--deep-contrast)] uppercase tracking-widest hover:bg-[var(--primary-green)] hover:text-white transition-all flex items-center justify-between shadow-sm active:scale-[0.98]"
+                                    className="group w-full h-10 rounded-xl bg-white/30 border border-white/40 px-4 text-[10px] font-bold text-[var(--deep-contrast)] uppercase tracking-wider hover:bg-[var(--primary-green)] hover:text-white transition-all flex items-center justify-between shadow-sm active:scale-[0.98]"
                                 >
                                     {action.name}
                                     <ArrowRight className="h-3.5 w-3.5 text-[var(--primary-green)] group-hover:text-white transition-colors" />
@@ -250,7 +250,7 @@ export default function DashboardPage() {
 
                     {/* Support/Dev Card */}
                     <div className="glass p-4 rounded-[24px] border border-white/40 bg-gradient-to-br from-emerald-50/50 to-white/50">
-                        <p className="text-[9px] font-bold text-[var(--primary-green)] uppercase tracking-widest mb-1.5">Pro Tip</p>
+                        <p className="text-[9px] font-bold text-[var(--primary-green)] uppercase tracking-wider mb-1.5">Pro Tip</p>
                         <p className="text-[10px] font-bold text-[var(--deep-contrast)] leading-relaxed italic opacity-70">
                             "Everything is live. Switch businesses in the sidebar to see instant data isolation."
                         </p>

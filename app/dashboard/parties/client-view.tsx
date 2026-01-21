@@ -10,6 +10,7 @@ import clsx from 'clsx'
 import { useBusiness } from '@/context/business-context'
 import ConfirmModal from '@/components/ui/ConfirmModal'
 import FeedbackModal from '@/components/ui/FeedbackModal'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
 export default function PartiesClientView() {
     const { activeBusinessId, formatCurrency } = useBusiness()
@@ -80,7 +81,7 @@ export default function PartiesClientView() {
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-xl font-bold text-[var(--deep-contrast)] tracking-tight">Parties</h1>
-                        <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-widest leading-none">Customers & Suppliers</p>
+                        <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Customers & Suppliers</p>
                     </div>
                     <button
                         onClick={() => setIsCreateModalOpen(true)}
@@ -140,7 +141,7 @@ export default function PartiesClientView() {
                                 )}>
                                     {party.opening_balance > 0 ? '+' : ''}{formatCurrency(party.opening_balance).replace(/^-/, '')}
                                 </p>
-                                <span className="text-[7px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">
+                                <span className="text-[7px] font-black uppercase tracking-wider text-[var(--foreground)]/30">
                                     {party.type}
                                 </span>
                             </div>
@@ -156,9 +157,8 @@ export default function PartiesClientView() {
             </div>
 
             {loading ? (
-                <div className="text-center py-20 opacity-50">
-                    <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
-                    <p className="text-[10px] font-bold uppercase tracking-widest">Fetching parties...</p>
+                <div className="py-20">
+                    <LoadingSpinner label="Fetching Parties..." />
                 </div>
             ) : filteredParties.length === 0 ? (
                 <div className="text-center py-10 opacity-50">

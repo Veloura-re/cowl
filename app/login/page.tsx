@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -14,6 +14,16 @@ export default function LoginPage() {
     const [error, setError] = useState<string | null>(null)
     const router = useRouter()
     const supabase = createClient()
+
+    useEffect(() => {
+        const checkSession = async () => {
+            const { data: { session } } = await supabase.auth.getSession()
+            if (session) {
+                router.replace('/dashboard')
+            }
+        }
+        checkSession()
+    }, [router, supabase])
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -44,7 +54,7 @@ export default function LoginPage() {
                     <h2 className="text-xl font-bold tracking-tight text-[var(--deep-contrast)] uppercase">
                         Welcome Back
                     </h2>
-                    <p className="mt-1 text-[10px] font-bold text-[var(--foreground)]/50 uppercase tracking-widest">
+                    <p className="mt-1 text-[10px] font-bold text-[var(--foreground)]/50 uppercase tracking-wider">
                         Access your LUCY-ex OS
                     </p>
                 </div>
@@ -54,7 +64,7 @@ export default function LoginPage() {
                         <div>
                             <label
                                 htmlFor="email"
-                                className="block text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/60 mb-1.5 ml-1"
+                                className="block text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-1.5 ml-1"
                             >
                                 Email address
                             </label>
@@ -73,7 +83,7 @@ export default function LoginPage() {
                         <div>
                             <label
                                 htmlFor="password"
-                                className="block text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/60 mb-1.5 ml-1"
+                                className="block text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-1.5 ml-1"
                             >
                                 Password
                             </label>
@@ -94,7 +104,7 @@ export default function LoginPage() {
                     <div className="flex items-center justify-end">
                         <Link
                             href="/login/forgot-password"
-                            className="text-[9px] font-bold text-[var(--primary-green)] hover:text-[var(--deep-contrast)] transition-colors uppercase tracking-widest"
+                            className="text-[9px] font-bold text-[var(--primary-green)] hover:text-[var(--deep-contrast)] transition-colors uppercase tracking-wider"
                         >
                             Forgot Password?
                         </Link>
@@ -109,7 +119,7 @@ export default function LoginPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="group relative flex w-full justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-3 text-[10px] font-bold text-white uppercase tracking-widest hover:bg-[var(--primary-green)] active:scale-95 disabled:opacity-70 transition-all duration-300 shadow-xl shadow-[var(--deep-contrast)]/20"
+                        className="group relative flex w-full justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-3 text-[10px] font-bold text-white uppercase tracking-wider hover:bg-[var(--primary-green)] active:scale-95 disabled:opacity-70 transition-all duration-300 shadow-xl shadow-[var(--deep-contrast)]/20"
                     >
                         {loading ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -123,7 +133,7 @@ export default function LoginPage() {
                 </form>
 
                 <div className="text-center">
-                    <p className="text-[9px] font-bold text-[var(--foreground)]/60 uppercase tracking-widest">
+                    <p className="text-[9px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider">
                         Don't have an account?{' '}
                         <Link
                             href="/register"

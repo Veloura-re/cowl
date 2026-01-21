@@ -87,7 +87,7 @@ export default function AddPurchaseItemModal({ isOpen, onClose, onAdd, items, in
                         </div>
                         <div>
                             <h2 className="text-sm font-bold text-[var(--deep-contrast)] tracking-tight">Add Purchase Item</h2>
-                            <p className="text-[10px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest leading-none">Bill Line</p>
+                            <p className="text-[10px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-none">Bill Line</p>
                         </div>
                     </div>
                     <button
@@ -101,7 +101,7 @@ export default function AddPurchaseItemModal({ isOpen, onClose, onAdd, items, in
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
                     {/* Item Selection */}
                     <div>
-                        <label className="block text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-1.5 ml-1">Select Product *</label>
+                        <label className="block text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1.5 ml-1">Select Product *</label>
                         <button
                             type="button"
                             onClick={() => setIsItemPickerOpen(true)}
@@ -117,7 +117,7 @@ export default function AddPurchaseItemModal({ isOpen, onClose, onAdd, items, in
                             <div className="grid grid-cols-2 gap-3">
                                 {/* Quantity */}
                                 <div>
-                                    <label className="block text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-1.5 ml-1">Quantity ({selectedItem.unit})</label>
+                                    <label className="block text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1.5 ml-1">Quantity ({selectedItem.unit})</label>
                                     <input
                                         type="number"
                                         step="any"
@@ -129,7 +129,7 @@ export default function AddPurchaseItemModal({ isOpen, onClose, onAdd, items, in
                                 </div>
                                 {/* Rate */}
                                 <div>
-                                    <label className="block text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-1.5 ml-1">Purchase Rate</label>
+                                    <label className="block text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1.5 ml-1">Purchase Rate</label>
                                     <input
                                         type="number"
                                         step="any"
@@ -146,7 +146,7 @@ export default function AddPurchaseItemModal({ isOpen, onClose, onAdd, items, in
                                 <div className="flex justify-between items-center">
                                     <div className="flex items-center gap-2">
                                         <Calculator className="h-3 w-3 text-[var(--primary-green)]" />
-                                        <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/60">Line Sum</span>
+                                        <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/60">Line Sum</span>
                                     </div>
                                     <span className="text-sm font-bold text-[var(--primary-green)]">{formatCurrency(total)}</span>
                                 </div>
@@ -158,14 +158,14 @@ export default function AddPurchaseItemModal({ isOpen, onClose, onAdd, items, in
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 h-11 rounded-xl text-[10px] font-bold uppercase tracking-widest text-[var(--foreground)]/40 hover:bg-white/50 transition-all active:scale-95"
+                            className="flex-1 h-11 rounded-xl text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 hover:bg-white/50 transition-all active:scale-95"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={!selectedItem || quantity <= 0}
-                            className="flex-1 h-11 flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] text-white shadow-lg text-[10px] font-bold uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50"
+                            className="flex-1 h-11 flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] text-white shadow-lg text-[10px] font-bold uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50"
                         >
                             <Plus className="mr-2 h-3 w-3" />
                             {initialData ? 'Save Changes' : 'Add to Bill'}

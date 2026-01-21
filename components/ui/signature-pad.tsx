@@ -42,12 +42,12 @@ const SignaturePad = forwardRef<SignaturePadHandle, { className?: string }>(({ c
                 {/* Placeholder text if empty */}
                 {!hasSignature && (
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-40">
-                        <span className="text-xs font-bold uppercase tracking-widest text-[var(--foreground)]">Sign Here</span>
+                        <span className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">Sign Here</span>
                     </div>
                 )}
             </div>
 
-            <div className="flex justify-between items-center text-[10px] uppercase font-bold tracking-widest text-[var(--foreground)]/50 px-1">
+            <div className="flex justify-between items-center text-[10px] uppercase font-bold tracking-wider text-[var(--foreground)]/50 px-1">
                 <span>Digital Signature</span>
                 <button
                     onClick={() => {

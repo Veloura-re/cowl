@@ -81,7 +81,7 @@ export default function Step3Review({ onComplete, onBack }: Step3Props) {
         <div className="glass rounded-[24px] border border-white/40 overflow-hidden">
             <div className="px-6 py-4 border-b border-white/10 bg-[var(--primary-green)]/5">
                 <h2 className="text-sm font-bold text-[var(--deep-contrast)] uppercase tracking-tight">Review & Confirm</h2>
-                <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Verify all details before saving</p>
+                <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mt-0.5">Verify all details before saving</p>
             </div>
 
             <div className="p-8 space-y-6">

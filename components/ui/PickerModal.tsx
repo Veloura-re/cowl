@@ -18,9 +18,21 @@ type PickerModalProps = {
     title: string
     selectedValue?: any
     footer?: React.ReactNode
+    showSearch?: boolean
+    autoFocus?: boolean
 }
 
-export default function PickerModal({ isOpen, onClose, onSelect, options, title, selectedValue, footer }: PickerModalProps) {
+export default function PickerModal({
+    isOpen,
+    onClose,
+    onSelect,
+    options,
+    title,
+    selectedValue,
+    footer,
+    showSearch = true,
+    autoFocus = false
+}: PickerModalProps) {
     const [searchQuery, setSearchQuery] = useState('')
 
     const filteredOptions = options.filter(opt =>
@@ -37,7 +49,7 @@ export default function PickerModal({ isOpen, onClose, onSelect, options, title,
                 <div className="flex items-center justify-between border-b border-white/10 px-6 py-4 bg-white/40">
                     <div>
                         <h2 className="text-sm font-bold text-[var(--deep-contrast)] tracking-tight">{title}</h2>
-                        <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest leading-none mt-0.5">Selection Panel</p>
+                        <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-none mt-0.5">Selection Panel</p>
                     </div>
                     <button onClick={onClose} className="p-1.5 rounded-full hover:bg-white/50 transition-all opacity-40 hover:opacity-100">
                         <X className="h-4 w-4" />
@@ -45,19 +57,24 @@ export default function PickerModal({ isOpen, onClose, onSelect, options, title,
                 </div>
 
                 <div className="p-4 space-y-3">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 opacity-20" />
-                        <input
-                            autoFocus
-                            type="text"
-                            placeholder="Search options..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full h-9 rounded-xl bg-white/60 border border-white/20 pl-9 pr-4 text-[11px] font-bold focus:outline-none transition-all shadow-inner"
-                        />
-                    </div>
+                    {showSearch && (
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 opacity-20" />
+                            <input
+                                autoFocus={autoFocus}
+                                type="text"
+                                placeholder="Search options..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full h-9 rounded-xl bg-white/60 border border-white/20 pl-9 pr-4 text-[11px] font-bold focus:outline-none transition-all shadow-inner"
+                            />
+                        </div>
+                    )}
 
-                    <div className="max-h-[300px] overflow-y-auto space-y-1 pr-1 custom-scrollbar">
+                    <div className={clsx(
+                        "overflow-y-auto space-y-1 pr-1 custom-scrollbar",
+                        showSearch ? "max-h-[300px]" : "max-h-[400px]"
+                    )}>
                         {filteredOptions.length > 0 ? (
                             filteredOptions.map((opt) => (
                                 <button
@@ -76,7 +93,7 @@ export default function PickerModal({ isOpen, onClose, onSelect, options, title,
                                         <p className="text-[11px] lg:text-[10px] font-bold tracking-tight leading-tight">{opt.label}</p>
                                         {opt.subLabel && (
                                             <p className={clsx(
-                                                "text-[8px] lg:text-[7px] font-black uppercase tracking-widest leading-none mt-1.5 px-2 py-1 lg:py-0.5 rounded-full inline-block border",
+                                                "text-[8px] lg:text-[7px] font-black uppercase tracking-wider leading-none mt-1.5 px-2 py-1 lg:py-0.5 rounded-full inline-block border",
                                                 selectedValue === opt.id
                                                     ? "bg-white/20 text-white border-white/20"
                                                     : opt.subLabel === 'OWNER'
@@ -94,7 +111,7 @@ export default function PickerModal({ isOpen, onClose, onSelect, options, title,
                             ))
                         ) : (
                             <div className="py-10 text-center opacity-20">
-                                <p className="text-[10px] font-bold uppercase tracking-widest">No results found</p>
+                                <p className="text-[10px] font-bold uppercase tracking-wider">No results found</p>
                             </div>
                         )}
                     </div>

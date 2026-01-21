@@ -59,7 +59,7 @@ export default function CreateBusinessModal({ isOpen, onClose }: CreateBusinessM
                         </div>
                         <div>
                             <h2 className="text-sm font-bold text-[var(--deep-contrast)] tracking-tight">New Business</h2>
-                            <p className="text-xs lg:text-[10px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest leading-none mt-1.5">Create Profile</p>
+                            <p className="text-xs lg:text-[10px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-none mt-1.5">Create Profile</p>
                         </div>
                     </div>
                     <button
@@ -72,7 +72,7 @@ export default function CreateBusinessModal({ isOpen, onClose }: CreateBusinessM
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
                     <div>
-                        <label className="block text-xs lg:text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/50 mb-2 ml-1">Business Name</label>
+                        <label className="block text-xs lg:text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-2 ml-1">Business Name</label>
                         <input
                             required
                             type="text"
@@ -87,14 +87,14 @@ export default function CreateBusinessModal({ isOpen, onClose }: CreateBusinessM
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 h-12 lg:h-10 rounded-xl text-[11px] lg:text-[10px] font-bold uppercase tracking-widest text-[var(--foreground)]/40 hover:bg-white/50 transition-all active:scale-95"
+                            className="flex-1 h-12 lg:h-10 rounded-xl text-[11px] lg:text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 hover:bg-white/50 transition-all active:scale-95"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={loading || !name}
-                            className="flex-1 h-12 lg:h-10 flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] text-white shadow-lg text-[11px] lg:text-[10px] font-bold uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50"
+                            className="flex-1 h-12 lg:h-10 flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] text-white shadow-lg text-[11px] lg:text-[10px] font-bold uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50"
                         >
                             {loading && <Loader2 className="mr-2 h-4 w-4 lg:h-3 lg:w-3 animate-spin" />}
                             Create

@@ -11,6 +11,7 @@ import { createClient } from '@/utils/supabase/client'
 import PickerModal from '@/components/ui/PickerModal'
 import ConfirmModal from '@/components/ui/ConfirmModal'
 import FeedbackModal from '@/components/ui/FeedbackModal'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
 export default function FinanceClientView({ initialTransactions }: { initialTransactions?: any[] }) {
     const router = useRouter()
@@ -24,6 +25,7 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
     const [confirmModal, setConfirmModal] = useState<{ open: boolean, transactionId: string }>({ open: false, transactionId: '' })
     const [isDeleting, setIsDeleting] = useState(false)
     const [feedbackModal, setFeedbackModal] = useState<{ open: boolean, message: string, variant: 'success' | 'error' }>({ open: false, message: '', variant: 'success' })
+    const [loading, setLoading] = useState(!initialTransactions)
     const [isSortPickerOpen, setIsSortPickerOpen] = useState(false)
     const [isTypePickerOpen, setIsTypePickerOpen] = useState(false)
     const [isModePickerOpen, setIsModePickerOpen] = useState(false)
@@ -32,12 +34,14 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
     useEffect(() => {
         if (!initialTransactions) {
             const fetchTransactions = async () => {
+                setLoading(true)
                 const { data } = await supabase
                     .from('transactions')
                     .select('*, party:parties(name)')
                     .order('date', { ascending: false })
                     .limit(50) // reasonable limit for client side fetch
                 if (data) setTransactions(data)
+                setLoading(false)
             }
             fetchTransactions()
         }
@@ -120,19 +124,19 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-[var(--primary-green)]/10">
                 <div>
                     <h1 className="text-2xl font-black text-[var(--deep-contrast)] tracking-tight">Finance</h1>
-                    <p className="text-[10px] font-bold text-[var(--foreground)]/40 uppercase tracking-[0.3em] leading-none">Financial Intelligence & Ledger</p>
+                    <p className="text-[10px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-none">Financial Intelligence & Ledger</p>
                 </div>
                 <div className="flex gap-2">
                     <button
                         onClick={() => router.push('/dashboard/finance/new?type=RECEIPT')}
-                        className="group flex-1 md:flex-none flex items-center justify-center gap-2 rounded-2xl bg-emerald-600/90 hover:bg-emerald-600 px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest text-white transition-all shadow-xl shadow-emerald-500/20 active:scale-95 border border-emerald-400/20"
+                        className="group flex-1 md:flex-none flex items-center justify-center gap-2 rounded-2xl bg-emerald-600/90 hover:bg-emerald-600 px-6 py-2.5 text-[10px] font-bold uppercase tracking-wider text-white transition-all shadow-xl shadow-emerald-500/20 active:scale-95 border border-emerald-400/20"
                     >
                         <Plus className="h-3.5 w-3.5 transition-transform group-hover:rotate-90" />
                         Got Payment
                     </button>
                     <button
                         onClick={() => router.push('/dashboard/finance/new?type=PAYMENT')}
-                        className="group flex-1 md:flex-none flex items-center justify-center gap-2 rounded-2xl bg-rose-600/90 hover:bg-rose-600 px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest text-white transition-all shadow-xl shadow-rose-500/20 active:scale-95 border border-rose-400/20"
+                        className="group flex-1 md:flex-none flex items-center justify-center gap-2 rounded-2xl bg-rose-600/90 hover:bg-rose-600 px-6 py-2.5 text-[10px] font-bold uppercase tracking-wider text-white transition-all shadow-xl shadow-rose-500/20 active:scale-95 border border-rose-400/20"
                     >
                         <Plus className="h-3.5 w-3.5 transition-transform group-hover:rotate-90" />
                         Gave Payment
@@ -148,7 +152,7 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                         <Wallet className="h-12 w-12 text-[var(--primary-green)]" />
                     </div>
                     <div className="relative z-10">
-                        <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/40">Cash in Hand</span>
+                        <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40">Cash in Hand</span>
                         <h2 className="text-xl font-black text-[var(--deep-contrast)] mt-1">{formatCurrency(cashBalance)}</h2>
                         <div className="flex items-center gap-2 mt-3">
                             <div className="h-1 w-full bg-black/5 rounded-full overflow-hidden">
@@ -164,7 +168,7 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                         <TrendingUp className="h-12 w-12 text-blue-500" />
                     </div>
                     <div className="relative z-10">
-                        <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/40">Bank Balance</span>
+                        <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40">Bank Balance</span>
                         <h2 className="text-xl font-black text-[var(--deep-contrast)] mt-1">{formatCurrency(bankBalance)}</h2>
                         <div className="flex items-center gap-2 mt-3 text-[9px] font-bold">
                             <span className="text-emerald-600">+{formatCurrency(bankIn)}</span>
@@ -180,7 +184,7 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                         <ArrowRightLeft className="h-12 w-12 text-purple-500" />
                     </div>
                     <div className="relative z-10">
-                        <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/40">Online / Wallet</span>
+                        <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40">Online / Wallet</span>
                         <h2 className="text-xl font-black text-[var(--deep-contrast)] mt-1">{formatCurrency(onlineBalance)}</h2>
                         <div className="mt-3 flex gap-1">
                             {[1, 2, 3, 4].map(i => (
@@ -195,7 +199,7 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
             <div className="glass p-5 rounded-[2rem] border border-white/40">
                 <div className="flex justify-between items-center mb-4">
                     <div>
-                        <h3 className="text-xs font-black text-[var(--deep-contrast)] uppercase tracking-widest">Cash Flow Analysis</h3>
+                        <h3 className="text-xs font-black text-[var(--deep-contrast)] uppercase tracking-wider">Cash Flow Analysis</h3>
                         <p className="text-[9px] font-bold text-[var(--foreground)]/40 mt-0.5">Ratio of Receipts vs Payments</p>
                     </div>
                     <div className="text-right">
@@ -241,21 +245,21 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                 </div>
                 <button
                     onClick={() => setIsSortPickerOpen(true)}
-                    className="h-9 px-3 rounded-xl bg-white/50 border border-white/20 flex items-center gap-2 text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-widest hover:bg-white/10 transition-all shadow-sm"
+                    className="h-9 px-3 rounded-xl bg-white/50 border border-white/20 flex items-center gap-2 text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-wider hover:bg-white/10 transition-all shadow-sm"
                 >
                     <ArrowUpDown className="h-3 w-3 opacity-40" />
                     <span>Sort</span>
                 </button>
                 <button
                     onClick={() => setIsTypePickerOpen(true)}
-                    className="h-9 px-3 rounded-xl bg-white/50 border border-white/20 flex items-center gap-2 text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-widest hover:bg-white/10 transition-all shadow-sm"
+                    className="h-9 px-3 rounded-xl bg-white/50 border border-white/20 flex items-center gap-2 text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-wider hover:bg-white/10 transition-all shadow-sm"
                 >
                     <Filter className="h-3 w-3 opacity-40" />
                     <span>Type</span>
                 </button>
                 <button
                     onClick={() => setIsModePickerOpen(true)}
-                    className="h-9 px-3 rounded-xl bg-white/50 border border-white/20 flex items-center gap-2 text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-widest hover:bg-white/10 transition-all shadow-sm"
+                    className="h-9 px-3 rounded-xl bg-white/50 border border-white/20 flex items-center gap-2 text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-wider hover:bg-white/10 transition-all shadow-sm"
                 >
                     <Wallet className="h-3 w-3 opacity-40" />
                     <span>Mode</span>
@@ -278,6 +282,7 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                     setIsSortPickerOpen(false)
                 }}
                 title="Sort Ledger"
+                showSearch={false}
                 options={[
                     { id: 'date-desc', label: 'DATE (NEWEST FIRST)' },
                     { id: 'date-asc', label: 'DATE (OLDEST FIRST)' },
@@ -296,6 +301,7 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                     setIsTypePickerOpen(false)
                 }}
                 title="Filter by Type"
+                showSearch={false}
                 options={[
                     { id: 'ALL', label: 'ALL ENTRIES' },
                     { id: 'RECEIPT', label: 'INCOME (IN)' },
@@ -312,6 +318,7 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                     setIsModePickerOpen(false)
                 }}
                 title="Filter by Mode"
+                showSearch={false}
                 options={[
                     { id: 'ALL', label: 'ALL MODES' },
                     { id: 'CASH', label: 'CASH' },
@@ -324,75 +331,82 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
             {/* Statement Ledger */}
             <div className="glass rounded-[2rem] border border-white/40 overflow-hidden shadow-2xl">
                 <div className="px-5 py-3 border-b border-white/10 bg-white/40 flex justify-between items-center">
-                    <h3 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-[0.3em]">Statement Ledger</h3>
-                    <div className="px-2 py-0.5 rounded-full bg-[var(--primary-green)]/10 border border-[var(--primary-green)]/20 text-[7px] font-black uppercase tracking-widest text-[var(--primary-green)]">Live Feed</div>
+                    <h3 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">Statement Ledger</h3>
+                    <div className="px-2 py-0.5 rounded-full bg-[var(--primary-green)]/10 border border-[var(--primary-green)]/20 text-[7px] font-black uppercase tracking-wider text-[var(--primary-green)]">Live Feed</div>
                 </div>
                 <div className="divide-y divide-white/5">
-                    {filteredTransactions.map((t) => (
-                        <div
-                            key={t.id}
-                            onClick={(e) => handleEdit(e, t)}
-                            className="group p-3 hover:bg-white/40 active:bg-white/60 transition-all flex justify-between items-center cursor-pointer"
-                        >
-                            <div className="flex items-center gap-3">
-                                <div className={clsx(
-                                    "h-9 w-9 rounded-xl flex items-center justify-center shadow-inner transition-all group-hover:scale-110",
-                                    t.type === 'RECEIPT' ? "bg-emerald-100 text-emerald-600" : "bg-rose-100 text-rose-600"
-                                )}>
-                                    {t.type === 'RECEIPT' ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
-                                </div>
-                                <div className="space-y-0.5">
-                                    <div className="flex items-center gap-2">
-                                        <p className="text-[11px] font-black text-[var(--deep-contrast)] leading-none">{t.party?.name || t.description || 'General Entry'}</p>
-                                        <span className={clsx(
-                                            "text-[6px] font-black px-1 py-0.5 rounded uppercase tracking-widest border",
-                                            t.mode === 'CASH' ? "bg-amber-50 text-amber-700 border-amber-200" :
-                                                t.mode === 'BANK' ? "bg-blue-50 text-blue-700 border-blue-200" :
-                                                    "bg-purple-50 text-purple-700 border-purple-200"
-                                        )}>
-                                            {t.mode}
-                                        </span>
-                                    </div>
+                    {loading ? (
+                        <div className="py-20">
+                            <LoadingSpinner label="Fetching Ledger..." />
+                        </div>
+                    ) : (
+                        <>
+                            {filteredTransactions.map((t) => (
+                                <div
+                                    key={t.id}
+                                    onClick={(e) => handleEdit(e, t)}
+                                    className="group p-3 hover:bg-white/40 active:bg-white/60 transition-all flex justify-between items-center cursor-pointer"
+                                >
                                     <div className="flex items-center gap-3">
-                                        <div className="flex items-center gap-1 opacity-40">
-                                            <Calendar className="h-2 w-2" />
-                                            <span className="text-[8px] font-bold lowercase">{new Date(t.date).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}</span>
+                                        <div className={clsx(
+                                            "h-9 w-9 rounded-xl flex items-center justify-center shadow-inner transition-all group-hover:scale-110",
+                                            t.type === 'RECEIPT' ? "bg-emerald-100 text-emerald-600" : "bg-rose-100 text-rose-600"
+                                        )}>
+                                            {t.type === 'RECEIPT' ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
                                         </div>
-                                        {t.description && <span className="text-[8px] font-medium text-[var(--foreground)]/30 truncate max-w-[150px]">{t.description}</span>}
+                                        <div className="space-y-0.5">
+                                            <div className="flex items-center gap-2">
+                                                <p className="text-[11px] font-black text-[var(--deep-contrast)] leading-none">{t.party?.name || t.description || 'General Entry'}</p>
+                                                <span className={clsx(
+                                                    "text-[6px] font-black px-1 py-0.5 rounded uppercase tracking-wider border",
+                                                    t.mode === 'CASH' ? "bg-amber-50 text-amber-700 border-amber-200" :
+                                                        t.mode === 'BANK' ? "bg-blue-50 text-blue-700 border-blue-200" :
+                                                            "bg-purple-50 text-purple-700 border-purple-200"
+                                                )}>
+                                                    {t.mode}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <div className="flex items-center gap-1 opacity-40">
+                                                    <Calendar className="h-2 w-2" />
+                                                    <span className="text-[8px] font-bold lowercase">{new Date(t.date).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}</span>
+                                                </div>
+                                                {t.description && <span className="text-[8px] font-medium text-[var(--foreground)]/30 truncate max-w-[150px]">{t.description}</span>}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        <div className="text-right">
+                                            <p className={clsx(
+                                                "text-xs font-black tracking-tight",
+                                                t.type === 'RECEIPT' ? "text-emerald-600" : "text-rose-600"
+                                            )}>
+                                                {t.type === 'RECEIPT' ? '+' : '-'} {formatCurrency(t.amount)}
+                                            </p>
+                                            <div className="flex items-center justify-end gap-1 mt-0.5 transition-all">
+                                                <button
+                                                    onClick={(e) => handleEdit(e, t)}
+                                                    className="p-1 rounded-md bg-white shadow-sm border border-black/5 text-blue-500 hover:bg-blue-500 hover:text-white transition-all scale-100"
+                                                >
+                                                    <Edit2 className="h-2.5 w-2.5" />
+                                                </button>
+                                                <button
+                                                    onClick={(e) => handleDelete(e, t.id)}
+                                                    className="p-1 rounded-md bg-white shadow-sm border border-black/5 text-rose-500 hover:bg-rose-500 hover:text-white transition-all scale-100"
+                                                >
+                                                    <Trash2 className="h-2.5 w-2.5" />
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <div className="text-right">
-                                    <p className={clsx(
-                                        "text-xs font-black tracking-tight",
-                                        t.type === 'RECEIPT' ? "text-emerald-600" : "text-rose-600"
-                                    )}>
-                                        {t.type === 'RECEIPT' ? '+' : '-'} {formatCurrency(t.amount)}
-                                    </p>
-                                    <div className="flex items-center justify-end gap-1 mt-0.5 transition-all">
-                                        <button
-                                            onClick={(e) => handleEdit(e, t)}
-                                            className="p-1 rounded-md bg-white shadow-sm border border-black/5 text-blue-500 hover:bg-blue-500 hover:text-white transition-all scale-100"
-                                        >
-                                            <Edit2 className="h-2.5 w-2.5" />
-                                        </button>
-                                        <button
-                                            onClick={(e) => handleDelete(e, t.id)}
-                                            className="p-1 rounded-md bg-white shadow-sm border border-black/5 text-rose-500 hover:bg-rose-500 hover:text-white transition-all scale-100"
-                                        >
-                                            <Trash2 className="h-2.5 w-2.5" />
-                                        </button>
-                                    </div>
+                            ))}
+                            {filteredTransactions.length === 0 && (
+                                <div className="text-center py-10 opacity-30">
+                                    <p className="text-[9px] font-black uppercase tracking-wider">Vault is Empty</p>
                                 </div>
-                            </div>
-                        </div>
-                    ))}
-                    {filteredTransactions.length === 0 && (
-                        <div className="text-center py-10 opacity-30">
-                            <Receipt className="h-6 w-6 mx-auto mb-2" />
-                            <p className="text-[9px] font-black uppercase tracking-[0.4em]">Vault is Empty</p>
-                        </div>
+                            )}
+                        </>
                     )}
                 </div>
             </div>

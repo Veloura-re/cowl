@@ -9,6 +9,7 @@ import { useBusiness } from '@/context/business-context'
 import Dropdown from '@/components/ui/dropdown'
 import PickerModal from '@/components/ui/PickerModal'
 import { createClient } from '@/utils/supabase/client'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
 export default function PurchasesClientView({ initialInvoices }: { initialInvoices?: any[] }) {
     const router = useRouter()
@@ -20,12 +21,14 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
     useEffect(() => {
         if (!initialInvoices) {
             const fetchInvoices = async () => {
+                setLoading(true)
                 const { data } = await supabase
                     .from('invoices')
                     .select('*, party:parties(name)')
                     .eq('type', 'PURCHASE')
                     .order('date', { ascending: false })
                 if (data) setInvoices(data)
+                setLoading(false)
             }
             fetchInvoices()
         }
@@ -35,6 +38,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
     const [isSortPickerOpen, setIsSortPickerOpen] = useState(false)
     const [isFilterPickerOpen, setIsFilterPickerOpen] = useState(false)
+    const [loading, setLoading] = useState(!initialInvoices)
 
     const handleEdit = (invoice: any) => {
         router.push(`/dashboard/purchases/edit?id=${invoice.id}`)
@@ -63,11 +67,11 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
             <div className="flex items-center justify-between pb-3 border-b border-[var(--primary-green)]/10">
                 <div>
                     <h1 className="text-xl font-bold text-[var(--deep-contrast)] tracking-tight">Purchases</h1>
-                    <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-widest leading-none">Stock Inward Log</p>
+                    <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Stock Inward Log</p>
                 </div>
                 <Link
                     href="/dashboard/purchases/new"
-                    className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white hover:bg-[var(--primary-green)] transition-all shadow-lg active:scale-95"
+                    className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white hover:bg-[var(--primary-green)] transition-all shadow-lg active:scale-95"
                 >
                     <Plus className="mr-1 h-3 w-3" />
                     New Bill
@@ -87,14 +91,14 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                 </div>
                 <button
                     onClick={() => setIsSortPickerOpen(true)}
-                    className="h-9 px-3 rounded-xl bg-white/50 border border-white/20 flex items-center gap-2 text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-widest hover:bg-white/10 transition-all shadow-sm"
+                    className="h-9 px-3 rounded-xl bg-white/50 border border-white/20 flex items-center gap-2 text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-wider hover:bg-white/10 transition-all shadow-sm"
                 >
                     <ArrowUpDown className="h-3 w-3 opacity-40" />
                     <span>Sort</span>
                 </button>
                 <button
                     onClick={() => setIsFilterPickerOpen(true)}
-                    className="h-9 px-3 rounded-xl bg-white/50 border border-white/20 flex items-center gap-2 text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-widest hover:bg-white/10 transition-all shadow-sm"
+                    className="h-9 px-3 rounded-xl bg-white/50 border border-white/20 flex items-center gap-2 text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-wider hover:bg-white/10 transition-all shadow-sm"
                 >
                     <Filter className="h-3 w-3 opacity-40" />
                     <span>Filter</span>
@@ -112,6 +116,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                     setIsSortPickerOpen(false)
                 }}
                 title="Sort Purchase Bills"
+                showSearch={false}
                 options={[
                     { id: 'date-desc', label: 'DATE (NEWEST FIRST)' },
                     { id: 'date-asc', label: 'DATE (OLDEST FIRST)' },
@@ -129,6 +134,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                     setIsFilterPickerOpen(false)
                 }}
                 title="Filter by Status"
+                showSearch={false}
                 options={[
                     { id: 'ALL', label: 'ALL STATUS' },
                     { id: 'PAID', label: 'PAID' },
@@ -155,7 +161,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                                     <h3 className="text-[10px] font-bold text-[var(--deep-contrast)] leading-tight">#{inv.invoice_number}</h3>
                                     <div className="flex items-center gap-1 opacity-40">
                                         <User className="h-2 w-2" />
-                                        <span className="text-[8px] font-bold uppercase tracking-widest">{inv.party?.name || 'Walk-in'}</span>
+                                        <span className="text-[8px] font-bold uppercase tracking-wider">{inv.party?.name || 'Walk-in'}</span>
                                     </div>
                                 </div>
                             </div>
@@ -171,7 +177,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
 
                         <div className="flex justify-between items-end mt-1.5 pt-1.5 border-t border-[var(--primary-green)]/5">
                             <div>
-                                <p className="text-[7px] font-bold text-[var(--foreground)]/30 uppercase tracking-widest leading-none mb-1 flex items-center gap-1">
+                                <p className="text-[7px] font-bold text-[var(--foreground)]/30 uppercase tracking-wider leading-none mb-1 flex items-center gap-1">
                                     <Calendar className="h-2 w-2" /> {inv.date}
                                 </p>
                                 <p className="text-xs font-bold text-[var(--deep-contrast)] tracking-tight">{formatCurrency(inv.total_amount)}</p>
@@ -181,13 +187,15 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                 ))}
             </div>
 
-            {
-                filteredPurchases.length === 0 && (
-                    <div className="text-center py-10 opacity-30">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.3em]">No bills found</p>
-                    </div>
-                )
-            }
+            {loading ? (
+                <div className="py-20">
+                    <LoadingSpinner label="Fetching Bills..." />
+                </div>
+            ) : filteredPurchases.length === 0 && (
+                <div className="text-center py-10 opacity-30">
+                    <p className="text-[10px] font-bold uppercase tracking-wider">No bills found</p>
+                </div>
+            )}
         </div >
     )
 }

@@ -52,7 +52,7 @@ export default function Step2AddItems({ items, onNext, onBack }: Step2Props) {
             <div className="px-5 py-3 border-b border-white/10 bg-[var(--primary-green)]/5 flex justify-between items-center">
                 <div>
                     <h2 className="text-[11px] font-bold text-[var(--deep-contrast)] uppercase tracking-tight">Add Line Items</h2>
-                    <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Select products and specify quantities</p>
+                    <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mt-0.5">Select products and specify quantities</p>
                 </div>
                 <button
                     onClick={() => setIsAddModalOpen(true)}
@@ -67,7 +67,7 @@ export default function Step2AddItems({ items, onNext, onBack }: Step2Props) {
                 {data.items.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-12 opacity-30">
                         <Package className="h-10 w-10 mb-3" />
-                        <p className="text-[9px] font-bold uppercase tracking-[0.3em]">No items added yet</p>
+                        <p className="text-[9px] font-bold uppercase tracking-wider">No items added yet</p>
                         <p className="text-[8px] font-bold text-[var(--foreground)]/40 mt-1">Click "Add Item" to get started</p>
                     </div>
                 ) : (

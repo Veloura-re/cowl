@@ -40,7 +40,7 @@ export default function ForgotPasswordPage() {
                     <h2 className="text-xl font-bold tracking-tight text-[var(--deep-contrast)] uppercase">
                         Reset Password
                     </h2>
-                    <p className="mt-1 text-[10px] font-bold text-[var(--foreground)]/50 uppercase tracking-widest leading-relaxed">
+                    <p className="mt-1 text-[10px] font-bold text-[var(--foreground)]/50 uppercase tracking-wider leading-relaxed">
                         We'll send a recovery link to your email
                     </p>
                 </div>
@@ -50,7 +50,7 @@ export default function ForgotPasswordPage() {
                         <div>
                             <label
                                 htmlFor="email"
-                                className="block text-[9px] font-bold uppercase tracking-widest text-[var(--foreground)]/60 mb-1.5 ml-1"
+                                className="block text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-1.5 ml-1"
                             >
                                 Registered Email
                             </label>
@@ -76,7 +76,7 @@ export default function ForgotPasswordPage() {
                         <button
                             type="submit"
                             disabled={loading || !email}
-                            className="group relative flex w-full justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-3 text-[10px] font-bold text-white uppercase tracking-[0.2em] hover:bg-[var(--primary-green)] active:scale-95 disabled:opacity-70 transition-all duration-300 shadow-xl shadow-[var(--deep-contrast)]/20"
+                            className="group relative flex w-full justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-3 text-[10px] font-bold text-white uppercase tracking-wider hover:bg-[var(--primary-green)] active:scale-95 disabled:opacity-70 transition-all duration-300 shadow-xl shadow-[var(--deep-contrast)]/20"
                         >
                             {loading ? (
                                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -91,7 +91,7 @@ export default function ForgotPasswordPage() {
                 ) : (
                     <div className="space-y-4 py-4 text-center">
                         <div className="rounded-2xl bg-emerald-50 p-4 border border-emerald-100">
-                            <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest leading-loose">
+                            <p className="text-[10px] font-black text-emerald-600 uppercase tracking-wider leading-loose">
                                 Recovery email sent!<br />Check your inbox for instructions.
                             </p>
                         </div>
@@ -101,7 +101,7 @@ export default function ForgotPasswordPage() {
                 <div className="text-center pt-2">
                     <Link
                         href="/login"
-                        className="inline-flex items-center gap-2 text-[9px] font-bold text-[var(--foreground)]/40 hover:text-[var(--deep-contrast)] transition-colors uppercase tracking-widest"
+                        className="inline-flex items-center gap-2 text-[9px] font-bold text-[var(--foreground)]/40 hover:text-[var(--deep-contrast)] transition-colors uppercase tracking-wider"
                     >
                         <ArrowLeft className="h-3 w-3" />
                         Back to Login

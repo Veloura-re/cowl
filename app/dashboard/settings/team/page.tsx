@@ -121,7 +121,7 @@ export default function TeamManagementPage() {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center p-20 text-[var(--foreground)]/50 text-[10px] font-bold uppercase tracking-widest">
+            <div className="flex items-center justify-center p-20 text-[var(--foreground)]/50 text-[10px] font-bold uppercase tracking-wider">
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 Loading Team...
             </div>
@@ -134,11 +134,11 @@ export default function TeamManagementPage() {
                 <div className="h-16 w-16 rounded-[24px] bg-rose-500/10 flex items-center justify-center text-rose-500 mb-2">
                     <Shield className="h-8 w-8" />
                 </div>
-                <h2 className="text-sm font-bold text-[var(--deep-contrast)] uppercase tracking-widest">No Active Business</h2>
+                <h2 className="text-sm font-bold text-[var(--deep-contrast)] uppercase tracking-wider">No Active Business</h2>
                 <p className="text-[10px] font-bold text-[var(--foreground)]/40 uppercase tracking-tighter max-w-[200px]">
                     You need an active business profile to manage team members.
                 </p>
-                <Link href="/dashboard/settings" className="px-6 py-2.5 rounded-xl bg-[var(--deep-contrast)] text-white text-[9px] font-bold uppercase tracking-widest hover:bg-[var(--primary-green)] transition-all active:scale-95 shadow-lg">
+                <Link href="/dashboard/settings" className="px-6 py-2.5 rounded-xl bg-[var(--deep-contrast)] text-white text-[9px] font-bold uppercase tracking-wider hover:bg-[var(--primary-green)] transition-all active:scale-95 shadow-lg">
                     Go to Settings
                 </Link>
             </div>
@@ -153,7 +153,7 @@ export default function TeamManagementPage() {
                 </Link>
                 <div className="flex-1">
                     <h1 className="text-xl font-bold text-[var(--deep-contrast)] tracking-tight">Team Management</h1>
-                    <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-widest leading-none">Add partners, admins, and viewers</p>
+                    <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Add partners, admins, and viewers</p>
                 </div>
                 {isOwner && (
                     <button
@@ -161,7 +161,7 @@ export default function TeamManagementPage() {
                         className="p-3 rounded-2xl bg-[var(--deep-contrast)] text-white shadow-xl shadow-[var(--deep-contrast)]/20 active:scale-95 transition-all flex items-center gap-2 group"
                     >
                         <UserPlus className="h-4 w-4" />
-                        <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Add Member</span>
+                        <span className="text-[10px] font-black uppercase tracking-wider hidden sm:inline">Add Member</span>
                     </button>
                 )}
             </div>
@@ -213,7 +213,7 @@ export default function TeamManagementPage() {
                             <div className="flex items-center gap-3">
                                 <div className="text-right">
                                     <div className={clsx(
-                                        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest",
+                                        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-wider",
                                         member.role === 'OWNER' ? "bg-amber-100 text-amber-700" :
                                             member.role === 'ADMIN' ? "bg-blue-100 text-blue-700" :
                                                 member.role === 'PARTNER' ? "bg-purple-100 text-purple-700" :
@@ -251,7 +251,7 @@ export default function TeamManagementPage() {
                     ))}
                     {members.length === 0 && (
                         <div className="p-10 text-center">
-                            <p className="text-[10px] font-bold text-[var(--foreground)]/20 uppercase tracking-[0.2em]">No team members found</p>
+                            <p className="text-[10px] font-bold text-[var(--foreground)]/20 uppercase tracking-wider">No team members found</p>
                         </div>
                     )}
                 </div>

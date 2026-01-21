@@ -20,6 +20,12 @@ type BusinessContextType = {
     isLoading: boolean
     activeCurrencySymbol: string
     formatCurrency: (amount: number) => string
+    isGlobalLoading: boolean
+    setIsGlobalLoading: (loading: boolean) => void
+    feedback: { isOpen: boolean, message: string, variant: 'success' | 'error', title?: string }
+    setFeedback: (f: { isOpen: boolean, message: string, variant: 'success' | 'error', title?: string }) => void
+    showSuccess: (message: string, title?: string) => void
+    showError: (message: string, title?: string) => void
 }
 
 const BusinessContext = createContext<BusinessContextType | undefined>(undefined)
@@ -28,45 +34,82 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
     const [businesses, setBusinesses] = useState<Business[]>([])
     const [activeBusinessId, setActiveBusinessIdState] = useState<string | null>(null)
     const [isLoading, setIsLoading] = useState(true)
+    const [isGlobalLoading, setIsGlobalLoading] = useState(false)
+    const [feedback, setFeedback] = useState<{ isOpen: boolean, message: string, variant: 'success' | 'error', title?: string }>({
+        isOpen: false,
+        message: '',
+        variant: 'success'
+    })
     const supabase = createClient()
     const router = useRouter()
 
     const fetchBusinesses = async () => {
         setIsLoading(true)
-        const { data: { user } } = await supabase.auth.getUser()
+        console.log('BusinessContext: Fetching session...')
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
 
-        if (!user) {
-            router.push('/login')
+        if (sessionError) {
+            console.error('BusinessContext: Session error', sessionError)
+        }
+
+        if (!session) {
+            console.warn('BusinessContext: No session found, redirecting to login')
+            // Only redirect if absolutely sure and on a dashboard route
+            if (window.location.pathname.startsWith('/dashboard')) {
+                router.replace('/login')
+            }
             setIsLoading(false)
             return
         }
 
-        if (user) {
-            const { data } = await supabase
-                .from('businesses')
-                .select('id, name, currency, owner_id')
-                .order('name')
+        console.log('BusinessContext: Session confirmed for', session.user.email)
+        const { data, error } = await supabase
+            .from('businesses')
+            .select('id, name, currency, owner_id')
+            .order('name')
 
-            if (data) {
-                const formattedBusinesses = data.map(b => ({
-                    ...b,
-                    isOwner: b.owner_id === user.id
-                }))
-                setBusinesses(formattedBusinesses)
-                // Restore from localStorage if possible
-                const savedId = localStorage.getItem('activeBusinessId')
-                if (savedId && data.find(b => b.id === savedId)) {
-                    setActiveBusinessIdState(savedId)
-                } else if (data.length > 0) {
-                    setActiveBusinessIdState(data[0].id)
-                }
+        if (error) {
+            console.error('BusinessContext: Error fetching businesses', error)
+        }
+
+        if (data) {
+            const formattedBusinesses = data.map(b => ({
+                ...b,
+                isOwner: b.owner_id === session.user.id
+            }))
+            setBusinesses(formattedBusinesses)
+            // Restore from localStorage if possible
+            const savedId = localStorage.getItem('activeBusinessId')
+            if (savedId && data.find(b => b.id === savedId)) {
+                setActiveBusinessIdState(savedId)
+                console.log('BusinessContext: Restored active business', savedId)
+            } else if (data.length > 0) {
+                setActiveBusinessIdState(data[0].id)
+                console.log('BusinessContext: Set default active business', data[0].id)
             }
         }
         setIsLoading(false)
     }
 
     useEffect(() => {
+        // Init businesses
         fetchBusinesses()
+
+        // Listen for auth changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            console.log('BusinessContext: Auth Event:', event)
+            if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+                fetchBusinesses()
+            } else if (event === 'SIGNED_OUT') {
+                setBusinesses([])
+                setActiveBusinessIdState(null)
+                if (window.location.pathname.startsWith('/dashboard')) {
+                    router.replace('/login')
+                }
+            }
+        })
+
+        return () => subscription.unsubscribe()
     }, [])
 
     const setActiveBusinessId = (id: string) => {
@@ -89,7 +132,13 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
             refreshBusinesses: fetchBusinesses,
             isLoading,
             activeCurrencySymbol,
-            formatCurrency
+            formatCurrency,
+            isGlobalLoading,
+            setIsGlobalLoading,
+            feedback,
+            setFeedback,
+            showSuccess: (message: string, title?: string) => setFeedback({ isOpen: true, message, title, variant: 'success' }),
+            showError: (message: string, title?: string) => setFeedback({ isOpen: true, message, title, variant: 'error' })
         }}>
             {children}
         </BusinessContext.Provider>

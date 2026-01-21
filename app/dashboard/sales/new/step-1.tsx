@@ -38,13 +38,13 @@ export default function Step1PartyInfo({ parties, onNext }: Step1Props) {
         <div className="glass rounded-2xl border border-white/40 overflow-hidden">
             <div className="px-5 py-3 border-b border-white/10 bg-[var(--primary-green)]/5">
                 <h2 className="text-[11px] font-bold text-[var(--deep-contrast)] uppercase tracking-tight">Party & Basic Information</h2>
-                <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Select customer and invoice details</p>
+                <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mt-0.5">Select customer and invoice details</p>
             </div>
 
             <div className="p-5 space-y-4">
                 {/* Customer Selection - Large Card */}
                 <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-2">
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-2">
                         Customer *
                     </label>
                     <button
@@ -83,7 +83,7 @@ export default function Step1PartyInfo({ parties, onNext }: Step1Props) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Invoice Number */}
                     <div>
-                        <label className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-2">
+                        <label className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-2">
                             <Hash className="h-3.5 w-3.5" />
                             Invoice Number
                         </label>
@@ -97,7 +97,7 @@ export default function Step1PartyInfo({ parties, onNext }: Step1Props) {
 
                     {/* Date */}
                     <div>
-                        <label className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--foreground)]/50 mb-2">
+                        <label className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-2">
                             <Calendar className="h-3.5 w-3.5" />
                             Invoice Date
                         </label>

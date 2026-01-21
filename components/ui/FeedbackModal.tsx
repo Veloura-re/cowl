@@ -61,7 +61,7 @@ export default function FeedbackModal({
                         <button
                             onClick={onClose}
                             className={clsx(
-                                "w-full h-12 rounded-2xl text-white text-[11px] lg:text-[10px] font-black uppercase tracking-[0.2em] shadow-xl transition-all active:scale-95",
+                                "w-full h-12 rounded-2xl text-white text-[11px] lg:text-[10px] font-black uppercase tracking-wider shadow-xl transition-all active:scale-95",
                                 isError ? "bg-[var(--deep-contrast)] hover:bg-black" : "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20"
                             )}
                         >
