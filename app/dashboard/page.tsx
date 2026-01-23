@@ -17,6 +17,7 @@ export default function DashboardPage() {
         parties: 0,
         stock: 0,
         pending: 0,
+        totalExpenses: 0,
         activities: [] as any[]
     });
 
@@ -48,6 +49,7 @@ export default function DashboardPage() {
                     .eq('business_id', activeBusinessId);
 
                 const totalStock = (stockItems || []).reduce((sum, i) => sum + Number(i.stock_quantity), 0);
+                const lowStockCount = (stockItems || []).filter(i => Number(i.stock_quantity) <= (i as any).min_stock).length;
 
                 // 4. Pending
                 const { count: pendingCount } = await supabase
@@ -55,6 +57,22 @@ export default function DashboardPage() {
                     .select('*', { count: 'exact', head: true })
                     .eq('business_id', activeBusinessId)
                     .eq('status', 'UNPAID');
+
+                // 4.5 Total Expenses (Purchases + Payments)
+                const { data: purchaseData } = await supabase
+                    .from('invoices')
+                    .select('total_amount')
+                    .eq('business_id', activeBusinessId)
+                    .eq('type', 'PURCHASE');
+
+                const { data: paymentData } = await supabase
+                    .from('transactions')
+                    .select('amount')
+                    .eq('business_id', activeBusinessId)
+                    .eq('type', 'PAYMENT');
+
+                const totalExpenses = (purchaseData || []).reduce((sum, p) => sum + Number(p.total_amount), 0) +
+                    (paymentData || []).reduce((sum, p) => sum + Number(p.amount), 0);
 
                 // 5. Activities (latest 5 invoices/transactions)
                 const [{ data: latestInvoices }, { data: latestTransactions }] = await Promise.all([
@@ -78,6 +96,7 @@ export default function DashboardPage() {
                         type: 'INVOICE',
                         title: inv.type === 'SALE' ? `Sale at ${inv.party?.name || 'Customer'}` : `Purchase from ${inv.party?.name || 'Supplier'}`,
                         subtitle: formatCurrency(inv.total_amount),
+                        amountType: inv.type === 'SALE' ? 'INCOME' : 'EXPENSE',
                         date: new Date(inv.created_at),
                         icon: inv.type === 'SALE' ? FileTextIcon : ShoppingCart
                     })),
@@ -86,6 +105,7 @@ export default function DashboardPage() {
                         type: 'TRANSACTION',
                         title: tx.type === 'RECEIPT' ? `Payment from ${tx.party?.name || 'Customer'}` : `Payment to ${tx.party?.name || 'Supplier'}`,
                         subtitle: formatCurrency(tx.amount),
+                        amountType: tx.type === 'RECEIPT' ? 'INCOME' : 'EXPENSE',
                         date: new Date(tx.created_at),
                         icon: Receipt
                     }))
@@ -101,6 +121,8 @@ export default function DashboardPage() {
                     parties: partiesCount || 0,
                     stock: totalStock,
                     pending: pendingCount || 0,
+                    totalExpenses,
+                    lowStockCount,
                     activities
                 });
             } catch (err) {
@@ -164,34 +186,64 @@ export default function DashboardPage() {
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: i * 0.1, duration: 0.4, ease: "easeOut" }}
-                        className="glass p-3 rounded-2xl border border-white/40 flex flex-col justify-between group hover:bg-white/60 transition-all duration-300"
+                        className="glass p-2.5 rounded-xl border border-white/40 flex flex-col justify-between group hover:bg-white/60 transition-all duration-300"
                     >
-                        <div className="flex items-center justify-between mb-2">
-                            <div className={clsx(
-                                "h-7 w-7 rounded-xl flex items-center justify-center shadow-inner",
-                                s.color === 'emerald' ? "bg-emerald-100/50 text-emerald-700" :
-                                    s.color === 'blue' ? "bg-blue-100/50 text-blue-700" :
-                                        s.color === 'purple' ? "bg-purple-100/50 text-purple-700" :
-                                            "bg-orange-100/50 text-orange-700"
-                            )}>
-                                <s.icon className="h-3.5 w-3.5" />
+                        <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                                <s.icon className={clsx(
+                                    "h-3 w-3",
+                                    s.color === 'emerald' ? "text-emerald-600" :
+                                        s.color === 'blue' ? "text-blue-600" :
+                                            s.color === 'purple' ? "text-purple-600" :
+                                                "text-orange-600"
+                                )} />
+                                <span className="text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 truncate">{s.label}</span>
                             </div>
-                            <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/30 group-hover:text-[var(--foreground)]/50 transition-colors">{s.label}</span>
-                        </div>
-                        <div>
-                            <p className="text-xl font-bold text-[var(--deep-contrast)] tracking-tight">{s.value}</p>
                             <p className={clsx(
-                                "text-[9px] font-bold flex items-center mt-0.5",
+                                "text-lg font-black tracking-tighter truncate tabular-nums",
                                 s.color === 'emerald' ? "text-emerald-600" :
-                                    s.color === 'blue' ? "text-blue-600" :
-                                        s.color === 'purple' ? "text-[var(--foreground)]/40" :
-                                            "text-orange-600"
-                            )}>
-                                {s.trend}
-                            </p>
+                                    s.color === 'orange' ? "text-orange-600" :
+                                        "text-[var(--deep-contrast)]"
+                            )}>{s.value}</p>
                         </div>
                     </motion.div>
                 ))}
+            </div>
+
+            {/* Dashboard Quick Stats Bar (In/Out) */}
+            <div className="flex gap-2">
+                <div className="flex-1 glass p-2.5 rounded-[20px] border border-white/40">
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                            <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                            <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600/60">Total Inbound</span>
+                        </div>
+                        <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-1.5 rounded uppercase tracking-tighter">Revenue</span>
+                    </div>
+                    <p className="text-xl font-black text-emerald-600 mt-2 tabular-nums">{formatCurrency(data.revenue)}</p>
+                </div>
+
+                <div className="flex-1 glass p-2.5 rounded-[20px] border border-white/40">
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                            <div className="h-2 w-2 rounded-full bg-rose-500" />
+                            <span className="text-[9px] font-black uppercase tracking-widest text-rose-600/60">Total Outbound</span>
+                        </div>
+                        <span className="text-[9px] font-black text-rose-600 bg-rose-50 px-1.5 rounded uppercase tracking-tighter">Expense</span>
+                    </div>
+                    <p className="text-xl font-black text-rose-600 mt-2 tabular-nums">{formatCurrency(data.totalExpenses)}</p>
+                </div>
+
+                <div className="flex-1 glass p-2.5 rounded-[20px] border border-white/40">
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                            <div className="h-2 w-2 rounded-full bg-blue-500" />
+                            <span className="text-[9px] font-black uppercase tracking-widest text-blue-600/60">Stock Alerts</span>
+                        </div>
+                        <span className="text-[9px] font-black text-blue-600 bg-blue-50 px-1.5 rounded uppercase tracking-tighter">Low</span>
+                    </div>
+                    <p className="text-xl font-black text-blue-600 mt-2 tabular-nums">{(data as any).lowStockCount || 0}</p>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -204,15 +256,14 @@ export default function DashboardPage() {
                         </div>
                         <div className="p-2 space-y-1">
                             {data.activities.length > 0 ? data.activities.map((act) => (
-                                <div key={act.id} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-white/40 transition-colors cursor-default">
-                                    <div className="h-8 w-8 rounded-xl bg-[var(--primary-green)]/5 text-[var(--primary-green)] flex items-center justify-center">
-                                        <act.icon className="h-4 w-4" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <p className="text-[11px] font-bold text-[var(--deep-contrast)] leading-tight capitalize">{act.title.toLowerCase()}</p>
-                                        <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-tighter mt-0.5">{act.subtitle}</p>
-                                    </div>
-                                    <span className="text-[9px] font-bold text-[var(--foreground)]/30">{act.time}</span>
+                                <div key={act.id} className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-white/40 transition-colors cursor-default">
+                                    <act.icon className="h-2.5 w-2.5 text-[var(--primary-green)]/40 shrink-0" />
+                                    <p className="text-[10px] font-bold text-[var(--deep-contrast)] leading-tight capitalize truncate flex-1">{act.title.toLowerCase()}</p>
+                                    <p className={clsx(
+                                        "text-[9px] font-black tabular-nums shrink-0",
+                                        act.amountType === 'INCOME' ? "text-emerald-600" : "text-rose-600"
+                                    )}>{act.subtitle}</p>
+                                    <span className="text-[8px] font-bold text-[var(--foreground)]/30 shrink-0">{act.time}</span>
                                 </div>
                             )) : (
                                 <div className="py-12 text-center opacity-30">
@@ -234,16 +285,22 @@ export default function DashboardPage() {
                         <div className="px-5 py-3 border-b border-white/10 bg-[var(--primary-green)]/5">
                             <h3 className="text-[10px] font-bold text-[var(--deep-contrast)] uppercase tracking-wider">Quick Actions</h3>
                         </div>
-                        <div className="p-3 grid gap-2">
-                            {actions.map((action) => (
-                                <Link
+                        <div className="p-2 grid gap-1.5">
+                            {actions.map((action, i) => (
+                                <motion.div
                                     key={action.name}
-                                    href={action.href}
-                                    className="group w-full h-10 rounded-xl bg-white/30 border border-white/40 px-4 text-[10px] font-bold text-[var(--deep-contrast)] uppercase tracking-wider hover:bg-[var(--primary-green)] hover:text-white transition-all flex items-center justify-between shadow-sm active:scale-[0.98]"
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: i * 0.05 }}
                                 >
-                                    {action.name}
-                                    <ArrowRight className="h-3.5 w-3.5 text-[var(--primary-green)] group-hover:text-white transition-colors" />
-                                </Link>
+                                    <Link
+                                        href={action.href}
+                                        className="group w-full h-9 rounded-xl bg-white/30 border border-white/40 px-3 text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-wider hover:bg-[var(--primary-green)] hover:text-white transition-all flex items-center justify-between shadow-sm active:scale-[0.98]"
+                                    >
+                                        {action.name}
+                                        <ArrowRight className="h-3 w-3 text-[var(--primary-green)] group-hover:text-white transition-transform group-hover:translate-x-1" />
+                                    </Link>
+                                </motion.div>
                             ))}
                         </div>
                     </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ArrowLeft, Save, Plus, Trash2, Printer } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/context/business-context'
@@ -46,33 +46,43 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
     const [notes, setNotes] = useState('')
 
     // Calculations
-    const subtotal = rows.reduce((sum, row) => sum + (row.quantity * row.rate), 0)
-    const totalTax = rows.reduce((sum, row) => sum + ((row.quantity * row.rate) * (row.tax / 100)), 0)
-    const totalAmount = subtotal + totalTax
+    const { subtotal, totalTax, totalAmount } = React.useMemo(() => {
+        const sub = rows.reduce((sum, row) => sum + (row.quantity * row.rate), 0)
+        const tax = rows.reduce((sum, row) => sum + ((row.quantity * row.rate) * (row.tax / 100)), 0)
+        return {
+            subtotal: sub,
+            totalTax: tax,
+            totalAmount: sub + tax
+        }
+    }, [rows])
 
-    const handleItemChange = (index: number, itemId: string) => {
+    const handleItemChange = React.useCallback((index: number, itemId: string) => {
         const item = items.find(i => i.id === itemId)
-        const newRows = [...rows]
-        newRows[index] = {
-            ...newRows[index],
-            itemId,
-            name: item?.name || '',
-            unit: item?.unit || '',
-            rate: item?.selling_price || 0,
-            tax: item?.tax_rate || 0,
-            amount: (newRows[index].quantity * (item?.selling_price || 0))
-        }
-        setRows(newRows)
-    }
+        setRows(prevRows => {
+            const newRows = [...prevRows]
+            newRows[index] = {
+                ...newRows[index],
+                itemId,
+                name: item?.name || '',
+                unit: item?.unit || '',
+                rate: item?.selling_price || 0,
+                tax: item?.tax_rate || 0,
+                amount: (newRows[index].quantity * (item?.selling_price || 0))
+            }
+            return newRows
+        })
+    }, [items])
 
-    const updateRow = (index: number, field: keyof InvoiceItem, value: any) => {
-        const newRows = [...rows]
-        newRows[index] = { ...newRows[index], [field]: value }
-        if (field === 'quantity' || field === 'rate') {
-            newRows[index].amount = newRows[index].quantity * newRows[index].rate
-        }
-        setRows(newRows)
-    }
+    const updateRow = React.useCallback((index: number, field: keyof InvoiceItem, value: any) => {
+        setRows(prevRows => {
+            const newRows = [...prevRows]
+            newRows[index] = { ...newRows[index], [field]: value }
+            if (field === 'quantity' || field === 'rate') {
+                newRows[index].amount = newRows[index].quantity * newRows[index].rate
+            }
+            return newRows
+        })
+    }, [])
 
     const addRow = () => {
         setRows([...rows, { itemId: '', name: '', unit: '', quantity: 1, rate: 0, tax: 0, amount: 0 }])

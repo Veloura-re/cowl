@@ -54,10 +54,19 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
 
         if (!session) {
             console.warn('BusinessContext: No session found, redirecting to login')
-            // Only redirect if absolutely sure and on a dashboard route
-            if (window.location.pathname.startsWith('/dashboard')) {
+            const path = window.location.pathname
+            if (path.startsWith('/dashboard') || path === '/onboarding') {
                 router.replace('/login')
             }
+            setIsLoading(false)
+            return
+        }
+
+        // If session exists but on login/register -> dashboard
+        const path = window.location.pathname
+        if (path === '/login' || path === '/register') {
+            console.log('BusinessContext: Logged in user on auth page, redirecting to dashboard')
+            router.replace('/dashboard')
             setIsLoading(false)
             return
         }
@@ -121,34 +130,50 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
         return () => subscription.unsubscribe()
     }, [])
 
-    const setActiveBusinessId = (id: string) => {
+    const setActiveBusinessId = React.useCallback((id: string) => {
         setActiveBusinessIdState(id)
         localStorage.setItem('activeBusinessId', id)
-    }
+    }, [])
 
-    const activeBusiness = businesses.find(b => b.id === activeBusinessId)
-    const activeCurrencySymbol = currencies.find(c => c.code === activeBusiness?.currency)?.symbol || '$'
+    const activeBusiness = React.useMemo(() => businesses.find(b => b.id === activeBusinessId), [businesses, activeBusinessId])
+    const activeCurrencySymbol = React.useMemo(() => currencies.find(c => c.code === activeBusiness?.currency)?.symbol || '$', [activeBusiness])
 
-    const formatCurrency = (amount: number) => {
+    const formatCurrency = React.useCallback((amount: number) => {
         return `${activeCurrencySymbol} ${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-    }
+    }, [activeCurrencySymbol])
+
+    const showSuccess = React.useCallback((message: string, title?: string) => setFeedback({ isOpen: true, message, title, variant: 'success' }), [])
+    const showError = React.useCallback((message: string, title?: string) => setFeedback({ isOpen: true, message, title, variant: 'error' }), [])
+
+    const contextValue = React.useMemo(() => ({
+        businesses,
+        activeBusinessId,
+        setActiveBusinessId,
+        refreshBusinesses: fetchBusinesses,
+        isLoading,
+        activeCurrencySymbol,
+        formatCurrency,
+        isGlobalLoading,
+        setIsGlobalLoading,
+        feedback,
+        setFeedback,
+        showSuccess,
+        showError
+    }), [
+        businesses,
+        activeBusinessId,
+        setActiveBusinessId,
+        isLoading,
+        activeCurrencySymbol,
+        formatCurrency,
+        isGlobalLoading,
+        feedback,
+        showSuccess,
+        showError
+    ])
 
     return (
-        <BusinessContext.Provider value={{
-            businesses,
-            activeBusinessId,
-            setActiveBusinessId,
-            refreshBusinesses: fetchBusinesses,
-            isLoading,
-            activeCurrencySymbol,
-            formatCurrency,
-            isGlobalLoading,
-            setIsGlobalLoading,
-            feedback,
-            setFeedback,
-            showSuccess: (message: string, title?: string) => setFeedback({ isOpen: true, message, title, variant: 'success' }),
-            showError: (message: string, title?: string) => setFeedback({ isOpen: true, message, title, variant: 'error' })
-        }}>
+        <BusinessContext.Provider value={contextValue}>
             {children}
         </BusinessContext.Provider>
     )

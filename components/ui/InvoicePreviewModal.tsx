@@ -28,7 +28,7 @@ export default function InvoicePreviewModal({
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in duration-300" onClick={onClose} />
 
-            <div className="glass w-full max-w-5xl h-[95vh] flex flex-col rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 relative z-10 border border-white/40 bg-white/95">
+            <div className="glass w-full max-w-3xl h-[95vh] flex flex-col rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 relative z-10 border border-white/40 bg-white/95">
                 {/* Header Actions */}
                 <div className="flex items-center justify-between border-b border-black/5 px-6 py-4 bg-white/90 sticky top-0 z-20">
                     <div>
@@ -60,61 +60,61 @@ export default function InvoicePreviewModal({
                 </div>
 
                 {/* Preview Content */}
-                <div className="flex-1 overflow-y-auto p-4 md:p-10 bg-slate-100/50 custom-scrollbar">
-                    <div className="w-full max-w-[210mm] mx-auto bg-white shadow-2xl overflow-hidden border border-black/5 flex flex-col min-h-[297mm]">
+                <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-100/50 custom-scrollbar">
+                    <div className="w-full max-w-[126mm] mx-auto bg-white shadow-2xl overflow-hidden border border-black/5 flex flex-col min-h-[178mm]">
                         {/* Internal Invoice Styling */}
-                        <div className="p-12 md:p-16 space-y-8 flex-1">
+                        <div className="p-8 md:p-10 space-y-6 flex-1">
                             {/* Brand Header */}
-                            <div className="flex justify-between items-start border-b-4 border-[var(--primary-green)] pb-6">
+                            <div className="flex justify-between items-start border-b border-[var(--primary-green)] pb-1.5">
                                 <div>
-                                    <h1 className="text-3xl font-black text-[var(--primary-green)] tracking-tighter">
+                                    <h1 className="text-[12px] font-black text-[var(--primary-green)] tracking-tighter leading-none">
                                         {isSale ? 'SALES INVOICE' : 'PURCHASE BILL'}
                                     </h1>
-                                    <p className="text-sm font-bold text-black/60 mt-1 uppercase tracking-widest">{data.businessName}</p>
+                                    <p className="text-[6px] font-bold text-black/60 mt-0.5 uppercase tracking-widest leading-none">{data.businessName}</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-[10px] font-black text-black/40 uppercase tracking-widest">Document No.</p>
-                                    <p className="text-xl font-black text-black">{data.invoiceNumber}</p>
+                                    <p className="text-[5px] font-black text-black/40 uppercase tracking-widest leading-none">No.</p>
+                                    <p className="text-[9px] font-black text-black leading-none mt-0.5">{data.invoiceNumber}</p>
                                 </div>
                             </div>
 
                             {/* Parties Info */}
-                            <div className="grid grid-cols-2 gap-12">
-                                <div className="space-y-2">
-                                    <h3 className="text-[10px] font-black text-black/40 uppercase tracking-widest border-b border-black/5 pb-1">FROM</h3>
-                                    <div className="space-y-0.5">
-                                        <p className="text-sm font-black text-black uppercase">{data.businessName}</p>
-                                        <p className="text-xs text-black/60 leading-relaxed max-w-[200px]">{data.businessAddress}</p>
-                                        <p className="text-xs font-bold text-black/80">{data.businessPhone}</p>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-0.5">
+                                    <h3 className="text-[5px] font-black text-black/40 uppercase tracking-widest border-b border-black/5 pb-0.5">FROM</h3>
+                                    <div className="space-y-0.5 pt-0.5">
+                                        <p className="text-[8px] font-black text-black uppercase leading-tight">{data.businessName}</p>
+                                        <p className="text-[6px] text-black/60 leading-tight max-w-[120px] font-medium">{data.businessAddress}</p>
+                                        <p className="text-[6px] font-bold text-black/80">{data.businessPhone}</p>
                                     </div>
                                 </div>
-                                <div className="space-y-2">
-                                    <h3 className="text-[10px] font-black text-black/40 uppercase tracking-widest border-b border-black/5 pb-1">
+                                <div className="space-y-0.5">
+                                    <h3 className="text-[5px] font-black text-black/40 uppercase tracking-widest border-b border-black/5 pb-0.5">
                                         {isSale ? 'BILL TO' : 'SUPPLIER'}
                                     </h3>
-                                    <div className="space-y-0.5">
-                                        <p className="text-sm font-black text-black uppercase">{data.partyName}</p>
-                                        <p className="text-xs text-black/60 leading-relaxed max-w-[200px]">{data.partyAddress}</p>
-                                        <p className="text-xs font-bold text-black/80">{data.partyPhone}</p>
+                                    <div className="space-y-0.5 pt-0.5">
+                                        <p className="text-[8px] font-black text-black uppercase leading-tight">{data.partyName}</p>
+                                        <p className="text-[6px] text-black/60 leading-tight max-w-[120px] font-medium">{data.partyAddress}</p>
+                                        <p className="text-[6px] font-bold text-black/80">{data.partyPhone}</p>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Dates & Status */}
-                            <div className="grid grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-black/5">
+                            <div className="grid grid-cols-3 gap-2 bg-slate-50 p-2 rounded border border-black/5">
                                 <div>
-                                    <p className="text-[8px] font-black text-black/40 uppercase tracking-widest mb-1 text-center">ISSUE DATE</p>
-                                    <p className="text-xs font-bold text-center">{data.date}</p>
+                                    <p className="text-[5px] font-black text-black/40 uppercase tracking-widest text-center">ISSUE DATE</p>
+                                    <p className="text-[8px] font-bold text-center leading-none mt-0.5">{data.date}</p>
                                 </div>
                                 <div>
-                                    <p className="text-[8px] font-black text-black/40 uppercase tracking-widest mb-1 text-center">DUE DATE</p>
-                                    <p className="text-xs font-bold text-center">{data.dueDate || 'N/A'}</p>
+                                    <p className="text-[5px] font-black text-black/40 uppercase tracking-widest text-center">DUE DATE</p>
+                                    <p className="text-[8px] font-bold text-center leading-none mt-0.5">{data.dueDate || 'N/A'}</p>
                                 </div>
                                 <div>
-                                    <p className="text-[8px] font-black text-black/40 uppercase tracking-widest mb-1 text-center">STATUS</p>
-                                    <div className="flex justify-center">
+                                    <p className="text-[5px] font-black text-black/40 uppercase tracking-widest text-center">STATUS</p>
+                                    <div className="flex justify-center mt-0.5">
                                         <span className={clsx(
-                                            "text-[9px] font-black uppercase tracking-tighter px-2 py-0.5 rounded-full border",
+                                            "text-[6px] font-black uppercase tracking-tighter px-1 py-0.5 rounded border leading-none",
                                             data.status === 'PAID' ? "bg-emerald-50 text-emerald-600 border-emerald-200" :
                                                 data.status === 'PARTIAL' ? "bg-amber-50 text-amber-600 border-amber-200" :
                                                     "bg-rose-50 text-rose-600 border-rose-200"
@@ -129,57 +129,57 @@ export default function InvoicePreviewModal({
                             <table className="w-full text-left">
                                 <thead>
                                     <tr className="bg-[var(--primary-green)] text-white">
-                                        <th className="p-3 rounded-tl-lg text-[9px] font-black uppercase tracking-widest">Description</th>
-                                        <th className="p-3 text-[9px] font-black uppercase tracking-widest text-center">Qty</th>
-                                        <th className="p-3 text-[9px] font-black uppercase tracking-widest text-right">Rate</th>
-                                        <th className="p-3 text-[9px] font-black uppercase tracking-widest text-right">Tax</th>
-                                        <th className="p-3 rounded-tr-lg text-[9px] font-black uppercase tracking-widest text-right">Amount</th>
+                                        <th className="p-1.5 rounded-tl text-[6px] font-black uppercase tracking-widest leading-none">Item</th>
+                                        <th className="p-1.5 text-[6px] font-black uppercase tracking-widest text-center leading-none">Qty</th>
+                                        <th className="p-1.5 text-[6px] font-black uppercase tracking-widest text-right leading-none">Rate</th>
+                                        <th className="p-1.5 text-[6px] font-black uppercase tracking-widest text-right leading-none">Tax</th>
+                                        <th className="p-1.5 rounded-tr text-[6px] font-black uppercase tracking-widest text-right leading-none">Total</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-black/5">
                                     {data.items.map((item, idx) => (
                                         <tr key={idx} className="hover:bg-slate-50/50">
-                                            <td className="p-3 text-xs font-bold text-black tracking-tight">{item.description}</td>
-                                            <td className="p-3 text-xs font-medium text-center">{item.quantity}</td>
-                                            <td className="p-3 text-xs font-medium text-right">{data.currencySymbol}{item.rate.toFixed(2)}</td>
-                                            <td className="p-3 text-xs font-medium text-right">{item.tax}%</td>
-                                            <td className="p-3 text-xs font-black text-right">{data.currencySymbol}{item.total.toFixed(2)}</td>
+                                            <td className="p-1 px-1.5 text-[7px] font-bold text-black tracking-tight leading-tight">{item.description}</td>
+                                            <td className="p-1 px-1.5 text-[7px] font-medium text-center leading-none">{item.quantity}</td>
+                                            <td className="p-1 px-1.5 text-[7px] font-medium text-right leading-none">{data.currencySymbol}{item.rate.toFixed(2)}</td>
+                                            <td className="p-1 px-1.5 text-[7px] font-medium text-right leading-none">{item.tax}%</td>
+                                            <td className="p-1 px-1.5 text-[7px] font-black text-right leading-none">{data.currencySymbol}{item.total.toFixed(2)}</td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
 
                             {/* Totals Section */}
-                            <div className="flex justify-end pt-4">
-                                <div className="w-64 space-y-2">
-                                    <div className="flex justify-between text-xs">
-                                        <span className="text-black/40 font-bold uppercase">Subtotal</span>
+                            <div className="flex justify-end pt-1">
+                                <div className="w-28 space-y-0.5">
+                                    <div className="flex justify-between text-[6px]">
+                                        <span className="text-black/40 font-bold uppercase">Sub</span>
                                         <span className="text-black font-bold">{data.currencySymbol}{data.subtotal.toFixed(2)}</span>
                                     </div>
-                                    <div className="flex justify-between text-xs">
+                                    <div className="flex justify-between text-[6px]">
                                         <span className="text-black/40 font-bold uppercase">Tax</span>
                                         <span className="text-black font-bold">{data.currencySymbol}{data.taxAmount.toFixed(2)}</span>
                                     </div>
                                     {data.discountAmount !== undefined && data.discountAmount > 0 && (
-                                        <div className="flex justify-between text-xs text-amber-600">
-                                            <span className="font-bold uppercase">Discount</span>
+                                        <div className="flex justify-between text-[6px] text-amber-600">
+                                            <span className="font-bold uppercase">Off</span>
                                             <span className="font-bold">-{data.currencySymbol}{data.discountAmount.toFixed(2)}</span>
                                         </div>
                                     )}
-                                    <div className="flex justify-between pt-3 border-t-2 border-[var(--primary-green)]">
-                                        <span className="text-sm font-black uppercase text-[var(--primary-green)]">Total</span>
-                                        <span className="text-xl font-black text-black leading-none">{data.currencySymbol}{data.totalAmount.toFixed(2)}</span>
+                                    <div className="flex justify-between pt-0.5 border-t border-[var(--primary-green)]">
+                                        <span className="text-[8px] font-black uppercase text-[var(--primary-green)] leading-none pt-0.5">Total</span>
+                                        <span className="text-[10px] font-black text-black leading-none pt-0.5">{data.currencySymbol}{data.totalAmount.toFixed(2)}</span>
                                     </div>
 
                                     {data.paidAmount !== undefined && data.paidAmount > 0 && (
-                                        <div className="flex justify-between text-xs pt-2">
-                                            <span className="text-emerald-600 font-bold uppercase">Amount Paid</span>
+                                        <div className="flex justify-between text-[6px] pt-0.5">
+                                            <span className="text-emerald-600 font-bold uppercase">Paid</span>
                                             <span className="text-emerald-600 font-bold">{data.currencySymbol}{data.paidAmount.toFixed(2)}</span>
                                         </div>
                                     )}
                                     {data.balanceAmount !== undefined && data.balanceAmount > 0 && (
-                                        <div className="flex justify-between text-xs">
-                                            <span className="text-rose-600 font-bold uppercase">Balance Due</span>
+                                        <div className="flex justify-between text-[6px]">
+                                            <span className="text-rose-600 font-bold uppercase">Due</span>
                                             <span className="text-rose-600 font-bold">{data.currencySymbol}{data.balanceAmount.toFixed(2)}</span>
                                         </div>
                                     )}
@@ -232,11 +232,11 @@ export default function InvoicePreviewModal({
                         </div>
 
                         {/* Footer */}
-                        <div className="bg-slate-50 p-6 border-t border-black/5 text-center mt-auto">
-                            <p className="text-[9px] font-black text-black/20 uppercase tracking-[0.2em]">
+                        <div className="bg-slate-50 p-4 border-t border-black/5 text-center mt-auto">
+                            <p className="text-[7px] font-black text-black/20 uppercase tracking-[0.2em]">
                                 Generated by LUCY-ex System • Official Transaction Document
                             </p>
-                            <p className="text-[8px] font-medium text-black/30 mt-1">
+                            <p className="text-[6px] font-medium text-black/30 mt-0.5">
                                 {data.businessAddress} • {data.businessPhone}
                             </p>
                         </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Plus, Search, Package, ShoppingBag, AlertTriangle, Boxes, Filter, SortAsc, ChevronDown } from 'lucide-react'
+import { motion } from 'framer-motion'
 import PickerModal from '@/components/ui/PickerModal'
 import clsx from 'clsx'
 import { useBusiness } from '@/context/business-context'
@@ -21,6 +22,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
     const [isSortPickerOpen, setIsSortPickerOpen] = useState(false)
     const [isFilterPickerOpen, setIsFilterPickerOpen] = useState(false)
+    const [filterLowStock, setFilterLowStock] = useState(false)
     const [loading, setLoading] = useState(!initialItems)
     const supabase = createClient()
 
@@ -60,7 +62,8 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
             const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 (item.sku && item.sku.toLowerCase().includes(searchQuery.toLowerCase()))
             const matchesCategory = filterCategory === 'all' || item.category === filterCategory
-            return matchesSearch && matchesCategory
+            const matchesLowStock = !filterLowStock || item.stock_quantity <= item.min_stock
+            return matchesSearch && matchesCategory && matchesLowStock
         })
         .sort((a, b) => {
             if (sortBy === 'name-asc') return a.name.localeCompare(b.name)
@@ -85,13 +88,17 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                         <h1 className="text-xl font-bold text-[var(--deep-contrast)] tracking-tight">Inventory</h1>
                         <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Stock Management</p>
                     </div>
-                    <Link
-                        href="/dashboard/inventory/new"
-                        className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white hover:bg-[var(--primary-green)] transition-all shadow-lg active:scale-95"
+                    <motion.button
+                        initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        whileHover={{ scale: 1.05, translateY: -2 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => router.push('/dashboard/inventory/new')}
+                        className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-2 text-[11px] font-black uppercase tracking-wider text-white hover:bg-blue-600 transition-all shadow-xl shadow-[var(--deep-contrast)]/20 active:scale-95 border border-white/10 group"
                     >
-                        <Plus className="mr-1 h-3 w-3" />
-                        New Item
-                    </Link>
+                        <Plus className="mr-1.5 h-3.5 w-3.5 transition-transform group-hover:rotate-90 duration-500" />
+                        <span>New Item</span>
+                    </motion.button>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -122,6 +129,45 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                 </div>
             </div>
 
+            {/* Quick Stats Bar */}
+            <div className="flex gap-2">
+                <div
+                    className="flex-1 glass p-2 rounded-xl border border-white/40 group hover:bg-white/60 transition-all cursor-default"
+                >
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-1.5">
+                            <div className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+                            <span className="text-[7px] font-black uppercase tracking-widest text-blue-600/60">Stock Value</span>
+                        </div>
+                        <span className="text-[7px] font-bold text-blue-600 bg-blue-50 px-1 rounded uppercase tracking-tighter">ASSETS</span>
+                    </div>
+                    <p className="text-xs font-black text-blue-600 mt-1 tabular-nums">
+                        {formatCurrency(items.reduce((sum, i) => sum + (i.stock_quantity * i.selling_price), 0))}
+                    </p>
+                </div>
+
+                <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setFilterLowStock(!filterLowStock)}
+                    className={clsx(
+                        "flex-1 glass p-2 rounded-xl border transition-all cursor-pointer group",
+                        filterLowStock ? "bg-rose-500/10 border-rose-500/50" : "border-white/40 hover:bg-white/60"
+                    )}
+                >
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-1.5">
+                            <div className="h-1.5 w-1.5 rounded-full bg-rose-500" />
+                            <span className="text-[7px] font-black uppercase tracking-widest text-rose-600/60">Low Stock</span>
+                        </div>
+                        <span className="text-[7px] font-bold text-rose-600 bg-rose-50 px-1 rounded uppercase tracking-tighter">ALERTS</span>
+                    </div>
+                    <p className="text-xs font-black text-rose-600 mt-1 tabular-nums">
+                        {items.filter(i => i.stock_quantity <= i.min_stock).length} <span className="text-[8px] opacity-40 uppercase">Low</span>
+                    </p>
+                </motion.div>
+            </div>
+
             {/* Grid - Ultra Compact Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                 {!isContextLoading && filteredItems.map((item) => (
@@ -130,90 +176,50 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                         onClick={() => {
                             router.push(`/dashboard/inventory/edit?id=${item.id}`)
                         }}
-                        className="glass p-2.5 rounded-xl group hover:bg-white/60 transition-all duration-300 border border-white/40 cursor-pointer active:scale-[0.98]"
+                        className="group relative flex flex-col glass rounded-[14px] border border-white/40 p-2 hover:bg-white/60 transition-all duration-500 cursor-pointer overflow-hidden"
                     >
-                        <div className="flex justify-between items-start mb-1.5">
-                            <div className="flex items-center gap-2">
-                                <div className={clsx(
-                                    "h-7 w-7 rounded-lg flex items-center justify-center shadow-inner transition-transform group-hover:rotate-3",
-                                    item.stock_quantity > item.min_stock ? "bg-emerald-100 text-emerald-600" :
-                                        item.stock_quantity > 0 ? "bg-amber-100 text-amber-600" :
-                                            "bg-rose-100 text-rose-600"
-                                )}>
-                                    <Package className="h-3.5 w-3.5" />
-                                </div>
-                                <div className="space-y-0.5">
-                                    <div className="flex items-center gap-2">
-                                        <h3 className="text-[10px] font-bold text-[var(--deep-contrast)] leading-tight">{item.name}</h3>
-                                        {item.category && (
-                                            <span className="text-[6px] font-bold uppercase tracking-wider bg-[var(--primary-green)]/10 text-[var(--primary-green)] px-1 py-0.5 rounded border border-[var(--primary-green)]/10">
-                                                {item.category}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <div className="flex items-center gap-1 opacity-40">
-                                        <Boxes className="h-2 w-2" />
-                                        <span className="text-[8px] font-bold uppercase tracking-wider">{item.unit || 'Units'}</span>
-                                        {item.sku && (
-                                            <>
-                                                <span className="mx-1">•</span>
-                                                <span className="text-[6px] font-bold tracking-wider bg-black/5 px-1 rounded">#{item.sku}</span>
-                                            </>
-                                        )}
-                                    </div>
+                        {/* Status Stripe */}
+                        <div className={clsx(
+                            "absolute top-0 left-0 w-1.5 h-full transition-all duration-500",
+                            item.stock_quantity > item.min_stock ? "bg-emerald-500" :
+                                item.stock_quantity > 0 ? "bg-amber-500" : "bg-rose-500"
+                        )} />
+
+                        <div className="flex justify-between items-center gap-2">
+                            <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                <Package className={clsx(
+                                    "h-2.5 w-2.5 shrink-0",
+                                    item.stock_quantity > item.min_stock ? "text-emerald-600" :
+                                        item.stock_quantity > 0 ? "text-amber-600" : "text-rose-600"
+                                )} />
+                                <div className="min-w-0">
+                                    <h3 className="text-[11px] font-black text-[var(--deep-contrast)] truncate">{item.name}</h3>
+                                    <span className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider">{item.category || 'Product'}</span>
                                 </div>
                             </div>
-                            <span className={clsx(
-                                "text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md border",
-                                item.stock_quantity > item.min_stock ? "bg-emerald-100/50 text-emerald-700 border-emerald-200" :
-                                    item.stock_quantity > 0 ? "bg-amber-100/50 text-amber-700 border-amber-200" :
-                                        "bg-rose-100/50 text-red-700 border-rose-200"
-                            )}>
-                                {item.stock_quantity.toLocaleString()} <span className="opacity-40">{item.unit}</span>
-                            </span>
+                            <div className="flex items-center gap-2 shrink-0">
+                                <div className={clsx(
+                                    "text-[10px] font-black uppercase px-2 py-0.5 rounded-full border shadow-sm",
+                                    item.stock_quantity > item.min_stock ? "bg-emerald-50/50 text-emerald-700 border-emerald-200" :
+                                        item.stock_quantity > 0 ? "bg-amber-50/50 text-amber-700 border-amber-200" :
+                                            "bg-rose-50/50 text-rose-700 border-rose-200"
+                                )}>
+                                    {item.stock_quantity.toLocaleString()} <span className="opacity-40 text-[8px]">{item.unit}</span>
+                                </div>
+                            </div>
                         </div>
 
-                        {item.description && (
-                            <p className="text-[9px] font-medium text-[var(--foreground)]/50 line-clamp-2 mt-1 px-1 border-l border-[var(--primary-green)]/10">
-                                {item.description}
+                        <div className="mt-2 pt-2 border-t border-[var(--primary-green)]/10 flex items-center justify-between">
+                            <p className="text-[14px] font-black text-[var(--deep-contrast)] tabular-nums">
+                                {formatCurrency(item.selling_price)}
                             </p>
-                        )}
-
-                        <div className="mt-3 space-y-1.5">
-                            <div className="flex justify-between items-center text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/30">
-                                <span>Stock Level</span>
-                                <span className={clsx(
-                                    item.stock_quantity <= item.min_stock ? "text-amber-600" : "text-[var(--foreground)]/30"
-                                )}>
-                                    {Math.round((item.stock_quantity / (item.min_stock * 3 || 100)) * 100)}%
-                                </span>
-                            </div>
-                            <div className="h-1 w-full bg-white/30 rounded-full overflow-hidden border border-white/20">
-                                <div
-                                    className={clsx(
-                                        "h-full transition-all duration-1000 ease-out rounded-full",
-                                        item.stock_quantity > item.min_stock ? "bg-emerald-500" :
-                                            item.stock_quantity > 0 ? "bg-amber-500 animate-pulse" :
-                                                "bg-rose-500"
-                                    )}
-                                    style={{ width: `${Math.min(100, (item.stock_quantity / (item.min_stock * 3 || 100)) * 100)}%` }}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="flex justify-between items-end mt-2 pt-2 border-t border-[var(--primary-green)]/5">
-                            <div>
-                                <p className="text-[8px] font-bold text-[var(--foreground)]/30 uppercase tracking-wider leading-none mb-1">Selling Rate</p>
-                                <p className="text-sm font-bold text-[var(--deep-contrast)] tracking-tight">{formatCurrency(item.selling_price)}</p>
-                            </div>
                             {item.stock_quantity <= item.min_stock && (
-                                <div className={clsx(
-                                    "flex items-center gap-1.5 px-2 py-0.5 rounded-lg border text-[8px] font-bold uppercase tracking-wider",
-                                    item.stock_quantity > 0 ? "bg-amber-100/50 text-amber-600 border-amber-200 animate-pulse" : "bg-rose-100/50 text-rose-600 border-rose-200"
+                                <span className={clsx(
+                                    "text-[7px] font-black uppercase px-1 rounded border",
+                                    item.stock_quantity > 0 ? "text-amber-600 border-amber-200 bg-amber-50" : "text-rose-600 border-rose-200 bg-rose-50"
                                 )}>
-                                    <AlertTriangle className="h-3 w-3" />
-                                    <span>{item.stock_quantity > 0 ? 'Low Stock' : 'Out of Stock'}</span>
-                                </div>
+                                    {item.stock_quantity > 0 ? 'LOW' : 'EMPTY'}
+                                </span>
                             )}
                         </div>
                     </div>

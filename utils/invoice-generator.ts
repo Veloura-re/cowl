@@ -60,18 +60,18 @@ export function generateInvoiceHTML(data: InvoiceData): string {
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #f1f5f9;
             color: #1e293b;
-            line-height: 1.5;
+            line-height: 1.4;
         }
         .invoice-page {
-            width: 210mm;
-            min-height: 297mm;
+            width: 126mm;
+            min-height: 178mm;
             margin: 0 auto;
             background: white;
-            padding: 20mm;
-            box-shadow: 0 0 10mm rgba(0,0,0,0.1);
+            padding: 6mm;
+            box-shadow: 0 0 5mm rgba(0,0,0,0.1);
             display: flex;
             flex-column;
             flex-direction: column;
@@ -95,29 +95,29 @@ export function generateInvoiceHTML(data: InvoiceData): string {
         }
         .header h1 {
             color: #10b981;
-            font-size: 32px;
+            font-size: 10px;
             font-weight: 900;
-            letter-spacing: -1px;
+            letter-spacing: -0.2px;
         }
         .header .biz-name {
-            font-size: 14px;
+            font-size: 4px;
             font-weight: 700;
             color: #64748b;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.2px;
         }
         .header .doc-info {
             text-align: right;
         }
         .header .doc-info p.label {
-            font-size: 10px;
+            font-size: 3.5px;
             font-weight: 900;
             color: #94a3b8;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 0.4px;
         }
         .header .doc-info p.val {
-            font-size: 24px;
+            font-size: 7px;
             font-weight: 900;
             color: #0f172a;
         }
@@ -125,52 +125,52 @@ export function generateInvoiceHTML(data: InvoiceData): string {
         .parties {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            margin-bottom: 40px;
+            gap: 12px;
+            margin-bottom: 12px;
         }
         .party h3 {
-            font-size: 10px;
+            font-size: 4px;
             font-weight: 900;
             color: #94a3b8;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            border-bottom: 1px solid #f1f5f9;
-            padding-bottom: 5px;
-            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+            border-bottom: 0.5px solid #f1f5f9;
+            padding-bottom: 2px;
+            margin-bottom: 3px;
         }
         .party .name {
-            font-size: 16px;
+            font-size: 5px;
             font-weight: 800;
             color: #0f172a;
-            margin-bottom: 4px;
+            margin-bottom: 1px;
             text-transform: uppercase;
         }
         .party .detail {
-            font-size: 12px;
+            font-size: 4.5px;
             color: #64748b;
-            line-height: 1.4;
+            line-height: 1.2;
         }
 
         .meta-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
+            gap: 4px;
             background: #f8fafc;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            border: 1px solid #e2e8f0;
+            padding: 4px;
+            border-radius: 3px;
+            margin-bottom: 8px;
+            border: 0.5px solid #e2e8f0;
         }
         .meta-item { text-align: center; }
         .meta-item p.label {
-            font-size: 9px;
+            font-size: 3.5px;
             font-weight: 900;
             color: #94a3b8;
             text-transform: uppercase;
-            margin-bottom: 3px;
+            margin-bottom: 1px;
         }
         .meta-item p.val {
-            font-size: 12px;
+            font-size: 4.5px;
             font-weight: 700;
             color: #0f172a;
         }
@@ -178,24 +178,24 @@ export function generateInvoiceHTML(data: InvoiceData): string {
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 30px;
+            margin-bottom: 18px;
         }
         th {
             background: #10b981;
             color: white;
-            padding: 12px;
-            font-size: 11px;
+            padding: 6px;
+            font-size: 6px;
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.4px;
             text-align: left;
         }
-        th:first-child { border-radius: 8px 0 0 0; }
-        th:last-child { border-radius: 0 8px 0 0; }
+        th:first-child { border-radius: 4px 0 0 0; }
+        th:last-child { border-radius: 0 4px 0 0; }
         td {
-            padding: 12px;
-            font-size: 12px;
-            border-bottom: 1px solid #f1f5f9;
+            padding: 6px;
+            font-size: 7px;
+            border-bottom: 0.5px solid #f1f5f9;
             color: #334155;
         }
         td.bold { font-weight: 700; }
@@ -205,22 +205,22 @@ export function generateInvoiceHTML(data: InvoiceData): string {
         .summary-container {
             display: flex;
             justify-content: flex-end;
-            margin-bottom: 40px;
+            margin-bottom: 12px;
         }
         .summary-box {
-            width: 250px;
+            width: 80px;
         }
         .summary-row {
             display: flex;
             justify-content: space-between;
-            padding: 6px 0;
-            font-size: 13px;
+            padding: 2px 0;
+            font-size: 5px;
         }
         .summary-row.total {
-            border-top: 2px solid #10b981;
-            margin-top: 10px;
-            padding-top: 12px;
-            font-size: 18px;
+            border-top: 1px solid #10b981;
+            margin-top: 3px;
+            padding-top: 4px;
+            font-size: 7px;
             font-weight: 900;
             color: #0f172a;
         }
@@ -229,32 +229,32 @@ export function generateInvoiceHTML(data: InvoiceData): string {
 
         .notes {
             background: #f8fafc;
-            padding: 20px;
-            border-radius: 12px;
-            border-left: 4px solid #10b981;
-            margin-top: 20px;
+            padding: 6px;
+            border-radius: 4px;
+            border-left: 2px solid #10b981;
+            margin-top: 6px;
         }
         .notes h4 {
-            font-size: 10px;
+            font-size: 4px;
             font-weight: 900;
             color: #94a3b8;
             text-transform: uppercase;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
         }
         .notes p {
-            font-size: 12px;
+            font-size: 5px;
             color: #475569;
-            line-height: 1.5;
+            line-height: 1.2;
         }
 
         .footer {
             margin-top: auto;
-            padding-top: 30px;
-            border-top: 1px solid #f1f5f9;
+            padding-top: 9px;
+            border-top: 0.5px solid #f1f5f9;
             text-align: center;
             color: #94a3b8;
-            font-size: 10px;
-            letter-spacing: 1px;
+            font-size: 4px;
+            letter-spacing: 0.3px;
         }
         
         .signature-section {
@@ -467,7 +467,7 @@ export function downloadInvoice(data: InvoiceData) {
     const doc = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
-        format: 'a4'
+        format: [126, 178]
     })
 
     const isSale = data.type === 'SALE'
@@ -480,72 +480,72 @@ export function downloadInvoice(data: InvoiceData) {
 
     // Header
     doc.setFont('helvetica', 'bold')
-    doc.setFontSize(28)
+    doc.setFontSize(8)
     doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
-    doc.text(title, 20, 25)
+    doc.text(title, 8, 10)
 
-    doc.setFontSize(10)
+    doc.setFontSize(3.5)
     doc.setTextColor(grayColor[0], grayColor[1], grayColor[2])
-    doc.text(data.businessName.toUpperCase(), 20, 32)
+    doc.text(data.businessName.toUpperCase(), 8, 13)
 
     // Document No
-    doc.setFontSize(8)
-    doc.text('DOCUMENT NO.', 190, 20, { align: 'right' })
-    doc.setFontSize(18)
+    doc.setFontSize(3)
+    doc.text('NO.', 118, 9, { align: 'right' })
+    doc.setFontSize(5)
     doc.setTextColor(darkColor[0], darkColor[1], darkColor[2])
-    doc.text(data.invoiceNumber, 190, 28, { align: 'right' })
+    doc.text(data.invoiceNumber, 118, 13, { align: 'right' })
 
     // Divider
     doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2])
-    doc.setLineWidth(1)
-    doc.line(20, 38, 190, 38)
+    doc.setLineWidth(0.2)
+    doc.line(8, 16, 118, 16)
 
     // Parties
-    let y = 50
+    let y = 22
 
     // FROM
-    doc.setFontSize(8)
+    doc.setFontSize(2.5)
     doc.setTextColor(grayColor[0], grayColor[1], grayColor[2])
-    doc.text('FROM', 20, y)
-    doc.text(isSale ? 'BILL TO' : 'SUPPLIER', 110, y)
+    doc.text('FROM', 8, y)
+    doc.text(isSale ? 'BILL TO' : 'SUPPLIER', 66, y)
 
-    y += 5
-    doc.setFontSize(12)
+    y += 2
+    doc.setFontSize(4.5)
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(darkColor[0], darkColor[1], darkColor[2])
-    doc.text(data.businessName, 20, y)
-    doc.text(data.partyName, 110, y)
+    doc.text(data.businessName, 8, y)
+    doc.text(data.partyName, 66, y)
 
-    y += 5
-    doc.setFontSize(9)
+    y += 2
+    doc.setFontSize(3.5)
     doc.setFont('helvetica', 'normal')
     doc.setTextColor(grayColor[0], grayColor[1], grayColor[2])
-    doc.text(data.businessAddress || '', 20, y, { maxWidth: 70 })
-    doc.text(data.partyAddress || '', 110, y, { maxWidth: 70 })
+    doc.text(data.businessAddress || '', 8, y, { maxWidth: 50 })
+    doc.text(data.partyAddress || '', 66, y, { maxWidth: 50 })
 
-    y += 10
-    doc.text(data.businessPhone || '', 20, y)
-    doc.text(data.partyPhone || '', 110, y)
+    y += 4
+    doc.text(data.businessPhone || '', 8, y)
+    doc.text(data.partyPhone || '', 66, y)
 
     // Meta Grid
-    y += 15
+    y += 7
     doc.setFillColor(248, 250, 252)
-    doc.roundedRect(20, y, 170, 15, 3, 3, 'F')
+    doc.roundedRect(8, y, 110, 7, 0.8, 0.8, 'F')
 
-    doc.setFontSize(8)
+    doc.setFontSize(2.5)
     doc.setFont('helvetica', 'bold')
-    doc.text('DATE', 35, y + 6, { align: 'center' })
-    doc.text('DUE DATE', 105, y + 6, { align: 'center' })
-    doc.text('STATUS', 175, y + 6, { align: 'center' })
+    doc.text('DATE', 26, y + 2.5, { align: 'center' })
+    doc.text('DUE DATE', 63, y + 2.5, { align: 'center' })
+    doc.text('STATUS', 100, y + 2.5, { align: 'center' })
 
-    doc.setFontSize(10)
+    doc.setFontSize(3.5)
     doc.setTextColor(darkColor[0], darkColor[1], darkColor[2])
-    doc.text(new Date(data.date).toLocaleDateString(), 35, y + 11, { align: 'center' })
-    doc.text(data.dueDate ? new Date(data.dueDate).toLocaleDateString() : 'N/A', 105, y + 11, { align: 'center' })
-    doc.text(data.status, 175, y + 11, { align: 'center' })
+    doc.text(new Date(data.date).toLocaleDateString(), 26, y + 5.5, { align: 'center' })
+    doc.text(data.dueDate ? new Date(data.dueDate).toLocaleDateString() : 'N/A', 63, y + 5.5, { align: 'center' })
+    doc.text(data.status, 100, y + 5.5, { align: 'center' })
 
     // Table
-    y += 25
+    y += 10
     const tableBody = data.items.map(item => [
         item.description,
         item.quantity.toString(),
@@ -556,13 +556,14 @@ export function downloadInvoice(data: InvoiceData) {
 
         ; (doc as any).autoTable({
             startY: y,
-            head: [['Description', 'Qty', 'Rate', 'Tax', 'Amount']],
+            head: [['Item', 'Qty', 'Rate', 'Tax', 'Total']],
             body: tableBody,
             theme: 'grid',
+            margin: { left: 8, right: 8 },
             headStyles: {
                 fillColor: [16, 185, 129],
                 textColor: 255,
-                fontSize: 9,
+                fontSize: 3.5,
                 fontStyle: 'bold',
                 halign: 'left'
             },
@@ -573,56 +574,56 @@ export function downloadInvoice(data: InvoiceData) {
                 4: { halign: 'right', fontStyle: 'bold' }
             },
             styles: {
-                fontSize: 9,
-                cellPadding: 5
+                fontSize: 3.5,
+                cellPadding: 1
             }
         })
 
     // Totals
-    const finalY = (doc as any).lastAutoTable.finalY + 10
-    doc.setFontSize(10)
+    const finalY = (doc as any).lastAutoTable.finalY + 3
+    doc.setFontSize(3.5)
     doc.setTextColor(grayColor[0], grayColor[1], grayColor[2])
 
     let ty = finalY
-    doc.text('Subtotal:', 140, ty)
+    doc.text('Subtotal:', 88, ty)
     doc.setTextColor(darkColor[0], darkColor[1], darkColor[2])
-    doc.text(`${data.currencySymbol}${data.subtotal.toFixed(2)}`, 190, ty, { align: 'right' })
+    doc.text(`${data.currencySymbol}${data.subtotal.toFixed(2)}`, 118, ty, { align: 'right' })
 
-    ty += 7
+    ty += 2.5
     doc.setTextColor(grayColor[0], grayColor[1], grayColor[2])
-    doc.text('Taxation:', 140, ty)
+    doc.text('Tax:', 88, ty)
     doc.setTextColor(darkColor[0], darkColor[1], darkColor[2])
-    doc.text(`${data.currencySymbol}${data.taxAmount.toFixed(2)}`, 190, ty, { align: 'right' })
+    doc.text(`${data.currencySymbol}${data.taxAmount.toFixed(2)}`, 118, ty, { align: 'right' })
 
     if (data.discountAmount && data.discountAmount > 0) {
-        ty += 7
-        doc.setTextColor(245, 158, 11) // Amber
-        doc.text('Discount:', 140, ty)
-        doc.text(`-${data.currencySymbol}${data.discountAmount.toFixed(2)}`, 190, ty, { align: 'right' })
+        ty += 2.5
+        doc.setTextColor(245, 158, 11)
+        doc.text('Off:', 88, ty)
+        doc.text(`-${data.currencySymbol}${data.discountAmount.toFixed(2)}`, 118, ty, { align: 'right' })
     }
 
-    ty += 10
+    ty += 4
     doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2])
-    doc.line(140, ty - 5, 190, ty - 5)
-    doc.setFontSize(14)
+    doc.line(88, ty - 2, 118, ty - 2)
+    doc.setFontSize(5)
     doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
-    doc.text('TOTAL:', 140, ty)
+    doc.text('TOTAL:', 88, ty)
     doc.setTextColor(darkColor[0], darkColor[1], darkColor[2])
-    doc.text(`${data.currencySymbol}${data.totalAmount.toFixed(2)}`, 190, ty, { align: 'right' })
+    doc.text(`${data.currencySymbol}${data.totalAmount.toFixed(2)}`, 118, ty, { align: 'right' })
 
     // Signature Area
     if (data.signature) {
-        doc.addImage(data.signature, 'PNG', 140, ty + 10, 40, 20)
+        doc.addImage(data.signature, 'PNG', 88, ty + 3, 15, 8)
     }
-    doc.setFontSize(8)
+    doc.setFontSize(2.5)
     doc.setTextColor(grayColor[0], grayColor[1], grayColor[2])
-    doc.line(140, ty + 30, 185, ty + 30)
-    doc.text('AUTHORIZED SIGNATURE', 162.5, ty + 34, { align: 'center' })
+    doc.line(88, ty + 12, 118, ty + 12)
+    doc.text('AUTH SIGNATURE', 103, ty + 14, { align: 'center' })
 
     // Footer
-    doc.setFontSize(8)
+    doc.setFontSize(2.5)
     doc.setTextColor(grayColor[0], grayColor[1], grayColor[2])
-    doc.text(`GENERATED BY LUCY-EX CLOUD SYSTEM • ${new Date().toLocaleString()}`, 105, 285, { align: 'center' })
+    doc.text(`GENERATED BY LUCY-EX CLOUD SYSTEM • ${new Date().toLocaleString()}`, 63, 174, { align: 'center' })
 
     doc.save(`${data.invoiceNumber}.pdf`)
 }

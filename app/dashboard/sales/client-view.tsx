@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Search, Plus, Calendar, FileText, User, Filter, ArrowUpDown, Trash2, Edit2, AlertTriangle, Printer } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/context/business-context'
@@ -129,21 +130,22 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
     }
 
     // Invoices are already filtered by business_id at the database level
-    let filteredInvoices = invoices.filter((inv) =>
-        (inv.invoice_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (inv.party?.name && inv.party.name.toLowerCase().includes(searchQuery.toLowerCase()))
-        ) && (statusFilter === 'ALL' || inv.status === statusFilter)
-    )
+    const filteredAndSortedInvoices = React.useMemo(() => {
+        let result = invoices.filter((inv) =>
+            (inv.invoice_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                (inv.party?.name && inv.party.name.toLowerCase().includes(searchQuery.toLowerCase()))
+            ) && (statusFilter === 'ALL' || inv.status === statusFilter)
+        )
 
-    // Sort
-    filteredInvoices = [...filteredInvoices].sort((a, b) => {
         const multiplier = sortOrder === 'asc' ? 1 : -1
-        if (sortBy === 'date') {
-            return multiplier * (new Date(a.date).getTime() - new Date(b.date).getTime())
-        } else {
-            return multiplier * (a.total_amount - b.total_amount)
-        }
-    })
+        return [...result].sort((a, b) => {
+            if (sortBy === 'date') {
+                return multiplier * (new Date(a.date).getTime() - new Date(b.date).getTime())
+            } else {
+                return multiplier * (a.total_amount - b.total_amount)
+            }
+        })
+    }, [invoices, searchQuery, statusFilter, sortBy, sortOrder])
 
     return (
         <div className="space-y-4 animate-in fade-in duration-500 pb-20">
@@ -155,13 +157,17 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                         <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Invoice Log</p>
 
                     </div>
-                    <Link
-                        href="/dashboard/sales/new"
-                        className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white hover:bg-[var(--primary-green)] transition-all shadow-lg active:scale-95"
+                    <motion.button
+                        initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        whileHover={{ scale: 1.05, translateY: -2 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => router.push('/dashboard/sales/new')}
+                        className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-2 text-[11px] font-black uppercase tracking-wider text-white hover:bg-[var(--primary-green)] transition-all shadow-xl shadow-[var(--deep-contrast)]/20 active:scale-95 border border-white/10 group"
                     >
-                        <Plus className="mr-1 h-3 w-3" />
-                        New Sale
-                    </Link>
+                        <Plus className="mr-1.5 h-3.5 w-3.5 transition-transform group-hover:rotate-90 duration-500" />
+                        <span>New Sale</span>
+                    </motion.button>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -190,6 +196,72 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                         <span>Filter</span>
                     </button>
                 </div>
+            </div>
+
+            {/* Quick Stats Bar */}
+            <div className="flex gap-2">
+                <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setStatusFilter(statusFilter === 'PAID' ? 'ALL' : 'PAID')}
+                    className={clsx(
+                        "flex-1 glass p-2 rounded-xl border transition-all cursor-pointer group",
+                        statusFilter === 'PAID' ? "bg-emerald-500/10 border-emerald-500/50" : "border-white/40 hover:bg-white/60"
+                    )}
+                >
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-1.5">
+                            <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                            <span className="text-[7px] font-black uppercase tracking-widest text-emerald-600/60">Collected</span>
+                        </div>
+                        <span className="text-[7px] font-bold text-emerald-600 bg-emerald-50 px-1 rounded uppercase tracking-tighter">IN</span>
+                    </div>
+                    <p className="text-xs font-black text-emerald-600 mt-1 tabular-nums">
+                        {formatCurrency(invoices.filter(i => i.status === 'PAID').reduce((sum, i) => sum + i.total_amount, 0))}
+                    </p>
+                </motion.div>
+
+                <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setStatusFilter(statusFilter === 'PENDING' ? 'ALL' : 'PENDING')}
+                    className={clsx(
+                        "flex-1 glass p-2 rounded-xl border transition-all cursor-pointer group",
+                        statusFilter === 'PENDING' ? "bg-amber-500/10 border-amber-500/50" : "border-white/40 hover:bg-white/60"
+                    )}
+                >
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-1.5">
+                            <div className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                            <span className="text-[7px] font-black uppercase tracking-widest text-amber-600/60">Pending</span>
+                        </div>
+                        <span className="text-[7px] font-bold text-amber-600 bg-amber-50 px-1 rounded uppercase tracking-tighter">WAIT</span>
+                    </div>
+                    <p className="text-xs font-black text-amber-600 mt-1 tabular-nums">
+                        {formatCurrency(invoices.filter(i => i.status === 'PENDING').reduce((sum, i) => sum + i.total_amount, 0))}
+                    </p>
+                </motion.div>
+
+                <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setStatusFilter(statusFilter === 'UNPAID' ? 'ALL' : 'UNPAID')}
+                    className={clsx(
+                        "flex-1 glass p-2 rounded-xl border transition-all cursor-pointer group",
+                        statusFilter === 'UNPAID' ? "bg-rose-500/10 border-rose-500/50" : "border-white/40 hover:bg-white/60"
+                    )}
+                >
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-1.5">
+                            <div className="h-1.5 w-1.5 rounded-full bg-rose-500" />
+                            <span className="text-[7px] font-black uppercase tracking-widest text-rose-600/60">Unpaid</span>
+                        </div>
+                        <span className="text-[7px] font-bold text-rose-600 bg-rose-50 px-1 rounded uppercase tracking-tighter">DUE</span>
+                    </div>
+                    <p className="text-xs font-black text-rose-600 mt-1 tabular-nums">
+                        {formatCurrency(invoices.filter(i => i.status === 'UNPAID').reduce((sum, i) => sum + i.total_amount, 0))}
+                    </p>
+                </motion.div>
             </div>
 
             <PickerModal
@@ -232,56 +304,57 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
 
             {/* Grid - Ultra Compact Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                {filteredInvoices.map((invoice) => (
+                {filteredAndSortedInvoices.map((invoice) => (
                     <div
                         key={invoice.id}
                         onClick={() => handleEdit(invoice)}
-                        className="glass p-2.5 rounded-xl group hover:bg-white/60 transition-all duration-300 border border-white/40 cursor-pointer active:scale-[0.98]"
+                        className="group relative flex flex-col glass rounded-[14px] border border-white/40 p-2 hover:bg-white/60 transition-all duration-500 cursor-pointer overflow-hidden"
                     >
-                        <div className="flex justify-between items-start mb-1.5">
-                            <div className="flex items-center gap-2">
-                                <div className="h-7 w-7 rounded-lg bg-blue-100/50 text-blue-600 flex items-center justify-center shadow-inner transition-transform group-hover:rotate-3">
-                                    <FileText className="h-3.5 w-3.5" />
-                                </div>
-                                <div className="space-y-0.5">
-                                    <h3 className="text-[10px] font-bold text-[var(--deep-contrast)] leading-none">{invoice.invoice_number}</h3>
-                                    <div className="flex items-center gap-1 opacity-40">
-                                        <Calendar className="h-2 w-2" />
-                                        <span className="text-[8px] font-bold uppercase tracking-wider">{new Date(invoice.date).toLocaleDateString()}</span>
-                                    </div>
+                        {/* Status Stripe */}
+                        <div className={clsx(
+                            "absolute top-0 left-0 w-1.5 h-full",
+                            invoice.status === 'PAID' ? "bg-emerald-500" :
+                                invoice.status === 'PENDING' ? "bg-amber-500" : "bg-rose-500"
+                        )} />
+
+                        <div className="flex justify-between items-center gap-2">
+                            <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                <User className="h-2.5 w-2.5 text-[var(--primary-green)]/40 shrink-0" />
+                                <div className="min-w-0">
+                                    <h3 className="text-[11px] font-black text-[var(--deep-contrast)] truncate">{invoice.party?.name || 'Walk-in'}</h3>
+                                    <span className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider">{new Date(invoice.date).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}</span>
                                 </div>
                             </div>
-                            <div className="flex flex-col items-end gap-1">
-                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button
-                                        onClick={(e) => handlePrintInvoice(e, invoice)}
-                                        className="p-1.5 rounded-lg bg-white/50 border border-white/20 text-[var(--foreground)]/40 hover:text-[var(--primary-green)] hover:bg-white transition-all shadow-sm"
-                                        title="Print Invoice"
-                                    >
-                                        <Printer className="h-3 w-3" />
-                                    </button>
-                                </div>
+                            <div className="flex items-center gap-2 shrink-0">
                                 <span className={clsx(
-                                    "text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md border",
+                                    "text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full border shadow-sm",
                                     invoice.status === 'PAID' ? "bg-emerald-100/50 text-emerald-700 border-emerald-200" :
                                         invoice.status === 'PENDING' ? "bg-amber-100/50 text-amber-700 border-amber-200" :
-                                            "bg-slate-100/50 text-slate-700 border-slate-200"
+                                            "bg-rose-100/50 text-rose-700 border-rose-200"
                                 )}>
                                     {invoice.status}
                                 </span>
+                                <button
+                                    onClick={(e) => handlePrintInvoice(e, invoice)}
+                                    className="p-1 rounded bg-white border border-slate-100 text-[var(--foreground)]/30 hover:text-[var(--primary-green)] transition-all active:scale-95"
+                                >
+                                    <Printer className="h-2.5 w-2.5" />
+                                </button>
                             </div>
                         </div>
 
-                        <div className="flex justify-between items-end mt-1.5 pt-1.5 border-t border-[var(--primary-green)]/5">
-                            <div className="flex items-center gap-1.5">
-                                <div className="h-4 w-4 rounded-full bg-[var(--primary-green)]/10 flex items-center justify-center text-[var(--primary-green)] shadow-inner">
-                                    <User className="h-2 w-2" />
-                                </div>
-                                <span className="text-[9px] font-bold text-[var(--foreground)]/60 truncate max-w-[100px]">{invoice.party?.name || 'Walk-in Customer'}</span>
+                        <div className="mt-2 pt-2 border-t border-[var(--primary-green)]/10 flex items-center justify-between">
+                            <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                <FileText className="h-2.5 w-2.5 text-[var(--deep-contrast)]/40 shrink-0" />
+                                <span className="text-[10px] font-bold text-[var(--deep-contrast)]/60 truncate uppercase tracking-tighter">{invoice.invoice_number}</span>
                             </div>
-                            <div className="text-right">
-                                <p className="text-[7px] font-bold uppercase tracking-wider text-[var(--foreground)]/30 mb-0.5">Grand Total</p>
-                                <p className="text-xs font-bold text-[var(--deep-contrast)] tracking-tight">{formatCurrency(invoice.total_amount)}</p>
+                            <div className="flex items-center gap-2 shrink-0">
+                                <p className={clsx(
+                                    "text-[13px] font-black tracking-tighter tabular-nums",
+                                    invoice.balance_amount > 0 ? "text-rose-600" : "text-emerald-600"
+                                )}>
+                                    {formatCurrency(invoice.total_amount)}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -299,7 +372,7 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                     <p className="text-[10px] font-bold uppercase tracking-wider">No active business</p>
                     <p className="text-[8px] font-bold uppercase tracking-widest mt-1 opacity-50">Please select a business from the sidebar</p>
                 </div>
-            ) : filteredInvoices.length === 0 ? (
+            ) : filteredAndSortedInvoices.length === 0 ? (
                 <div className="text-center py-24 opacity-30 animate-in fade-in duration-700">
                     <FileText className="h-10 w-10 mx-auto mb-3 opacity-20" />
                     <p className="text-[10px] font-bold uppercase tracking-wider">No sales recorded today</p>

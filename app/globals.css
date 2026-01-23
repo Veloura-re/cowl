@@ -9,8 +9,8 @@
   --color-glass-bg: var(--glass-bg);
 
   --font-sans: var(--font-inter);
-  --font-serif: var(--font-calibri);
-  --font-display: var(--font-poppins);
+  --font-serif: var(--font-inter);
+  --font-display: var(--font-inter);
 }
 
 :root {
@@ -30,16 +30,14 @@
   --glass-bg: rgba(255, 255, 255, 0.7);
 
   /* Fonts */
-  --font-inter: "Inter", sans-serif;
-  --font-calibri: "Calibri", "Inter", sans-serif;
-  /* Poppins variable is injected by Next.js in layout.tsx */
+  --font-inter: "Inter", system-ui, sans-serif;
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-poppins);
-  font-weight: 500;
+  font-family: var(--font-inter);
+  font-weight: 450;
   /* Medium default */
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
@@ -57,7 +55,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-poppins);
+  font-family: var(--font-inter);
   color: var(--deep-contrast);
   font-weight: 600;
   /* Semibold, not 'fat' */

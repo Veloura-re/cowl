@@ -130,35 +130,44 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                     <p className="text-[10px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-none">Financial Intelligence & Ledger</p>
                 </div>
                 <div className="flex gap-2">
-                    <button
+                    <motion.button
+                        initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        whileHover={{ scale: 1.05, translateY: -2 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={() => router.push('/dashboard/finance/new?type=RECEIPT')}
-                        className="group flex-1 md:flex-none flex items-center justify-center gap-2 rounded-2xl bg-emerald-600/90 hover:bg-emerald-600 px-6 py-2.5 text-[10px] font-bold uppercase tracking-wider text-white transition-all shadow-xl shadow-emerald-500/20 active:scale-95 border border-emerald-400/20"
+                        className="group flex-1 md:flex-none flex items-center justify-center gap-2 rounded-2xl bg-emerald-600/90 hover:bg-emerald-600 px-6 py-2.5 text-[11px] font-black uppercase tracking-wider text-white transition-all shadow-xl shadow-emerald-500/20 active:scale-95 border border-emerald-400/20"
                     >
-                        <Plus className="h-3.5 w-3.5 transition-transform group-hover:rotate-90" />
+                        <Plus className="h-3.5 w-3.5 transition-transform group-hover:rotate-90 duration-500" />
                         Got Payment
-                    </button>
-                    <button
+                    </motion.button>
+                    <motion.button
+                        initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                        whileHover={{ scale: 1.05, translateY: -2 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={() => router.push('/dashboard/finance/new?type=PAYMENT')}
-                        className="group flex-1 md:flex-none flex items-center justify-center gap-2 rounded-2xl bg-rose-600/90 hover:bg-rose-600 px-6 py-2.5 text-[10px] font-bold uppercase tracking-wider text-white transition-all shadow-xl shadow-rose-500/20 active:scale-95 border border-rose-400/20"
+                        className="group flex-1 md:flex-none flex items-center justify-center gap-2 rounded-2xl bg-rose-600/90 hover:bg-rose-600 px-6 py-2.5 text-[11px] font-black uppercase tracking-wider text-white transition-all shadow-xl shadow-rose-500/20 active:scale-95 border border-rose-400/20"
                     >
-                        <Plus className="h-3.5 w-3.5 transition-transform group-hover:rotate-90" />
+                        <Plus className="h-3.5 w-3.5 transition-transform group-hover:rotate-90 duration-500" />
                         Gave Payment
-                    </button>
+                    </motion.button>
                 </div>
             </div>
 
             {/* Main Stats - 2 Columns (Side by Side) */}
             <div className="grid grid-cols-2 gap-3">
                 {/* Cash Card */}
-                <div className="glass p-4 rounded-3xl border border-white/40 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <Wallet className="h-12 w-12 text-[var(--primary-green)]" />
+                <div className="glass p-2.5 rounded-2xl border border-white/40 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <Wallet className="h-8 w-8 text-[var(--primary-green)]" />
                     </div>
                     <div className="relative z-10">
-                        <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40">Cash in Hand</span>
-                        <h2 className="text-xl font-black text-[var(--deep-contrast)] mt-1">{formatCurrency(cashBalance)}</h2>
-                        <div className="flex items-center gap-2 mt-3">
-                            <div className="h-1 w-full bg-black/5 rounded-full overflow-hidden">
+                        <span className="text-[7px] font-bold uppercase tracking-wider text-[var(--foreground)]/40">Cash</span>
+                        <h2 className="text-sm font-black text-[var(--deep-contrast)] mt-0.5">{formatCurrency(cashBalance)}</h2>
+                        <div className="flex items-center gap-1.5 mt-2">
+                            <div className="h-0.5 w-full bg-black/5 rounded-full overflow-hidden">
                                 <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${Math.min(100, (cashIn / (cashIn + cashOut || 1)) * 100)}%` }} />
                             </div>
                         </div>
@@ -166,32 +175,32 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                 </div>
 
                 {/* Bank Card */}
-                <div className="glass p-4 rounded-3xl border border-white/40 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <TrendingUp className="h-12 w-12 text-blue-500" />
+                <div className="glass p-2.5 rounded-2xl border border-white/40 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <TrendingUp className="h-8 w-8 text-blue-500" />
                     </div>
                     <div className="relative z-10">
-                        <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40">Bank Balance</span>
-                        <h2 className="text-xl font-black text-[var(--deep-contrast)] mt-1">{formatCurrency(bankBalance)}</h2>
-                        <div className="flex items-center gap-2 mt-3 text-[9px] font-bold">
-                            <span className="text-emerald-600">+{formatCurrency(bankIn)}</span>
+                        <span className="text-[7px] font-bold uppercase tracking-wider text-[var(--foreground)]/40">Bank</span>
+                        <h2 className="text-sm font-black text-[var(--deep-contrast)] mt-0.5">{formatCurrency(bankBalance)}</h2>
+                        <div className="flex items-center gap-1.5 mt-2 text-[7px] font-bold">
+                            <span className="text-emerald-600">+{formatCurrency(bankIn).split('.')[0]}</span>
                             <span className="opacity-20">|</span>
-                            <span className="text-rose-600">-{formatCurrency(bankOut)}</span>
+                            <span className="text-rose-600">-{formatCurrency(bankOut).split('.')[0]}</span>
                         </div>
                     </div>
                 </div>
 
                 {/* Online Card */}
-                <div className="glass p-4 rounded-3xl border border-white/40 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <ArrowRightLeft className="h-12 w-12 text-purple-500" />
+                <div className="glass p-2.5 rounded-2xl border border-white/40 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <ArrowRightLeft className="h-8 w-8 text-purple-500" />
                     </div>
                     <div className="relative z-10">
-                        <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40">Online / Wallet</span>
-                        <h2 className="text-xl font-black text-[var(--deep-contrast)] mt-1">{formatCurrency(onlineBalance)}</h2>
-                        <div className="mt-3 flex gap-1">
+                        <span className="text-[7px] font-bold uppercase tracking-wider text-[var(--foreground)]/40">Online</span>
+                        <h2 className="text-sm font-black text-[var(--deep-contrast)] mt-0.5">{formatCurrency(onlineBalance)}</h2>
+                        <div className="mt-2 flex gap-0.5">
                             {[1, 2, 3, 4].map(i => (
-                                <div key={i} className={`h-1 flex-1 rounded-full ${i <= 3 ? 'bg-purple-500/30' : 'bg-black/5'}`} />
+                                <div key={i} className={`h-0.5 flex-1 rounded-full ${i <= 3 ? 'bg-purple-500/30' : 'bg-black/5'}`} />
                             ))}
                         </div>
                     </div>
@@ -199,39 +208,81 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
             </div>
 
             {/* Cash Flow Analytics */}
-            <div className="glass p-5 rounded-[2rem] border border-white/40">
-                <div className="flex justify-between items-center mb-4">
+            <div className="glass p-3 rounded-2xl border border-white/40">
+                <div className="flex justify-between items-center mb-2">
                     <div>
-                        <h3 className="text-xs font-black text-[var(--deep-contrast)] uppercase tracking-wider">Cash Flow Analysis</h3>
-                        <p className="text-[9px] font-bold text-[var(--foreground)]/40 mt-0.5">Ratio of Receipts vs Payments</p>
+                        <h3 className="text-[9px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">Cash Flow Analysis</h3>
+                        <p className="text-[7px] font-bold text-[var(--foreground)]/40 mt-0.5">Ratio of Receipts vs Payments</p>
                     </div>
                     <div className="text-right">
-                        <p className="text-lg font-black text-[var(--primary-green)] leading-none">{incomePercent.toFixed(1)}%</p>
-                        <p className="text-[8px] font-bold uppercase text-[var(--foreground)]/40">Positive Ratio</p>
+                        <p className="text-sm font-black text-[var(--primary-green)] leading-none">{incomePercent.toFixed(1)}%</p>
                     </div>
                 </div>
-                <div className="flex h-3 w-full bg-rose-500/20 rounded-full overflow-hidden p-0.5 border border-white/40 shadow-inner">
+                <div className="flex h-1.5 w-full bg-rose-500/20 rounded-full overflow-hidden p-0.5 border border-white/40 shadow-inner">
                     <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${incomePercent}%` }}
                         transition={{ duration: 1, ease: "easeOut" }}
                         className="h-full bg-emerald-500 rounded-full shadow-lg shadow-emerald-500/40 relative group"
-                    >
-                        <div className="absolute -right-1 top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-white border-2 border-emerald-500 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </motion.div>
+                    />
                 </div>
-                <div className="flex justify-between mt-3 text-[9px] font-bold uppercase tracking-tighter">
+                <div className="flex justify-between mt-2 text-[7px] font-bold uppercase tracking-tight">
                     <div className="flex items-center gap-1.5">
-                        <div className="h-2 w-2 rounded-full bg-emerald-500" />
-                        <span className="opacity-40">Total In:</span>
+                        <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                        <span className="opacity-40">In:</span>
                         <span className="text-emerald-700">{formatCurrency(totalIncome)}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                        <div className="h-2 w-2 rounded-full bg-rose-500" />
-                        <span className="opacity-40">Total Out:</span>
+                        <div className="h-1.5 w-1.5 rounded-full bg-rose-500" />
+                        <span className="opacity-40">Out:</span>
                         <span className="text-rose-700">{formatCurrency(totalExpenses)}</span>
                     </div>
                 </div>
+            </div>
+
+            {/* Quick Stats Bar */}
+            <div className="flex gap-2">
+                <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setTypeFilter(typeFilter === 'RECEIPT' ? 'ALL' : 'RECEIPT')}
+                    className={clsx(
+                        "flex-1 glass p-2 rounded-xl border transition-all cursor-pointer group",
+                        typeFilter === 'RECEIPT' ? "bg-emerald-500/10 border-emerald-500/50" : "border-white/40 hover:bg-white/60"
+                    )}
+                >
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-1.5">
+                            <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                            <span className="text-[8px] font-black uppercase tracking-widest text-emerald-600/60">Receipts</span>
+                        </div>
+                        <span className="text-[8px] font-bold text-emerald-600 bg-emerald-50 px-1 rounded uppercase tracking-tighter">IN</span>
+                    </div>
+                    <p className="text-sm font-black text-emerald-600 mt-1 tabular-nums">
+                        {formatCurrency(totalIncome)}
+                    </p>
+                </motion.div>
+
+                <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setTypeFilter(typeFilter === 'PAYMENT' ? 'ALL' : 'PAYMENT')}
+                    className={clsx(
+                        "flex-1 glass p-2 rounded-xl border transition-all cursor-pointer group",
+                        typeFilter === 'PAYMENT' ? "bg-rose-500/10 border-rose-500/50" : "border-white/40 hover:bg-white/60"
+                    )}
+                >
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-1.5">
+                            <div className="h-1.5 w-1.5 rounded-full bg-rose-500" />
+                            <span className="text-[8px] font-black uppercase tracking-widest text-rose-600/60">Payments</span>
+                        </div>
+                        <span className="text-[8px] font-bold text-rose-600 bg-rose-50 px-1 rounded uppercase tracking-tighter">OUT</span>
+                    </div>
+                    <p className="text-sm font-black text-rose-600 mt-1 tabular-nums">
+                        {formatCurrency(totalExpenses)}
+                    </p>
+                </motion.div>
             </div>
 
             {/* Filter Bar */}
@@ -349,20 +400,20 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                                 <div
                                     key={t.id}
                                     onClick={(e) => handleEdit(e, t)}
-                                    className="group p-3 hover:bg-white/40 active:bg-white/60 transition-all flex justify-between items-center cursor-pointer"
+                                    className="group p-2 hover:bg-white/40 active:bg-white/60 transition-all flex justify-between items-center cursor-pointer"
                                 >
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-2">
                                         <div className={clsx(
-                                            "h-9 w-9 rounded-xl flex items-center justify-center shadow-inner transition-all group-hover:scale-110",
+                                            "h-7 w-7 rounded-lg flex items-center justify-center shadow-inner transition-all group-hover:scale-110",
                                             t.type === 'RECEIPT' ? "bg-emerald-100 text-emerald-600" : "bg-rose-100 text-rose-600"
                                         )}>
-                                            {t.type === 'RECEIPT' ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
+                                            {t.type === 'RECEIPT' ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
                                         </div>
-                                        <div className="space-y-0.5">
-                                            <div className="flex items-center gap-2">
-                                                <p className="text-[11px] font-black text-[var(--deep-contrast)] leading-none">{t.party?.name || t.description || 'General Entry'}</p>
+                                        <div className="space-y-0">
+                                            <div className="flex items-center gap-1.5">
+                                                <p className="text-[9px] font-black text-[var(--deep-contrast)] leading-none">{t.party?.name || t.description || 'General Entry'}</p>
                                                 <span className={clsx(
-                                                    "text-[6px] font-black px-1 py-0.5 rounded uppercase tracking-wider border",
+                                                    "text-[5px] font-black px-1 py-0 rounded uppercase tracking-wider border",
                                                     t.mode === 'CASH' ? "bg-amber-50 text-amber-700 border-amber-200" :
                                                         t.mode === 'BANK' ? "bg-blue-50 text-blue-700 border-blue-200" :
                                                             "bg-purple-50 text-purple-700 border-purple-200"
@@ -370,19 +421,19 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                                                     {t.mode}
                                                 </span>
                                             </div>
-                                            <div className="flex items-center gap-3">
+                                            <div className="flex items-center gap-2">
                                                 <div className="flex items-center gap-1 opacity-40">
                                                     <Calendar className="h-2 w-2" />
-                                                    <span className="text-[8px] font-bold lowercase">{new Date(t.date).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}</span>
+                                                    <span className="text-[7px] font-bold lowercase">{new Date(t.date).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}</span>
                                                 </div>
-                                                {t.description && <span className="text-[8px] font-medium text-[var(--foreground)]/30 truncate max-w-[150px]">{t.description}</span>}
+                                                {t.description && <span className="text-[7px] font-medium text-[var(--foreground)]/30 truncate max-w-[100px]">{t.description}</span>}
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-3">
                                         <div className="text-right">
                                             <p className={clsx(
-                                                "text-xs font-black tracking-tight",
+                                                "text-[10px] font-black tracking-tight",
                                                 t.type === 'RECEIPT' ? "text-emerald-600" : "text-rose-600"
                                             )}>
                                                 {t.type === 'RECEIPT' ? '+' : '-'} {formatCurrency(t.amount)}
@@ -390,15 +441,15 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                                             <div className="flex items-center justify-end gap-1 mt-0.5 transition-all">
                                                 <button
                                                     onClick={(e) => handleEdit(e, t)}
-                                                    className="p-1 rounded-md bg-white shadow-sm border border-black/5 text-blue-500 hover:bg-blue-500 hover:text-white transition-all scale-100"
+                                                    className="p-1 rounded-md bg-white shadow-sm border border-black/5 text-blue-500 hover:bg-blue-500 hover:text-white transition-all scale-90"
                                                 >
-                                                    <Edit2 className="h-2.5 w-2.5" />
+                                                    <Edit2 className="h-2 w-2" />
                                                 </button>
                                                 <button
                                                     onClick={(e) => handleDelete(e, t.id)}
-                                                    className="p-1 rounded-md bg-white shadow-sm border border-black/5 text-rose-500 hover:bg-rose-500 hover:text-white transition-all scale-100"
+                                                    className="p-1 rounded-md bg-white shadow-sm border border-black/5 text-rose-500 hover:bg-rose-500 hover:text-white transition-all scale-90"
                                                 >
-                                                    <Trash2 className="h-2.5 w-2.5" />
+                                                    <Trash2 className="h-2 w-2" />
                                                 </button>
                                             </div>
                                         </div>

@@ -21,6 +21,7 @@ export default function PartiesClientView() {
     const [editingParty, setEditingParty] = useState<any>(null)
     const [confirmModal, setConfirmModal] = useState<{ open: boolean, partyId: string }>({ open: false, partyId: '' })
     const [isDeleting, setIsDeleting] = useState(false)
+    const [typeFilter, setTypeFilter] = useState<'ALL' | 'CUSTOMER' | 'SUPPLIER'>('ALL')
     const [feedbackModal, setFeedbackModal] = useState<{ open: boolean, message: string, variant: 'success' | 'error' }>({ open: false, message: '', variant: 'success' })
     const router = useRouter()
     const supabase = createClient()
@@ -72,7 +73,7 @@ export default function PartiesClientView() {
         party.business_id === activeBusinessId && (
             party.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             party.phone?.includes(searchQuery)
-        )
+        ) && (typeFilter === 'ALL' || party.type === typeFilter)
     )
 
     return (
@@ -83,13 +84,17 @@ export default function PartiesClientView() {
                         <h1 className="text-xl font-bold text-[var(--deep-contrast)] tracking-tight">Parties</h1>
                         <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Customers & Suppliers</p>
                     </div>
-                    <button
+                    <motion.button
+                        initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        whileHover={{ scale: 1.05, translateY: -2 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={() => setIsCreateModalOpen(true)}
-                        className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white hover:bg-[var(--primary-green)] transition-all shadow-lg shadow-[var(--deep-contrast)]/20 hover:scale-105"
+                        className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-2 text-[11px] font-black uppercase tracking-wider text-white hover:bg-indigo-600 transition-all shadow-xl shadow-[var(--deep-contrast)]/20 active:scale-95 border border-white/10 group"
                     >
-                        <Plus className="mr-1 h-3 w-3" />
+                        <Plus className="mr-1.5 h-3.5 w-3.5 transition-transform group-hover:rotate-90 duration-500" />
                         Add Party
-                    </button>
+                    </motion.button>
                 </div>
 
                 <div className="relative">
@@ -104,6 +109,51 @@ export default function PartiesClientView() {
                 </div>
             </div>
 
+            {/* Quick Stats Bar */}
+            <div className="flex gap-2">
+                <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setTypeFilter(typeFilter === 'CUSTOMER' ? 'ALL' : 'CUSTOMER')}
+                    className={clsx(
+                        "flex-1 glass p-2 rounded-xl border transition-all cursor-pointer group",
+                        typeFilter === 'CUSTOMER' ? "bg-blue-500/10 border-blue-500/50" : "border-white/40 hover:bg-white/60"
+                    )}
+                >
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-1.5">
+                            <div className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+                            <span className="text-[8px] font-black uppercase tracking-widest text-blue-600/60">Receivables</span>
+                        </div>
+                        <span className="text-[8px] font-bold text-blue-600 bg-blue-50 px-1 rounded uppercase tracking-tighter">IN</span>
+                    </div>
+                    <p className="text-sm font-black text-blue-600 mt-1 tabular-nums">
+                        {formatCurrency(parties.filter(p => p.type === 'CUSTOMER').reduce((sum, p) => sum + (p.opening_balance || 0), 0))}
+                    </p>
+                </motion.div>
+
+                <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setTypeFilter(typeFilter === 'SUPPLIER' ? 'ALL' : 'SUPPLIER')}
+                    className={clsx(
+                        "flex-1 glass p-2 rounded-xl border transition-all cursor-pointer group",
+                        typeFilter === 'SUPPLIER' ? "bg-orange-500/10 border-orange-500/50" : "border-white/40 hover:bg-white/60"
+                    )}
+                >
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-1.5">
+                            <div className="h-1.5 w-1.5 rounded-full bg-orange-500" />
+                            <span className="text-[8px] font-black uppercase tracking-widest text-orange-600/60">Payables</span>
+                        </div>
+                        <span className="text-[8px] font-bold text-orange-600 bg-orange-50 px-1 rounded uppercase tracking-tighter">OUT</span>
+                    </div>
+                    <p className="text-sm font-black text-orange-600 mt-1 tabular-nums">
+                        {formatCurrency(Math.abs(parties.filter(p => p.type === 'SUPPLIER').reduce((sum, p) => sum + (p.opening_balance || 0), 0)))}
+                    </p>
+                </motion.div>
+            </div>
+
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5">
                 {filteredParties.map((party) => (
                     <motion.div
@@ -111,40 +161,36 @@ export default function PartiesClientView() {
                         whileHover={{ scale: 1.02, translateY: -2 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={(e: React.MouseEvent) => handleEdit(e, party)}
-                        className="glass p-3 rounded-[24px] group hover:bg-white/80 transition-all duration-300 border border-white/50 cursor-pointer relative overflow-hidden flex flex-col justify-between min-h-[110px]"
+                        className="glass p-2 rounded-[14px] group hover:bg-white/80 transition-all duration-300 border border-white/50 cursor-pointer relative overflow-hidden flex flex-col justify-between min-h-[70px]"
                     >
                         {/* Status/Type pill absolute */}
-                        <div className="flex justify-between items-start">
-                            <div className={clsx(
-                                "h-8 w-8 rounded-2xl flex items-center justify-center shadow-sm border border-white/50",
-                                party.type === 'CUSTOMER' ? "bg-blue-50 text-blue-600" :
-                                    party.type === 'SUPPLIER' ? "bg-orange-50 text-orange-600" :
-                                        "bg-purple-50 text-purple-600"
-                            )}>
-                                <UserIcon className="h-4 w-4" />
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                <UserIcon className={clsx(
+                                    "h-2.5 w-2.5 shrink-0",
+                                    party.type === 'CUSTOMER' ? "text-blue-600" : "text-orange-600"
+                                )} />
+                                <h3 className="text-[10px] font-black text-[var(--deep-contrast)] truncate">{party.name}</h3>
                             </div>
                             <button
                                 onClick={(e) => handleDelete(e, party.id)}
-                                className="h-7 w-7 flex items-center justify-center rounded-xl bg-rose-50 text-rose-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-rose-500 hover:text-white border border-rose-100"
+                                className="h-5 w-5 flex items-center justify-center rounded-lg bg-rose-50 text-rose-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-rose-500 hover:text-white border border-rose-100 shrink-0"
                             >
-                                <Trash2 size={13} />
+                                <Trash2 size={10} />
                             </button>
                         </div>
 
-                        <div className="mt-2">
-                            <h3 className="text-[11px] font-black text-[var(--deep-contrast)] leading-tight truncate">{party.name}</h3>
-                            <div className="flex items-center justify-between mt-1">
-                                <p className={clsx(
-                                    "text-xs font-black tracking-tighter",
-                                    party.opening_balance > 0 ? "text-emerald-600" :
-                                        party.opening_balance < 0 ? "text-rose-600" : "text-[var(--foreground)]/30"
-                                )}>
-                                    {party.opening_balance > 0 ? '+' : ''}{formatCurrency(party.opening_balance).replace(/^-/, '')}
-                                </p>
-                                <span className="text-[7px] font-black uppercase tracking-wider text-[var(--foreground)]/30">
-                                    {party.type}
-                                </span>
-                            </div>
+                        <div className="mt-1.5 pt-1.5 border-t border-black/5 flex items-center justify-between">
+                            <p className={clsx(
+                                "text-[9px] font-black tracking-tighter",
+                                party.opening_balance > 0 ? "text-emerald-600" :
+                                    party.opening_balance < 0 ? "text-rose-600" : "text-[var(--foreground)]/30"
+                            )}>
+                                {party.opening_balance > 0 ? '+' : ''}{formatCurrency(party.opening_balance).replace(/^-/, '')}
+                            </p>
+                            <span className="text-[6px] font-bold text-[var(--foreground)]/40 uppercase tracking-tighter">
+                                {party.phone ? party.phone.slice(-4) : party.type.slice(0, 4)}
+                            </span>
                         </div>
 
                         {/* Subtle Phone Indicator */}

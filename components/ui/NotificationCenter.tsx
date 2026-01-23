@@ -171,89 +171,117 @@ export default function NotificationCenter() {
 
             <AnimatePresence>
                 {isOpen && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        className="fixed sm:absolute top-20 sm:top-full right-4 sm:right-0 w-[calc(100vw-32px)] sm:w-80 bg-white/95 backdrop-blur-xl rounded-[24px] border border-white/40 shadow-2xl z-[100] overflow-hidden"
-                    >
-                        <div className="px-5 py-4 border-b border-white/10 bg-white/40 flex items-center justify-between">
-                            <div>
-                                <h3 className="text-sm lg:text-xs font-bold text-[var(--deep-contrast)]">Alert Center</h3>
-                                <p className="text-[9px] lg:text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-wider leading-none mt-1">Activities & Updates</p>
-                            </div>
-                            {unreadCount > 0 && (
-                                <button
-                                    onClick={() => markAsRead()}
-                                    className="p-1.5 rounded-lg hover:bg-[var(--primary-green)]/10 text-[var(--primary-green)] transition-all group"
-                                    title="Mark all as read"
-                                >
-                                    <CheckCheck className="h-3.5 w-3.5" />
-                                </button>
-                            )}
-                        </div>
+                    <>
+                        {/* Backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsOpen(false)}
+                            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100]"
+                        />
 
-                        <div className="max-h-[380px] overflow-y-auto custom-scrollbar">
-                            {loading ? (
-                                <div className="p-10 flex flex-col items-center justify-center space-y-2 opacity-20">
-                                    <Loader2 className="h-5 w-5 animate-spin" />
-                                    <span className="text-[9px] font-bold uppercase tracking-wider">Syncing...</span>
-                                </div>
-                            ) : notifications.length > 0 ? (
-                                <div className="divide-y divide-white/5">
-                                    {notifications.map((notif) => (
-                                        <div
-                                            key={notif.id}
-                                            onClick={() => markAsRead(notif.id)}
-                                            className={clsx(
-                                                "p-4 hover:bg-white/40 transition-all cursor-pointer relative group",
-                                                !notif.is_read && "bg-[var(--primary-green)]/5"
-                                            )}
+                        {/* Modal Container */}
+                        <div className="fixed inset-0 flex items-center justify-center p-4 z-[110] pointer-events-none">
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                                className="w-full max-w-sm bg-white rounded-[32px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] overflow-hidden pointer-events-auto border border-slate-100"
+                            >
+                                {/* Header */}
+                                <div className="px-6 py-5 border-b border-slate-50 flex items-center justify-between">
+                                    <div>
+                                        <h3 className="text-sm font-bold text-slate-900">Alert Center</h3>
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mt-1">Activities & Updates</p>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        {unreadCount > 0 && (
+                                            <button
+                                                onClick={() => markAsRead()}
+                                                className="p-2 rounded-xl hover:bg-emerald-50 text-emerald-600 transition-all group"
+                                                title="Mark all as read"
+                                            >
+                                                <CheckCheck className="h-4 w-4" />
+                                            </button>
+                                        )}
+                                        <button
+                                            onClick={() => setIsOpen(false)}
+                                            className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 transition-all"
                                         >
-                                            <div className="flex gap-3">
-                                                <div className={clsx(
-                                                    "h-8 w-8 rounded-xl flex items-center justify-center shrink-0 border border-white/40 shadow-sm",
-                                                    !notif.is_read ? "bg-white shadow-md" : "bg-white/20"
-                                                )}>
-                                                    {getIcon(notif.type)}
-                                                </div>
-                                                <div className="min-w-0 pr-4">
-                                                    <p className={clsx(
-                                                        "text-[11px] font-bold leading-tight",
-                                                        !notif.is_read ? "text-[var(--deep-contrast)]" : "text-[var(--foreground)]/60"
-                                                    )}>
-                                                        {notif.title}
-                                                    </p>
-                                                    <p className="text-[10px] text-[var(--foreground)]/40 mt-0.5 line-clamp-2 leading-relaxed">
-                                                        {notif.message}
-                                                    </p>
-                                                    <p className="text-[8px] font-bold text-[var(--foreground)]/20 uppercase tracking-tighter mt-1.5">
-                                                        {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true })}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            {!notif.is_read && (
-                                                <div className="absolute right-4 top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-[var(--primary-green)]" />
-                                            )}
-                                        </div>
-                                    ))}
+                                            <X className="h-4 w-4" />
+                                        </button>
+                                    </div>
                                 </div>
-                            ) : (
-                                <div className="p-16 flex flex-col items-center justify-center text-center space-y-3 opacity-20">
-                                    <Bell className="h-10 w-10" />
-                                    <p className="text-[10px] font-bold uppercase tracking-wider">No Alerts Yet</p>
-                                </div>
-                            )}
-                        </div>
 
-                        {notifications.length > 0 && (
-                            <div className="p-3 border-t border-white/10 bg-white/20 text-center">
-                                <button className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 hover:text-[var(--deep-contrast)] transition-colors">
-                                    View Detailed History
-                                </button>
-                            </div>
-                        )}
-                    </motion.div>
+                                {/* Content */}
+                                <div className="max-h-[60vh] overflow-y-auto custom-scrollbar bg-white">
+                                    {loading ? (
+                                        <div className="p-12 flex flex-col items-center justify-center space-y-3">
+                                            <Loader2 className="h-6 w-6 animate-spin text-emerald-500" />
+                                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300">Syncing...</span>
+                                        </div>
+                                    ) : notifications.length > 0 ? (
+                                        <div className="divide-y divide-slate-50">
+                                            {notifications.map((notif) => (
+                                                <div
+                                                    key={notif.id}
+                                                    onClick={() => markAsRead(notif.id)}
+                                                    className={clsx(
+                                                        "p-5 hover:bg-slate-50/50 transition-all cursor-pointer relative group",
+                                                        !notif.is_read && "bg-emerald-50/30"
+                                                    )}
+                                                >
+                                                    <div className="flex gap-4">
+                                                        <div className={clsx(
+                                                            "h-10 w-10 rounded-2xl flex items-center justify-center shrink-0 border border-slate-100 transition-all",
+                                                            !notif.is_read ? "bg-white shadow-lg shadow-emerald-900/5 rotate-3" : "bg-slate-50"
+                                                        )}>
+                                                            {getIcon(notif.type)}
+                                                        </div>
+                                                        <div className="min-w-0 flex-1 pr-4">
+                                                            <p className={clsx(
+                                                                "text-[12px] font-bold leading-tight",
+                                                                !notif.is_read ? "text-slate-900" : "text-slate-500"
+                                                            )}>
+                                                                {notif.title}
+                                                            </p>
+                                                            <p className="text-[11px] text-slate-400 mt-1 line-clamp-2 leading-relaxed font-medium">
+                                                                {notif.message}
+                                                            </p>
+                                                            <div className="flex items-center gap-2 mt-2">
+                                                                <p className="text-[9px] font-bold text-slate-300 uppercase tracking-tight">
+                                                                    {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true })}
+                                                                </p>
+                                                                {!notif.is_read && (
+                                                                    <span className="h-1 w-1 rounded-full bg-emerald-500" />
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="p-20 flex flex-col items-center justify-center text-center space-y-4">
+                                            <div className="h-16 w-16 rounded-full bg-slate-50 flex items-center justify-center text-slate-200">
+                                                <Bell className="h-8 w-8" />
+                                            </div>
+                                            <p className="text-[11px] font-bold uppercase tracking-widest text-slate-300">No Alerts Yet</p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {notifications.length > 0 && (
+                                    <div className="p-4 border-t border-slate-50 bg-white">
+                                        <button className="w-full py-3 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:bg-slate-50 hover:text-slate-900 transition-all">
+                                            View Detailed History
+                                        </button>
+                                    </div>
+                                )}
+                            </motion.div>
+                        </div>
+                    </>
                 )}
             </AnimatePresence>
         </div>
