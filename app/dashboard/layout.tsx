@@ -175,8 +175,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     <div className={clsx(
                         "absolute inset-0 transition-all duration-300",
                         scrolled
-                            ? "bg-[var(--background)] backdrop-blur-md border-b border-[var(--foreground)]/10 dark:border-white/5 shadow-sm"
-                            : "bg-transparent"
+                            ? "bg-white/95 backdrop-blur-md border-b border-gray-200 dark:bg-black/90 dark:border-white/10 shadow-sm"
+                            : "bg-transparent border-b border-transparent shadow-none"
                     )} />
 
                     <div className="relative z-10 flex h-14 items-center justify-between px-4 pt-[env(safe-area-inset-top)] box-content">
