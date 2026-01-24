@@ -6,6 +6,7 @@ import { useBusiness } from '@/context/business-context'
 import PickerModal from '@/components/ui/PickerModal'
 import ErrorModal from '@/components/ui/ErrorModal'
 import { motion } from 'framer-motion'
+import clsx from 'clsx'
 
 type AddPurchaseItemModalProps = {
     isOpen: boolean
@@ -104,72 +105,111 @@ export default function AddPurchaseItemModal({ isOpen, onClose, onAdd, items, in
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-5">
                     {/* Item Selection */}
-                    <div>
+                    <div className="relative group">
                         <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Inventory Resource *</label>
                         <button
                             type="button"
                             onClick={() => setIsItemPickerOpen(true)}
-                            className="w-full h-11 flex items-center justify-between rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-bold text-[var(--deep-contrast)] hover:border-[var(--primary-green)] transition-all shadow-inner text-left"
+                            className={clsx(
+                                "w-full h-14 flex items-center justify-between rounded-2xl border transition-all text-left px-5 group/btn",
+                                selectedItem
+                                    ? "bg-[var(--primary-green)]/5 border-[var(--primary-green)]/30 ring-4 ring-[var(--primary-green)]/5"
+                                    : "bg-[var(--foreground)]/5 border-[var(--foreground)]/10 hover:border-[var(--primary-green)]/50"
+                            )}
                         >
-                            <span className="truncate">{selectedItem ? selectedItem.name.toUpperCase() : 'SELECT PRODUCT...'}</span>
-                            <Package className="h-4 w-4 opacity-20" />
+                            <div className="flex items-center gap-3 min-w-0">
+                                <div className={clsx(
+                                    "h-8 w-8 rounded-xl flex items-center justify-center transition-all shadow-sm",
+                                    selectedItem ? "bg-[var(--primary-green)] text-white" : "bg-[var(--foreground)]/10 text-[var(--foreground)]/30"
+                                )}>
+                                    <Package className="h-4 w-4" />
+                                </div>
+                                <div className="min-w-0">
+                                    <p className={clsx(
+                                        "text-[12px] font-black uppercase truncate tracking-tight transition-colors",
+                                        selectedItem ? "text-[var(--primary-green)]" : "text-[var(--foreground)]/30"
+                                    )}>
+                                        {selectedItem ? selectedItem.name : 'Choose Item'}
+                                    </p>
+                                    <p className="text-[8px] font-black opacity-40 uppercase tracking-widest">
+                                        {selectedItem ? `${selectedItem.stock_quantity ?? 0} in stock` : 'Select from inventory'}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="h-6 w-6 rounded-lg bg-[var(--foreground)]/5 flex items-center justify-center opacity-0 group-hover/btn:opacity-100 transition-opacity">
+                                <Plus className="h-3 w-3" />
+                            </div>
                         </button>
                     </div>
 
                     {selectedItem && (
-                        <div className="animate-in fade-in slide-in-from-top-2 duration-400 space-y-4">
+                        <div className="animate-in fade-in slide-in-from-top-4 duration-500 space-y-4">
                             <div className="grid grid-cols-2 gap-3">
                                 {/* Quantity */}
-                                <div>
-                                    <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Vol ({selectedItem.unit})</label>
+                                <div className="space-y-1.5">
+                                    <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 ml-1">Volume ({selectedItem.unit})</label>
                                     <input
                                         type="number"
                                         step="any"
                                         required
+                                        autoFocus
                                         value={quantity}
                                         onChange={(e) => setQuantity(Number(e.target.value))}
-                                        className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[13px] font-black text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] transition-all shadow-inner tabular-nums"
+                                        className="w-full h-12 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-5 text-[14px] font-black text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] focus:ring-4 focus:ring-[var(--primary-green)]/10 transition-all shadow-inner tabular-nums"
                                     />
                                 </div>
                                 {/* Rate */}
-                                <div>
-                                    <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Acquisition Rate</label>
+                                <div className="space-y-1.5">
+                                    <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 ml-1">Cost / {selectedItem.unit}</label>
                                     <input
                                         type="number"
                                         step="any"
                                         required
                                         value={rate}
                                         onChange={(e) => setRate(Number(e.target.value))}
-                                        className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[13px] font-black text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] transition-all shadow-inner tabular-nums"
+                                        className="w-full h-12 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-5 text-[14px] font-black text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] focus:ring-4 focus:ring-[var(--primary-green)]/10 transition-all shadow-inner tabular-nums"
                                     />
                                 </div>
                             </div>
 
-                            {/* Line Total Display */}
-                            <div className="p-4 rounded-2xl bg-[var(--primary-green)]/5 border border-[var(--primary-green)]/20 shadow-sm">
-                                <div className="flex flex-col">
-                                    <span className="text-[7.5px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 mb-0.5">Line Liability</span>
-                                    <span className="text-[13px] font-black text-[var(--primary-green)] tabular-nums">{formatCurrency(total)}</span>
+                            {/* Summary Card */}
+                            <div className="relative overflow-hidden rounded-[24px] bg-[var(--deep-contrast)] p-5 shadow-2xl shadow-[var(--deep-contrast)]/20 border border-white/10">
+                                <div className="relative z-10 flex flex-col gap-1">
+                                    <p className="text-[8px] font-black uppercase tracking-[0.2em] text-white/40 mb-1">Total Procurement Cost</p>
+                                    <div className="flex items-end justify-between">
+                                        <p className="text-[24px] font-black text-white tabular-nums leading-none tracking-tighter">
+                                            {formatCurrency(total)}
+                                        </p>
+                                        <div className="px-3 py-1 rounded-lg bg-[var(--primary-green)]/10 border border-[var(--primary-green)]/20 text-[var(--primary-green)] text-[9px] font-black uppercase tracking-widest">
+                                            STOCK INLET
+                                        </div>
+                                    </div>
+                                    <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-[8px] font-black uppercase tracking-widest text-white/20">
+                                        <span>Current Stock: {selectedItem.stock_quantity ?? 0}</span>
+                                        <span>Expected: {(selectedItem.stock_quantity ?? 0) + quantity}</span>
+                                    </div>
                                 </div>
+                                {/* Decorative elements */}
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--primary-green)] opacity-[0.03] blur-3xl -mr-16 -mt-16 rounded-full" />
                             </div>
                         </div>
                     )}
 
-                    <div className="flex justify-end pt-4 gap-2 border-t border-[var(--primary-green)]/10">
+                    <div className="flex justify-end pt-2 gap-3">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 h-11 rounded-xl text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/30 hover:bg-[var(--foreground)]/5 transition-all active:scale-95"
+                            className="flex-1 h-12 rounded-2xl text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/30 hover:bg-[var(--foreground)]/5 hover:text-[var(--foreground)]/60 transition-all active:scale-95 border border-transparent hover:border-[var(--foreground)]/10"
                         >
-                            Abort
+                            Cancel
                         </button>
                         <button
                             type="submit"
-                            disabled={!selectedItem || quantity <= 0}
-                            className="flex-1 h-11 flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] shadow-xl shadow-[var(--deep-contrast)]/20 text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50 hover:bg-[var(--deep-contrast-hover)]"
+                            disabled={!selectedItem || !quantity || quantity <= 0}
+                            className="flex-[2] h-12 flex items-center justify-center rounded-2xl bg-[var(--primary-green)] text-white shadow-xl shadow-[var(--primary-green)]/20 text-[10px] font-black uppercase tracking-[0.2em] transition-all active:scale-95 disabled:opacity-50 hover:bg-[var(--primary-hover)] ring-offset-2 focus:ring-2 ring-[var(--primary-green)]"
                         >
-                            <Plus className="mr-2 h-3.5 w-3.5" />
-                            {initialData ? 'Update' : 'Commit'}
+                            <Plus className="mr-2 h-4 w-4" />
+                            {initialData ? 'Update Bill' : 'Record Entry'}
                         </button>
                     </div>
                 </form>
@@ -178,11 +218,11 @@ export default function AddPurchaseItemModal({ isOpen, onClose, onAdd, items, in
                     isOpen={isItemPickerOpen}
                     onClose={() => setIsItemPickerOpen(false)}
                     onSelect={handleSelect}
-                    title="Select Resource"
+                    title="Select Procurement Item"
                     options={items.map(i => ({
                         id: i.id,
                         label: i.name.toUpperCase(),
-                        subLabel: `${i.stock_quantity ?? 0} ${i.unit ?? 'Units'} In Stock`
+                        subLabel: `${i.stock_quantity ?? 0} ${i.unit ?? 'Units'} currently in stock`
                     }))}
                     selectedValue={selectedItem?.id}
                 />

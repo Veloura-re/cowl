@@ -18,7 +18,7 @@ export default function InvoiceWizard({ parties, items }: WizardProps) {
     const [currentStep, setCurrentStep] = useState(1)
     const router = useRouter()
 
-    const steps = ['Party Info', 'Add Items', 'Review', 'Complete']
+    const steps = ['Add Items', 'Party Info', 'Review', 'Complete']
 
     const handleNext = () => {
         if (currentStep < 4) {
@@ -59,14 +59,15 @@ export default function InvoiceWizard({ parties, items }: WizardProps) {
                     {/* Step Content */}
                     <div className="animate-in slide-in-from-right-5 fade-in duration-300">
                         {currentStep === 1 && (
-                            <Step1PartyInfo
-                                parties={parties}
+                            <Step2AddItems
+                                items={items}
                                 onNext={handleNext}
+                                onBack={handleBack}
                             />
                         )}
                         {currentStep === 2 && (
-                            <Step2AddItems
-                                items={items}
+                            <Step1PartyInfo
+                                parties={parties}
                                 onNext={handleNext}
                                 onBack={handleBack}
                             />

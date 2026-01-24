@@ -6,6 +6,7 @@ import { useInvoice } from '@/context/invoice-context'
 import { useBusiness } from '@/context/business-context'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
+import SignaturePad from '@/components/ui/signature-pad'
 
 type Step3Props = {
     onNext: () => void
@@ -102,57 +103,92 @@ export default function Step3Review({ onNext, onBack }: Step3Props) {
             </div>
 
             <div className="p-5 space-y-4">
-                {/* Invoice Summary Card */}
-                <div className="glass rounded-2xl border border-white/30 dark:border-white/10 p-5">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div>
-                            <div className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">Customer</div>
-                            <div className="text-sm font-bold text-[var(--deep-contrast)]">{data.partyName}</div>
+                {/* Summary Table & Financial Resolution */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Invoice Metadata Summary */}
+                    <div className="glass rounded-[32px] border border-[var(--foreground)]/10 p-6 space-y-4">
+                        <div className="flex items-center gap-3 border-b border-[var(--foreground)]/5 pb-3">
+                            <div className="h-7 w-7 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center">
+                                <Edit3 size={14} />
+                            </div>
+                            <h3 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-widest">Document Header</h3>
                         </div>
-                        <div>
-                            <div className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">Invoice #</div>
-                            <div className="text-sm font-bold text-[var(--deep-contrast)]">{data.invoiceNumber}</div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <p className="text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1">Customer / Client</p>
+                                <p className="text-[12px] font-black text-[var(--deep-contrast)] truncate">{data.partyName}</p>
+                            </div>
+                            <div>
+                                <p className="text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1">Reference ID</p>
+                                <p className="text-[12px] font-black text-[var(--deep-contrast)]">{data.invoiceNumber}</p>
+                            </div>
+                            <div>
+                                <p className="text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1">Issue Date</p>
+                                <p className="text-[12px] font-black text-[var(--deep-contrast)]">{new Date(data.date).toLocaleDateString()}</p>
+                            </div>
+                            <div>
+                                <p className="text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1">Line Density</p>
+                                <p className="text-[12px] font-black text-[var(--deep-contrast)]">{data.items.length} RECORDED</p>
+                            </div>
                         </div>
-                        <div>
-                            <div className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">Date</div>
-                            <div className="text-sm font-bold text-[var(--deep-contrast)]">{new Date(data.date).toLocaleDateString()}</div>
+                    </div>
+
+                    {/* Financial Totals */}
+                    <div className="glass rounded-[32px] border border-[var(--foreground)]/10 p-6 flex flex-col justify-between">
+                        <div className="space-y-3">
+                            <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/30">
+                                <span>NET SUB-TOTAL</span>
+                                <span className="text-[var(--deep-contrast)] tabular-nums">{formatCurrency(subtotal)}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/30">
+                                <span>AGGREGATED TAX</span>
+                                <span className="text-[var(--deep-contrast)] tabular-nums">{formatCurrency(totalTax)}</span>
+                            </div>
                         </div>
-                        <div>
-                            <div className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">Items</div>
-                            <div className="text-sm font-bold text-[var(--deep-contrast)]">{data.items.length}</div>
+                        <div className="mt-4 pt-4 border-t border-[var(--foreground)]/10 flex justify-between items-end">
+                            <div>
+                                <p className="text-[8px] font-black uppercase tracking-[0.3em] text-[var(--foreground)]/30 mb-1">Grand Valuation</p>
+                                <p className="text-[24px] font-black text-[var(--primary-green)] tabular-nums leading-none tracking-tighter">
+                                    {formatCurrency(grandTotal)}
+                                </p>
+                            </div>
+                            <div className="px-3 py-1 rounded-lg bg-[var(--primary-green)]/10 text-[var(--primary-green)] text-[8px] font-black uppercase tracking-widest border border-[var(--primary-green)]/20">
+                                PENDING SAVE
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Items Table */}
-                <div className="glass rounded-2xl border border-white/30 dark:border-white/10 overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left text-sm">
-                            <thead className="bg-white/40 dark:bg-white/5 border-b border-white/20 dark:border-white/10">
-                                <tr>
-                                    <th className="px-4 py-3 text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/50">Item</th>
-                                    <th className="px-4 py-3 text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 text-center">Qty × Unit</th>
-                                    <th className="px-4 py-3 text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 text-center">Rate/Unit</th>
-                                    <th className="px-4 py-3 text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 text-right">Amount</th>
+                {/* Items Manifest */}
+                <div className="glass rounded-[32px] border border-[var(--foreground)]/10 overflow-hidden shadow-xl">
+                    <div className="px-6 py-4 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5">
+                        <h3 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-widest">Items Manifest</h3>
+                    </div>
+                    <div className="p-4 overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead>
+                                <tr className="border-b border-[var(--foreground)]/5">
+                                    <th className="px-4 py-3 text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Specification</th>
+                                    <th className="px-4 py-3 text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 text-center">Volume</th>
+                                    <th className="px-4 py-3 text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 text-center">Rate</th>
+                                    <th className="px-4 py-3 text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 text-right">Yield</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-white/10 dark:divide-white/5">
+                            <tbody className="divide-y divide-[var(--foreground)]/5">
                                 {data.items.map((item, index) => (
-                                    <tr key={index} className="hover:bg-white/20 dark:hover:bg-white/5 transition-colors">
-                                        <td className="px-4 py-3">
-                                            <div className="text-sm font-bold text-[var(--deep-contrast)]">{item.name}</div>
-                                            {item.tax > 0 && (
-                                                <div className="text-[9px] font-bold text-[var(--foreground)]/40">Tax: {item.tax}%</div>
-                                            )}
+                                    <tr key={index} className="group hover:bg-[var(--foreground)]/5 transition-colors">
+                                        <td className="px-4 py-4">
+                                            <p className="text-[12px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">{item.name}</p>
+                                            {item.tax > 0 && <span className="text-[8px] font-black text-[var(--foreground)]/30 uppercase">TAX: {item.tax}%</span>}
                                         </td>
-                                        <td className="px-4 py-3 text-center">
-                                            <span className="text-sm font-bold text-[var(--deep-contrast)]">{item.quantity} × {item.unit}</span>
+                                        <td className="px-4 py-4 text-center">
+                                            <span className="px-2 py-1 rounded-lg bg-[var(--foreground)]/5 text-[10px] font-black text-[var(--deep-contrast)] uppercase">{item.quantity} {item.unit}</span>
                                         </td>
-                                        <td className="px-4 py-3 text-center">
-                                            <span className="text-sm font-bold text-[var(--deep-contrast)]">{formatCurrency(item.rate)}/{item.unit}</span>
+                                        <td className="px-4 py-4 text-center text-[11px] font-black text-[var(--foreground)]/50 tabular-nums uppercase">
+                                            {formatCurrency(item.rate)}
                                         </td>
-                                        <td className="px-4 py-3 text-right">
-                                            <span className="text-sm font-bold text-[var(--primary-green)]">{formatCurrency(item.amount)}</span>
+                                        <td className="px-4 py-4 text-right text-[12px] font-black text-[var(--primary-green)] tabular-nums font-mono">
+                                            {formatCurrency(item.amount)}
                                         </td>
                                     </tr>
                                 ))}
@@ -161,32 +197,26 @@ export default function Step3Review({ onNext, onBack }: Step3Props) {
                     </div>
                 </div>
 
-                {/* Notes */}
-                <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-2">
-                        Internal Notes (Optional)
-                    </label>
-                    <textarea
-                        value={data.notes}
-                        onChange={(e) => updateData({ notes: e.target.value })}
-                        className="w-full min-h-[80px] rounded-xl bg-white/50 dark:bg-white/5 border border-white/30 dark:border-white/10 p-3 text-sm font-bold text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none resize-none placeholder-[var(--foreground)]/20"
-                        placeholder="Add payment terms, delivery notes, or other information..."
-                    />
-                </div>
+                {/* Bottom Section: Notes & Signature */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="glass rounded-[32px] border border-[var(--foreground)]/10 p-6 flex flex-col">
+                        <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-4 ml-1">Internal Provisions</label>
+                        <textarea
+                            value={data.notes}
+                            onChange={(e) => updateData({ notes: e.target.value })}
+                            className="flex-1 w-full bg-transparent text-[11px] font-black text-[var(--deep-contrast)] focus:outline-none resize-none placeholder:opacity-10 min-h-[120px]"
+                            placeholder="APPEND MEMORANDUM..."
+                        />
+                    </div>
 
-                {/* Totals */}
-                <div className="glass rounded-2xl border border-white/30 dark:border-white/10 p-5 space-y-3">
-                    <div className="flex justify-between text-sm">
-                        <span className="font-bold text-[var(--foreground)]/50 uppercase tracking-wider">Subtotal</span>
-                        <span className="font-bold text-[var(--deep-contrast)]">{formatCurrency(subtotal)}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                        <span className="font-bold text-[var(--foreground)]/50 uppercase tracking-wider">Total Tax</span>
-                        <span className="font-bold text-[var(--deep-contrast)]">{formatCurrency(totalTax)}</span>
-                    </div>
-                    <div className="flex justify-between text-lg pt-3 border-t border-white/20 dark:border-white/10">
-                        <span className="font-bold text-[var(--deep-contrast)] uppercase tracking-wider">Grand Total</span>
-                        <span className="font-bold text-[var(--primary-green)]">{formatCurrency(grandTotal)}</span>
+                    <div className="glass rounded-[32px] border border-[var(--foreground)]/10 p-6 space-y-4 shadow-2xl">
+                        <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/30 ml-1">Client Authentication</label>
+                        <div className="rounded-2xl border border-dashed border-[var(--primary-green)]/30 bg-white/40 dark:bg-white/5 backdrop-blur-sm overflow-hidden relative group">
+                            <SignaturePad className="h-32" />
+                            <div className="absolute top-2 right-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="h-1.5 w-1.5 rounded-full bg-[var(--primary-green)] animate-pulse" />
+                            </div>
+                        </div>
                     </div>
                 </div>
 

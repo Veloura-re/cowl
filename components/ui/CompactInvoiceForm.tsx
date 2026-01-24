@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { ArrowLeft, Save, Plus, Trash2, Loader2, CheckCircle2, Wallet, Calculator, Paperclip, Image as ImageIcon, X, Building, Printer } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/context/business-context'
@@ -14,6 +14,7 @@ import { printInvoice, InvoiceData, downloadInvoice } from '@/utils/invoice-gene
 import { currencies } from '@/lib/currencies'
 import SignaturePad, { SignaturePadHandle } from '@/components/ui/signature-pad'
 import InvoicePreviewModal from '@/components/ui/InvoicePreviewModal'
+import CreatePartyModal from '@/app/dashboard/parties/create-party-modal'
 
 type InvoiceFormProps = {
     parties?: any[]
@@ -36,10 +37,10 @@ type InvoiceItem = {
 
 export default function CompactInvoiceForm({ parties = [], items = [], paymentModes = [], initialData, initialLineItems }: InvoiceFormProps) {
     const router = useRouter()
-    const supabase = createClient()
-    const isEdit = !!initialData?.id
-    const isSale = initialData ? initialData.type === 'SALE' : true
     const { activeBusinessId, formatCurrency, businesses } = useBusiness()
+    const supabase = useMemo(() => createClient(), [])
+    const isEdit = !!initialData?.id
+    const isSale = useMemo(() => initialData ? initialData.type === 'SALE' : true, [initialData?.type])
 
     const [loading, setLoading] = useState(false)
     const [deleting, setDeleting] = useState(false)
@@ -48,6 +49,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
     const [isAddModalOpen, setIsAddModalOpen] = useState(false)
     const [isModePickerOpen, setIsModePickerOpen] = useState(false)
     const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+    const [isCreatePartyOpen, setIsCreatePartyOpen] = useState(false)
     const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null)
     const [isPreviewOpen, setIsPreviewOpen] = useState(false)
     const [previewData, setPreviewData] = useState<InvoiceData | null>(null)
@@ -57,16 +59,30 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
     const [fetchedItems, setFetchedItems] = useState<any[]>(items)
     const [fetchedModes, setFetchedModes] = useState<any[]>(paymentModes)
 
+    const fetchParties = useCallback(async () => {
+        if (!activeBusinessId) return
+        const { data, error } = await supabase
+            .from('parties')
+            .select('*')
+            .eq('business_id', activeBusinessId)
+            .order('name')
+
+        if (error) console.error('Error fetching parties:', error)
+        if (data) {
+            console.log('DEBUG: Parties refreshed:', data.length)
+            setFetchedParties(data)
+        }
+    }, [activeBusinessId, supabase])
+
+    // Initial Fetch & Subscription
     useEffect(() => {
-        async function loadLookupData() {
-            if (parties.length === 0) {
-                // Determine party types based on invoice type (isSale)
-                // SALE -> CUSTOMER & BOTH
-                // PURCHASE -> SUPPLIER & BOTH
-                const partyTypes = isSale ? ['CUSTOMER', 'BOTH'] : ['SUPPLIER', 'BOTH']
-                const { data } = await supabase.from('parties').select('*').eq('business_id', activeBusinessId).in('type', partyTypes).order('name')
-                if (data) setFetchedParties(data)
-            }
+        if (!activeBusinessId) return
+
+        // 1. Initial Load
+        fetchParties()
+
+        // 2. Load other lookups (preserve existing logic for items/modes)
+        async function loadOthers() {
             if (items.length === 0) {
                 const { data } = await supabase.from('items').select('*').eq('business_id', activeBusinessId).order('name')
                 if (data) setFetchedItems(data)
@@ -76,8 +92,22 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                 if (data) setFetchedModes(data)
             }
         }
-        loadLookupData()
-    }, [parties.length, items.length, paymentModes.length, isSale, activeBusinessId])
+        loadOthers()
+
+        // 3. Real-time Subscription
+        const channel = supabase
+            .channel('parties-auto-sync')
+            .on('postgres_changes',
+                { event: '*', schema: 'public', table: 'parties', filter: `business_id=eq.${activeBusinessId}` },
+                (payload) => {
+                    console.log('Real-time sync triggered:', payload)
+                    fetchParties()
+                }
+            )
+            .subscribe()
+
+        return () => { supabase.removeChannel(channel) }
+    }, [activeBusinessId, supabase, fetchParties, items.length, paymentModes.length])
 
     const displayParties = parties.length > 0 ? parties : fetchedParties
     const displayItems = items.length > 0 ? items : fetchedItems
@@ -115,9 +145,26 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
 
 
     // Filter data by active business
-    const filteredParties = displayParties.filter(p => p.business_id === activeBusinessId)
-    const filteredItems = displayItems.filter(i => i.business_id === activeBusinessId)
-    const filteredPaymentModes = displayModes.filter(m => m.business_id === activeBusinessId)
+    // We also do a loose type filter in memory for UI preference, but keep it lenient
+    const filteredParties = displayParties
+        .filter(p => !activeBusinessId || p.business_id === activeBusinessId)
+        .sort((a, b) => {
+            // Sort logic: 
+            // 1. Matches type (Customer/Supplier)
+            // 2. Alphabetical
+            const typeA = a.type?.toUpperCase()
+            const typeB = b.type?.toUpperCase()
+            const preferredType = isSale ? 'CUSTOMER' : 'SUPPLIER'
+
+            const aMatch = typeA === preferredType || typeA === 'BOTH'
+            const bMatch = typeB === preferredType || typeB === 'BOTH'
+
+            if (aMatch && !bMatch) return -1
+            if (!aMatch && bMatch) return 1
+            return a.name.localeCompare(b.name)
+        })
+    const filteredItems = displayItems.filter(i => !activeBusinessId || i.business_id === activeBusinessId)
+    const filteredPaymentModes = displayModes.filter(m => !activeBusinessId || m.business_id === activeBusinessId)
 
     const subtotal = rows.reduce((sum, row) => sum + (row.quantity * row.rate), 0)
     const itemTax = rows.reduce((sum, row) => sum + ((row.quantity * row.rate) * (row.tax / 100)), 0)
@@ -526,29 +573,29 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
 
     return (
         <>
-            <form onSubmit={handleSubmit} className="space-y-4 max-w-6xl mx-auto pb-20 px-4 animate-in fade-in duration-500">
+            <form onSubmit={handleSubmit} className="space-y-2 max-w-6xl mx-auto pb-10 px-4 animate-in fade-in duration-500">
                 {/* Header */}
-                <div className="flex items-center justify-between pb-3 border-b border-[var(--primary-green)]/10">
+                <div className="flex items-center justify-between pb-2 border-b border-[var(--primary-green)]/10">
                     <div className="flex items-center gap-2">
-                        <Link href={isSale ? "/dashboard/sales" : "/dashboard/purchases"} className="p-2 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:bg-[var(--primary-green)] hover:text-[var(--primary-foreground)] transition-all active:scale-95 shadow-sm">
-                            <ArrowLeft className="h-4 w-4" />
+                        <Link href={isSale ? "/dashboard/sales" : "/dashboard/purchases"} className="p-1.5 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:bg-[var(--primary-green)] hover:text-[var(--primary-foreground)] transition-all active:scale-95 shadow-sm">
+                            <ArrowLeft className="h-3.5 w-3.5" />
                         </Link>
                         <div>
-                            <h1 className="text-xs font-black text-[var(--deep-contrast)] uppercase tracking-tight">
+                            <h1 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">
                                 {isEdit ? 'Edit' : 'New'} {isSale ? 'Ledger' : 'Purchase'}
                             </h1>
-                            <p className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">
+                            <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest">
                                 UID: {invoiceNumber}
                             </p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                         <button
                             type="button"
                             onClick={handlePreview}
-                            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-[var(--deep-contrast)] text-[9px] font-black uppercase tracking-widest hover:bg-[var(--foreground)]/10 transition-all shadow-sm active:scale-95"
+                            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-[var(--deep-contrast)] text-[8px] font-black uppercase tracking-widest hover:bg-[var(--foreground)]/10 transition-all shadow-sm active:scale-95"
                         >
-                            <Printer className="h-3.5 w-3.5" />
+                            <Printer className="h-3 w-3" />
                             <span className="hidden sm:inline">Preview</span>
                         </button>
                         {isEdit && (
@@ -556,393 +603,379 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                 type="button"
                                 onClick={() => setIsConfirmOpen(true)}
                                 disabled={loading || deleting}
-                                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-500/5 text-rose-500 text-[9px] font-black uppercase tracking-widest hover:bg-rose-500 hover:text-white border border-rose-500/10 transition-all shadow-sm active:scale-95"
+                                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-500/5 text-rose-500 text-[8px] font-black uppercase tracking-widest hover:bg-rose-500 hover:text-white border border-rose-500/10 transition-all shadow-sm active:scale-95"
                             >
-                                {deleting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
+                                {deleting ? <Loader2 className="h-2.5 w-2.5 animate-spin" /> : <Trash2 className="h-2.5 w-2.5" />}
                                 <span className="hidden sm:inline">Delete</span>
                             </button>
                         )}
                         <button
                             type="submit"
                             disabled={loading || !partyId || rows.length === 0}
-                            className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-[var(--primary-green)] text-[var(--primary-foreground)] text-[9px] font-black uppercase tracking-widest hover:bg-[var(--primary-hover)] transition-all disabled:opacity-50 shadow-lg shadow-[var(--primary-green)]/20 active:scale-95"
+                            className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[var(--primary-green)] text-[var(--primary-foreground)] text-[8px] font-black uppercase tracking-widest hover:bg-[var(--primary-hover)] transition-all disabled:opacity-50 shadow-md active:scale-95"
                         >
-                            {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                            {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
                             {isEdit ? 'Update' : 'Commit'}
                         </button>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-                    {/* Left: Basic Info */}
-                    <div className="lg:col-span-1 space-y-4">
-                        <div className="glass rounded-[24px] border border-[var(--foreground)]/10 p-4 shadow-lg">
-                            <h3 className="text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-3 border-b border-[var(--foreground)]/5 pb-2">Entry Metadata</h3>
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1.5 ml-1">{isSale ? 'Client Account' : 'Vendor Account'} *</label>
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsPartyPickerOpen(true)}
-                                        className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[10px] font-black text-left hover:border-[var(--primary-green)] transition-all flex items-center justify-between shadow-inner"
-                                    >
-                                        <span className="truncate">{filteredParties.find(p => p.id === partyId)?.name || 'SELECT ACCOUNT...'}</span>
-                                        <Plus className="h-3.5 w-3.5 opacity-20" />
-                                    </button>
-                                </div>
-                                <div className="space-y-3">
-                                    <div>
-                                        <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1.5 ml-1">Reference UID</label>
-                                        <input
-                                            type="text"
-                                            value={invoiceNumber}
-                                            onChange={(e) => setInvoiceNumber(e.target.value)}
-                                            className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none shadow-inner transition-all"
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <div>
-                                            <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1.5 ml-1">Entry Date</label>
-                                            <input
-                                                type="date"
-                                                value={date}
-                                                onChange={(e) => setDate(e.target.value)}
-                                                className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[10px] font-black focus:border-[var(--primary-green)] focus:outline-none shadow-inner transition-all"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1.5 ml-1">Due Date</label>
-                                            <input
-                                                type="date"
-                                                value={dueDate}
-                                                onChange={(e) => setDueDate(e.target.value)}
-                                                className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[10px] font-black focus:border-[var(--primary-green)] focus:outline-none shadow-inner transition-all"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
+                {/* 0. IDENTITY GATE */}
+                {!partyId ? (
+                    <div className="py-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="glass rounded-[32px] border border-[var(--foreground)]/10 p-10 text-center shadow-lg relative overflow-hidden group max-w-lg mx-auto">
+                            <div className="h-16 w-16 bg-blue-500/10 text-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-500">
+                                <Building size={32} strokeWidth={1.5} />
                             </div>
+                            <h2 className="text-sm font-black text-[var(--deep-contrast)] uppercase tracking-tight mb-2">Party Resolution</h2>
+                            <p className="text-[9px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.2em] mb-4 leading-tight">Identify party to reveal specifications</p>
+
+                            <button
+                                type="button"
+                                onClick={() => setIsPartyPickerOpen(true)}
+                                className="inline-flex items-center gap-3 px-8 py-3.5 rounded-xl bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] text-[9px] font-black uppercase tracking-[0.2em] hover:bg-[var(--deep-contrast-hover)] transition-all shadow-md active:scale-95 group/btn"
+                            >
+                                Select Party
+                            </button>
                         </div>
-
-                        <div className="glass rounded-[24px] border border-[var(--foreground)]/10 p-4 space-y-4 shadow-lg">
-                            <div>
-                                <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1.5 ml-1">Liquidation Mode</label>
-                                <div className="flex gap-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsModePickerOpen(true)}
-                                        className={clsx(
-                                            "flex-1 h-10 rounded-xl border px-4 text-[9px] font-black flex items-center justify-center transition-all shadow-sm",
-                                            paymentMode === 'UNPAID' ? "bg-[var(--foreground)]/5 border-[var(--foreground)]/10 text-[var(--foreground)]/30" : "bg-[var(--primary-green)]/10 border-[var(--primary-green)]/30 text-[var(--primary-green)]"
-                                        )}
-                                    >
-                                        <Wallet className="h-3.5 w-3.5 mr-2 opacity-40" />
-                                        {paymentMode}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsAddBankOpen(true)}
-                                        className="h-10 px-2 rounded-xl border border-dashed border-blue-500/30 bg-blue-500/5 text-blue-500 hover:bg-blue-500 hover:text-white transition-all active:scale-95"
-                                        title="Attach Bank"
-                                    >
-                                        <Building className="h-4 w-4" />
-                                    </button>
-                                </div>
-                            </div>
-
-                            {isAddBankOpen && (
-                                <div className="p-3 rounded-xl bg-blue-500/5 border border-blue-500/20 animate-in slide-in-from-top-2">
-                                    <label className="block text-[7px] font-black uppercase tracking-widest text-blue-600/60 mb-1.5 ml-1">Define New Mode</label>
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="text"
-                                            value={newBankName}
-                                            onChange={(e) => setNewBankName(e.target.value)}
-                                            placeholder="..."
-                                            className="flex-1 h-8 rounded-lg bg-[var(--background)]/50 border border-blue-500/20 px-3 text-[10px] font-black uppercase focus:outline-none"
-                                            onKeyDown={(e) => e.key === 'Enter' && handleAddBank()}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={handleAddBank}
-                                            disabled={addingBank || !newBankName.trim()}
-                                            className="px-3 h-8 rounded-lg bg-blue-500 text-white text-[8px] font-black uppercase disabled:opacity-50 active:scale-95 shadow-sm"
-                                        >
-                                            {addingBank ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'Set'}
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setIsAddBankOpen(false)}
-                                            className="h-8 w-8 rounded-lg bg-white/50 border border-blue-500/20 flex items-center justify-center text-blue-400 active:scale-95"
-                                        >
-                                            <X className="h-3.5 w-3.5" />
-                                        </button>
+                    </div>
+                ) : (
+                    <>
+                        <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 animate-in fade-in slide-in-from-top-2 duration-400">
+                            {/* Left: Basic Info */}
+                            <div className="lg:col-span-1 space-y-3">
+                                <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-3 shadow-md">
+                                    <h3 className="text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 border-b border-[var(--foreground)]/5 pb-1">Metadata</h3>
+                                    <div className="space-y-3">
+                                        <div>
+                                            <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1 ml-0.5">Account</label>
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsPartyPickerOpen(true)}
+                                                className="w-full h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[9px] font-black text-left hover:border-[var(--primary-green)] transition-all flex items-center justify-between shadow-inner"
+                                            >
+                                                <span className="truncate">{filteredParties.find(p => p.id === partyId)?.name || 'SELECT...'}</span>
+                                            </button>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <div>
+                                                <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1 ml-0.5">UID</label>
+                                                <input
+                                                    type="text"
+                                                    value={invoiceNumber}
+                                                    onChange={(e) => setInvoiceNumber(e.target.value)}
+                                                    className="w-full h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[10px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all"
+                                                />
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-1.5">
+                                                <div>
+                                                    <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1 ml-0.5">Date</label>
+                                                    <input
+                                                        type="date"
+                                                        value={date}
+                                                        onChange={(e) => setDate(e.target.value)}
+                                                        className="w-full h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-2 text-[8px] font-black focus:border-[var(--primary-green)] focus:outline-none transition-all"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1 ml-0.5">Due</label>
+                                                    <input
+                                                        type="date"
+                                                        value={dueDate}
+                                                        onChange={(e) => setDueDate(e.target.value)}
+                                                        className="w-full h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-2 text-[8px] font-black focus:border-[var(--primary-green)] focus:outline-none transition-all"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            )}
 
-                            {paymentMode !== 'UNPAID' && (
-                                <div className="pt-2 animate-in slide-in-from-top-2 duration-400">
-                                    <div className="flex items-center justify-between mb-2 ml-1">
-                                        <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30">{isSale ? 'Credit Received' : 'Balance Settled'}</label>
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                const newState = !isFullyReceived
-                                                setIsFullyReceived(newState)
-                                                if (newState) setReceivedAmount(totalAmount)
-                                            }}
-                                            className={clsx(
-                                                "flex items-center gap-1.5 px-2 py-0.5 rounded-lg border transition-all active:scale-95",
-                                                isFullyReceived
-                                                    ? "bg-[var(--primary-green)]/10 border-[var(--primary-green)]/30 text-[var(--primary-green)] shadow-sm"
-                                                    : "bg-[var(--foreground)]/5 border-[var(--foreground)]/10 text-[var(--foreground)]/40 hover:text-[var(--primary-green)]"
-                                            )}
-                                        >
-                                            <div className={clsx(
-                                                "h-2 w-2 rounded-full border border-current flex items-center justify-center",
-                                                isFullyReceived && "bg-current"
-                                            )}>
-                                                {isFullyReceived && <div className="h-1 w-1 bg-white rounded-full" />}
-                                            </div>
-                                            <span className="text-[7px] font-black uppercase tracking-wider">Lump Sum</span>
-                                        </button>
+                                <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-xl space-y-3">
+                                    <div className="flex items-center gap-2 border-b border-[var(--foreground)]/5 pb-2 mb-0.5">
+                                        <div className="h-5 w-5 rounded-md bg-[var(--primary-green)] text-white flex items-center justify-center">
+                                            <Calculator size={12} />
+                                        </div>
+                                        <h3 className="text-[8px] font-black uppercase tracking-widest text-[var(--deep-contrast)]">Summary</h3>
                                     </div>
                                     <div className="space-y-2">
-                                        <input
-                                            type="number"
-                                            step="any"
-                                            value={receivedAmount}
-                                            onChange={(e) => {
-                                                setReceivedAmount(e.target.value)
-                                                setIsFullyReceived(false)
-                                            }}
-                                            placeholder="0.00"
-                                            className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--primary-green)]/20 px-4 text-[11px] font-black focus:border-[var(--primary-green)] transition-all shadow-inner tabular-nums"
-                                        />
-                                        <div className="flex justify-between px-1">
-                                            <span className="text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/20">
-                                                {numReceived >= totalAmount ? 'EXCESS' : 'ARREARS'}
-                                            </span>
-                                            <span className={clsx(
-                                                "text-[10px] font-black font-mono tracking-tighter tabular-nums",
-                                                numReceived >= totalAmount ? "text-blue-500" : "text-rose-500"
-                                            )}>
-                                                {formatCurrency(numReceived >= totalAmount ? changeAmount : balanceDue)}
-                                            </span>
+                                        <div className="flex justify-between text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 px-0.5">
+                                            <span>Subtotal</span>
+                                            <span className="text-[var(--deep-contrast)] tabular-nums font-mono">{formatCurrency(subtotal)}</span>
+                                        </div>
+                                        <div className="flex justify-between text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 px-0.5">
+                                            <span>Tax</span>
+                                            <span className="text-[var(--deep-contrast)] tabular-nums font-mono">{formatCurrency(totalTax)}</span>
+                                        </div>
+                                        {discountAmount > 0 && (
+                                            <div className="flex justify-between text-[8px] font-black uppercase tracking-widest text-orange-600 px-0.5">
+                                                <span>Rebate</span>
+                                                <span className="tabular-nums font-mono">-{formatCurrency(discountAmount)}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="pt-2 border-t border-[var(--primary-green)]/20 mt-1">
+                                        <div className="flex justify-between items-center mb-0.5">
+                                            <span className="text-[7px] font-black uppercase tracking-[0.2em] opacity-30">Total</span>
+                                            {paymentMode !== 'UNPAID' && (
+                                                <span className="text-[6px] font-black px-1.5 py-0.5 rounded-full bg-[var(--primary-green)]/10 text-[var(--primary-green)] uppercase">Paid</span>
+                                            )}
+                                        </div>
+                                        <div className={clsx(
+                                            "text-2xl font-black tabular-nums tracking-tighter leading-none",
+                                            paymentMode !== 'UNPAID' ? "text-[var(--primary-green)]" : "text-[var(--deep-contrast)]"
+                                        )}>
+                                            {formatCurrency(totalAmount)}
                                         </div>
                                     </div>
                                 </div>
-                            )}
-
-                            <div className="pt-3 border-t border-[var(--foreground)]/5">
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1.5 ml-1">Discount</label>
-                                        <input
-                                            type="number"
-                                            step="any"
-                                            value={discount}
-                                            onChange={(e) => setDiscount(e.target.value)}
-                                            placeholder="0"
-                                            className="w-full h-9 rounded-lg bg-[var(--foreground)]/5 border border-orange-500/20 px-3 text-[10px] font-black focus:border-orange-500 shadow-inner"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1.5 ml-1">Tax (%)</label>
-                                        <input
-                                            type="number"
-                                            step="any"
-                                            value={invoiceTax}
-                                            onChange={(e) => setInvoiceTax(e.target.value)}
-                                            placeholder="0"
-                                            className="w-full h-9 rounded-lg bg-[var(--foreground)]/5 border border-emerald-500/20 px-3 text-[10px] font-black focus:border-emerald-500 shadow-inner"
-                                        />
-                                    </div>
-                                </div>
                             </div>
-                        </div>
 
-                        <div className="glass rounded-[24px] border border-[var(--foreground)]/10 p-4 shadow-lg">
-                            <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-2 ml-1">Authentication Pad</label>
-                            <div className="rounded-2xl overflow-hidden border border-dashed border-[var(--primary-green)]/20 bg-white/30 dark:bg-white/5 backdrop-blur-sm relative group">
-                                <SignaturePad ref={sigPadRef} className="h-32" />
-                                <button
-                                    type="button"
-                                    onClick={() => sigPadRef.current?.clear()}
-                                    className="absolute top-2 right-2 p-1.5 rounded-lg bg-rose-500/5 text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity active:scale-95"
-                                >
-                                    <Trash2 size={12} />
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="glass rounded-[24px] border border-[var(--foreground)]/10 p-4 shadow-lg">
-                            <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-2 ml-1">Supporting Evidence</label>
-                            <div className="flex flex-wrap gap-2">
-                                {attachments.map((url, i) => (
-                                    <div key={i} className="relative group">
-                                        <div className="h-12 w-12 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 overflow-hidden shadow-sm">
-                                            {url.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
-                                                <img src={url} alt="" className="w-full h-full object-cover" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center">
-                                                    <Paperclip className="h-4 w-4 text-[var(--foreground)]/20" />
-                                                </div>
-                                            )}
+                            {/* Right: Items */}
+                            <div className="lg:col-span-4 space-y-3">
+                                <div className="glass rounded-[24px] border border-[var(--foreground)]/10 overflow-hidden min-h-[400px] shadow-xl">
+                                    <div className="px-4 py-3 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5 flex justify-between items-center relative overflow-hidden">
+                                        <div className="relative z-10">
+                                            <h3 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">Inventory Log</h3>
+                                            <p className="text-[7px] font-black text-[var(--foreground)]/40 uppercase tracking-widest">{rows.length} ENTRIES</p>
                                         </div>
                                         <button
                                             type="button"
-                                            onClick={() => removeAttachment(i)}
-                                            className="absolute -top-1.5 -right-1.5 h-4.5 w-4.5 rounded-full bg-rose-500 text-white flex items-center justify-center shadow-lg active:scale-95 z-10"
+                                            onClick={() => setIsAddModalOpen(true)}
+                                            className="relative z-10 flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--primary-green)] text-[var(--primary-foreground)] text-[9px] font-black uppercase tracking-wider hover:bg-[var(--primary-hover)] transition-all shadow-md active:scale-95 group"
                                         >
-                                            <X className="h-3 w-3" />
+                                            <Plus size={12} />
+                                            NEW LINE
                                         </button>
                                     </div>
-                                ))}
-                                <label className="h-12 w-12 rounded-xl border border-dashed border-[var(--foreground)]/20 bg-[var(--foreground)]/5 flex items-center justify-center cursor-pointer hover:bg-[var(--foreground)]/10 hover:border-[var(--primary-green)]/30 transition-all active:scale-95 group shadow-sm">
-                                    <Plus className="h-4 w-4 text-[var(--foreground)]/20 group-hover:text-[var(--primary-green)]" />
-                                    <input
-                                        type="file"
-                                        multiple
-                                        accept="image/*,.pdf,.doc,.docx"
-                                        onChange={handleFileUpload}
-                                        className="hidden"
-                                    />
-                                </label>
-                            </div>
-                        </div>
 
-                        <div className="space-y-2 pt-4 border-t border-[var(--foreground)]/5">
-                            <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/30 px-1">
-                                <span>Subtotal</span>
-                                <span className="text-[var(--deep-contrast)] tabular-nums">{formatCurrency(subtotal)}</span>
-                            </div>
-                            <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/30 px-1">
-                                <span>Accumulated Tax</span>
-                                <span className="text-[var(--deep-contrast)] tabular-nums">{formatCurrency(totalTax)}</span>
-                            </div>
-                            {discountAmount > 0 && (
-                                <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-orange-600 px-1">
-                                    <span>Discount (Applied)</span>
-                                    <span className="tabular-nums">-{formatCurrency(discountAmount)}</span>
-                                </div>
-                            )}
-                            {isSale && (
-                                <div className={clsx(
-                                    "flex justify-between text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-xl border mt-2",
-                                    isTotalLoss ? "bg-rose-500/5 border-rose-500/10 text-rose-500" : "bg-blue-500/5 border-blue-500/10 text-blue-500"
-                                )}>
-                                    <span>{isTotalLoss ? 'PROJECTED LOSS' : 'PROJECTED MARGIN'}</span>
-                                    <span className="tabular-nums font-mono">{formatCurrency(projectedProfit)}</span>
-                                </div>
-                            )}
-                            <div className="flex justify-between items-center text-xl font-black text-[var(--deep-contrast)] pt-3 border-t border-[var(--primary-green)]/20 mt-3 px-1">
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-30">Total</span>
-                                <span className={clsx(paymentMode !== 'UNPAID' ? "text-[var(--primary-green)] drop-shadow-sm font-mono tracking-tighter" : "font-mono tracking-tighter")}>
-                                    {formatCurrency(totalAmount)}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Right: Items */}
-                    <div className="lg:col-span-3 space-y-4">
-                        <div className="glass rounded-[32px] border border-[var(--foreground)]/10 overflow-hidden min-h-[500px] shadow-2xl">
-                            <div className="px-6 py-4 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5 flex justify-between items-center">
-                                <div>
-                                    <h3 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">Active Inventory Log</h3>
-                                    <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">{rows.length} RECORDED ENTRIES</p>
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={() => setIsAddModalOpen(true)}
-                                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--primary-green)] text-[var(--primary-foreground)] text-[10px] font-black uppercase tracking-[0.1em] hover:bg-[var(--primary-hover)] transition-all shadow-lg active:scale-95 group"
-                                >
-                                    <Plus className="h-4 w-4 transition-transform group-hover:rotate-90 duration-500" />
-                                    GENERATE LINE
-                                </button>
-                            </div>
-
-                            <div className="p-4 space-y-2.5 max-h-[600px] overflow-y-auto custom-scrollbar">
-                                {rows.length === 0 ? (
-                                    <div className="text-center py-32 opacity-20">
-                                        <Calculator className="h-12 w-12 mx-auto mb-4 opacity-10" />
-                                        <p className="text-[10px] font-black uppercase tracking-[0.3em]">Ledger is empty</p>
-                                    </div>
-                                ) : (
-                                    rows.map((row, index) => (
-                                        <div
-                                            key={index}
-                                            onClick={() => openEditModal(index)}
-                                            className="group relative p-4 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/5 hover:bg-[var(--foreground)]/10 transition-all cursor-pointer active:scale-[0.99] shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
-                                        >
-                                            <div className="flex items-center gap-4 flex-1 min-w-0">
-                                                <div className="h-10 w-10 rounded-xl bg-[var(--primary-green)] text-[var(--primary-foreground)] flex items-center justify-center shadow-lg shadow-[var(--primary-green)]/10 group-hover:scale-110 transition-transform">
-                                                    <Calculator size={18} strokeWidth={2.5} />
-                                                </div>
-                                                <div className="min-w-0 flex-1">
-                                                    <h4 className="text-[11px] font-black text-[var(--deep-contrast)] uppercase truncate tracking-tight">{row.name}</h4>
-                                                    <div className={clsx(
-                                                        "text-[8px] font-black uppercase tracking-wider mt-0.5",
-                                                        (row.rate - (row.purchasePrice || 0)) < 0 ? "text-rose-500" : "text-blue-500"
-                                                    )}>
-                                                        PROFIT PER UNIT: {formatCurrency(row.rate - (row.purchasePrice || 0))}
-                                                    </div>
-                                                </div>
+                                    <div className="p-2 space-y-1.5 max-h-[500px] overflow-y-auto custom-scrollbar">
+                                        {rows.length === 0 ? (
+                                            <div className="text-center py-24 opacity-10">
+                                                <Calculator className="h-8 w-8 mx-auto mb-3" />
+                                                <p className="text-[8px] font-black uppercase tracking-[0.3em]">Empty</p>
                                             </div>
-
-                                            <div className="flex items-center gap-6 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-[var(--foreground)]/5">
-                                                <div className="flex gap-4">
-                                                    <div className="text-center sm:text-right">
-                                                        <p className="text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-0.5">Quantity</p>
-                                                        <p className="text-[11px] font-black text-[var(--deep-contrast)] tabular-nums">{row.quantity} {row.unit}</p>
-                                                    </div>
-                                                    <div className="text-center sm:text-right">
-                                                        <p className="text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-0.5">Rate</p>
-                                                        <p className="text-[11px] font-black text-[var(--deep-contrast)] tabular-nums">{formatCurrency(row.rate)}</p>
-                                                    </div>
-                                                </div>
-                                                <div className="text-right pl-4 border-l border-[var(--foreground)]/10">
-                                                    <p className="text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-0.5">Valuation</p>
-                                                    <p className="text-[14px] font-black text-[var(--primary-green)] tabular-nums font-mono tracking-tighter">{formatCurrency(row.amount)}</p>
-                                                </div>
-                                                <button
-                                                    type="button"
-                                                    onClick={(e) => { e.stopPropagation(); removeRow(index); }}
-                                                    className="p-2 rounded-xl bg-rose-500/5 text-rose-500 transition-all hover:bg-rose-500 hover:text-white z-10 active:scale-95 shadow-sm border border-rose-500/10"
+                                        ) : (
+                                            rows.map((row, index) => (
+                                                <div
+                                                    key={index}
+                                                    onClick={() => openEditModal(index)}
+                                                    className="group relative p-2.5 rounded-xl bg-[var(--foreground)]/3 border border-[var(--foreground)]/5 hover:bg-[var(--foreground)]/7 transition-all cursor-pointer active:scale-[0.99] shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3"
                                                 >
-                                                    <Trash2 size={14} />
-                                                </button>
+                                                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                                                        <div className="h-8 w-8 rounded-lg bg-[var(--primary-green)] text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+                                                            <Calculator size={14} strokeWidth={2.5} />
+                                                        </div>
+                                                        <div className="min-w-0 flex-1">
+                                                            <h4 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase truncate tracking-tight">{row.name}</h4>
+                                                            <p className="text-[7px] font-black uppercase tracking-wider text-blue-500 mt-0.5">
+                                                                P/U: {formatCurrency(row.rate - (row.purchasePrice || 0))}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+                                                        <div className="flex gap-4">
+                                                            <div className="text-right">
+                                                                <p className="text-[10px] font-black text-[var(--deep-contrast)] tabular-nums">{row.quantity} {row.unit} × {formatCurrency(row.rate)}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-right pl-3 border-l border-[var(--foreground)]/10">
+                                                            <p className="text-[12px] font-black text-[var(--primary-green)] tabular-nums font-mono tracking-tighter">{formatCurrency(row.amount)}</p>
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            onClick={(e) => { e.stopPropagation(); removeRow(index); }}
+                                                            className="p-1.5 rounded-lg bg-rose-500/5 text-rose-500 hover:bg-rose-500 transition-all active:scale-95 opacity-0 group-hover:opacity-100"
+                                                        >
+                                                            <Trash2 size={12} />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Bottom Documentation Layer */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mt-3">
+
+                            {/* 1. Documentation & Metadata */}
+                            <div className="space-y-2">
+                                <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md space-y-2">
+                                    <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Adjustments</label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div className="p-2.5 rounded-xl bg-[var(--foreground)]/3 border border-white/5 space-y-1">
+                                            <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 font-mono">DIS %</label>
+                                            <div className="flex items-center">
+                                                <input
+                                                    type="number"
+                                                    value={discount}
+                                                    onChange={(e) => setDiscount(e.target.value)}
+                                                    className="w-full bg-transparent text-[11px] font-black text-[var(--deep-contrast)] focus:outline-none tabular-nums"
+                                                />
                                             </div>
                                         </div>
-                                    ))
-                                )}
-                            </div>
-                        </div>
+                                        <div className="p-2.5 rounded-xl bg-[var(--foreground)]/3 border border-white/5 space-y-1">
+                                            <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 font-mono">TAX %</label>
+                                            <div className="flex items-center">
+                                                <input
+                                                    type="number"
+                                                    value={invoiceTax}
+                                                    onChange={(e) => setInvoiceTax(e.target.value)}
+                                                    className="w-full bg-transparent text-[11px] font-black text-[var(--deep-contrast)] focus:outline-none tabular-nums"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-                        <div className="relative group shadow-xl">
-                            <textarea
-                                value={notes}
-                                onChange={(e) => setNotes(e.target.value)}
-                                placeholder="ENTER INTERNAL MEMORANDUM..."
-                                className="w-full h-32 rounded-[32px] glass border border-[var(--foreground)]/10 p-6 text-[11px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none resize-none placeholder:text-[var(--foreground)]/20 transition-all shadow-inner"
-                            />
-                            <div className="absolute top-4 right-6 pointer-events-none opacity-10">
-                                <Paperclip size={24} />
+                                <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md flex flex-col min-h-[100px]">
+                                    <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 mb-2">Internal Memo</label>
+                                    <textarea
+                                        value={notes}
+                                        onChange={(e) => setNotes(e.target.value)}
+                                        placeholder="SPECIFICATIONS..."
+                                        className="flex-1 w-full bg-transparent text-[10px] font-black text-[var(--deep-contrast)] focus:outline-none resize-none placeholder:opacity-10 custom-scrollbar"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* 2. Authentication & Liquidation */}
+                            <div className="space-y-2">
+                                <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md space-y-2">
+                                    <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Liquidation</label>
+                                    <div className="space-y-2">
+                                        <div className="flex gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsModePickerOpen(true)}
+                                                className={clsx(
+                                                    "flex-1 h-10 rounded-xl border px-3 text-[9px] font-black flex items-center justify-center transition-all",
+                                                    paymentMode === 'UNPAID' ? "bg-rose-500/5 border-rose-500/10 text-rose-500" : "bg-[var(--primary-green)]/10 border-[var(--primary-green)]/40 text-[var(--primary-green)]"
+                                                )}
+                                            >
+                                                {paymentMode}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsAddBankOpen(true)}
+                                                className="h-10 w-10 rounded-xl border border-dashed border-blue-500/20 bg-blue-500/5 text-blue-500 flex items-center justify-center"
+                                            >
+                                                <Building size={14} />
+                                            </button>
+                                        </div>
+
+                                        {paymentMode !== 'UNPAID' && (
+                                            <div className="p-2.5 rounded-xl bg-[var(--foreground)]/3 border border-white/5 space-y-2">
+                                                <div className="flex items-center justify-between">
+                                                    <label className="text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30">Receipt</label>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            const newState = !isFullyReceived
+                                                            setIsFullyReceived(newState)
+                                                            if (newState) setReceivedAmount(totalAmount)
+                                                        }}
+                                                        className={clsx(
+                                                            "px-1.5 py-0.5 rounded text-[6px] font-black uppercase transition-all",
+                                                            isFullyReceived ? "bg-[var(--primary-green)] text-white" : "bg-[var(--foreground)]/10 text-[var(--foreground)]/40"
+                                                        )}
+                                                    >
+                                                        Full
+                                                    </button>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <input
+                                                        type="number"
+                                                        value={receivedAmount}
+                                                        onChange={(e) => {
+                                                            setReceivedAmount(e.target.value)
+                                                            setIsFullyReceived(false)
+                                                        }}
+                                                        className="flex-1 bg-transparent text-base font-black text-[var(--deep-contrast)] focus:outline-none tabular-nums"
+                                                        placeholder="0.00"
+                                                    />
+                                                    <div className="text-right">
+                                                        <p className={clsx(
+                                                            "text-[10px] font-black tabular-nums font-mono leading-none",
+                                                            balanceDue > 0 ? "text-rose-500" : "text-[var(--primary-green)]"
+                                                        )}>{formatCurrency(balanceDue)}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md space-y-2">
+                                    <div className="flex justify-between items-center">
+                                        <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Auth</label>
+                                        <button type="button" onClick={() => sigPadRef.current?.clear()} className="text-[7px] font-black uppercase text-rose-500/50">Reset</button>
+                                    </div>
+                                    <div className="rounded-xl border border-dashed border-[var(--primary-green)]/20 bg-white/5 backdrop-blur-sm overflow-hidden h-20">
+                                        <SignaturePad ref={sigPadRef} className="h-full" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* 3. Evidence & Media */}
+                            <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md flex flex-col">
+                                <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 mb-3 ml-1">Evidence</label>
+                                <div className="flex flex-wrap gap-2 flex-1 overflow-y-auto custom-scrollbar max-h-[160px]">
+                                    {attachments.map((url, i) => (
+                                        <div key={i} className="relative group/attachment h-12 w-12 rounded-lg border border-white/5 overflow-hidden shadow-sm">
+                                            <img src={url} className="w-full h-full object-cover" />
+                                            <button type="button" onClick={() => removeAttachment(i)} className="absolute inset-0 bg-rose-500/80 text-white flex items-center justify-center opacity-0 group-hover/attachment:opacity-100 transition-opacity">
+                                                <X size={12} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    <label className="h-12 w-12 rounded-lg border-2 border-dashed border-[var(--foreground)]/10 bg-[var(--foreground)]/2 flex items-center justify-center cursor-pointer hover:border-[var(--primary-green)]/30 transition-all">
+                                        <Plus size={14} className="text-[var(--foreground)]/10" />
+                                        <input type="file" multiple onChange={handleFileUpload} className="hidden" />
+                                    </label>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </>
+                )}
             </form>
 
             <PickerModal
                 isOpen={isPartyPickerOpen}
                 onClose={() => setIsPartyPickerOpen(false)}
                 onSelect={setPartyId}
-                title="Select Account"
-                options={filteredParties.map(p => ({ id: p.id, label: p.name.toUpperCase(), subLabel: p.phone }))}
+                title="Select Party"
+                options={filteredParties.map(p => ({
+                    id: p.id,
+                    label: p.name.toUpperCase(),
+                    subLabel: p.type // Show type to help debug/identify
+                }))}
                 selectedValue={partyId}
+                footer={
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setIsPartyPickerOpen(false)
+                            setIsCreatePartyOpen(true)
+                        }}
+                        className="w-full py-2 rounded-xl bg-[var(--primary-green)]/10 text-[var(--primary-green)] text-[10px] font-black uppercase tracking-widest hover:bg-[var(--primary-green)] hover:text-white transition-all"
+                    >
+                        + Create New Party
+                    </button>
+                }
+            />
+
+            <CreatePartyModal
+                isOpen={isCreatePartyOpen}
+                onClose={() => setIsCreatePartyOpen(false)}
+                onSuccess={() => {
+                    fetchParties() // Immediate manual refresh
+                }}
+                initialData={{ type: isSale ? 'CUSTOMER' : 'SUPPLIER' }}
             />
 
             <PickerModal
