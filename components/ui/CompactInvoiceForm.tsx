@@ -39,6 +39,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
     const supabase = createClient()
     const isEdit = !!initialData?.id
     const isSale = initialData ? initialData.type === 'SALE' : true
+    const { activeBusinessId, formatCurrency, businesses } = useBusiness()
 
     const [loading, setLoading] = useState(false)
     const [deleting, setDeleting] = useState(false)
@@ -111,7 +112,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
     const [modeBalances, setModeBalances] = useState<Record<string, number>>({})
     const sigPadRef = useRef<SignaturePadHandle>(null)
 
-    const { activeBusinessId, formatCurrency, businesses } = useBusiness()
+
 
     // Filter data by active business
     const filteredParties = displayParties.filter(p => p.business_id === activeBusinessId)
