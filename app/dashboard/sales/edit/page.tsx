@@ -30,13 +30,13 @@ function EditInvoiceContent() {
             const { data: lineItems } = await supabase.from('invoice_items').select('*, items(unit)').eq('invoice_id', id)
 
             // 3. Parties
-            const { data: parties } = await supabase.from('parties').select('*').in('type', ['CUSTOMER', 'BOTH']).order('name')
+            const { data: parties } = await supabase.from('parties').select('*').eq('business_id', invoice.business_id).in('type', ['CUSTOMER', 'BOTH']).order('name')
 
             // 4. Items
-            const { data: items } = await supabase.from('items').select('*').order('name')
+            const { data: items } = await supabase.from('items').select('*').eq('business_id', invoice.business_id).order('name')
 
             // 5. Payment Modes
-            const { data: paymentModes } = await supabase.from('payment_modes').select('*').order('name')
+            const { data: paymentModes } = await supabase.from('payment_modes').select('*').eq('business_id', invoice.business_id).order('name')
 
             setData({
                 invoice,

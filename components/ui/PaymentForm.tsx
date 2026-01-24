@@ -70,20 +70,24 @@ export default function PaymentForm({
     useEffect(() => {
         async function loadLookupData() {
             if (parties.length === 0) {
-                const { data } = await supabase.from('parties').select('*').in('type', ['CUSTOMER', 'BOTH']).order('name')
+                // Load appropriate party types based on transaction type
+                // RECEIPT (money IN) -> CUSTOMER & BOTH
+                // PAYMENT (money OUT) -> SUPPLIER & BOTH
+                const partyTypes = isReceipt ? ['CUSTOMER', 'BOTH'] : ['SUPPLIER', 'BOTH']
+                const { data } = await supabase.from('parties').select('*').eq('business_id', activeBusinessId).in('type', partyTypes).order('name')
                 if (data) setFetchedParties(data)
             }
             if (allItems.length === 0) {
-                const { data } = await supabase.from('items').select('*').order('name')
+                const { data } = await supabase.from('items').select('*').eq('business_id', activeBusinessId).order('name')
                 if (data) setFetchedItems(data)
             }
             if (paymentModes.length === 0) {
-                const { data } = await supabase.from('payment_modes').select('*').order('name')
+                const { data } = await supabase.from('payment_modes').select('*').eq('business_id', activeBusinessId).order('name')
                 if (data) setFetchedModes(data)
             }
         }
         loadLookupData()
-    }, [parties.length, allItems.length, paymentModes.length])
+    }, [parties.length, allItems.length, paymentModes.length, isReceipt, activeBusinessId])
 
     const displayParties = parties.length > 0 ? parties : fetchedParties
     const displayItems = allItems.length > 0 ? allItems : fetchedItems

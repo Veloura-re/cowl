@@ -45,7 +45,13 @@ function EditFinanceContent() {
             }
 
             // 3. Parties
-            const { data: parties } = await supabase.from('parties').select('id, name').order('name')
+            const partyTypes = transaction.type === 'RECEIPT' ? ['CUSTOMER', 'BOTH'] : ['SUPPLIER', 'BOTH']
+            const { data: parties } = await supabase
+                .from('parties')
+                .select('id, name')
+                .eq('business_id', transaction.business_id)
+                .in('type', partyTypes)
+                .order('name')
 
             // 4. Items
             const { data: items } = await supabase.from('items').select('*').order('name')

@@ -59,20 +59,24 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
     useEffect(() => {
         async function loadLookupData() {
             if (parties.length === 0) {
-                const { data } = await supabase.from('parties').select('*').in('type', ['CUSTOMER', 'BOTH']).order('name')
+                // Determine party types based on invoice type (isSale)
+                // SALE -> CUSTOMER & BOTH
+                // PURCHASE -> SUPPLIER & BOTH
+                const partyTypes = isSale ? ['CUSTOMER', 'BOTH'] : ['SUPPLIER', 'BOTH']
+                const { data } = await supabase.from('parties').select('*').eq('business_id', activeBusinessId).in('type', partyTypes).order('name')
                 if (data) setFetchedParties(data)
             }
             if (items.length === 0) {
-                const { data } = await supabase.from('items').select('*').order('name')
+                const { data } = await supabase.from('items').select('*').eq('business_id', activeBusinessId).order('name')
                 if (data) setFetchedItems(data)
             }
             if (paymentModes.length === 0) {
-                const { data } = await supabase.from('payment_modes').select('*').order('name')
+                const { data } = await supabase.from('payment_modes').select('*').eq('business_id', activeBusinessId).order('name')
                 if (data) setFetchedModes(data)
             }
         }
         loadLookupData()
-    }, [parties.length, items.length, paymentModes.length])
+    }, [parties.length, items.length, paymentModes.length, isSale, activeBusinessId])
 
     const displayParties = parties.length > 0 ? parties : fetchedParties
     const displayItems = items.length > 0 ? items : fetchedItems
