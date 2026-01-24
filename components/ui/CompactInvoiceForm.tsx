@@ -905,7 +905,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                                 <button
                                                     type="button"
                                                     onClick={(e) => { e.stopPropagation(); removeRow(index); }}
-                                                    className="p-2 rounded-xl bg-rose-500/5 text-rose-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-rose-500 hover:text-white z-10 active:scale-95 shadow-sm border border-rose-500/10"
+                                                    className="p-2 rounded-xl bg-rose-500/5 text-rose-500 transition-all hover:bg-rose-500 hover:text-white z-10 active:scale-95 shadow-sm border border-rose-500/10"
                                                 >
                                                     <Trash2 size={14} />
                                                 </button>

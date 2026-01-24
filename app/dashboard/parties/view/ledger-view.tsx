@@ -161,9 +161,9 @@ export default function PartyLedgerView({ party, initialInvoices, initialTransac
                             <div className="flex items-center gap-4">
                                 <div className={clsx(
                                     "h-10 w-10 rounded-xl flex items-center justify-center",
-                                    tx.type === 'PAYMENT_IN' ? "bg-[var(--status-success)] text-[var(--status-success-foreground)]" : "bg-[var(--status-danger)] text-[var(--status-danger-foreground)]"
+                                    tx.type === 'RECEIPT' ? "bg-[var(--status-success)] text-[var(--status-success-foreground)]" : "bg-[var(--status-danger)] text-[var(--status-danger-foreground)]"
                                 )}>
-                                    {tx.type === 'PAYMENT_IN' ? <ArrowDownRight className="h-5 w-5" /> : <ArrowUpRight className="h-5 w-5" />}
+                                    {tx.type === 'RECEIPT' ? <ArrowDownRight className="h-5 w-5" /> : <ArrowUpRight className="h-5 w-5" />}
                                 </div>
                                 <div>
                                     <h3 className="text-sm font-bold text-[var(--deep-contrast)]">{tx.number || 'Transaction'}</h3>
@@ -175,9 +175,9 @@ export default function PartyLedgerView({ party, initialInvoices, initialTransac
                             <div className="text-right">
                                 <p className={clsx(
                                     "text-sm font-bold",
-                                    tx.type === 'PAYMENT_IN' ? "text-[var(--status-success-foreground)]" : "text-[var(--status-danger-foreground)]"
+                                    tx.type === 'RECEIPT' ? "text-[var(--status-success-foreground)]" : "text-[var(--status-danger-foreground)]"
                                 )}>
-                                    {tx.type === 'PAYMENT_IN' ? '+' : '-'}{formatCurrency(tx.amount)}
+                                    {tx.type === 'RECEIPT' ? '+' : '-'}{formatCurrency(tx.amount)}
                                 </p>
                                 <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider">
                                     {tx.mode || 'Cash'}

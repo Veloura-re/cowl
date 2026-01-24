@@ -2,7 +2,7 @@
 import { useTheme } from "next-themes";
 import { Sun, Moon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function ThemeToggle() {
     const { theme, setTheme } = useTheme();
@@ -14,22 +14,32 @@ export function ThemeToggle() {
     }, []);
 
     if (!mounted) {
-        return null;
+        return (
+            <div className="p-2 rounded-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 opacity-0">
+                <div className="h-5 w-5" />
+            </div>
+        );
     }
+
+    const isDark = theme === 'dark';
 
     return (
         <button
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="p-2 rounded-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:bg-[var(--foreground)]/10 transition-all text-[var(--foreground)]"
-            aria-label="Toggle Dark Mode"
+            onClick={() => setTheme(isDark ? 'light' : 'dark')}
+            className="p-2 rounded-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:bg-[var(--foreground)]/10 transition-all text-[var(--foreground)] active:scale-95"
+            aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
         >
-            <motion.div
-                initial={{ rotate: 0 }}
-                animate={{ rotate: theme === 'dark' ? 180 : 0 }}
-                transition={{ duration: 0.5 }}
-            >
-                {theme === 'dark' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-            </motion.div>
+            <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                    key={isDark ? 'dark' : 'light'}
+                    initial={{ y: -20, opacity: 0, rotate: -180 }}
+                    animate={{ y: 0, opacity: 1, rotate: 0 }}
+                    exit={{ y: 20, opacity: 0, rotate: 180 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                >
+                    {isDark ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+                </motion.div>
+            </AnimatePresence>
         </button>
     );
 }

@@ -62,7 +62,7 @@ export default function Dropdown({ options, value, onChange, placeholder, classN
 
             {isOpen && (
                 <div className="absolute top-full left-0 right-0 mt-1 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                    <div className="glass rounded-xl border border-white/40 dark:border-white/10 shadow-2xl overflow-hidden backdrop-blur-xl bg-white/60 dark:bg-zinc-900/90">
+                    <div className="glass rounded-xl border border-white/40 dark:border-white/10 shadow-2xl overflow-hidden backdrop-blur-xl bg-white/60 dark:bg-neutral-950/90">
                         <div className="py-1 max-h-[240px] overflow-y-auto custom-scrollbar">
                             {options.map((option) => (
                                 <button

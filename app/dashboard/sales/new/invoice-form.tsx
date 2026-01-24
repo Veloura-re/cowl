@@ -314,7 +314,7 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                                 <div key={index} className="group relative glass p-3 rounded-2xl border border-white/30 dark:border-white/10 hover:bg-white/60 dark:hover:bg-white/10 transition-all flex flex-col sm:flex-row gap-3">
                                     <button
                                         onClick={() => removeRow(index)}
-                                        className="absolute -top-1.5 -right-1.5 p-1 bg-white dark:bg-zinc-800 rounded-full border border-rose-100 dark:border-rose-900/30 text-rose-500 hover:bg-rose-500 hover:text-white transition-all shadow-sm z-10"
+                                        className="absolute -top-1.5 -right-1.5 p-1 bg-white dark:bg-white/10 rounded-full border border-rose-100 dark:border-rose-900/30 text-rose-500 hover:bg-rose-500 hover:text-white transition-all shadow-sm z-10"
                                     >
                                         <Trash2 className="h-3 w-3" />
                                     </button>

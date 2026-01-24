@@ -66,7 +66,7 @@ export default function BusinessSwitcherModal({
                         </div>
 
                         {/* Business List */}
-                        <div className="p-4 space-y-2 max-h-[40vh] overflow-y-auto scrollbar-hide py-6 custom-scrollbar">
+                        <div className="p-4 space-y-2 max-h-[40vh] overflow-y-auto py-6 custom-scrollbar">
                             {businesses.map((biz) => {
                                 const isActive = biz.id === activeBusinessId
                                 return (
