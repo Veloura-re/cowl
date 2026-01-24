@@ -35,7 +35,7 @@ export default function Step1PartyInfo({ parties, onNext }: Step1Props) {
     }
 
     return (
-        <div className="glass rounded-2xl border border-white/40 overflow-hidden">
+        <div className="glass rounded-2xl border border-gray-200 overflow-hidden">
             <div className="px-5 py-3 border-b border-white/10 bg-[var(--primary-green)]/5">
                 <h2 className="text-[11px] font-bold text-[var(--deep-contrast)] uppercase tracking-tight">Party & Basic Information</h2>
                 <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mt-0.5">Select customer and invoice details</p>

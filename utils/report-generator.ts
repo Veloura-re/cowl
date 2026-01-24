@@ -1,6 +1,4 @@
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-import * as XLSX from 'xlsx';
+// Types only imports (optional, or just remove static imports)
 import { format } from 'date-fns';
 
 export type ReportType = 'SALES' | 'PURCHASES' | 'INVENTORY' | 'PROFIT_LOSS';
@@ -23,13 +21,15 @@ export const ReportGenerator = {
     /**
      * Generates a PDF Report
      */
-    generatePDF: (
+    generatePDF: async (
         reportType: ReportType,
         data: ReportData,
         businessInfo: BusinessInfo,
         dateRange?: { start: Date; end: Date },
         signatureDataUrl?: string
     ) => {
+        const { jsPDF } = await import('jspdf');
+        const { default: autoTable } = await import('jspdf-autotable');
         const doc = new jsPDF();
         const pageWidth = doc.internal.pageSize.width;
 
@@ -154,11 +154,12 @@ export const ReportGenerator = {
     /**
      * Generates an Excel Report
      */
-    generateExcel: (
+    generateExcel: async (
         reportType: ReportType,
         data: ReportData,
         dateRange?: { start: Date; end: Date }
     ) => {
+        const XLSX = await import('xlsx');
         // prepare data for sheet
         const sheetData = [
             [data.title],

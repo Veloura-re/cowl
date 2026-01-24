@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { AlertCircle, CheckCircle2, X } from 'lucide-react'
+import { AlertCircle, CheckCircle2, X, ShieldCheck, ShieldAlert } from 'lucide-react'
 import clsx from 'clsx'
 
 interface FeedbackModalProps {
@@ -30,47 +30,50 @@ export default function FeedbackModal({
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="absolute inset-0 bg-black/60 backdrop-blur-md"
+                        className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-md"
                     />
 
                     <motion.div
                         initial={{ scale: 0.9, opacity: 0, y: 20 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                        className="relative w-full max-w-sm glass rounded-[32px] border border-white/40 shadow-2xl overflow-hidden bg-white/80 p-8 text-center"
+                        className="glass w-full max-w-sm rounded-[32px] border border-[var(--foreground)]/10 shadow-2xl overflow-hidden relative z-10 p-8 text-center"
                     >
                         <div className={clsx(
-                            "mx-auto h-16 w-16 rounded-[24px] flex items-center justify-center mb-6 shadow-lg",
-                            isError ? "bg-rose-500 shadow-rose-500/20" : "bg-emerald-500 shadow-emerald-500/20"
+                            "mx-auto h-20 w-20 rounded-[28px] flex items-center justify-center mb-6 shadow-2xl transition-transform duration-500",
+                            isError ? "bg-rose-500 shadow-rose-500/30" : "bg-emerald-500 shadow-emerald-500/30"
                         )}>
                             {isError ? (
-                                <AlertCircle className="h-8 w-8 text-white" />
+                                <ShieldAlert className="h-10 w-10 text-white" />
                             ) : (
-                                <CheckCircle2 className="h-8 w-8 text-white" />
+                                <ShieldCheck className="h-10 w-10 text-white" />
                             )}
                         </div>
 
-                        <h3 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight mb-2">
-                            {title || (isError ? 'Action Failed' : 'Success!')}
-                        </h3>
-
-                        <p className="text-xs lg:text-[11px] font-bold text-[var(--foreground)]/60 leading-relaxed max-w-[220px] mx-auto uppercase tracking-wider mb-8">
-                            {message}
-                        </p>
+                        <div className="space-y-2 mb-8">
+                            <h3 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight uppercase">
+                                {title || (isError ? 'Action Denied' : 'Verification Success')}
+                            </h3>
+                            <p className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.2em] leading-relaxed max-w-[220px] mx-auto">
+                                {message}
+                            </p>
+                        </div>
 
                         <button
                             onClick={onClose}
                             className={clsx(
-                                "w-full h-12 rounded-2xl text-white text-[11px] lg:text-[10px] font-black uppercase tracking-wider shadow-xl transition-all active:scale-95",
-                                isError ? "bg-[var(--deep-contrast)] hover:bg-black" : "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20"
+                                "w-full h-12 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl transition-all active:scale-95",
+                                isError
+                                    ? "bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] hover:bg-rose-500 hover:text-white shadow-black/10"
+                                    : "bg-[var(--primary-green)] text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] shadow-[var(--primary-green)]/20"
                             )}
                         >
-                            Got it
+                            Acknowledge
                         </button>
 
                         <button
                             onClick={onClose}
-                            className="absolute top-4 right-4 p-2 rounded-xl text-[var(--foreground)]/20 hover:text-rose-500 transition-all"
+                            className="absolute top-5 right-5 h-8 w-8 flex items-center justify-center rounded-xl text-[var(--foreground)]/20 hover:text-rose-500 transition-all hover:bg-[var(--foreground)]/5"
                         >
                             <X className="h-4 w-4" />
                         </button>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Save, Trash2, Loader2, ArrowUpRight, ArrowDownRight, User, Plus, Building, Wallet, CheckCircle2, X } from 'lucide-react'
+import { ArrowLeft, Save, Trash2, Loader2, ArrowUpRight, ArrowDownRight, User, Plus, Building, Wallet, CheckCircle2, X, Calculator, Receipt, Calendar } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/utils/supabase/client'
@@ -89,7 +89,6 @@ export default function PaymentForm({
     const displayItems = allItems.length > 0 ? allItems : fetchedItems
     const displayModes = paymentModes.length > 0 ? paymentModes : fetchedModes
 
-    // Fetch Mode Balances
     useEffect(() => {
         if (activeBusinessId) {
             const fetchBalances = async () => {
@@ -147,7 +146,6 @@ export default function PaymentForm({
 
         try {
             if (isEdit) {
-                // Update Transaction
                 const { error } = await supabase
                     .from('transactions')
                     .update({
@@ -161,10 +159,8 @@ export default function PaymentForm({
 
                 if (error) throw error
 
-                // Update Invoice Items if linked
                 const invoice_id = cleanUUID(initialData.invoice_id)
                 if (invoice_id && billingEntries.length > 0) {
-                    // Logic from PaymentModal: delete and re-insert
                     await supabase.from('invoice_items').delete().eq('invoice_id', invoice_id)
 
                     const itemsToInsert = billingEntries.map(e => ({
@@ -183,11 +179,10 @@ export default function PaymentForm({
 
                     await supabase.from('invoices').update({
                         total_amount: totalAmount,
-                        balance_amount: 0 // Assume full pay if editing bill items here? Actually logic copied from modal.
+                        balance_amount: 0
                     }).eq('id', initialData.invoice_id)
                 }
             } else {
-                // Insert Transaction
                 const { error } = await supabase.from('transactions').insert({
                     business_id,
                     party_id,
@@ -203,7 +198,10 @@ export default function PaymentForm({
 
             setSuccess(true)
             router.refresh()
-            setTimeout(() => setSuccess(false), 2000)
+            setTimeout(() => {
+                setSuccess(false)
+                router.push('/dashboard/finance')
+            }, 1000)
         } catch (err: any) {
             alert(err.message)
         } finally {
@@ -219,7 +217,10 @@ export default function PaymentForm({
             if (error) throw error
             setSuccess(true)
             router.refresh()
-            setTimeout(() => setSuccess(false), 2000)
+            setTimeout(() => {
+                setSuccess(false)
+                router.push('/dashboard/finance')
+            }, 1000)
         } catch (err: any) {
             alert('Error deleting: ' + err.message)
         } finally {
@@ -253,10 +254,10 @@ export default function PaymentForm({
     if (success) {
         return (
             <div className="min-h-screen flex items-center justify-center pb-20">
-                <div className="glass rounded-2xl border border-white/40 p-8 text-center">
+                <div className="glass rounded-[32px] border border-[var(--foreground)]/10 p-8 text-center shadow-2xl">
                     <CheckCircle2 className="h-12 w-12 text-[var(--primary-green)] mx-auto mb-3 animate-in zoom-in" />
-                    <h2 className="text-lg font-bold text-[var(--deep-contrast)] uppercase tracking-tight">Transaction {isEdit ? 'Updated' : 'Logged'}!</h2>
-                    <p className="text-[9px] font-bold text-[var(--foreground)]/60 uppercase mt-1">Redirecting...</p>
+                    <h2 className="text-lg font-black text-[var(--deep-contrast)] uppercase tracking-tight">Sync {isEdit ? 'Modified' : 'Authenticated'}</h2>
+                    <p className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-1">Executing Ledger Update...</p>
                 </div>
             </div>
         )
@@ -267,15 +268,15 @@ export default function PaymentForm({
             {/* Header */}
             <div className="flex items-center justify-between pb-3 border-b border-[var(--primary-green)]/10">
                 <div className="flex items-center gap-2">
-                    <Link href="/dashboard/finance" className="p-1.5 rounded-xl bg-white/50 border border-white/10 hover:bg-[var(--primary-green)] hover:text-white transition-all">
+                    <Link href="/dashboard/finance" className="p-2 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:bg-[var(--primary-green)] hover:text-[var(--primary-foreground)] transition-all active:scale-95 shadow-sm">
                         <ArrowLeft className="h-4 w-4" />
                     </Link>
                     <div>
-                        <h1 className="text-xl font-bold text-[var(--deep-contrast)] tracking-tight">
-                            {isEdit ? 'Update' : 'New'} {isReceipt ? 'Deposit' : 'Expense'}
+                        <h1 className="text-xs font-black text-[var(--deep-contrast)] uppercase tracking-tight">
+                            {isEdit ? 'Modify' : 'Log'} {isReceipt ? 'Receipt' : 'Payment'}
                         </h1>
-                        <p className="text-[11px] lg:text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider leading-none mt-1">
-                            {isReceipt ? 'Credit entry to ledger' : 'Debit entry from ledger'}
+                        <p className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">
+                            Financial Authenticator
                         </p>
                     </div>
                 </div>
@@ -284,18 +285,18 @@ export default function PaymentForm({
                         <button
                             type="button"
                             onClick={() => setIsConfirmOpen(true)}
-                            className="flex items-center gap-1.5 px-4 py-2.5 lg:py-2 rounded-xl bg-rose-50 text-rose-500 text-[11px] lg:text-[10px] font-bold uppercase tracking-wider hover:bg-rose-100 transition-all shadow-sm active:scale-95"
+                            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-500/5 text-rose-500 text-[10px] font-black uppercase tracking-widest hover:bg-rose-500 hover:text-white border border-rose-500/10 transition-all shadow-sm active:scale-95"
                         >
-                            <Trash2 className="h-4 w-4 lg:h-4 lg:w-4" />
-                            <span className="hidden sm:inline">Delete</span>
+                            <Trash2 className="h-4 w-4" />
+                            <span className="hidden sm:inline">Purge</span>
                         </button>
                     )}
                     <button
                         type="submit"
                         disabled={loading || formData.amount <= 0}
                         className={clsx(
-                            "flex items-center gap-1.5 px-6 py-2.5 lg:py-2 rounded-xl text-white text-[11px] lg:text-[10px] font-bold uppercase tracking-wider transition-all shadow-lg active:scale-95 disabled:opacity-50",
-                            isReceipt ? "bg-emerald-600 hover:bg-emerald-700" : "bg-rose-600 hover:bg-rose-700"
+                            "flex items-center gap-1.5 px-6 py-2 rounded-xl text-[var(--primary-foreground)] text-[10px] font-black uppercase tracking-widest transition-all shadow-lg active:scale-95 disabled:opacity-50",
+                            isReceipt ? "bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20" : "bg-rose-500 hover:bg-rose-600 shadow-rose-500/20"
                         )}
                     >
                         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
@@ -307,118 +308,129 @@ export default function PaymentForm({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Left Side: Basic Info */}
                 <div className="space-y-4">
-                    <div className="glass rounded-2xl border border-white/40 p-5 space-y-4">
+                    <div className="glass rounded-[24px] border border-[var(--foreground)]/10 p-5 space-y-4 shadow-lg">
+                        <h3 className="text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-3 border-b border-[var(--foreground)]/5 pb-2">Entry Metadata</h3>
                         <div>
-                            <label className="block text-xs lg:text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-2 ml-1">Entity / Party Reference</label>
+                            <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-2 ml-1">Entity Reference</label>
                             <button
                                 type="button"
                                 onClick={() => setIsPartyPickerOpen(true)}
-                                className="w-full h-12 lg:h-11 rounded-xl bg-white/50 border border-white/20 px-4 text-sm lg:text-[12px] font-bold text-left flex items-center justify-between hover:border-[var(--primary-green)] transition-all shadow-inner"
+                                className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-black text-left flex items-center justify-between hover:border-[var(--primary-green)] transition-all shadow-inner"
                             >
-                                <span>{displayParties.find(p => p.id === formData.party_id)?.name || 'General Transaction (No Party)'}</span>
+                                <span className="truncate">{displayParties.find(p => p.id === formData.party_id)?.name.toUpperCase() || 'GENERAL TRANSACTION...'}</span>
                                 <User className="h-5 w-5 lg:h-4 lg:w-4 opacity-20" />
                             </button>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-3">
                             <div>
-                                <label className="block text-xs lg:text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-2 ml-1">Date</label>
+                                <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-2 ml-1">Entry Date</label>
                                 <input
                                     type="date"
                                     value={formData.date}
                                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                    className="w-full h-12 lg:h-11 rounded-xl bg-white/50 border border-white/20 px-4 text-sm lg:text-[11px] font-bold focus:border-[var(--primary-green)] focus:outline-none transition-all"
+                                    className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[10px] font-black focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner"
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs lg:text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-2 ml-1">Fiscal Amount ({activeCurrencySymbol})</label>
+                                <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-2 ml-1">Valuation ({activeCurrencySymbol})</label>
                                 <input
                                     type="number"
                                     required
                                     value={formData.amount}
                                     onChange={(e) => setFormData({ ...formData, amount: Number(e.target.value) })}
-                                    className="w-full h-12 lg:h-11 rounded-xl bg-[var(--primary-green)]/5 border border-[var(--primary-green)]/20 px-4 text-xl lg:text-lg font-bold text-center text-[var(--primary-green)] focus:outline-none transition-all"
+                                    className={clsx(
+                                        "w-full h-11 rounded-xl border px-4 text-[14px] font-black text-center focus:outline-none transition-all shadow-inner tabular-nums",
+                                        isReceipt ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600 focus:border-emerald-500" : "bg-rose-500/5 border-rose-500/20 text-rose-600 focus:border-rose-500"
+                                    )}
                                     placeholder="0.00"
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label className="block text-xs lg:text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-2 ml-1">Notation / Memo</label>
+                            <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-2 ml-1">Transaction Memorandum</label>
                             <textarea
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                className="w-full h-32 lg:h-24 rounded-xl bg-white/50 border border-white/20 p-4 text-sm lg:text-[11px] font-bold focus:border-[var(--primary-green)] focus:outline-none transition-all placeholder:text-black/10"
-                                placeholder="Enter transaction details..."
+                                className="w-full h-24 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 p-4 text-[11px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all placeholder:text-[var(--foreground)]/10 resize-none shadow-inner"
+                                placeholder="Details / Notes..."
                             />
                         </div>
                     </div>
 
-                    <div className="glass rounded-2xl border border-white/40 p-5 space-y-4">
-                        <div className="flex items-center justify-between">
-                            <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 ml-1">Payment Mode</label>
+                    <div className="glass rounded-[24px] border border-[var(--foreground)]/10 p-5 space-y-4 shadow-lg">
+                        <div className="flex items-center justify-between px-1">
+                            <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30">Liquidation Mode</label>
                             <button
                                 type="button"
                                 onClick={() => setIsAddBankOpen(!isAddBankOpen)}
-                                className="text-[9px] font-bold uppercase text-blue-500 hover:underline"
+                                className="text-[7.5px] font-black uppercase tracking-widest text-blue-500 hover:text-blue-600 transition-colors"
                             >
-                                {isAddBankOpen ? 'Cancel' : '+ New Bank'}
+                                {isAddBankOpen ? '[ ABORT ]' : '[ ATTACH BANK ]'}
                             </button>
                         </div>
 
                         {isAddBankOpen && (
-                            <div className="flex gap-2 animate-in slide-in-from-top-2">
-                                <input
-                                    type="text"
-                                    value={newBankName}
-                                    onChange={(e) => setNewBankName(e.target.value)}
-                                    placeholder="Bank Name..."
-                                    className="flex-1 h-9 rounded-xl bg-white border border-blue-200 px-3 text-[10px] font-bold uppercase"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={handleAddBank}
-                                    disabled={addingBank || !newBankName}
-                                    className="px-4 h-9 rounded-xl bg-blue-500 text-white text-[9px] font-bold uppercase disabled:opacity-50"
-                                >
-                                    {addingBank ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Add'}
-                                </button>
+                            <div className="p-3 rounded-xl bg-blue-500/5 border border-blue-500/20 animate-in slide-in-from-top-2">
+                                <label className="block text-[7px] font-black uppercase tracking-widest text-blue-500/60 mb-2 ml-1">Define New Registry</label>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        value={newBankName}
+                                        onChange={(e) => setNewBankName(e.target.value)}
+                                        placeholder="Name..."
+                                        className="flex-1 h-8 rounded-lg bg-[var(--background)]/50 border border-blue-500/20 px-3 text-[10px] font-black uppercase focus:outline-none"
+                                        onKeyDown={(e) => e.key === 'Enter' && handleAddBank()}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={handleAddBank}
+                                        disabled={addingBank || !newBankName}
+                                        className="px-3 h-8 rounded-lg bg-blue-500 text-white text-[8px] font-black uppercase disabled:opacity-50 active:scale-95 shadow-sm"
+                                    >
+                                        {addingBank ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Set'}
+                                    </button>
+                                </div>
                             </div>
                         )}
 
                         <button
                             type="button"
                             onClick={() => setIsModePickerOpen(true)}
-                            className="w-full h-12 lg:h-11 rounded-xl bg-white/50 border border-white/20 px-4 flex items-center justify-between hover:border-[var(--primary-green)] transition-all shadow-sm"
+                            className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 flex items-center justify-between hover:border-[var(--primary-green)] transition-all shadow-inner"
                         >
                             <div className="flex items-center gap-2">
-                                <Wallet className="h-5 w-5 lg:h-4 lg:w-4 opacity-20" />
-                                <span className="text-xs lg:text-[11px] font-bold uppercase tracking-wider">{formData.mode}</span>
+                                <Wallet className="h-4 w-4 opacity-20" />
+                                <span className="text-[10px] font-black uppercase tracking-widest text-[var(--deep-contrast)]">{formData.mode}</span>
                             </div>
-                            <span className="text-xs lg:text-[10px] font-bold text-[var(--primary-green)]">{formatCurrency(modeBalances[formData.mode] || 0)}</span>
+                            <div className="px-2 py-0.5 rounded-lg bg-[var(--primary-green)]/10 text-[8px] font-black text-[var(--primary-green)] border border-[var(--primary-green)]/10 tabular-nums">
+                                {formatCurrency(modeBalances[formData.mode] || 0)}
+                            </div>
                         </button>
                     </div>
                 </div>
 
                 {/* Right Side: Cashier Logic & Billing */}
                 <div className="space-y-4">
-                    <div className="glass rounded-2xl border border-white/40 p-5 space-y-4 bg-white/20">
-                        <h3 className="text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 ml-1">Cashier Calculator</h3>
+                    <div className="glass rounded-[24px] border border-[var(--foreground)]/10 p-5 space-y-4 bg-[var(--foreground)]/5 shadow-lg relative overflow-hidden group">
+                        <div className="absolute -top-6 -right-6 h-24 w-24 bg-[var(--primary-green)]/5 rounded-full blur-2xl group-hover:bg-[var(--primary-green)]/10 transition-colors" />
+                        <h3 className="text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 ml-1">Fiscal Calculator</h3>
                         <div className="space-y-3">
                             <div>
-                                <label className="block text-xs lg:text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/30 mb-2 ml-1">Cash Given / Received</label>
+                                <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-2 ml-1">Lump Sum {isReceipt ? 'Tendered' : 'Paid'}</label>
                                 <input
                                     type="number"
                                     value={givenAmount}
                                     onChange={(e) => setGivenAmount(e.target.value)}
-                                    className="w-full h-12 lg:h-11 rounded-xl bg-white/60 border border-white/30 px-4 text-xl lg:text-lg font-bold text-center focus:outline-none transition-all shadow-inner"
+                                    className="w-full h-11 rounded-xl bg-[var(--background)]/40 border border-[var(--foreground)]/10 px-4 text-[16px] font-black text-center focus:border-[var(--primary-green)] transition-all shadow-inner tabular-nums"
                                     placeholder="0.00"
                                 />
                             </div>
                             {Number(givenAmount) > formData.amount && (
-                                <div className="p-4 rounded-2xl bg-[var(--primary-green)]/10 border border-[var(--primary-green)]/20 text-center animate-in zoom-in-95">
-                                    <p className="text-[9px] font-bold text-[var(--primary-green)] uppercase tracking-wider mb-1">Return Balance</p>
-                                    <p className="text-2xl font-black text-[var(--primary-green)] tracking-tight">
+                                <div className="p-4 rounded-2xl bg-[var(--primary-green)]/10 border border-[var(--primary-green)]/20 text-center animate-in zoom-in-95 shadow-sm">
+                                    <p className="text-[8px] font-black text-[var(--primary-green)] uppercase tracking-[0.2em] mb-1">Fiscal Change</p>
+                                    <p className="text-2xl font-black text-[var(--primary-green)] tracking-tighter tabular-nums drop-shadow-sm">
                                         {formatCurrency(Number(givenAmount) - formData.amount)}
                                     </p>
                                 </div>
@@ -427,59 +439,51 @@ export default function PaymentForm({
                     </div>
 
                     {(initialData?.invoice_id || billingEntries.length > 0) && (
-                        <div className="glass rounded-2xl border border-white/40 p-5 space-y-3">
-                            <div className="flex items-center justify-between ml-1">
-                                <h3 className="text-xs lg:text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40">Billing Entries</h3>
+                        <div className="glass rounded-[24px] border border-[var(--foreground)]/10 p-5 space-y-4 shadow-lg min-h-[300px]">
+                            <div className="flex items-center justify-between px-1">
+                                <h3 className="text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40">Active Feed</h3>
                                 <button
                                     type="button"
                                     onClick={() => { setEditingEntryIndex(null); setIsItemModalOpen(true); }}
-                                    className="p-1 px-3 h-8 lg:h-auto rounded-lg bg-[var(--primary-green)]/10 text-[10px] lg:text-[9px] font-bold uppercase text-[var(--primary-green)] hover:bg-[var(--primary-green)]/20 transition-all border border-[var(--primary-green)]/20 shadow-sm"
+                                    className="px-3 py-1.5 rounded-xl bg-[var(--primary-green)] text-[8px] font-black uppercase tracking-widest text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] transition-all shadow-lg shadow-[var(--primary-green)]/10 active:scale-95"
                                 >
-                                    + Add Item
+                                    + ADD LINE
                                 </button>
                             </div>
-                            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
+                            <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1 custom-scrollbar">
                                 {billingEntries.map((e, idx) => (
                                     <div
                                         key={idx}
-                                        className="p-3 rounded-2xl bg-white/50 border border-white/30 flex justify-between items-center group shadow-sm"
+                                        onClick={() => { setEditingEntryIndex(idx); setIsItemModalOpen(true); }}
+                                        className="p-3 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/5 flex justify-between items-center group shadow-sm hover:bg-[var(--foreground)]/10 transition-all cursor-pointer active:scale-[0.99]"
                                     >
-                                        <div className="flex items-center gap-4">
-                                            <div className="h-10 w-10 lg:h-8 lg:w-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 border border-slate-200">
-                                                <Plus className="h-5 w-5 lg:h-4 lg:w-4" />
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-8 w-8 rounded-xl bg-[var(--primary-green)] text-[var(--primary-foreground)] flex items-center justify-center shadow-lg shadow-[var(--primary-green)]/10">
+                                                <Calculator size={14} />
                                             </div>
-                                            <div>
-                                                <p className="text-[11px] lg:text-[10px] font-black uppercase text-[var(--deep-contrast)]">{e.name}</p>
-                                                <p className="text-[10px] lg:text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mt-0.5">
-                                                    {e.quantity} Units × {formatCurrency(e.rate)}
+                                            <div className="min-w-0">
+                                                <p className="text-[10px] font-black uppercase text-[var(--deep-contrast)] truncate">{e.name}</p>
+                                                <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">
+                                                    {e.quantity} {e.unit} × {formatCurrency(e.rate)}
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-[11px] font-black text-[var(--primary-green)]">{formatCurrency(e.amount)}</span>
-                                            <div className="flex items-center opacity-0 group-hover:opacity-100 transition-all">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => { setEditingEntryIndex(idx); setIsItemModalOpen(true); }}
-                                                    className="p-1.5 rounded-lg text-blue-500 hover:bg-blue-50 transition-all"
-                                                >
-                                                    <Plus className="h-3 w-3" />
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => removeEntry(idx)}
-                                                    className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 transition-all"
-                                                >
-                                                    <X className="h-3 w-3" />
-                                                </button>
-                                            </div>
+                                        <div className="flex items-center gap-4">
+                                            <span className="text-[11px] font-black text-[var(--primary-green)] tabular-nums">{formatCurrency(e.amount)}</span>
+                                            <button
+                                                type="button"
+                                                onClick={(e) => { e.stopPropagation(); removeEntry(idx); }}
+                                                className="p-1.5 rounded-lg text-rose-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-rose-500 hover:text-white"
+                                            >
+                                                <X className="h-3.5 w-3.5" />
+                                            </button>
                                         </div>
                                     </div>
                                 ))}
                                 {billingEntries.length === 0 && (
-                                    <div className="flex flex-col items-center justify-center py-8 text-[var(--foreground)]/20 border-2 border-dashed border-black/5 rounded-2xl">
-                                        <Plus className="h-6 w-6 mb-1 opacity-10" />
-                                        <p className="text-[9px] font-bold uppercase tracking-wider">No detailed items</p>
+                                    <div className="flex flex-col items-center justify-center py-20 text-[var(--foreground)]/20 border-2 border-dashed border-[var(--foreground)]/5 rounded-2xl opacity-40">
+                                        <Receipt className="h-8 w-8 mb-2" strokeWidth={1.5} />
+                                        <p className="text-[8px] font-black uppercase tracking-[0.3em]">No Recorded Details</p>
                                     </div>
                                 )}
                             </div>
@@ -493,8 +497,8 @@ export default function PaymentForm({
                 isOpen={isPartyPickerOpen}
                 onClose={() => setIsPartyPickerOpen(false)}
                 onSelect={(id) => setFormData({ ...formData, party_id: id })}
-                title="Select Party"
-                options={[{ id: '', label: 'General Transaction (No Party)' }, ...displayParties.map(p => ({ id: p.id, label: p.name }))]}
+                title="Select Account"
+                options={[{ id: '', label: 'GENERAL LEDGER (NO PARTY)' }, ...displayParties.map(p => ({ id: p.id, label: p.name.toUpperCase() }))]}
                 selectedValue={formData.party_id}
             />
 
@@ -502,14 +506,14 @@ export default function PaymentForm({
                 isOpen={isModePickerOpen}
                 onClose={() => setIsModePickerOpen(false)}
                 onSelect={(mode) => setFormData({ ...formData, mode })}
-                title="Select Payment Mode"
+                title="Select Liquidation Mode"
                 options={[
-                    { id: 'CASH', label: 'CASH', subLabel: formatCurrency(modeBalances['CASH'] || 0) },
-                    { id: 'BANK', label: 'BANK', subLabel: formatCurrency(modeBalances['BANK'] || 0) },
-                    { id: 'ONLINE', label: 'ONLINE', subLabel: formatCurrency(modeBalances['ONLINE'] || 0) },
+                    { id: 'CASH', label: 'PHYSICAL CASH', subLabel: formatCurrency(modeBalances['CASH'] || 0) },
+                    { id: 'BANK', label: 'BANK ACCOUNT', subLabel: formatCurrency(modeBalances['BANK'] || 0) },
+                    { id: 'ONLINE', label: 'ONLINE GATEWAY', subLabel: formatCurrency(modeBalances['ONLINE'] || 0) },
                     ...displayModes.map(m => ({
                         id: m.name,
-                        label: m.name,
+                        label: m.name.toUpperCase(),
                         subLabel: formatCurrency(modeBalances[m.name] || 0)
                     }))
                 ]}
@@ -521,9 +525,9 @@ export default function PaymentForm({
                 onClose={() => setIsConfirmOpen(false)}
                 onConfirm={handleDelete}
                 isLoading={deleting}
-                title={`Delete ${isReceipt ? 'Receipt' : 'Payment'}?`}
-                message="Are you sure you want to permanently delete this transaction? This action cannot be undone."
-                confirmText="Delete"
+                title={`Purge ${isReceipt ? 'Receipt' : 'Payment'}?`}
+                message="Irreversibly purge this financial record from the ledger repository? This cannot be undone."
+                confirmText="Purge"
                 variant="danger"
             />
 

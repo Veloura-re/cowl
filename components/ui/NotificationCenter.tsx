@@ -150,7 +150,7 @@ export default function NotificationCenter() {
             case 'PURCHASE': return <ShoppingCart className="h-3.5 w-3.5 text-orange-500" />
             case 'STOCK': return <Package className="h-3.5 w-3.5 text-rose-500" />
             case 'TEAM': return <Users className="h-3.5 w-3.5 text-[var(--primary-green)]" />
-            default: return <Bell className="h-3.5 w-3.5 text-slate-500" />
+            default: return <Bell className="h-3.5 w-3.5 text-[var(--foreground)]/40" />
         }
     }
 
@@ -160,12 +160,12 @@ export default function NotificationCenter() {
                 onClick={() => setIsOpen(!isOpen)}
                 className={clsx(
                     "relative p-2 rounded-xl transition-all duration-300",
-                    isOpen ? "bg-[var(--primary-green)]/10 text-[var(--primary-green)]" : "hover:bg-black/5 text-[var(--foreground)]/40 hover:text-[var(--deep-contrast)]"
+                    isOpen ? "bg-[var(--primary-green)]/10 text-[var(--primary-green)]" : "hover:bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:text-[var(--deep-contrast)]"
                 )}
             >
                 <Bell className="h-5 w-5" />
                 {unreadCount > 0 && (
-                    <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-rose-500 border-2 border-white animate-pulse" />
+                    <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-rose-500 border-2 border-[var(--background)] animate-pulse" />
                 )}
             </button>
 
@@ -178,7 +178,7 @@ export default function NotificationCenter() {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={() => setIsOpen(false)}
-                            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100]"
+                            className="fixed inset-0 bg-[var(--modal-backdrop)] backdrop-blur-sm z-[100]"
                         />
 
                         {/* Modal Container */}
@@ -187,27 +187,28 @@ export default function NotificationCenter() {
                                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                                className="w-full max-w-sm bg-white rounded-[32px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] overflow-hidden pointer-events-auto border border-slate-100"
+                                className="w-full max-w-sm bg-[var(--background)] rounded-[32px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] overflow-hidden pointer-events-auto border border-[var(--foreground)]/5"
                             >
                                 {/* Header */}
-                                <div className="px-6 py-5 border-b border-slate-50 flex items-center justify-between">
+                                <div className="px-6 py-5 border-b border-[var(--foreground)]/5 flex items-center justify-between">
                                     <div>
-                                        <h3 className="text-sm font-bold text-slate-900">Alert Center</h3>
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mt-1">Activities & Updates</p>
+                                        <h3 className="text-sm font-bold text-[var(--deep-contrast)]">Alert Center</h3>
+                                        <p className="text-[10px] font-black text-[var(--foreground)]/40 uppercase tracking-widest leading-none mt-1">Activities & Updates</p>
                                     </div>
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-1.5 pr-2">
                                         {unreadCount > 0 && (
                                             <button
                                                 onClick={() => markAsRead()}
-                                                className="p-2 rounded-xl hover:bg-emerald-50 text-emerald-600 transition-all group"
+                                                className="h-10 px-4 rounded-2xl hover:bg-emerald-500/10 text-emerald-600 transition-all group flex items-center gap-2 active:scale-95 border border-transparent hover:border-emerald-500/20"
                                                 title="Mark all as read"
                                             >
                                                 <CheckCheck className="h-4 w-4" />
+                                                <span className="text-[10px] font-black uppercase tracking-wider hidden sm:inline">Flush All</span>
                                             </button>
                                         )}
                                         <button
                                             onClick={() => setIsOpen(false)}
-                                            className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 transition-all"
+                                            className="h-10 w-10 flex items-center justify-center rounded-2xl hover:bg-[var(--foreground)]/5 text-[var(--foreground)]/40 transition-all active:scale-95 border border-transparent hover:border-[var(--foreground)]/10"
                                         >
                                             <X className="h-4 w-4" />
                                         </button>
@@ -215,11 +216,11 @@ export default function NotificationCenter() {
                                 </div>
 
                                 {/* Content */}
-                                <div className="max-h-[60vh] overflow-y-auto custom-scrollbar bg-white">
+                                <div className="max-h-[60vh] overflow-y-auto custom-scrollbar bg-[var(--background)]">
                                     {loading ? (
                                         <div className="p-12 flex flex-col items-center justify-center space-y-3">
                                             <Loader2 className="h-6 w-6 animate-spin text-emerald-500" />
-                                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300">Syncing...</span>
+                                            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/20">Syncing...</span>
                                         </div>
                                     ) : notifications.length > 0 ? (
                                         <div className="divide-y divide-slate-50">
@@ -228,29 +229,29 @@ export default function NotificationCenter() {
                                                     key={notif.id}
                                                     onClick={() => markAsRead(notif.id)}
                                                     className={clsx(
-                                                        "p-5 hover:bg-slate-50/50 transition-all cursor-pointer relative group",
-                                                        !notif.is_read && "bg-emerald-50/30"
+                                                        "p-5 hover:bg-[var(--foreground)]/5 transition-all cursor-pointer relative group",
+                                                        !notif.is_read && "bg-emerald-500/5"
                                                     )}
                                                 >
                                                     <div className="flex gap-4">
                                                         <div className={clsx(
-                                                            "h-10 w-10 rounded-2xl flex items-center justify-center shrink-0 border border-slate-100 transition-all",
-                                                            !notif.is_read ? "bg-white shadow-lg shadow-emerald-900/5 rotate-3" : "bg-slate-50"
+                                                            "h-10 w-10 rounded-2xl flex items-center justify-center shrink-0 border border-[var(--foreground)]/5 transition-all",
+                                                            !notif.is_read ? "bg-[var(--background)] shadow-lg shadow-emerald-900/5 rotate-3" : "bg-[var(--foreground)]/5"
                                                         )}>
                                                             {getIcon(notif.type)}
                                                         </div>
                                                         <div className="min-w-0 flex-1 pr-4">
                                                             <p className={clsx(
                                                                 "text-[12px] font-bold leading-tight",
-                                                                !notif.is_read ? "text-slate-900" : "text-slate-500"
+                                                                !notif.is_read ? "text-[var(--deep-contrast)]" : "text-[var(--foreground)]/60"
                                                             )}>
                                                                 {notif.title}
                                                             </p>
-                                                            <p className="text-[11px] text-slate-400 mt-1 line-clamp-2 leading-relaxed font-medium">
+                                                            <p className="text-[11px] text-[var(--foreground)]/40 mt-1 line-clamp-2 leading-relaxed font-medium">
                                                                 {notif.message}
                                                             </p>
                                                             <div className="flex items-center gap-2 mt-2">
-                                                                <p className="text-[9px] font-bold text-slate-300 uppercase tracking-tight">
+                                                                <p className="text-[9px] font-bold text-[var(--foreground)]/20 uppercase tracking-tight">
                                                                     {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true })}
                                                                 </p>
                                                                 {!notif.is_read && (
@@ -264,17 +265,17 @@ export default function NotificationCenter() {
                                         </div>
                                     ) : (
                                         <div className="p-20 flex flex-col items-center justify-center text-center space-y-4">
-                                            <div className="h-16 w-16 rounded-full bg-slate-50 flex items-center justify-center text-slate-200">
+                                            <div className="h-16 w-16 rounded-full bg-[var(--foreground)]/5 flex items-center justify-center text-[var(--foreground)]/20">
                                                 <Bell className="h-8 w-8" />
                                             </div>
-                                            <p className="text-[11px] font-bold uppercase tracking-widest text-slate-300">No Alerts Yet</p>
+                                            <p className="text-[11px] font-bold uppercase tracking-widest text-[var(--foreground)]/20">No Alerts Yet</p>
                                         </div>
                                     )}
                                 </div>
 
                                 {notifications.length > 0 && (
-                                    <div className="p-4 border-t border-slate-50 bg-white">
-                                        <button className="w-full py-3 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:bg-slate-50 hover:text-slate-900 transition-all">
+                                    <div className="p-4 border-t border-[var(--foreground)]/5 bg-[var(--background)]">
+                                        <button className="w-full py-3 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-[var(--foreground)]/40 hover:bg-[var(--foreground)]/5 hover:text-[var(--deep-contrast)] transition-all">
                                             View Detailed History
                                         </button>
                                     </div>

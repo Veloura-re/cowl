@@ -22,6 +22,6 @@ export default function Home() {
   }, [router, supabase]);
 
   return (
-    <div className="min-h-screen bg-white" />
+    <div className="min-h-screen bg-transparent" />
   );
 }

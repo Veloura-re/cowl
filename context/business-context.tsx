@@ -113,6 +113,13 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
         // Init businesses
         fetchBusinesses()
 
+        // Sync on focus (good for PWA/Mobile when resuming)
+        const handleFocus = () => {
+            console.log('BusinessContext: App focused, refreshing...')
+            fetchBusinesses()
+        }
+        window.addEventListener('focus', handleFocus)
+
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             console.log('BusinessContext: Auth Event:', event)
@@ -127,7 +134,10 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
             }
         })
 
-        return () => subscription.unsubscribe()
+        return () => {
+            subscription.unsubscribe()
+            window.removeEventListener('focus', handleFocus)
+        }
     }, [])
 
     const setActiveBusinessId = React.useCallback((id: string) => {

@@ -1,5 +1,5 @@
-import { jsPDF } from 'jspdf'
-import 'jspdf-autotable'
+// Types only imports
+import type { jsPDF } from 'jspdf'
 
 
 export type InvoiceData = {
@@ -463,7 +463,10 @@ export function printInvoice(data: InvoiceData) {
 /**
  * Download invoice as PDF file using jsPDF
  */
-export function downloadInvoice(data: InvoiceData) {
+export async function downloadInvoice(data: InvoiceData) {
+    const { jsPDF } = await import('jspdf')
+    await import('jspdf-autotable')
+
     const doc = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',

@@ -44,14 +44,14 @@ export default function PickerModal({
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose} />
-            <div className="glass w-full max-w-sm rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 relative z-10 border border-white/40">
-                <div className="flex items-center justify-between border-b border-white/10 px-6 py-4 bg-white/40">
+            <div className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose} />
+            <div className="glass w-full max-w-sm rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 relative z-10 border border-[var(--foreground)]/10 bg-[var(--background)]/80">
+                <div className="flex items-center justify-between border-b border-[var(--foreground)]/10 px-6 py-4 bg-[var(--foreground)]/5">
                     <div>
                         <h2 className="text-sm font-bold text-[var(--deep-contrast)] tracking-tight">{title}</h2>
-                        <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-none mt-0.5">Selection Panel</p>
+                        <p className="text-[9px] font-bold text-[var(--foreground)]/40 dark:text-neutral-500 uppercase tracking-wider leading-none mt-0.5">Selection Panel</p>
                     </div>
-                    <button onClick={onClose} className="p-1.5 rounded-full hover:bg-white/50 transition-all opacity-40 hover:opacity-100">
+                    <button onClick={onClose} className="p-1.5 rounded-full hover:bg-[var(--foreground)]/10 transition-all opacity-40 hover:opacity-100">
                         <X className="h-4 w-4" />
                     </button>
                 </div>
@@ -66,7 +66,7 @@ export default function PickerModal({
                                 placeholder="Search options..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full h-9 rounded-xl bg-white/60 border border-white/20 pl-9 pr-4 text-[11px] font-bold focus:outline-none transition-all shadow-inner"
+                                className="w-full h-9 rounded-xl bg-[var(--foreground)]/5 dark:bg-white/5 border border-[var(--foreground)]/10 dark:border-white/10 pl-9 pr-4 text-[11px] font-bold focus:outline-none transition-all shadow-inner text-[var(--deep-contrast)] placeholder:text-[var(--foreground)]/20"
                             />
                         </div>
                     )}
@@ -86,7 +86,9 @@ export default function PickerModal({
                                     }}
                                     className={clsx(
                                         "w-full flex items-center justify-between p-3 rounded-2xl transition-all duration-200 group text-left",
-                                        selectedValue === opt.id ? "bg-[var(--primary-green)] text-white shadow-lg" : "hover:bg-white/80 text-[var(--deep-contrast)]"
+                                        selectedValue === opt.id
+                                            ? "bg-[var(--primary-green)] text-[var(--primary-foreground)] shadow-lg hover:bg-[var(--primary-hover)]"
+                                            : "hover:bg-[var(--foreground)]/5 text-[var(--deep-contrast)]"
                                     )}
                                 >
                                     <div>
@@ -118,7 +120,7 @@ export default function PickerModal({
                 </div>
 
                 {footer && (
-                    <div className="p-3 border-t border-white/10 bg-white/20">
+                    <div className="p-3 border-t border-[var(--foreground)]/10 bg-[var(--foreground)]/5">
                         {footer}
                     </div>
                 )}

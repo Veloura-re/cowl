@@ -50,7 +50,7 @@ export const BottomNav = () => {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="absolute inset-0 bg-black/40 backdrop-blur-md transition-all duration-500"
+                            className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-md transition-all duration-500"
                             onClick={() => setIsMenuOpen(false)}
                         />
                         <motion.div
@@ -58,7 +58,7 @@ export const BottomNav = () => {
                             animate={{ y: 0, opacity: 1, scale: 1 }}
                             exit={{ y: "100%", opacity: 0, scale: 0.95 }}
                             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                            className="relative z-10 glass rounded-[40px] p-8 border border-white/30 shadow-[0_-20px_50px_-12px_rgba(0,0,0,0.3)] bg-white/70 backdrop-blur-3xl"
+                            className="relative z-10 glass rounded-[40px] p-8 border border-[var(--foreground)]/10 shadow-[0_-20px_50px_-12px_rgba(0,0,0,0.3)] bg-[var(--background)]/95 backdrop-blur-3xl"
                         >
                             <div className="flex justify-between items-center mb-8">
                                 <div>
@@ -67,7 +67,7 @@ export const BottomNav = () => {
                                 </div>
                                 <button
                                     onClick={() => setIsMenuOpen(false)}
-                                    className="h-10 w-10 flex items-center justify-center rounded-2xl bg-black/5 hover:bg-rose-500 hover:text-white transition-all active:scale-95 group border border-white/50"
+                                    className="h-10 w-10 flex items-center justify-center rounded-2xl bg-[var(--foreground)]/5 hover:bg-rose-500 hover:text-white transition-all active:scale-95 group border border-[var(--foreground)]/10"
                                 >
                                     <X size={18} className="transition-transform group-hover:rotate-90" />
                                 </button>
@@ -84,13 +84,13 @@ export const BottomNav = () => {
                                             className={clsx(
                                                 "relative flex flex-col items-center gap-3 p-5 rounded-[28px] transition-all border group",
                                                 isActive
-                                                    ? 'bg-[var(--primary-green)] text-white border-[var(--primary-green)]/30'
-                                                    : 'bg-white/40 border-white/20 hover:bg-white/60 hover:border-white/40 shadow-sm'
+                                                    ? 'bg-[var(--primary-green)] text-[var(--primary-foreground)] border-[var(--primary-foreground)]/10 shadow-[0_10px_25px_-5px_rgba(16,185,129,0.3)]'
+                                                    : 'bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:bg-[var(--foreground)]/10 shadow-sm'
                                             )}
                                         >
                                             <div className={clsx(
                                                 "p-3 rounded-2xl transition-all shadow-lg",
-                                                isActive ? 'bg-white/20 text-white' : 'bg-[var(--primary-green)]/10 text-[var(--primary-green)]'
+                                                isActive ? 'bg-white/10 text-[var(--primary-foreground)]' : 'bg-[var(--primary-green)]/10 text-[var(--primary-green)]'
                                             )}>
                                                 <item.icon size={22} strokeWidth={2.5} />
                                             </div>
@@ -109,9 +109,9 @@ export const BottomNav = () => {
                                             window.location.href = '/login'
                                         }
                                     }}
-                                    className="col-span-2 relative flex items-center justify-center gap-3 p-5 rounded-[28px] transition-all border bg-rose-50 border-rose-100 hover:bg-rose-500 hover:text-white group text-rose-600"
+                                    className="col-span-2 relative flex items-center justify-center gap-3 p-5 rounded-[28px] transition-all border bg-rose-500/5 border-rose-500/10 hover:bg-rose-500 hover:text-white group text-rose-600 active:scale-95"
                                 >
-                                    <div className="p-3 rounded-2xl bg-rose-500/10 text-rose-600 group-hover:bg-white/20 group-hover:text-white transition-all shadow-lg">
+                                    <div className="p-3 rounded-2xl bg-rose-500/10 text-rose-600 group-hover:bg-white/10 group-hover:text-white transition-all shadow-lg">
                                         <LogOut size={22} strokeWidth={2.5} />
                                     </div>
                                     <span className="text-[10px] font-black uppercase tracking-wider">Sign Out</span>
@@ -119,7 +119,7 @@ export const BottomNav = () => {
                             </div>
 
                             {/* Bottom decorative handle */}
-                            <div className="w-12 h-1.5 bg-black/10 rounded-full mx-auto mt-10 mb-2 opacity-50" />
+                            <div className="w-12 h-1.5 bg-[var(--foreground)]/10 rounded-full mx-auto mt-10 mb-2 opacity-50" />
                         </motion.div>
                     </div>
                 )}
@@ -131,7 +131,7 @@ export const BottomNav = () => {
                 style={{ bottom: `calc(1.5rem + env(safe-area-inset-bottom, 0px))` }}
             >
                 <LayoutGroup>
-                    <div className="flex items-center gap-1 px-1.5 py-1.5 rounded-full border border-white/40 shadow-[0_15px_35px_-10px_rgba(0,0,0,0.2)] bg-white/70 backdrop-blur-2xl relative">
+                    <div className="flex items-center gap-1 px-1.5 py-1.5 rounded-full border border-[var(--foreground)]/10 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] bg-[var(--background)]/95 backdrop-blur-2xl relative transition-all duration-500">
 
                         {/* Standard Dock Items */}
                         {dockItems.map((item) => {
@@ -142,13 +142,13 @@ export const BottomNav = () => {
                                     href={item.path}
                                     className={clsx(
                                         "relative flex items-center justify-center w-12 h-12 rounded-full transition-all duration-500 overflow-visible group active:scale-90",
-                                        isActive ? "text-white" : "text-[var(--foreground)]/60 hover:text-[var(--foreground)]"
+                                        isActive ? "text-[var(--primary-foreground)]" : "text-[var(--foreground)]/60 hover:text-[var(--foreground)]"
                                     )}
                                 >
                                     {isActive && (
                                         <motion.div
                                             layoutId="nav-pill"
-                                            className="absolute inset-0 bg-[var(--primary-green)] rounded-full shadow-[0_5px_15px_-3px_rgba(6,78,59,0.4)] border border-white/20"
+                                            className="absolute inset-0 bg-[var(--primary-green)] rounded-full shadow-[0_5px_15px_-3px_rgba(6,78,59,0.4)] border border-[var(--primary-foreground)]/10"
                                             transition={{ type: "spring", bounce: 0.35, duration: 0.6 }}
                                         />
                                     )}
@@ -165,7 +165,7 @@ export const BottomNav = () => {
 
                                     {/* Tooltip on long press/hover could go here */}
                                     {!isActive && (
-                                        <div className="absolute -top-10 scale-0 group-hover:scale-100 transition-all px-2 py-1 rounded-lg bg-black text-white text-[8px] font-black uppercase tracking-wider pointer-events-none">
+                                        <div className="absolute -top-10 scale-0 group-hover:scale-100 transition-all px-2 py-1 rounded-lg bg-[var(--foreground)] text-[var(--background)] text-[8px] font-black uppercase tracking-wider pointer-events-none">
                                             {item.label}
                                         </div>
                                     )}
@@ -174,7 +174,7 @@ export const BottomNav = () => {
                         })}
 
                         {/* Separation Line (Subtle) */}
-                        <div className="h-6 w-[1px] bg-black/5 mx-1" />
+                        <div className="h-6 w-[1px] bg-[var(--foreground)]/10 mx-1" />
 
                         {/* Hamburger Button */}
                         <button
@@ -182,8 +182,8 @@ export const BottomNav = () => {
                             className={clsx(
                                 "group relative flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 active:scale-90",
                                 isMenuOpen
-                                    ? "bg-[var(--deep-contrast)] text-white shadow-lg"
-                                    : "text-[var(--foreground)]/60 hover:text-[var(--foreground)] hover:bg-black/[0.03]"
+                                    ? "bg-[var(--primary-green)] text-[var(--primary-foreground)] shadow-lg"
+                                    : "text-[var(--foreground)]/40 hover:text-[var(--deep-contrast)] hover:bg-[var(--foreground)]/10"
                             )}
                         >
                             <div className="relative z-10">

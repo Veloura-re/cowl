@@ -5,7 +5,7 @@ import clsx from 'clsx'
 
 interface BrandLogoProps {
     className?: string
-    size?: 'sm' | 'md' | 'lg'
+    size?: 'sm' | 'md' | 'lg' | 'xl'
 }
 
 export function BrandLogo({ className, size = 'md' }: BrandLogoProps) {
@@ -13,6 +13,7 @@ export function BrandLogo({ className, size = 'md' }: BrandLogoProps) {
         sm: 'w-5 h-5',
         md: 'w-8 h-8',
         lg: 'w-10 h-10',
+        xl: 'w-16 h-16',
     }
 
     return (

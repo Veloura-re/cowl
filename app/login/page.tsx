@@ -45,28 +45,28 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="flex min-h-screen items-center justify-center p-6 sm:p-4">
-            <div className="glass w-full max-w-sm space-y-6 rounded-[32px] p-6 relative overflow-hidden border border-white/40 shadow-2xl">
+        <div className="flex min-h-screen items-center justify-center p-6 sm:p-4 bg-[var(--background)]">
+            <div className="glass w-full max-w-sm space-y-6 rounded-[32px] p-6 relative overflow-hidden border border-[var(--foreground)]/10 shadow-2xl animate-in zoom-in duration-500">
                 <div className="text-center">
-                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/40 mb-4 shadow-xl border border-white/40">
+                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--foreground)]/5 mb-4 shadow-xl border border-[var(--foreground)]/10">
                         <BrandLogo size="lg" />
                     </div>
-                    <h2 className="text-xl font-bold tracking-tight text-[var(--deep-contrast)] uppercase">
+                    <h2 className="text-xl font-black tracking-tight text-[var(--deep-contrast)] uppercase">
                         Welcome Back
                     </h2>
-                    <p className="mt-1 text-[10px] font-bold text-[var(--foreground)]/50 uppercase tracking-wider">
+                    <p className="mt-1 text-[10px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.2em]">
                         Access your LUCY-ex OS
                     </p>
                 </div>
 
                 <form className="space-y-4" onSubmit={handleLogin}>
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                         <div>
                             <label
                                 htmlFor="email"
-                                className="block text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-1.5 ml-1"
+                                className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1"
                             >
-                                Email address
+                                System Email
                             </label>
                             <input
                                 id="email"
@@ -76,16 +76,16 @@ export default function LoginPage() {
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="block w-full h-10 rounded-xl border border-white/20 bg-white/50 px-4 text-xs font-bold text-[var(--deep-contrast)] placeholder-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none focus:ring-1 focus:ring-[var(--primary-green)] transition-all shadow-inner"
+                                className="block w-full h-11 rounded-xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 px-4 text-xs font-black text-[var(--deep-contrast)] placeholder-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner"
                                 placeholder="you@company.com"
                             />
                         </div>
                         <div>
                             <label
                                 htmlFor="password"
-                                className="block text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-1.5 ml-1"
+                                className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1"
                             >
-                                Password
+                                Secure Password
                             </label>
                             <input
                                 id="password"
@@ -95,23 +95,23 @@ export default function LoginPage() {
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="block w-full h-10 rounded-xl border border-white/20 bg-white/50 px-4 text-xs font-bold text-[var(--deep-contrast)] placeholder-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none focus:ring-1 focus:ring-[var(--primary-green)] transition-all shadow-inner"
+                                className="block w-full h-11 rounded-xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 px-4 text-xs font-black text-[var(--deep-contrast)] placeholder-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner"
                                 placeholder="••••••••"
                             />
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-end">
+                    <div className="flex items-center justify-end px-1">
                         <Link
                             href="/login/forgot-password"
-                            className="text-[9px] font-bold text-[var(--primary-green)] hover:text-[var(--deep-contrast)] transition-colors uppercase tracking-wider"
+                            className="text-[9px] font-black text-[var(--primary-green)] hover:text-[var(--deep-contrast)] transition-colors uppercase tracking-[0.15em]"
                         >
-                            Forgot Password?
+                            Recovery Key?
                         </Link>
                     </div>
 
                     {error && (
-                        <div className="rounded-xl bg-red-50 p-2.5 text-[10px] font-bold text-red-600 border border-red-100 uppercase tracking-wider text-center">
+                        <div className="rounded-xl bg-rose-500/10 p-2.5 text-[10px] font-black text-rose-500 border border-rose-500/20 uppercase tracking-widest text-center animate-in shake duration-300">
                             {error}
                         </div>
                     )}
@@ -119,27 +119,27 @@ export default function LoginPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="group relative flex w-full justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-3 text-[10px] font-bold text-white uppercase tracking-wider hover:bg-[var(--primary-green)] active:scale-95 disabled:opacity-70 transition-all duration-300 shadow-xl shadow-[var(--deep-contrast)]/20"
+                        className="group relative flex w-full justify-center rounded-xl bg-[var(--primary-green)] px-4 py-3.5 text-[10px] font-black text-[var(--primary-foreground)] uppercase tracking-[0.2em] hover:bg-[var(--primary-hover)] active:scale-95 disabled:opacity-70 transition-all duration-300 shadow-xl shadow-[var(--primary-green)]/20 mt-2"
                     >
                         {loading ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
                             <span className="flex items-center">
-                                SIGN IN
-                                <ArrowRight className="ml-2 h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                                AUTHORIZE
+                                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                             </span>
                         )}
                     </button>
                 </form>
 
-                <div className="text-center">
-                    <p className="text-[9px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider">
-                        Don't have an account?{' '}
+                <div className="text-center pt-2">
+                    <p className="text-[10px] font-black text-[var(--foreground)]/30 uppercase tracking-widest">
+                        New to the network?{' '}
                         <Link
                             href="/register"
-                            className="text-[var(--primary-green)] hover:text-[var(--deep-contrast)] transition-colors underline decoration-2 underline-offset-4 decoration-[var(--primary-green)]/30"
+                            className="text-[var(--primary-green)] hover:text-[var(--deep-contrast)] transition-colors underline decoration-2 underline-offset-4 decoration-[var(--primary-green)]/20"
                         >
-                            Create one
+                            Request Access
                         </Link>
                     </p>
                 </div>

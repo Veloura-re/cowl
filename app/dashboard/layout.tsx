@@ -17,6 +17,7 @@ import NotificationCenter from '@/components/ui/NotificationCenter'
 import { BrandLogo } from '@/components/ui/BrandLogo'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import FeedbackModal from '@/components/ui/FeedbackModal'
+import BusinessSwitcherModal from '@/components/ui/BusinessSwitcherModal'
 
 const navigation = [
     { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
@@ -53,65 +54,47 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
 
+    // Daily Stock Reminder Trigger
+    useEffect(() => {
+        if (!activeBusinessId) return
+
+        const triggerReminders = async () => {
+            await supabase.rpc('trigger_daily_stock_reminders', {
+                p_business_id: activeBusinessId
+            })
+        }
+        triggerReminders()
+    }, [activeBusinessId])
+
     const activeBusiness = businesses.find(b => b.id === activeBusinessId)
 
     return (
         <div className="flex min-h-screen bg-transparent">
             {/* Desktop Sidebar (Glassmorphic) - Compact */}
             <div className="hidden lg:flex w-60 flex-col fixed inset-y-0 z-50 p-2">
-                <div className="flex flex-col flex-grow glass rounded-[24px] overflow-hidden shadow-2xl border border-white/30 ring-1 ring-white/20">
-                    <div className="relative border-b border-white/10 bg-white/5 flex items-center h-16">
+                <div className="flex flex-col flex-grow glass rounded-[24px] overflow-hidden shadow-2xl border border-[var(--foreground)]/10 dark:border-white/10 ring-1 ring-[var(--foreground)]/5 dark:ring-white/20">
+                    <div className="relative border-b border-[var(--foreground)]/5 bg-[var(--foreground)]/5 flex items-center h-16">
                         <button
                             onClick={() => setIsSwitcherOpen(true)}
-                            className="flex-1 flex items-center h-full pl-5 pr-2 gap-3 hover:bg-white/10 transition-colors group text-left min-w-0"
+                            className="flex-1 flex items-center h-full pl-5 pr-2 gap-3 hover:bg-[var(--foreground)]/5 transition-colors group text-left min-w-0"
                         >
-                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/40 shadow-xl border border-white/40 shrink-0">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--foreground)]/5 shadow-xl border border-[var(--foreground)]/10 dark:border-white/40 shrink-0 group-hover:bg-[var(--foreground)]/10 transition-all">
                                 <BrandLogo size="md" />
                             </div>
                             <div className="flex-1 text-left min-w-0">
-                                <h1 className="text-sm font-bold text-[var(--deep-contrast)] tracking-tight truncate uppercase">{activeBusiness?.name || 'SELECT BIZ'}</h1>
-                                <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-none mt-0.5">Switch Identity</p>
+                                <h1 className="text-sm font-black text-[var(--deep-contrast)] tracking-tight truncate uppercase">{activeBusiness?.name || 'SELECT BIZ'}</h1>
+                                <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest leading-none mt-0.5">Switch Identity</p>
                             </div>
                         </button>
 
                         <div className="flex items-center gap-1 pr-5 h-full">
-                            {/* NotificationCenter has its own button, so it handles clicks separately */}
                             <NotificationCenter />
-                            {/* The Plus was previously just visual, or maybe for adding business? 
-                                If it's for adding business, it should be part of the switcher or a separate button. 
-                                Since it was just an icon before, I'll leave it here as a visual indicator or make it open the switcher too if clicked?
-                                For now, just rendering it. To act as switcher trigger it needs to be in the button or have same onclick.
-                            */}
-                            <button onClick={() => setIsSwitcherOpen(true)} className="hover:bg-black/5 p-1 rounded-full transition-colors">
-                                <Plus className="h-3 w-3 opacity-20" />
+                            <button onClick={() => setIsSwitcherOpen(true)} className="hover:bg-[var(--foreground)]/10 p-1.5 rounded-xl transition-all active:scale-95 group">
+                                <Plus className="h-4 w-4 opacity-20 group-hover:opacity-100 transition-opacity" />
                             </button>
                         </div>
                     </div>
 
-                    <PickerModal
-                        isOpen={isSwitcherOpen}
-                        onClose={() => setIsSwitcherOpen(false)}
-                        onSelect={(id) => setActiveBusinessId(id)}
-                        title="Switch Business"
-                        options={businesses.map(b => ({
-                            id: b.id,
-                            label: b.name.toUpperCase(),
-                            subLabel: b.isOwner ? 'OWNER' : 'JOINED TEAM'
-                        }))}
-                        selectedValue={activeBusinessId}
-                        footer={(
-                            <button
-                                onClick={() => {
-                                    setIsCreateModalOpen(true)
-                                    setIsSwitcherOpen(false)
-                                }}
-                                className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider text-[var(--primary-green)] bg-white/40 border border-[var(--primary-green)]/10 hover:bg-[var(--primary-green)] hover:text-white transition-all active:scale-[0.98]"
-                            >
-                                <Plus className="h-3 w-3" />
-                                Add Business
-                            </button>
-                        )}
-                    />
 
 
                     <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto scrollbar-hide">
@@ -122,19 +105,19 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                                     key={item.name}
                                     href={item.href}
                                     className={clsx(
-                                        'group flex items-center px-3 py-2 text-xs font-semibold rounded-xl transition-all duration-300 relative overflow-hidden',
+                                        'group flex items-center px-3 py-2.5 text-[11px] font-black rounded-xl transition-all duration-300 relative overflow-hidden uppercase tracking-tighter',
                                         isActive
-                                            ? 'text-white shadow-md shadow-[var(--primary-green)]/20 translate-x-1'
-                                            : 'text-[var(--foreground)]/70 hover:bg-white/40 hover:text-[var(--deep-contrast)] hover:translate-x-1'
+                                            ? 'text-[var(--primary-foreground)] shadow-md shadow-[var(--primary-green)]/20 translate-x-1'
+                                            : 'text-[var(--foreground)]/40 hover:bg-[var(--foreground)]/5 hover:text-[var(--deep-contrast)] hover:translate-x-1'
                                     )}
                                 >
                                     {isActive && (
-                                        <div className="absolute inset-0 bg-[var(--primary-green)] bg-opacity-100" />
+                                        <div className="absolute inset-0 bg-[var(--primary-green)]" />
                                     )}
                                     <item.icon
                                         className={clsx(
                                             'mr-3 h-4 w-4 flex-shrink-0 relative z-10 transition-colors',
-                                            isActive ? 'text-white' : 'text-[var(--foreground)]/50 group-hover:text-[var(--primary-green)]'
+                                            isActive ? 'text-[var(--primary-foreground)]' : 'text-[var(--foreground)]/20 group-hover:text-[var(--primary-green)]'
                                         )}
                                     />
                                     <span className="relative z-10">{item.name}</span>
@@ -143,10 +126,10 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                         })}
                     </nav>
 
-                    <div className="p-4 bg-white/5 border-t border-white/10 space-y-2">
+                    <div className="p-4 bg-[var(--foreground)]/5 border-t border-[var(--foreground)]/10 space-y-2">
                         <button
                             onClick={() => setIsInviteModalOpen(true)}
-                            className="w-full flex items-center px-4 py-2.5 text-xs font-bold text-[var(--primary-green)] bg-[var(--primary-green)]/5 hover:bg-[var(--primary-green)] hover:text-white rounded-xl transition-all border border-[var(--primary-green)]/10"
+                            className="w-full flex items-center px-4 py-2.5 text-[10px] font-black text-[var(--primary-green)] bg-[var(--primary-green)]/5 hover:bg-[var(--primary-green)] hover:text-[var(--primary-foreground)] active:bg-[var(--primary-active)] rounded-xl transition-all border border-[var(--primary-green)]/10 uppercase tracking-widest shadow-sm active:scale-95"
                         >
                             <UserPlus className="mr-3 h-4 w-4" />
                             Invite Members
@@ -154,14 +137,14 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                         <Link
                             href="/dashboard/settings"
                             className={clsx(
-                                'flex items-center px-4 py-2.5 text-xs font-bold rounded-xl transition-all',
+                                'flex items-center px-4 py-2.5 text-[10px] font-black rounded-xl transition-all uppercase tracking-widest',
                                 pathname === '/dashboard/settings'
-                                    ? 'bg-[var(--primary-green)] text-white shadow-lg'
-                                    : 'text-[var(--foreground)]/60 hover:bg-white/10 hover:text-[var(--deep-contrast)]'
+                                    ? 'bg-[var(--primary-green)] text-[var(--primary-foreground)] shadow-lg'
+                                    : 'text-[var(--foreground)]/40 hover:bg-[var(--foreground)]/5 hover:text-[var(--deep-contrast)]'
                             )}
                         >
                             <Settings className="mr-3 h-4 w-4" />
-                            Account Settings
+                            Settings
                         </Link>
                         <button
                             onClick={async () => {
@@ -175,10 +158,10 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                                     window.location.href = '/login'
                                 }
                             }}
-                            className="w-full flex items-center px-4 py-2.5 text-xs font-bold text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
+                            className="w-full h-11 flex items-center px-4 py-2.5 text-[10px] font-black text-rose-500/60 hover:bg-rose-500 hover:text-white rounded-xl transition-all uppercase tracking-widest active:scale-95 group shadow-sm border border-rose-500/10"
                         >
-                            <LogOut className="mr-3 h-4 w-4" />
-                            Sign Out
+                            <LogOut className="mr-3 h-4 w-4 opacity-40 group-hover:opacity-100 transition-opacity" />
+                            Log Out
                         </button>
                     </div>
 
@@ -192,15 +175,28 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     <div className={clsx(
                         "absolute inset-0 transition-all duration-300",
                         scrolled
-                            ? "bg-white border-b border-black/5 shadow-md"
+                            ? "bg-[var(--background)] backdrop-blur-md border-b border-[var(--foreground)]/10 dark:border-white/5 shadow-sm"
                             : "bg-transparent"
                     )} />
 
                     <div className="relative z-10 flex h-14 items-center justify-between px-4 pt-[env(safe-area-inset-top)] box-content">
-                        <div className="w-10 flex items-center justify-center">
-                            <BrandLogo size="sm" />
-                        </div>
-                        <h2 className="text-[10px] font-bold text-[var(--deep-contrast)] uppercase tracking-wider">{activeBusiness?.name || 'MEMBER'}</h2>
+                        <button
+                            onClick={() => setIsSwitcherOpen(true)}
+                            className="flex items-center gap-3 active:scale-95 transition-all group max-w-[60%]"
+                        >
+                            <div className="w-10 flex items-center justify-center shrink-0">
+                                <BrandLogo size="sm" />
+                            </div>
+                            <div className="flex flex-col items-start min-w-0">
+                                <div className="flex items-center gap-1.5 min-w-0">
+                                    <h2 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-wider truncate">
+                                        {activeBusiness ? activeBusiness.name : (businesses.length > 0 ? businesses[0].name : 'Loading...')}
+                                    </h2>
+                                    <ChevronDown className="h-2.5 w-2.5 text-[var(--foreground)]/40 group-hover:text-[var(--primary-green)] transition-colors shrink-0" />
+                                </div>
+                                <p className="text-[7px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.2em] leading-none mt-0.5">Switch Identity</p>
+                            </div>
+                        </button>
                         <div className="flex items-center gap-1">
                             <NotificationCenter />
                             <button
@@ -255,6 +251,16 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                 title={feedback.title}
             />
 
+            {/* Modal Components */}
+            <BusinessSwitcherModal
+                isOpen={isSwitcherOpen}
+                onClose={() => setIsSwitcherOpen(false)}
+                businesses={businesses}
+                activeBusinessId={activeBusinessId}
+                onSelect={(id) => setActiveBusinessId(id)}
+                onCreateNew={() => setIsCreateModalOpen(true)}
+            />
+
             {/* Global Loading Overlay */}
             <AnimatePresence>
                 {isGlobalLoading && (
@@ -262,9 +268,9 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[100] flex items-center justify-center bg-white/60 backdrop-blur-sm shadow-2xl"
+                        className="fixed inset-0 z-[100] flex items-center justify-center bg-[var(--background)]/60 backdrop-blur-sm shadow-2xl"
                     >
-                        <div className="glass p-8 rounded-3xl border border-white/50 flex flex-col items-center gap-4">
+                        <div className="glass p-8 rounded-3xl border border-[var(--foreground)]/10 dark:border-white/50 flex flex-col items-center gap-4">
                             <LoadingSpinner size="lg" label="Processing..." />
                             <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-[0.3em] animate-pulse">Lucy-ex OS is working</p>
                         </div>

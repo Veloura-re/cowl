@@ -18,9 +18,12 @@ export default function LoadingSpinner({ className, size = 'md', label }: Loadin
 
     return (
         <div className={clsx("flex flex-col items-center justify-center p-8 text-center", className)}>
-            <Loader2 className={clsx("animate-spin text-[var(--primary-green)]", sizeClasses[size])} />
+            <div className="relative">
+                <Loader2 className={clsx("animate-spin text-[var(--primary-green)]", sizeClasses[size])} strokeWidth={3} />
+                <div className={clsx("absolute inset-0 animate-ping opacity-20 bg-[var(--primary-green)] rounded-full", sizeClasses[size])} />
+            </div>
             {label && (
-                <p className="mt-3 text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40">
+                <p className="mt-4 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 animate-pulse">
                     {label}
                 </p>
             )}

@@ -50,11 +50,11 @@ export default function CreateBusinessModal({ isOpen, onClose }: CreateBusinessM
 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose} />
-            <div className="glass w-full max-w-sm rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 relative z-10 border border-white/40">
-                <div className="flex items-center justify-between border-b border-white/20 bg-white/40 px-6 py-4">
+            <div className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose} />
+            <div className="glass w-full max-w-sm rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 relative z-10 border border-[var(--foreground)]/10 bg-[var(--background)]/80">
+                <div className="flex items-center justify-between border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5 px-6 py-4">
                     <div className="flex items-center gap-2.5">
-                        <div className="p-2 rounded-xl bg-[var(--primary-green)] text-white shadow-lg">
+                        <div className="p-2 rounded-xl bg-[var(--primary-green)] text-[var(--primary-foreground)] shadow-lg">
                             <Building2 className="h-4 w-4" />
                         </div>
                         <div>
@@ -64,7 +64,7 @@ export default function CreateBusinessModal({ isOpen, onClose }: CreateBusinessM
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-1.5 rounded-full hover:bg-white/50 transition-colors"
+                        className="p-1.5 rounded-full hover:bg-[var(--foreground)]/5 transition-colors"
                     >
                         <X className="h-4 w-4" />
                     </button>
@@ -78,26 +78,26 @@ export default function CreateBusinessModal({ isOpen, onClose }: CreateBusinessM
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="w-full h-11 lg:h-9 rounded-xl bg-white/50 border border-white/20 px-4 text-sm lg:text-[11px] font-bold text-[var(--deep-contrast)] focus:outline-none transition-all shadow-inner"
+                            className="w-full h-11 lg:h-9 rounded-xl bg-[var(--foreground)]/5 dark:bg-white/5 border border-[var(--foreground)]/10 dark:border-white/10 px-4 text-sm lg:text-[11px] font-bold text-[var(--deep-contrast)] focus:outline-none transition-all shadow-inner"
                             placeholder="e.g. Acme Corp"
                         />
                     </div>
 
-                    <div className="flex justify-end pt-5 gap-3 border-t border-black/5">
+                    <div className="flex justify-end pt-5 gap-3 border-t border-[var(--foreground)]/10">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 h-12 lg:h-10 rounded-xl text-[11px] lg:text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 hover:bg-white/50 transition-all active:scale-95"
+                            className="flex-1 h-12 lg:h-10 rounded-xl text-[11px] lg:text-[10px] font-black uppercase tracking-wider text-[var(--foreground)]/40 hover:bg-[var(--foreground)]/10 transition-all active:scale-95"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={loading || !name}
-                            className="flex-1 h-12 lg:h-10 flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] text-white shadow-lg text-[11px] lg:text-[10px] font-bold uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50"
+                            className="flex-1 h-12 lg:h-10 flex items-center justify-center rounded-xl bg-[var(--primary-green)] text-[var(--primary-foreground)] shadow-lg text-[11px] lg:text-[10px] font-black uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50 hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)]"
                         >
                             {loading && <Loader2 className="mr-2 h-4 w-4 lg:h-3 lg:w-3 animate-spin" />}
-                            Create
+                            Commit Profile
                         </button>
                     </div>
                 </form>

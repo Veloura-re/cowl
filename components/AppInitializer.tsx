@@ -15,11 +15,14 @@ export default function AppInitializer() {
                 // 1. Enable overlay so the webview sits BEHIND the status bar (edge-to-edge)
                 await StatusBar.setOverlaysWebView({ overlay: true })
 
-                // 2. Set Status Bar Background to White (translucent if overlay is true)
-                await StatusBar.setBackgroundColor({ color: '#ffffff' })
+                // 2. Set Status Bar Background to Transparent (handled by overlay)
+                // We don't want a solid color if we are doing edge-to-edge
+                // But for safety, we set it to something compatible
+                await StatusBar.setBackgroundColor({ color: '#00000000' })
 
-                // 3. Set Status Bar Style to Light (Dark icons/text)
-                await StatusBar.setStyle({ style: Style.Light })
+                // 3. Set Status Bar Style to Dark (Light icons/text) for Dark Mode
+                // Since this app defaults to a very dark emerald theme, Light style (white icons) is usually better
+                await StatusBar.setStyle({ style: Style.Dark })
 
                 // 4. Request Notification Permissions
                 const permissionStatus = await PushNotifications.checkPermissions()

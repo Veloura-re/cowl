@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Building, Lock, Loader2, Globe, Shield, Bell, ChevronDown, LogOut, User, Wallet, X, Users, ChevronRight } from 'lucide-react'
+import { Building, Lock, Loader2, Globe, Shield, Bell, ChevronDown, LogOut, User, Wallet, X, Users, ChevronRight, Moon, Sparkles, Building2, UserPlus, Plus, Save } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { currencies } from '@/lib/currencies'
 import Link from 'next/link'
@@ -10,11 +10,11 @@ import clsx from 'clsx'
 import PickerModal from '@/components/ui/PickerModal'
 import { useBusiness } from '@/context/business-context'
 import CreateBusinessModal from '@/components/ui/CreateBusinessModal'
-import { Plus, Building2, UserPlus } from 'lucide-react'
 import AddTeamMemberModal from '@/components/ui/AddTeamMemberModal'
 import FeedbackModal from '@/components/ui/FeedbackModal'
 import ConfirmModal from '@/components/ui/ConfirmModal'
 import ChangePasswordModal from '@/components/ui/ChangePasswordModal'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
 
 export default function SettingsPage() {
     const supabase = createClient()
@@ -66,7 +66,7 @@ export default function SettingsPage() {
                         .single()
 
                     if (activeBusinessId) {
-                        const { data: bus, error: busError } = await supabase
+                        const { data: bus } = await supabase
                             .from('businesses')
                             .select('*')
                             .eq('id', activeBusinessId)
@@ -85,7 +85,6 @@ export default function SettingsPage() {
                             }))
                         }
 
-                        // Fetch Payment Modes
                         const { data: modes } = await supabase
                             .from('payment_modes')
                             .select('*')
@@ -94,7 +93,6 @@ export default function SettingsPage() {
 
                         if (modes) setPaymentModes(modes)
 
-                        // Fetch Notification Settings
                         const { data: ns } = await supabase
                             .from('notification_settings')
                             .select('*')
@@ -111,7 +109,6 @@ export default function SettingsPage() {
                             })
                         }
                     } else {
-                        // No active business, just set profile info
                         setFormData(prev => ({
                             ...prev,
                             fullName: profile?.full_name || '',
@@ -240,375 +237,375 @@ export default function SettingsPage() {
             sessionStorage.clear()
             window.location.href = '/login'
         } catch (error: any) {
-            console.error('Sign out error:', error)
             window.location.href = '/login'
         }
     }
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center p-20 text-[var(--foreground)]/50">
-                <Loader2 className="h-5 w-5 animate-spin" />
+            <div className="flex items-center justify-center p-24 text-[var(--foreground)]/20">
+                <Loader2 className="h-6 w-6 animate-spin" />
             </div>
         )
     }
 
     return (
-        <div className="space-y-4 pb-20 max-w-3xl mx-auto">
+        <div className="space-y-4 pb-20 max-w-2xl mx-auto animate-in fade-in duration-500">
             <div className="pb-3 border-b border-[var(--primary-green)]/10">
-                <h1 className="text-xl font-bold text-[var(--deep-contrast)] tracking-tight">Settings</h1>
-                <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Manage your business & account</p>
+                <h1 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight">Configuration</h1>
+                <p className="text-[10px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.2em] leading-none mt-1">Platform Control Center</p>
             </div>
 
             <div className="grid gap-3">
-                {/* Personal Profile - NEW */}
-                <div className="glass rounded-2xl border border-white/40 overflow-hidden">
-                    <div className="px-4 py-3 border-b border-white/20 bg-white/40 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <div className="h-7 w-7 rounded-lg bg-[var(--primary-green)]/10 text-[var(--primary-green)] flex items-center justify-center">
+                {/* Interface Control */}
+                <div className="glass rounded-[24px] border border-[var(--foreground)]/10 overflow-hidden shadow-lg">
+                    <div className="px-5 py-3.5 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="h-8 w-8 rounded-xl bg-[var(--foreground)]/5 text-[var(--deep-contrast)] flex items-center justify-center shadow-inner">
+                                <Sparkles className="h-4 w-4" />
+                            </div>
+                            <div>
+                                <h3 className="text-[11px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">Interface</h3>
+                                <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">App Theme Logic</p>
+                            </div>
+                        </div>
+                        <ThemeToggle />
+                    </div>
+                </div>
+
+                {/* Account Metadata */}
+                <div className="glass rounded-[24px] border border-[var(--foreground)]/10 overflow-hidden shadow-lg">
+                    <div className="px-5 py-3.5 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="h-8 w-8 rounded-xl bg-[var(--primary-green)]/10 text-[var(--primary-green)] flex items-center justify-center shadow-inner">
                                 <User className="h-4 w-4" />
                             </div>
-                            <h3 className="text-xs font-bold text-[var(--deep-contrast)]">Personal Profile</h3>
+                            <div>
+                                <h3 className="text-[11px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">Personal Identity</h3>
+                                <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Account Master Data</p>
+                            </div>
                         </div>
-                        <span className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider">Account Metadata</span>
+                        <span className="text-[8px] font-black text-[var(--foreground)]/20 uppercase tracking-[0.3em]">SECURE ACCESS</span>
                     </div>
 
-                    <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="space-y-1.5">
-                            <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 ml-1">Full Name</label>
+                    <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Identity Label</label>
                             <input
                                 type="text"
                                 value={formData.fullName}
                                 onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                                className="w-full h-9 rounded-xl bg-white/50 border border-white/20 px-3 text-xs font-bold text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:ring-1 focus:ring-[var(--primary-green)]/20 focus:outline-none transition-all shadow-inner"
-                                placeholder="John Doe"
+                                className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner"
+                                placeholder="Full Name"
                             />
                         </div>
-                        <div className="space-y-1.5">
-                            <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 ml-1">Username</label>
+                        <div>
+                            <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Universal Handle</label>
                             <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--foreground)]/30 font-bold text-xs">@</span>
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--foreground)]/20 font-black text-[11px]">@</span>
                                 <input
                                     type="text"
                                     value={formData.username}
                                     onChange={(e) => setFormData({ ...formData, username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '') })}
-                                    className="w-full h-9 rounded-xl bg-white/50 border border-white/20 pl-7 pr-3 text-xs font-bold text-[var(--primary-green)] focus:border-[var(--primary-green)] focus:ring-1 focus:ring-[var(--primary-green)]/20 focus:outline-none transition-all shadow-inner"
-                                    placeholder="username"
+                                    className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 pl-9 pr-4 text-[11px] font-black text-[var(--primary-green)] focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner"
+                                    placeholder="handle"
                                 />
                             </div>
                         </div>
                     </div>
                 </div>
-                {/* Business Profile - Ultra Compact */}
-                <div className="glass rounded-2xl border border-white/40 overflow-hidden">
-                    <div className="px-4 py-3 border-b border-white/20 bg-white/40 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <div className="h-7 w-7 rounded-lg bg-[var(--primary-green)] text-white flex items-center justify-center shadow-sm">
+
+                {/* Organization Data */}
+                <div className="glass rounded-[24px] border border-[var(--foreground)]/10 overflow-hidden shadow-lg">
+                    <div className="px-5 py-3.5 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="h-8 w-8 rounded-xl bg-[var(--primary-green)] text-[var(--primary-foreground)] flex items-center justify-center shadow-lg shadow-[var(--primary-green)]/20">
                                 <Building2 className="h-4 w-4" />
                             </div>
-                            <h3 className="text-xs font-bold text-[var(--deep-contrast)]">Business Profile</h3>
+                            <div>
+                                <h3 className="text-[11px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">Organization Profile</h3>
+                                <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Enterprise Registry</p>
+                            </div>
                         </div>
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => setIsSwitcherOpen(true)}
-                                className="px-3 py-1.5 rounded-xl bg-white/40 border border-white/10 text-[9px] font-bold uppercase tracking-wider text-[var(--deep-contrast)] hover:bg-white/60 transition-all active:scale-95"
+                                className="px-3 py-1.5 rounded-xl bg-[var(--foreground)]/10 border border-[var(--foreground)]/5 text-[9px] font-black uppercase tracking-widest text-[var(--deep-contrast)] hover:bg-[var(--foreground)]/20 transition-all active:scale-95 shadow-sm"
                             >
-                                Switch
+                                SWITCH
                             </button>
                             <button
                                 onClick={() => setIsCreateModalOpen(true)}
-                                className="p-1.5 rounded-xl bg-[var(--deep-contrast)] text-white shadow-lg shadow-[var(--deep-contrast)]/10 active:scale-95 transition-all"
+                                className="h-8 w-8 flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] text-[var(--primary-foreground)] shadow-xl shadow-[var(--deep-contrast)]/20 active:scale-95 transition-all hover:bg-[var(--primary-green)]"
                             >
                                 <Plus className="h-4 w-4" />
                             </button>
                         </div>
                     </div>
 
-                    <PickerModal
-                        isOpen={isSwitcherOpen}
-                        onClose={() => setIsSwitcherOpen(false)}
-                        onSelect={(id) => {
-                            setActiveBusinessId(id)
-                            setIsSwitcherOpen(false)
-                        }}
-                        title="Select Business"
-                        options={businesses.map(b => ({
-                            id: b.id,
-                            label: b.name.toUpperCase(),
-                            subLabel: b.isOwner ? 'OWNER' : 'JOINED TEAM'
-                        }))}
-                        selectedValue={activeBusinessId}
-                    />
-
-                    <CreateBusinessModal
-                        isOpen={isCreateModalOpen}
-                        onClose={() => setIsCreateModalOpen(false)}
-                    />
-
-                    <ChangePasswordModal
-                        isOpen={isChangePasswordModalOpen}
-                        onClose={() => setIsChangePasswordModalOpen(false)}
-                    />
-
-                    <div className="p-4 space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="p-5 space-y-5">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="md:col-span-2">
-                                <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-1.5 ml-1">Business Name</label>
+                                <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Entity Label</label>
                                 <input
                                     type="text"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full h-9 rounded-xl bg-white/50 border border-white/20 px-3 text-xs font-bold text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:ring-1 focus:ring-[var(--primary-green)]/20 focus:outline-none transition-all shadow-inner"
+                                    className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner"
                                 />
                             </div>
                             <div>
-                                <label className="block text-[11px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-1.5 ml-1">Phone Number</label>
+                                <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Registry Phone</label>
                                 <input
                                     type="text"
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                    className="w-full h-9 rounded-xl bg-white/50 border border-white/20 px-3 text-xs font-bold text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:ring-1 focus:ring-[var(--primary-green)]/20 focus:outline-none transition-all shadow-inner"
+                                    className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner"
                                 />
                             </div>
                             <div>
-                                <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-1.5 ml-1 flex items-center gap-1.5">
-                                    <Globe className="h-2.5 w-2.5" /> Business Currency
+                                <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1 flex items-center gap-2">
+                                    <Globe className="h-2.5 w-2.5" /> Fiscal Currency
                                 </label>
                                 <button
                                     type="button"
                                     onClick={() => setIsCurrencyPickerOpen(true)}
-                                    className="w-full h-9 rounded-xl bg-white/50 border border-white/20 px-3 text-xs font-bold text-[var(--deep-contrast)] hover:border-[var(--primary-green)] transition-all flex items-center justify-between shadow-inner"
+                                    className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-black text-[var(--deep-contrast)] hover:border-[var(--primary-green)] transition-all flex items-center justify-between shadow-inner"
                                 >
                                     <span className="truncate">
-                                        {currencies.find(c => c.code === formData.currency)?.symbol} - {currencies.find(c => c.code === formData.currency)?.name} ({formData.currency})
+                                        {currencies.find(c => c.code === formData.currency)?.symbol} - {formData.currency}
                                     </span>
-                                    <ChevronDown className="h-3 w-3 opacity-20" />
+                                    <ChevronDown className="h-3.5 w-3.5 opacity-20" />
                                 </button>
-                                <PickerModal
-                                    isOpen={isCurrencyPickerOpen}
-                                    onClose={() => setIsCurrencyPickerOpen(false)}
-                                    onSelect={(currency) => setFormData({ ...formData, currency })}
-                                    title="Select Currency"
-                                    options={currencies.map(c => ({
-                                        id: c.code,
-                                        label: `${c.symbol} - ${c.code}`,
-                                        subLabel: c.name
-                                    }))}
-                                    selectedValue={formData.currency}
-                                />
                             </div>
                         </div>
 
                         <div>
-                            <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-1.5 ml-1">Business Address</label>
+                            <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Registry Address</label>
                             <textarea
                                 value={formData.address}
                                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                className="w-full min-h-[60px] rounded-xl bg-white/50 border border-white/20 p-3 text-xs font-bold text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:ring-1 focus:ring-[var(--primary-green)]/20 focus:outline-none transition-all shadow-inner resize-none"
-                                placeholder="P.O. Box, Building, Street..."
+                                className="w-full h-24 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 p-4 text-[11px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner resize-none"
+                                placeholder="Operational locus..."
                             />
                         </div>
 
-                        <div className="flex justify-end pt-2 border-t border-[var(--primary-green)]/5">
+                        <div className="flex justify-end pt-3 border-t border-[var(--foreground)]/5">
                             <button
                                 onClick={handleSave}
                                 disabled={saving}
-                                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--deep-contrast)] text-white font-bold text-[10px] uppercase tracking-wider hover:bg-[var(--primary-green)] transition-all shadow-lg active:scale-95 disabled:opacity-50"
+                                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[var(--primary-green)] text-[var(--primary-foreground)] font-black text-[10px] uppercase tracking-[0.2em] hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] transition-all shadow-xl shadow-[var(--primary-green)]/20 active:scale-95 disabled:opacity-50"
                             >
-                                {saving ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
-                                Save Profile
+                                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                                Commit Changes
                             </button>
                         </div>
                     </div>
                 </div>
 
-            </div>
-
-            {/* Payment Modes - NEW */}
-            <div className="glass rounded-2xl border border-white/40 overflow-hidden">
-                <div className="px-4 py-3 border-b border-white/20 bg-white/40 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <div className="h-7 w-7 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center">
-                            <Wallet className="h-4 w-4" />
-                        </div>
-                        <h3 className="text-xs font-bold text-[var(--deep-contrast)]">Payment Modes</h3>
-                    </div>
-                    <span className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider">Global Methods</span>
-                </div>
-                <div className="p-4 space-y-4">
-                    <div className="flex gap-2">
-                        <input
-                            type="text"
-                            value={newModeName}
-                            onChange={(e) => setNewModeName(e.target.value)}
-                            placeholder="e.g. M-PESA, STRIPE..."
-                            className="flex-1 h-9 rounded-xl bg-white/50 border border-white/20 px-3 text-xs font-bold text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner uppercase"
-                            onKeyDown={(e) => e.key === 'Enter' && handleAddMode()}
-                        />
-                        <button
-                            onClick={handleAddMode}
-                            disabled={addingMode || !newModeName.trim()}
-                            className="px-4 h-9 rounded-xl bg-[var(--deep-contrast)] text-white font-bold text-[10px] uppercase tracking-wider hover:bg-[var(--primary-green)] transition-all shadow-lg active:scale-95 disabled:opacity-50"
-                        >
-                            {addingMode ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Add'}
-                        </button>
-                    </div>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                        {paymentModes.length === 0 && (
-                            <p className="col-span-full text-[9px] font-bold text-[var(--foreground)]/30 uppercase text-center py-4">No custom modes added</p>
-                        )}
-                        {paymentModes.map((mode) => (
-                            <div
-                                key={mode.id}
-                                className="group relative flex items-center justify-between px-3 py-2 rounded-xl bg-white/30 border border-white/10 hover:bg-white/50 transition-all"
-                            >
-                                <span className="text-[10px] font-bold text-[var(--deep-contrast)] tracking-wider">{mode.name}</span>
-                                <button
-                                    onClick={() => handleDeleteMode(mode.id)}
-                                    className="p-1 rounded-lg hover:bg-rose-50 text-rose-500 opacity-0 group-hover:opacity-100 transition-all"
-                                >
-                                    <X className="h-3 w-3" />
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="pt-2 border-t border-black/5">
-                        <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-relaxed">
-                            Note: Default modes (CASH, BANK, ONLINE) are always available.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            {/* Account Security - Compact */}
-            <div className="glass rounded-2xl border border-white/40 overflow-hidden">
-                <div className="px-4 py-3 border-b border-white/20 bg-white/40 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <div className="h-7 w-7 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center">
-                            <Lock className="h-4 w-4" />
-                        </div>
-                        <h3 className="text-xs font-bold text-[var(--deep-contrast)]">Security</h3>
-                    </div>
-                    <span className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider">Access Control</span>
-                </div>
-                <div className="p-4 space-y-3">
-                    <div className="flex items-center justify-between">
+                {/* Ledger Config */}
+                <div className="glass rounded-[24px] border border-[var(--foreground)]/10 overflow-hidden shadow-lg">
+                    <div className="px-5 py-3.5 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5 flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <Shield className="h-4 w-4 text-[var(--foreground)]/30" />
+                            <div className="h-8 w-8 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center shadow-inner">
+                                <Wallet className="h-4 w-4" />
+                            </div>
                             <div>
-                                <p className="text-xs font-bold text-[var(--deep-contrast)]">Password</p>
-                                <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider">Update your login credentials</p>
+                                <h3 className="text-[11px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">Financial Rails</h3>
+                                <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Payment Liquidation Modes</p>
                             </div>
                         </div>
-                        <button
-                            onClick={() => setIsChangePasswordModalOpen(true)}
-                            className="px-3 py-1.5 rounded-xl border border-[var(--primary-green)]/20 hover:bg-[var(--primary-green)] hover:text-white text-[10px] font-bold uppercase tracking-wider text-[var(--deep-contrast)] transition-all"
-                        >
-                            Change
-                        </button>
+                        <span className="text-[8px] font-black text-[var(--foreground)]/20 uppercase tracking-[0.3em]">REVENUE CHANNELS</span>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        <Link
-                            href="/dashboard/settings/team"
-                            className="flex-1 flex items-center justify-between p-3 rounded-xl bg-white/30 border border-white/10 hover:bg-white/50 transition-all group"
-                        >
-                            <div className="flex items-center gap-3">
-                                <Users className="h-4 w-4 text-blue-500" />
-                                <div>
-                                    <p className="text-xs font-bold text-[var(--deep-contrast)]">Team Management</p>
-                                    <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider">Manage partners & viewers</p>
-                                </div>
-                            </div>
-                            <ChevronRight className="h-4 w-4 text-[var(--foreground)]/20 group-hover:text-[var(--deep-contrast)] transition-colors" />
-                        </Link>
-                        <button
-                            onClick={() => setIsAddTeamModalOpen(true)}
-                            className="p-4 rounded-xl bg-[var(--primary-green)] text-white shadow-lg shadow-[var(--primary-green)]/10 hover:bg-[var(--deep-contrast)] transition-all active:scale-95 flex items-center justify-center"
-                            title="Quick Invite Member"
-                        >
-                            <UserPlus className="h-5 w-5" />
-                        </button>
-                    </div>
-
-                    <AddTeamMemberModal
-                        isOpen={isAddTeamModalOpen}
-                        onClose={() => setIsAddTeamModalOpen(false)}
-                        businessId={activeBusinessId}
-                        onSuccess={() => router.refresh()}
-                    />
-
-                    <div className="pt-3 border-t border-[var(--primary-green)]/5">
-                        <button
-                            onClick={handleSignOut}
-                            className="w-full flex items-center justify-between px-4 py-2 text-[10px] font-bold text-rose-600/60 rounded-xl bg-white/5 border border-white/10 hover:bg-rose-600 hover:text-white transition-all active:scale-95 group"
-                        >
-                            <span className="uppercase tracking-wider">Terminate Session</span>
-                            <LogOut className="h-3.5 w-3.5 opacity-50 group-hover:opacity-100 transition-opacity" />
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            {/* Notifications - Small Section */}
-            <div className="glass rounded-2xl border border-white/40 overflow-hidden">
-                <div className="px-4 py-3 border-b border-white/20 bg-white/40 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <div className="h-7 w-7 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
-                            <Bell className="h-4 w-4" />
+                    <div className="p-5 space-y-5">
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                value={newModeName}
+                                onChange={(e) => setNewModeName(e.target.value.toUpperCase())}
+                                placeholder="E.G. M-PESA, STRIPE..."
+                                className="flex-1 h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner uppercase"
+                                onKeyDown={(e) => e.key === 'Enter' && handleAddMode()}
+                            />
+                            <button
+                                onClick={handleAddMode}
+                                disabled={addingMode || !newModeName.trim()}
+                                className="px-6 h-11 rounded-xl bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] font-black text-[10px] uppercase tracking-widest hover:bg-[var(--deep-contrast-hover)] transition-all shadow-xl active:scale-95 disabled:opacity-40"
+                            >
+                                {addingMode ? <Loader2 className="h-4 w-4 animate-spin" /> : 'REGISTER'}
+                            </button>
                         </div>
-                        <h3 className="text-xs font-bold text-[var(--deep-contrast)]">Notifications</h3>
-                    </div>
-                    <span className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider">Alert Settings</span>
-                </div>
-                <div className="p-4 space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {[
-                            { id: 'notify_sales', label: 'Sales Alerts', desc: 'New sale transactions' },
-                            { id: 'notify_purchases', label: 'Purchase Alerts', desc: 'New stock purchases' },
-                            { id: 'notify_stock', label: 'Low Stock Alerts', desc: 'When items hit minimum stock' },
-                            { id: 'notify_team', label: 'Team Activity', desc: 'Membership changes' },
-                        ].map((item) => (
-                            <div key={item.id} className="flex items-center justify-between p-3 rounded-xl bg-white/30 border border-white/10">
-                                <div>
-                                    <p className="text-[10px] font-bold text-[var(--deep-contrast)] uppercase tracking-tight">{item.label}</p>
-                                    <p className="text-[8px] font-bold text-[var(--foreground)]/40">{item.desc}</p>
-                                </div>
-                                <button
-                                    onClick={() => handleUpdateNotifSetting(item.id as any, !notifSettings[item.id as keyof typeof notifSettings])}
-                                    disabled={updatingNotif === item.id}
-                                    className={clsx(
-                                        "w-9 h-5 rounded-full p-1 transition-all duration-300 relative",
-                                        notifSettings[item.id as keyof typeof notifSettings] ? "bg-[var(--primary-green)] shadow-inner" : "bg-black/10"
-                                    )}
+
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                            {paymentModes.map((mode) => (
+                                <div
+                                    key={mode.id}
+                                    className="group relative flex items-center justify-between px-3 py-2.5 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:border-[var(--primary-green)]/30 transition-all shadow-sm"
                                 >
-                                    <div className={clsx(
-                                        "h-3 w-3 rounded-full bg-white shadow-md transition-all duration-300 transform",
-                                        notifSettings[item.id as keyof typeof notifSettings] ? "translate-x-4" : "translate-x-0"
-                                    )} />
-                                </button>
-                            </div>
-                        ))}
+                                    <span className="text-[9px] font-black text-[var(--deep-contrast)] uppercase tracking-widest">{mode.name}</span>
+                                    <button
+                                        onClick={() => handleDeleteMode(mode.id)}
+                                        className="h-6 w-6 flex items-center justify-center rounded-lg hover:bg-rose-500/10 text-rose-500 opacity-0 group-hover:opacity-100 transition-all active:scale-90"
+                                    >
+                                        <X className="h-3.5 w-3.5" />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                    <div className="pt-2 border-t border-black/5">
-                        <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-relaxed">
-                            Team members set their own notification preferences.
-                        </p>
+                </div>
+
+                {/* Secure Access Control */}
+                <div className="glass rounded-[24px] border border-[var(--foreground)]/10 overflow-hidden shadow-lg">
+                    <div className="px-5 py-3.5 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="h-8 w-8 rounded-xl bg-orange-600 text-white flex items-center justify-center shadow-lg shadow-orange-600/20">
+                                <Lock className="h-4 w-4" />
+                            </div>
+                            <div>
+                                <h3 className="text-[11px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">Secure Access</h3>
+                                <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Authorization Controls</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="p-5 space-y-3">
+                        <div className="flex items-center justify-between p-4 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/5 hover:border-[var(--primary-green)]/20 transition-all cursor-pointer group" onClick={() => setIsChangePasswordModalOpen(true)}>
+                            <div className="flex items-center gap-3">
+                                <Shield className="h-5 w-5 text-orange-600/40 group-hover:text-orange-600 transition-colors" />
+                                <div>
+                                    <p className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">Cryptographic Key</p>
+                                    <p className="text-[8px] font-black text-[var(--foreground)]/30 uppercase tracking-widest mt-0.5">Mandatory security cycle</p>
+                                </div>
+                            </div>
+                            <ChevronRight className="h-4 w-4 text-[var(--foreground)]/20 group-hover:text-[var(--deep-contrast)] transition-all" />
+                        </div>
+
+                        <div className="flex gap-2">
+                            <Link
+                                href="/dashboard/settings/team"
+                                className="flex-1 flex items-center justify-between p-4 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/5 hover:border-blue-500/20 transition-all group"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <Users className="h-5 w-5 text-blue-500/40 group-hover:text-blue-500 transition-colors" />
+                                    <div>
+                                        <p className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">Network Consortium</p>
+                                        <p className="text-[8px] font-black text-[var(--foreground)]/30 uppercase tracking-widest mt-0.5">Collaborative access</p>
+                                    </div>
+                                </div>
+                                <ChevronRight className="h-4 w-4 text-[var(--foreground)]/20 group-hover:text-[var(--deep-contrast)] transition-all" />
+                            </Link>
+                            <button
+                                onClick={() => setIsAddTeamModalOpen(true)}
+                                className="w-14 rounded-2xl bg-blue-500 text-white shadow-xl shadow-blue-500/20 hover:bg-blue-600 transition-all active:scale-95 flex items-center justify-center"
+                                title="Invite New Node"
+                            >
+                                <UserPlus className="h-6 w-6" />
+                            </button>
+                        </div>
+
+                        <div className="pt-3 border-t border-[var(--foreground)]/5">
+                            <button
+                                onClick={handleSignOut}
+                                className="w-full h-11 flex items-center justify-between px-5 rounded-xl bg-orange-600/5 text-orange-600/40 border border-orange-600/10 hover:bg-orange-600 hover:text-white transition-all active:scale-[0.99] group shadow-inner"
+                            >
+                                <span className="text-[9px] font-black uppercase tracking-[0.3em]">DE-AUTHORIZE SESSION</span>
+                                <LogOut className="h-4 w-4 opacity-40 group-hover:opacity-100 transition-opacity" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Alert Configuration */}
+                <div className="glass rounded-[24px] border border-[var(--foreground)]/10 overflow-hidden shadow-lg">
+                    <div className="px-5 py-3.5 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="h-8 w-8 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center shadow-inner">
+                                <Bell className="h-4 w-4" />
+                            </div>
+                            <div>
+                                <h3 className="text-[11px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">Signal Matrix</h3>
+                                <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Notification Routing</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="p-5 space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {[
+                                { id: 'notify_sales', label: 'Fiscal Inbound', desc: 'Realtime Sales Data' },
+                                { id: 'notify_purchases', label: 'Fiscal Outbound', desc: 'Registry Expenditures' },
+                                { id: 'notify_stock', label: 'Asset Alert', desc: 'Critical stock levels' },
+                                { id: 'notify_team', label: 'Node Activity', desc: 'Network changes' },
+                            ].map((item) => (
+                                <div key={item.id} className="flex items-center justify-between p-4 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/5 shadow-sm">
+                                    <div className="min-w-0">
+                                        <p className="text-[9px] font-black text-[var(--deep-contrast)] uppercase tracking-widest truncate">{item.label}</p>
+                                        <p className="text-[7px] font-black text-[var(--foreground)]/30 uppercase mt-0.5 truncate">{item.desc}</p>
+                                    </div>
+                                    <button
+                                        onClick={() => handleUpdateNotifSetting(item.id as any, !notifSettings[item.id as keyof typeof notifSettings])}
+                                        disabled={updatingNotif === item.id}
+                                        className={clsx(
+                                            "w-10 h-6 rounded-full p-1 transition-all duration-300 relative shadow-inner",
+                                            notifSettings[item.id as keyof typeof notifSettings] ? "bg-[var(--primary-green)]" : "bg-[var(--foreground)]/10"
+                                        )}
+                                    >
+                                        <div className={clsx(
+                                            "h-4 w-4 rounded-full bg-white shadow-lg transition-all duration-300 transform",
+                                            notifSettings[item.id as keyof typeof notifSettings] ? "translate-x-4" : "translate-x-0"
+                                        )} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
+
+            {/* Sub-Modals */}
+            <PickerModal
+                isOpen={isSwitcherOpen}
+                onClose={() => setIsSwitcherOpen(false)}
+                onSelect={(id) => {
+                    setActiveBusinessId(id)
+                    setIsSwitcherOpen(false)
+                }}
+                title="Select Deployment"
+                options={businesses.map(b => ({
+                    id: b.id,
+                    label: b.name.toUpperCase(),
+                    subLabel: b.isOwner ? 'MASTER NODE (OWNER)' : 'GUEST NODE (TEAM)'
+                }))}
+                selectedValue={activeBusinessId}
+            />
+
+            <CreateBusinessModal
+                isOpen={isCreateModalOpen}
+                onClose={() => setIsCreateModalOpen(false)}
+            />
+
+            <ChangePasswordModal
+                isOpen={isChangePasswordModalOpen}
+                onClose={() => setIsChangePasswordModalOpen(false)}
+            />
+
+            <AddTeamMemberModal
+                isOpen={isAddTeamModalOpen}
+                onClose={() => setIsAddTeamModalOpen(false)}
+                businessId={activeBusinessId}
+                onSuccess={() => router.refresh()}
+            />
 
             <ConfirmModal
                 isOpen={confirmModal.open}
                 onClose={() => setConfirmModal({ ...confirmModal, open: false })}
                 onConfirm={() => executeDeleteMode(confirmModal.modeId)}
                 isLoading={deletingMode}
-                title="Delete Mode?"
-                message="This payment mode will no longer be available for new transactions."
-                confirmText="Delete"
-                cancelText="Keep"
+                title="De-register Mode?"
+                message="Permanently isolate this payment channel from the active registry?"
+                confirmText="De-register"
+                variant="danger"
             />
 
             <FeedbackModal

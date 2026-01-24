@@ -23,7 +23,7 @@ export default function Step4Success({ onComplete }: Step4Props) {
     }
 
     return (
-        <div className="glass rounded-[24px] border border-white/40 overflow-hidden">
+        <div className="glass rounded-[24px] border border-gray-200 overflow-hidden">
             <div className="p-12 text-center space-y-6">
                 {/* Success Icon */}
                 <div className="flex justify-center">

@@ -2,38 +2,42 @@
 
 import { useState, useEffect } from 'react'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
-import { Plus, Search, ShoppingCart, Calendar, User, Filter, ArrowUpDown, Printer } from 'lucide-react'
+import { Plus, Search, ShoppingCart, Calendar, User, Filter, ArrowUpDown, Printer, Edit2 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import clsx from 'clsx'
+import dynamic from 'next/dynamic'
 import { useBusiness } from '@/context/business-context'
+import { Loader2 } from 'lucide-react'
 import PickerModal from '@/components/ui/PickerModal'
 import { createClient } from '@/utils/supabase/client'
 import { printInvoice, InvoiceData, downloadInvoice } from '@/utils/invoice-generator'
 import { currencies } from '@/lib/currencies'
-import InvoicePreviewModal from '@/components/ui/InvoicePreviewModal'
+
+const InvoicePreviewModal = dynamic(() => import('@/components/ui/InvoicePreviewModal'), {
+    ssr: false,
+    loading: () => <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm"><Loader2 className="h-8 w-8 animate-spin text-[var(--primary-green)]" /></div>
+})
 
 export default function PurchasesClientView({ initialInvoices }: { initialInvoices?: any[] }) {
     const router = useRouter()
     const { activeBusinessId, formatCurrency, businesses } = useBusiness()
     const [invoices, setInvoices] = useState(initialInvoices || [])
     const [searchQuery, setSearchQuery] = useState('')
-    const supabase = createClient() // Create client instance here if not existing, or use existing
+    const supabase = createClient()
 
     useEffect(() => {
         const fetchInvoices = async () => {
             if (!activeBusinessId) {
-                console.log('PurchasesClientView: No active business, skipping fetch')
                 setLoading(false)
                 return
             }
 
             setLoading(true)
-            console.log('PurchasesClientView: Fetching fresh purchases for business:', activeBusinessId)
             const { data, error } = await supabase
                 .from('invoices')
-                .select('*, party:parties(name, phone, address)')
+                .select('id, invoice_number, date, total_amount, balance_amount, status, party:parties(name)')
                 .eq('business_id', activeBusinessId)
                 .eq('type', 'PURCHASE')
                 .order('date', { ascending: false })
@@ -42,13 +46,13 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                 console.error('PurchasesClientView: Error fetching purchases', error)
             }
             if (data) {
-                console.log('PurchasesClientView: Fetched', data.length, 'purchases')
                 setInvoices(data)
             }
             setLoading(false)
         }
         fetchInvoices()
     }, [activeBusinessId])
+
     const [statusFilter, setStatusFilter] = useState<string>('ALL')
     const [sortBy, setSortBy] = useState<'date' | 'amount'>('date')
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
@@ -63,16 +67,14 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
     }
 
     const handlePrintInvoice = async (e: React.MouseEvent, invoice: any) => {
-        e.stopPropagation() // Prevent card click
+        e.stopPropagation()
 
         try {
-            // Fetch invoice items
             const { data: items } = await supabase
                 .from('invoice_items')
                 .select('*')
                 .eq('invoice_id', invoice.id)
 
-            // Get business info
             const activeBusiness = businesses.find(b => b.id === activeBusinessId)
             const currencyCode = (activeBusiness as any)?.currency || 'USD'
             const currencySymbol = currencies.find(c => c.code === currencyCode)?.symbol || '$'
@@ -126,14 +128,12 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
         }
     }
 
-    // Purchases are already filtered by business_id at the database level
     let filteredPurchases = invoices.filter((inv) =>
         (inv.invoice_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
             (inv.party?.name && inv.party.name.toLowerCase().includes(searchQuery.toLowerCase()))
         ) && (statusFilter === 'ALL' || inv.status === statusFilter)
     )
 
-    // Sort
     filteredPurchases = [...filteredPurchases].sort((a, b) => {
         const multiplier = sortOrder === 'asc' ? 1 : -1
         if (sortBy === 'date') {
@@ -146,22 +146,51 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
     return (
         <div className="space-y-4 animate-in fade-in duration-500 pb-20">
             {/* Header - Compact */}
-            <div className="flex items-center justify-between pb-3 border-b border-[var(--primary-green)]/10">
-                <div>
-                    <h1 className="text-xl font-bold text-[var(--deep-contrast)] tracking-tight">Purchases</h1>
-                    <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Stock Inward Log</p>
+            <div className="flex flex-col gap-3 pb-3 border-b border-[var(--primary-green)]/10">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight">Purchases</h1>
+                        <p className="text-[10px] font-black text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Stock Inward Log</p>
+                    </div>
+                    <motion.button
+                        initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        whileHover={{ scale: 1.05, translateY: -2 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => router.push('/dashboard/purchases/new')}
+                        className="flex items-center justify-center rounded-xl bg-[var(--primary-green)] px-4 py-2 text-[11px] font-black uppercase tracking-wider text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] transition-all shadow-xl shadow-[var(--primary-green)]/20 active:scale-95 border border-[var(--primary-foreground)]/10 group"
+                    >
+                        <Plus className="mr-1.5 h-3.5 w-3.5 transition-transform group-hover:rotate-90 duration-500" />
+                        <span>New Bill</span>
+                    </motion.button>
                 </div>
-                <motion.button
-                    initial={{ opacity: 0, scale: 0.9, y: 10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    whileHover={{ scale: 1.05, translateY: -2 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => router.push('/dashboard/purchases/new')}
-                    className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-2 text-[11px] font-black uppercase tracking-wider text-white hover:bg-orange-600 transition-all shadow-xl shadow-[var(--deep-contrast)]/20 active:scale-95 border border-white/10 group"
-                >
-                    <Plus className="mr-1.5 h-3.5 w-3.5 transition-transform group-hover:rotate-90 duration-500" />
-                    <span>New Bill</span>
-                </motion.button>
+
+                <div className="flex items-center gap-2">
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--foreground)]/40" />
+                        <input
+                            type="text"
+                            placeholder="Search bills..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full h-9 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 pl-9 pr-4 text-[10px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:ring-1 focus:ring-[var(--primary-green)]/20 focus:outline-none transition-all shadow-inner placeholder:text-[var(--foreground)]/40"
+                        />
+                    </div>
+                    <button
+                        onClick={() => setIsSortPickerOpen(true)}
+                        className="h-9 px-3 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 flex items-center gap-2 text-[9px] font-black text-[var(--deep-contrast)] uppercase tracking-wider hover:bg-[var(--deep-contrast-hover)] transition-all shadow-sm"
+                    >
+                        <ArrowUpDown className="h-3 w-3 opacity-40" />
+                        <span>Sort</span>
+                    </button>
+                    <button
+                        onClick={() => setIsFilterPickerOpen(true)}
+                        className="h-9 px-3 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 flex items-center gap-2 text-[9px] font-black text-[var(--deep-contrast)] uppercase tracking-wider hover:bg-[var(--deep-contrast-hover)] transition-all shadow-sm"
+                    >
+                        <Filter className="h-3 w-3 opacity-40" />
+                        <span>Filter</span>
+                    </button>
+                </div>
             </div>
 
             {/* Quick Stats Bar */}
@@ -172,17 +201,17 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                     onClick={() => setStatusFilter(statusFilter === 'PAID' ? 'ALL' : 'PAID')}
                     className={clsx(
                         "flex-1 glass p-2 rounded-xl border transition-all cursor-pointer group",
-                        statusFilter === 'PAID' ? "bg-emerald-500/10 border-emerald-500/50" : "border-white/40 hover:bg-white/60"
+                        statusFilter === 'PAID' ? "bg-[var(--status-success)] border-[var(--status-success-border)]" : "bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:bg-[var(--foreground)]/10"
                     )}
                 >
                     <div className="flex justify-between items-center">
                         <div className="flex items-center gap-1.5">
                             <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                            <span className="text-[8px] font-black uppercase tracking-widest text-emerald-600/60">Paid Bills</span>
+                            <span className="text-[7.5px] font-black uppercase tracking-widest text-[var(--status-success-foreground)]/60">Paid Bills</span>
                         </div>
-                        <span className="text-[8px] font-bold text-emerald-600 bg-emerald-50 px-1 rounded uppercase tracking-tighter">Done</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full border border-[var(--status-success-border)] bg-[var(--status-success)] text-[var(--status-success-foreground)] shadow-sm">DONE</span>
                     </div>
-                    <p className="text-sm font-black text-emerald-600 mt-1 tabular-nums">
+                    <p className="text-xs font-black text-[var(--status-success-foreground)] mt-1 tabular-nums">
                         {formatCurrency(invoices.filter(i => i.status === 'PAID').reduce((sum, i) => sum + i.total_amount, 0))}
                     </p>
                 </motion.div>
@@ -193,49 +222,21 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                     onClick={() => setStatusFilter(statusFilter === 'UNPAID' ? 'ALL' : 'UNPAID')}
                     className={clsx(
                         "flex-1 glass p-2 rounded-xl border transition-all cursor-pointer group",
-                        statusFilter === 'UNPAID' ? "bg-rose-500/10 border-rose-500/50" : "border-white/40 hover:bg-white/60"
+                        statusFilter === 'UNPAID' ? "bg-[var(--status-danger)] border-[var(--status-danger-border)]" : "bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:bg-[var(--foreground)]/10"
                     )}
                 >
                     <div className="flex justify-between items-center">
                         <div className="flex items-center gap-1.5">
                             <div className="h-1.5 w-1.5 rounded-full bg-rose-500" />
-                            <span className="text-[8px] font-black uppercase tracking-widest text-rose-600/60">To Pay</span>
+                            <span className="text-[7.5px] font-black uppercase tracking-widest text-[var(--status-danger-foreground)]/60">To Pay</span>
                         </div>
-                        <span className="text-[8px] font-bold text-rose-600 bg-rose-50 px-1 rounded uppercase tracking-tighter">DUE</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full border border-[var(--status-danger-border)] bg-[var(--status-danger)] text-[var(--status-danger-foreground)] shadow-sm">DUE</span>
                     </div>
-                    <p className="text-sm font-black text-rose-600 mt-1 tabular-nums">
+                    <p className="text-xs font-black text-[var(--status-danger-foreground)] mt-1 tabular-nums">
                         {formatCurrency(invoices.filter(i => i.status !== 'PAID').reduce((sum, i) => sum + i.total_amount, 0))}
                     </p>
                 </motion.div>
             </div>
-
-            <div className="flex items-center gap-2">
-                <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--foreground)]/40" />
-                    <input
-                        type="text"
-                        placeholder="Search bills..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full h-9 rounded-xl bg-white/50 border border-white/20 pl-9 pr-4 text-[10px] font-bold text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:ring-1 focus:ring-[var(--primary-green)]/20 focus:outline-none transition-all shadow-inner placeholder:text-[var(--foreground)]/20"
-                    />
-                </div>
-                <button
-                    onClick={() => setIsSortPickerOpen(true)}
-                    className="h-9 px-3 rounded-xl bg-white/50 border border-white/20 flex items-center gap-2 text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-wider hover:bg-white/10 transition-all shadow-sm"
-                >
-                    <ArrowUpDown className="h-3 w-3 opacity-40" />
-                    <span>Sort</span>
-                </button>
-                <button
-                    onClick={() => setIsFilterPickerOpen(true)}
-                    className="h-9 px-3 rounded-xl bg-white/50 border border-white/20 flex items-center gap-2 text-[9px] font-bold text-[var(--deep-contrast)] uppercase tracking-wider hover:bg-white/10 transition-all shadow-sm"
-                >
-                    <Filter className="h-3 w-3 opacity-40" />
-                    <span>Filter</span>
-                </button>
-            </div>
-
 
             <PickerModal
                 isOpen={isSortPickerOpen}
@@ -281,53 +282,76 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                     <div
                         key={inv.id}
                         onClick={() => handleEdit(inv)}
-                        className="group relative flex flex-col glass rounded-[14px] border border-white/40 p-2 hover:bg-white/60 transition-all duration-500 cursor-pointer overflow-hidden"
+                        className="group relative flex flex-col glass rounded-[14px] border border-[var(--foreground)]/10 p-2 hover:bg-[var(--foreground)]/10 transition-all duration-500 cursor-pointer overflow-hidden"
                     >
-                        {/* Status Stripe */}
+                        {/* Status Indicator Stripe */}
                         <div className={clsx(
-                            "absolute top-0 left-0 w-1.5 h-full",
-                            inv.status === 'PAID' ? "bg-emerald-500" :
-                                inv.status === 'PARTIAL' ? "bg-amber-500" : "bg-rose-500"
+                            "absolute top-0 left-0 w-[3px] h-full transition-colors duration-500",
+                            inv.status === 'PAID' ? "bg-emerald-500" : "bg-rose-500"
                         )} />
 
-                        <div className="flex justify-between items-center gap-2">
-                            <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                                <User className="h-2.5 w-2.5 text-orange-600/40 shrink-0" />
-                                <div className="min-w-0">
-                                    <h3 className="text-[11px] font-black text-[var(--deep-contrast)] truncate">{inv.party?.name || 'Walk-in'}</h3>
-                                    <span className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider">{new Date(inv.date).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}</span>
-                                </div>
+                        {/* Identity & Status Header */}
+                        <div className="flex items-center gap-2">
+                            <div className={clsx(
+                                "h-8 w-8 rounded-[10px] flex items-center justify-center font-black text-[10px] transition-all duration-500 shadow-inner shrink-0 border uppercase",
+                                inv.status === 'UNPAID'
+                                    ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
+                                    : "bg-[var(--foreground)]/5 text-[var(--deep-contrast)]/60 border-[var(--foreground)]/10"
+                            )}>
+                                {(inv.party?.name || 'S').charAt(0)}
                             </div>
-                            <div className="flex items-center gap-2 shrink-0">
-                                <span className={clsx(
-                                    "text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full border shadow-sm",
-                                    inv.status === 'PAID' ? "bg-emerald-100/50 text-emerald-700 border-emerald-200" :
-                                        inv.status === 'PARTIAL' ? "bg-amber-100/50 text-amber-700 border-amber-200" :
-                                            "bg-rose-100/50 text-rose-700 border-rose-200"
-                                )}>
-                                    {inv.status}
-                                </span>
-                                <button
-                                    onClick={(e) => handlePrintInvoice(e, inv)}
-                                    className="p-1 rounded bg-white border border-slate-100 text-[var(--foreground)]/30 hover:text-orange-600 transition-all active:scale-95"
-                                >
-                                    <Printer className="h-2.5 w-2.5" />
-                                </button>
+                            <div className="min-w-0 flex-1">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-[10px] font-black text-[var(--deep-contrast)] truncate">{inv.party?.name || 'Supplier'}</h3>
+                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button
+                                            onClick={(e) => handlePrintInvoice(e, inv)}
+                                            className="h-6 w-6 flex items-center justify-center rounded-lg bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-orange-600 hover:text-white border border-[var(--foreground)]/10 transition-all shadow-sm"
+                                        >
+                                            <Printer size={10} />
+                                        </button>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                handleEdit(inv)
+                                            }}
+                                            className="h-6 w-6 flex items-center justify-center rounded-lg bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-orange-600 hover:text-white border border-[var(--foreground)]/10 transition-all shadow-sm"
+                                        >
+                                            <Edit2 size={10} />
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-1 mt-0 opacity-40">
+                                    <span className="text-[6.5px] font-black uppercase tracking-[0.1em] leading-none shrink-0">PURCHASE</span>
+                                    <div className="h-0.5 w-0.5 rounded-full bg-current opacity-20" />
+                                    <span className="text-[6.5px] font-bold uppercase tracking-widest truncate">#{inv.invoice_number}</span>
+                                </div>
                             </div>
                         </div>
 
-                        <div className="mt-2 pt-2 border-t border-[var(--primary-green)]/10 flex items-center justify-between">
-                            <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                                <ShoppingCart className="h-2.5 w-2.5 text-orange-600/40 shrink-0" />
-                                <span className="text-[10px] font-bold text-[var(--deep-contrast)]/60 truncate uppercase tracking-tighter">#{inv.invoice_number}</span>
-                            </div>
-                            <div className="flex items-center gap-2 shrink-0">
+                        {/* Status & Date Bar */}
+                        <div className="mt-2.5 flex items-center justify-between">
+                            <div className="flex flex-col">
+                                <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.15em]">Value</span>
                                 <p className={clsx(
-                                    "text-[13px] font-black tracking-tighter tabular-nums",
-                                    inv.balance_amount > 0 ? "text-rose-600" : "text-emerald-600"
+                                    "text-[15px] font-black tracking-tighter tabular-nums leading-none",
+                                    inv.balance_amount > 0 ? "text-[var(--status-danger-foreground)]" : "text-[var(--status-success-foreground)]"
                                 )}>
                                     {formatCurrency(inv.total_amount)}
                                 </p>
+                            </div>
+                            <div className="flex flex-col items-end gap-1">
+                                <span className={clsx(
+                                    "text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full border shadow-sm",
+                                    inv.status === 'PAID' ? "bg-[var(--status-success)] text-[var(--status-success-foreground)] border-[var(--status-success-border)]" :
+                                        inv.status === 'PARTIAL' ? "bg-[var(--status-warning)] text-[var(--status-warning-foreground)] border-[var(--status-warning-border)]" :
+                                            "bg-[var(--status-danger)] text-[var(--status-danger-foreground)] border-[var(--status-danger-border)]"
+                                )}>
+                                    {inv.status}
+                                </span>
+                                <span className="text-[6.5px] font-black text-[var(--foreground)]/30 uppercase tracking-widest opacity-60">
+                                    {new Date(inv.date).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -335,12 +359,15 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
             </div>
 
             {loading ? (
-                <div className="py-20">
+                <div className="py-20 flex flex-col items-center justify-center">
                     <LoadingSpinner label="Fetching Bills..." />
+                    <p className="text-[8px] font-bold text-[var(--foreground)]/20 uppercase tracking-[0.3em] mt-3">Accessing Ledger Archives</p>
                 </div>
             ) : filteredPurchases.length === 0 && (
-                <div className="text-center py-10 opacity-30">
+                <div className="text-center py-24 opacity-30 animate-in fade-in duration-700">
+                    <ShoppingCart className="h-10 w-10 mx-auto mb-3 opacity-20" />
                     <p className="text-[10px] font-bold uppercase tracking-wider">No bills found</p>
+                    <p className="text-[8px] font-bold uppercase tracking-widest mt-1 opacity-50">Record a purchase to update your inventory</p>
                 </div>
             )}
             {isPreviewOpen && previewData && (

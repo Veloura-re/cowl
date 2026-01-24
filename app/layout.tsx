@@ -30,22 +30,26 @@ export const viewport: Viewport = {
   themeColor: '#ffffff',
 };
 
+import { Providers } from "@/components/Providers";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} antialiased`}
+        className={`${inter.variable} antialiased bg-background text-foreground`}
       >
-        <AppInitializer />
-        <QuillBackground />
+        <Providers>
+          <AppInitializer />
+          <QuillBackground />
 
-        <div className="relative z-10 w-full min-h-[100dvh] pb-[env(safe-area-inset-bottom)]">
-          {children}
-        </div>
+          <div className="relative z-10 w-full min-h-[100dvh] pb-[env(safe-area-inset-bottom)]">
+            {children}
+          </div>
+        </Providers>
       </body>
     </html>
   );

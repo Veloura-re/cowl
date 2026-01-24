@@ -26,11 +26,11 @@ export default function InvoicePreviewModal({
 
     return (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in duration-300" onClick={onClose} />
+            <div className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-md animate-in fade-in duration-300" onClick={onClose} />
 
-            <div className="glass w-full max-w-3xl h-[95vh] flex flex-col rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 relative z-10 border border-white/40 bg-white/95">
+            <div className="glass w-full max-w-3xl h-[95vh] flex flex-col rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 relative z-10 border border-[var(--foreground)]/10 bg-[var(--background)]/95">
                 {/* Header Actions */}
-                <div className="flex items-center justify-between border-b border-black/5 px-6 py-4 bg-white/90 sticky top-0 z-20">
+                <div className="flex items-center justify-between border-b border-[var(--foreground)]/10 px-6 py-4 bg-[var(--foreground)]/5 sticky top-0 z-20">
                     <div>
                         <h2 className="text-sm font-bold text-[var(--deep-contrast)] tracking-tight">Invoice Preview</h2>
                         <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-none mt-0.5">A4 Standard Format</p>
@@ -38,7 +38,7 @@ export default function InvoicePreviewModal({
                     <div className="flex items-center gap-2">
                         <button
                             onClick={onPrint}
-                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--primary-green)] text-white hover:bg-[var(--primary-hover)] transition-all shadow-lg active:scale-95"
+                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--primary-green)] text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] transition-all shadow-lg active:scale-95"
                             title="Print"
                         >
                             <Printer className="h-4 w-4" />
@@ -46,15 +46,15 @@ export default function InvoicePreviewModal({
                         </button>
                         <button
                             onClick={onDownload}
-                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--deep-contrast)] text-white hover:bg-black transition-all shadow-lg active:scale-95"
+                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--deep-contrast)] text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] transition-all shadow-lg active:scale-95"
                             title="Download PDF"
                         >
                             <Download className="h-4 w-4" />
                             <span className="text-[10px] font-bold uppercase tracking-wider">Download</span>
                         </button>
-                        <div className="w-px h-6 bg-black/10 mx-1" />
-                        <button onClick={onClose} className="p-2 rounded-full hover:bg-black/5 transition-all">
-                            <X className="h-5 w-5 text-black/40" />
+                        <div className="w-px h-6 bg-black/10 dark:bg-white/10 mx-1" />
+                        <button onClick={onClose} className="p-2 rounded-full hover:bg-[var(--foreground)]/5 transition-all text-[var(--foreground)]/40 hover:text-[var(--deep-contrast)]">
+                            <X className="h-5 w-5" />
                         </button>
                     </div>
                 </div>

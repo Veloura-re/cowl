@@ -316,3 +316,12 @@ create table payment_modes (
   created_at timestamp with time zone default now(),
   unique(business_id, name)
 );
+
+-- 12. Daily Check Logs (Throttling)
+create table daily_check_logs (
+  id uuid primary key default uuid_generate_v4(),
+  business_id uuid references businesses(id) on delete cascade not null,
+  check_type text not null,
+  last_check_at date default CURRENT_DATE,
+  unique(business_id, check_type, last_check_at)
+);

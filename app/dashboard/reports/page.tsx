@@ -204,19 +204,19 @@ export default function ReportsPage() {
             {/* Header */}
             <div className="flex items-center justify-between pb-3 border-b border-[var(--primary-green)]/10">
                 <div>
-                    <h1 className="text-xl font-bold text-[var(--deep-contrast)] tracking-tight">Reports</h1>
-                    <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Business Performance</p>
+                    <h1 className="text-xl font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)] tracking-tight">Reports</h1>
+                    <p className="text-[10px] font-bold text-[var(--foreground)]/60 dark:text-neutral-500 uppercase tracking-wider leading-none">Business Performance</p>
                 </div>
                 {loading && <Activity className="h-4 w-4 text-[var(--primary-green)] animate-spin" />}
             </div>
 
             {/* Export Section - NEW */}
-            <div className="glass p-5 rounded-2xl border border-white/40 space-y-4">
+            <div className="glass p-5 rounded-2xl border border-gray-200 dark:border-white/10 space-y-4">
                 <div className="flex items-center gap-2 mb-2">
                     <div className="h-7 w-7 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center">
                         <FileText className="h-4 w-4" />
                     </div>
-                    <h3 className="text-xs font-bold text-[var(--deep-contrast)]">Export Detailed Reports</h3>
+                    <h3 className="text-xs font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)]">Export Detailed Reports</h3>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
@@ -242,7 +242,7 @@ export default function ReportsPage() {
                             type="button"
                             onClick={() => setIsStartOpen(true)}
                             disabled={selectedReport === 'INVENTORY'}
-                            className="w-full h-10 flex items-center gap-2.5 px-3 bg-white/50 border border-white/40 rounded-lg text-xs font-bold text-[var(--deep-contrast)] hover:border-[var(--primary-green)]/40 transition-all disabled:opacity-50"
+                            className="w-full h-10 flex items-center gap-2.5 px-3 bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg text-xs font-bold text-[var(--deep-contrast)] hover:border-[var(--primary-green)]/40 transition-all disabled:opacity-50"
                         >
                             <Calendar className="h-3.5 w-3.5 opacity-40" />
                             {format(parseISO(dateRange.start), 'MMM dd, yyyy')}
@@ -256,7 +256,7 @@ export default function ReportsPage() {
                             type="button"
                             onClick={() => setIsEndOpen(true)}
                             disabled={selectedReport === 'INVENTORY'}
-                            className="w-full h-10 flex items-center gap-2.5 px-3 bg-white/50 border border-white/40 rounded-lg text-xs font-bold text-[var(--deep-contrast)] hover:border-[var(--primary-green)]/40 transition-all disabled:opacity-50"
+                            className="w-full h-10 flex items-center gap-2.5 px-3 bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg text-xs font-bold text-[var(--deep-contrast)] hover:border-[var(--primary-green)]/40 transition-all disabled:opacity-50"
                         >
                             <Calendar className="h-3.5 w-3.5 opacity-40" />
                             {format(parseISO(dateRange.end), 'MMM dd, yyyy')}
@@ -289,7 +289,7 @@ export default function ReportsPage() {
                         <button
                             onClick={() => handleExport('PDF')}
                             disabled={exporting}
-                            className="flex-1 flex items-center justify-center gap-2 bg-[var(--deep-contrast)] text-white p-2.5 rounded-lg text-xs font-bold hover:bg-black/90 transition-colors disabled:opacity-70"
+                            className="flex-1 flex items-center justify-center gap-2 bg-emerald-600 dark:bg-emerald-600 text-[var(--primary-foreground)] p-2.5 rounded-lg text-xs font-bold hover:bg-emerald-700 dark:hover:bg-emerald-700 transition-colors disabled:opacity-70"
                         >
                             {exporting ? <Activity className="h-3 w-3 animate-spin" /> : <FileText className="h-3 w-3" />}
                             PDF
@@ -297,7 +297,7 @@ export default function ReportsPage() {
                         <button
                             onClick={() => handleExport('EXCEL')}
                             disabled={exporting}
-                            className="flex-1 flex items-center justify-center gap-2 bg-emerald-600 text-white p-2.5 rounded-lg text-xs font-bold hover:bg-emerald-700 transition-colors disabled:opacity-70"
+                            className="flex-1 flex items-center justify-center gap-2 bg-emerald-600 text-[var(--primary-foreground)] p-2.5 rounded-lg text-xs font-bold hover:bg-emerald-700 transition-colors disabled:opacity-70"
                         >
                             {exporting ? <Activity className="h-3 w-3 animate-spin" /> : <FileSpreadsheet className="h-3 w-3" />}
                             XLSX
@@ -309,22 +309,22 @@ export default function ReportsPage() {
             {/* Dashboard Grid */}
             <div className="grid gap-2 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {/* Profit & Loss - Compact */}
-                <div className="glass p-4 rounded-2xl border border-white/40 space-y-4">
+                <div className="glass p-4 rounded-2xl border border-gray-200 dark:border-white/10 space-y-4">
                     <div className="flex items-center gap-2">
                         <div className="h-7 w-7 rounded-lg bg-[var(--primary-green)]/10 text-[var(--primary-green)] flex items-center justify-center">
                             <BarChart3 className="h-4 w-4" />
                         </div>
-                        <h3 className="text-xs font-bold text-[var(--deep-contrast)]">Profit & Loss</h3>
+                        <h3 className="text-xs font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)]">Profit & Loss</h3>
                     </div>
 
                     <div className="space-y-2">
                         <div className="flex justify-between items-center">
                             <span className="text-[10px] font-bold text-[var(--foreground)]/50 uppercase tracking-wider">Revenue</span>
-                            <span className="text-xs font-bold text-[var(--deep-contrast)]">{formatCurrency(data.revenue)}</span>
+                            <span className="text-xs font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)]">{formatCurrency(data.revenue)}</span>
                         </div>
                         <div className="flex justify-between items-center">
                             <span className="text-[10px] font-bold text-[var(--foreground)]/50 uppercase tracking-wider">Expenses</span>
-                            <span className="text-xs font-bold text-[var(--deep-contrast)]">{formatCurrency(data.expenses)}</span>
+                            <span className="text-xs font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)]">{formatCurrency(data.expenses)}</span>
                         </div>
                         <div className="pt-2 border-t border-[var(--primary-green)]/5 flex justify-between items-center">
                             <span className="text-[10px] font-bold text-[var(--primary-green)] uppercase tracking-wider">Net Profit</span>
@@ -334,12 +334,12 @@ export default function ReportsPage() {
                 </div>
 
                 {/* Sales Trend - Compact */}
-                <div className="glass p-4 rounded-2xl border border-white/40 space-y-4">
+                <div className="glass p-4 rounded-2xl border border-gray-200 dark:border-white/10 space-y-4">
                     <div className="flex items-center gap-2">
                         <div className="h-7 w-7 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
                             <TrendingUp className="h-4 w-4" />
                         </div>
-                        <h3 className="text-xs font-bold text-[var(--deep-contrast)]">Sales Trend</h3>
+                        <h3 className="text-xs font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)]">Sales Trend</h3>
                     </div>
                     <div className="h-24 flex items-end justify-between px-1 gap-1.5 pb-2 border-b border-[var(--primary-green)]/5">
                         {data.salesTrend.map((val, i) => (
@@ -362,21 +362,21 @@ export default function ReportsPage() {
                 </div>
 
                 {/* Expense Breakdown - Compact */}
-                <div className="glass p-4 rounded-2xl border border-white/40 space-y-4">
+                <div className="glass p-4 rounded-2xl border border-gray-200 dark:border-white/10 space-y-4">
                     <div className="flex items-center gap-2">
                         <div className="h-7 w-7 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center">
                             <Wallet className="h-4 w-4" />
                         </div>
-                        <h3 className="text-xs font-bold text-[var(--deep-contrast)]">Expense Breakdown</h3>
+                        <h3 className="text-xs font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)]">Expense Breakdown</h3>
                     </div>
                     <div className="space-y-3">
                         {data.expenseBreakdown.map((item, i) => (
                             <div key={i} className="space-y-1">
                                 <div className="flex justify-between text-[9px] font-bold uppercase tracking-wider leading-none">
                                     <span className="text-[var(--foreground)]/40">{item.label}</span>
-                                    <span className="text-[var(--deep-contrast)]">{item.value}%</span>
+                                    <span className="text-[var(--deep-contrast)] dark:text-[var(--foreground)]">{item.value}%</span>
                                 </div>
-                                <div className="h-1.5 w-full bg-white/30 rounded-full overflow-hidden border border-white/20">
+                                <div className="h-1.5 w-full bg-white/30 dark:bg-white/10 rounded-full overflow-hidden border border-white/20 dark:border-white/5">
                                     <div
                                         className={clsx("h-full rounded-full transition-all duration-1000", item.color)}
                                         style={{ width: `${item.value}%` }}
@@ -389,22 +389,22 @@ export default function ReportsPage() {
             </div>
 
             {/* Quick Insights - Compact */}
-            <div className="glass p-4 rounded-3xl border border-white/40">
-                <h3 className="text-xs font-bold text-[var(--deep-contrast)] mb-3">Quick Insights</h3>
+            <div className="glass p-4 rounded-3xl border border-gray-200 dark:border-white/10">
+                <h3 className="text-xs font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)] mb-3">Quick Insights</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="p-2 rounded-xl bg-white/30 border border-white/20">
+                    <div className="p-2 rounded-xl bg-white/30 dark:bg-white/5 border border-white/20 dark:border-white/10">
                         <p className="text-[9px] font-bold text-[var(--foreground)]/50 uppercase tracking-wider mb-1">Top Item</p>
-                        <p className="text-xs font-bold text-[var(--deep-contrast)] truncate">{data.topItem}</p>
+                        <p className="text-xs font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)] truncate">{data.topItem}</p>
                     </div>
-                    <div className="p-2 rounded-xl bg-white/30 border border-white/20">
+                    <div className="p-2 rounded-xl bg-white/30 dark:bg-white/5 border border-white/20 dark:border-white/10">
                         <p className="text-[9px] font-bold text-[var(--foreground)]/50 uppercase tracking-wider mb-1">Low Stock</p>
                         <p className="text-xs font-bold text-rose-600">{data.lowStockCount} Items</p>
                     </div>
-                    <div className="p-2 rounded-xl bg-white/30 border border-white/20">
+                    <div className="p-2 rounded-xl bg-white/30 dark:bg-white/5 border border-white/20 dark:border-white/10">
                         <p className="text-[9px] font-bold text-[var(--foreground)]/50 uppercase tracking-wider mb-1">Top Party</p>
-                        <p className="text-xs font-bold text-[var(--deep-contrast)] truncate">{data.topParty}</p>
+                        <p className="text-xs font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)] truncate">{data.topParty}</p>
                     </div>
-                    <div className="p-2 rounded-xl bg-white/30 border border-white/20">
+                    <div className="p-2 rounded-xl bg-white/30 dark:bg-white/5 border border-white/20 dark:border-white/10">
                         <p className="text-[9px] font-bold text-[var(--foreground)]/50 uppercase tracking-wider mb-1">L7D Growth</p>
                         <p className="text-xs font-bold text-emerald-600">{data.growth}</p>
                     </div>

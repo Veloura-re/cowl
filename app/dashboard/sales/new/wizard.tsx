@@ -48,7 +48,7 @@ export default function InvoiceWizard({ parties, items }: WizardProps) {
             <div className="min-h-screen pb-20 px-4 sm:px-6 animate-in fade-in duration-500">
                 <div className="max-w-5xl mx-auto space-y-4">
                     {/* Progress Stepper */}
-                    <div className="glass rounded-2xl border border-white/40 p-4">
+                    <div className="glass rounded-2xl border border-gray-200 p-4">
                         <ProgressStepper
                             currentStep={currentStep}
                             steps={steps}

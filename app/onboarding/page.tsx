@@ -88,9 +88,9 @@ export default function OnboardingPage() {
 
     return (
         <div className="flex min-h-screen items-center justify-center p-6 sm:p-4">
-            <div className="glass w-full max-w-2xl space-y-6 rounded-[32px] p-8 relative overflow-hidden border border-white/40 shadow-2xl">
+            <div className="glass w-full max-w-2xl space-y-6 rounded-[32px] p-8 relative overflow-hidden border border-white/40 dark:border-white/10 shadow-2xl">
                 <div className="text-center">
-                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-white/40 mb-4 shadow-xl border border-white/40">
+                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-white/40 dark:bg-white/5 mb-4 shadow-xl border border-white/40 dark:border-white/10">
                         <BrandLogo size="lg" />
                     </div>
                     <h2 className="text-2xl font-bold tracking-tight text-[var(--deep-contrast)] uppercase">
@@ -119,7 +119,7 @@ export default function OnboardingPage() {
                                 required
                                 value={formData.name}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                className="block w-full h-12 rounded-xl border border-white/20 bg-white/50 px-4 text-sm font-bold text-[var(--deep-contrast)] placeholder-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-green)]/20 transition-all shadow-inner"
+                                className="block w-full h-12 rounded-xl border border-white/20 dark:border-white/10 bg-white/50 dark:bg-white/5 px-4 text-sm font-bold text-[var(--deep-contrast)] placeholder-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-green)]/20 transition-all shadow-inner"
                                 placeholder="e.g., Acme Corporation"
                             />
                         </div>
@@ -139,7 +139,7 @@ export default function OnboardingPage() {
                                 type="text"
                                 value={formData.address}
                                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                className="block w-full h-12 rounded-xl border border-white/20 bg-white/50 px-4 text-sm font-bold text-[var(--deep-contrast)] placeholder-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-green)]/20 transition-all shadow-inner"
+                                className="block w-full h-12 rounded-xl border border-white/20 dark:border-white/10 bg-white/50 dark:bg-white/5 px-4 text-sm font-bold text-[var(--deep-contrast)] placeholder-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-green)]/20 transition-all shadow-inner"
                                 placeholder="123 Main Street, City, Country"
                             />
                         </div>
@@ -160,7 +160,7 @@ export default function OnboardingPage() {
                                     type="tel"
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                    className="block w-full h-12 rounded-xl border border-white/20 bg-white/50 px-4 text-sm font-bold text-[var(--deep-contrast)] placeholder-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-green)]/20 transition-all shadow-inner"
+                                    className="block w-full h-12 rounded-xl border border-white/20 dark:border-white/10 bg-white/50 dark:bg-white/5 px-4 text-sm font-bold text-[var(--deep-contrast)] placeholder-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-green)]/20 transition-all shadow-inner"
                                     placeholder="+1 234 567 8900"
                                 />
                             </div>
@@ -176,7 +176,7 @@ export default function OnboardingPage() {
                                 <button
                                     type="button"
                                     onClick={() => setIsCurrencyPickerOpen(true)}
-                                    className="w-full h-12 rounded-xl border border-white/20 bg-white/50 px-4 text-sm font-bold text-[var(--deep-contrast)] hover:border-[var(--primary-green)] transition-all shadow-inner text-left flex items-center justify-between"
+                                    className="w-full h-12 rounded-xl border border-white/20 dark:border-white/10 bg-white/50 dark:bg-white/5 px-4 text-sm font-bold text-[var(--deep-contrast)] hover:border-[var(--primary-green)] transition-all shadow-inner text-left flex items-center justify-between"
                                 >
                                     <span>{currencies.find(c => c.code === formData.currency)?.name || 'Select Currency'}</span>
                                     <span className="text-[var(--foreground)]/40">{currencies.find(c => c.code === formData.currency)?.symbol}</span>

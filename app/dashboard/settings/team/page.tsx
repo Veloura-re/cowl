@@ -164,11 +164,11 @@ export default function TeamManagementPage() {
     return (
         <div className="space-y-4 pb-20 max-w-2xl mx-auto">
             <div className="flex items-center gap-3 pb-3 border-b border-[var(--primary-green)]/10">
-                <Link href="/dashboard/settings" className="p-2 rounded-xl bg-white/40 border border-white/10 hover:bg-white/60 transition-all active:scale-95">
+                <Link href="/dashboard/settings" className="p-2 rounded-xl bg-white/40 dark:bg-white/5 border border-white/10 dark:border-white/5 hover:bg-white/60 dark:hover:bg-white/10 transition-all active:scale-95">
                     <ArrowLeft className="h-4 w-4 text-[var(--deep-contrast)]" />
                 </Link>
                 <div className="flex-1">
-                    <h1 className="text-xl font-bold text-[var(--deep-contrast)] tracking-tight">Team Management</h1>
+                    <h1 className="text-xl font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)] tracking-tight">Team Management</h1>
                     <p className="text-[10px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Add partners, admins, and viewers</p>
                 </div>
                 <div className="flex gap-2">
@@ -184,7 +184,7 @@ export default function TeamManagementPage() {
                     {isOwner && (
                         <button
                             onClick={() => setIsAddModalOpen(true)}
-                            className="p-3 rounded-2xl bg-[var(--deep-contrast)] text-white shadow-xl shadow-[var(--deep-contrast)]/20 active:scale-95 transition-all flex items-center gap-2 group"
+                            className="p-3 rounded-2xl bg-emerald-600 text-white shadow-xl shadow-emerald-600/20 active:scale-95 transition-all flex items-center gap-2 group hover:bg-emerald-700"
                         >
                             <UserPlus className="h-4 w-4" />
                             <span className="text-[10px] font-black uppercase tracking-wider hidden sm:inline">Add Member</span>
@@ -202,8 +202,8 @@ export default function TeamManagementPage() {
             />
 
             {/* Members List */}
-            <div className="glass rounded-[28px] border border-white/40 overflow-hidden shadow-sm shadow-[var(--primary-green)]/5">
-                <div className="px-5 py-4 border-b border-white/20 bg-white/40 flex items-center justify-between">
+            <div className="glass rounded-[28px] border border-gray-200 dark:border-white/10 overflow-hidden shadow-sm shadow-[var(--primary-green)]/5">
+                <div className="px-5 py-4 border-b border-white/20 dark:border-white/10 bg-white/40 dark:bg-white/5 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <div className="h-7 w-7 rounded-xl bg-[var(--deep-contrast)]/5 text-[var(--deep-contrast)] flex items-center justify-center">
                             <Users className="h-4 w-4" />
@@ -261,7 +261,7 @@ export default function TeamManagementPage() {
                                                     const nextRoleIndex = (currentRoleIndex + 1) % ROLES.length
                                                     handleUpdateRole(member.user_id, ROLES[nextRoleIndex].id)
                                                 }}
-                                                className="p-2 rounded-xl bg-white/40 border border-white/20 hover:bg-white/60 text-[var(--foreground)]/50 hover:text-[var(--deep-contrast)] transition-all shadow-sm"
+                                                className="p-2 rounded-xl bg-white/40 dark:bg-white/5 border border-white/20 dark:border-white/10 hover:bg-white/60 dark:hover:bg-white/10 text-[var(--foreground)]/50 hover:text-[var(--deep-contrast)] transition-all shadow-sm"
                                                 title="Update Role"
                                             >
                                                 <Shield className="h-3.5 w-3.5" />
@@ -269,7 +269,7 @@ export default function TeamManagementPage() {
                                         )}
                                         <button
                                             onClick={() => handleRemoveMember(member.user_id)}
-                                            className="p-2 rounded-xl bg-rose-50 border border-rose-100 hover:bg-rose-500 hover:text-white text-rose-400 transition-all shadow-sm"
+                                            className="p-2 rounded-xl bg-rose-50 border border-rose-100 hover:bg-rose-500 hover:text-white text-rose-400 transition-all shadow-sm dark:bg-rose-500/10 dark:border-rose-500/20 dark:text-rose-400 dark:hover:bg-rose-500 dark:hover:text-white"
                                             title="Remove Member"
                                         >
                                             <Trash2 className="h-3.5 w-3.5" />

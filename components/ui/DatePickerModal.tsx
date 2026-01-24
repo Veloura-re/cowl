@@ -58,15 +58,15 @@ export default function DatePickerModal({
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose} />
-            <div className="glass w-full max-w-md rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 relative z-10 border border-white/40">
+            <div className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose} />
+            <div className="glass w-full max-w-md rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 relative z-10 border border-white/40 dark:border-white/10">
                 {/* Header */}
-                <div className="flex items-center justify-between border-b border-white/10 px-6 py-4 bg-white/40">
+                <div className="flex items-center justify-between border-b border-white/10 dark:border-white/5 px-6 py-4 bg-white/40 dark:bg-white/5">
                     <div>
                         <h2 className="text-sm font-bold text-[var(--deep-contrast)] tracking-tight">{title}</h2>
                         <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-none mt-0.5">Choose a Day</p>
                     </div>
-                    <button onClick={onClose} className="p-1.5 rounded-full hover:bg-white/50 transition-all opacity-40 hover:opacity-100">
+                    <button onClick={onClose} className="p-1.5 rounded-full hover:bg-white/50 dark:hover:bg-white/10 transition-all opacity-40 hover:opacity-100">
                         <X className="h-4 w-4" />
                     </button>
                 </div>
@@ -80,13 +80,13 @@ export default function DatePickerModal({
                         <div className="flex items-center gap-1">
                             <button
                                 onClick={handlePrevMonth}
-                                className="p-1.5 rounded-lg hover:bg-white/50 border border-transparent hover:border-white/20 transition-all"
+                                className="p-1.5 rounded-lg hover:bg-white/50 dark:hover:bg-white/10 border border-transparent hover:border-white/20 transition-all"
                             >
                                 <ChevronLeft className="h-4 w-4 opacity-40" />
                             </button>
                             <button
                                 onClick={handleNextMonth}
-                                className="p-1.5 rounded-lg hover:bg-white/50 border border-transparent hover:border-white/20 transition-all"
+                                className="p-1.5 rounded-lg hover:bg-white/50 dark:hover:bg-white/10 border border-transparent hover:border-white/20 transition-all"
                             >
                                 <ChevronRight className="h-4 w-4 opacity-40" />
                             </button>
@@ -138,7 +138,7 @@ export default function DatePickerModal({
                 </div>
 
                 {/* Footer Info */}
-                <div className="p-3 border-t border-white/10 bg-white/20 text-center">
+                <div className="p-3 border-t border-white/10 dark:border-white/5 bg-white/20 dark:bg-white/5 text-center">
                     <div className="flex items-center justify-center gap-1.5 text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40">
                         <CalendarIcon className="h-3 w-3" />
                         Today: {format(new Date(), 'MMM do, yyyy')}

@@ -95,15 +95,15 @@ export default function Step3Review({ onNext, onBack }: Step3Props) {
     }
 
     return (
-        <div className="glass rounded-2xl border border-white/40 overflow-hidden">
-            <div className="px-5 py-3 border-b border-white/10 bg-[var(--primary-green)]/5">
+        <div className="glass rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+            <div className="px-5 py-3 border-b border-white/10 dark:border-white/5 bg-[var(--primary-green)]/5">
                 <h2 className="text-[11px] font-bold text-[var(--deep-contrast)] uppercase tracking-tight">Review & Confirm</h2>
                 <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mt-0.5">Verify all details before saving</p>
             </div>
 
             <div className="p-5 space-y-4">
                 {/* Invoice Summary Card */}
-                <div className="glass rounded-2xl border border-white/30 p-5">
+                <div className="glass rounded-2xl border border-white/30 dark:border-white/10 p-5">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
                             <div className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">Customer</div>
@@ -125,10 +125,10 @@ export default function Step3Review({ onNext, onBack }: Step3Props) {
                 </div>
 
                 {/* Items Table */}
-                <div className="glass rounded-2xl border border-white/30 overflow-hidden">
+                <div className="glass rounded-2xl border border-white/30 dark:border-white/10 overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-sm">
-                            <thead className="bg-white/40 border-b border-white/20">
+                            <thead className="bg-white/40 dark:bg-white/5 border-b border-white/20 dark:border-white/10">
                                 <tr>
                                     <th className="px-4 py-3 text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/50">Item</th>
                                     <th className="px-4 py-3 text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 text-center">Qty × Unit</th>
@@ -136,9 +136,9 @@ export default function Step3Review({ onNext, onBack }: Step3Props) {
                                     <th className="px-4 py-3 text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 text-right">Amount</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-white/10">
+                            <tbody className="divide-y divide-white/10 dark:divide-white/5">
                                 {data.items.map((item, index) => (
-                                    <tr key={index} className="hover:bg-white/20 transition-colors">
+                                    <tr key={index} className="hover:bg-white/20 dark:hover:bg-white/5 transition-colors">
                                         <td className="px-4 py-3">
                                             <div className="text-sm font-bold text-[var(--deep-contrast)]">{item.name}</div>
                                             {item.tax > 0 && (
@@ -169,13 +169,13 @@ export default function Step3Review({ onNext, onBack }: Step3Props) {
                     <textarea
                         value={data.notes}
                         onChange={(e) => updateData({ notes: e.target.value })}
-                        className="w-full min-h-[80px] rounded-xl bg-white/50 border border-white/30 p-3 text-sm font-bold text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none resize-none placeholder-[var(--foreground)]/20"
+                        className="w-full min-h-[80px] rounded-xl bg-white/50 dark:bg-white/5 border border-white/30 dark:border-white/10 p-3 text-sm font-bold text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none resize-none placeholder-[var(--foreground)]/20"
                         placeholder="Add payment terms, delivery notes, or other information..."
                     />
                 </div>
 
                 {/* Totals */}
-                <div className="glass rounded-2xl border border-white/30 p-5 space-y-3">
+                <div className="glass rounded-2xl border border-white/30 dark:border-white/10 p-5 space-y-3">
                     <div className="flex justify-between text-sm">
                         <span className="font-bold text-[var(--foreground)]/50 uppercase tracking-wider">Subtotal</span>
                         <span className="font-bold text-[var(--deep-contrast)]">{formatCurrency(subtotal)}</span>
@@ -184,7 +184,7 @@ export default function Step3Review({ onNext, onBack }: Step3Props) {
                         <span className="font-bold text-[var(--foreground)]/50 uppercase tracking-wider">Total Tax</span>
                         <span className="font-bold text-[var(--deep-contrast)]">{formatCurrency(totalTax)}</span>
                     </div>
-                    <div className="flex justify-between text-lg pt-3 border-t border-white/20">
+                    <div className="flex justify-between text-lg pt-3 border-t border-white/20 dark:border-white/10">
                         <span className="font-bold text-[var(--deep-contrast)] uppercase tracking-wider">Grand Total</span>
                         <span className="font-bold text-[var(--primary-green)]">{formatCurrency(grandTotal)}</span>
                     </div>
@@ -198,11 +198,11 @@ export default function Step3Review({ onNext, onBack }: Step3Props) {
             </div>
 
             {/* Navigation */}
-            <div className="px-6 py-4 border-t border-white/10 flex justify-between">
+            <div className="px-6 py-4 border-t border-white/10 dark:border-white/5 flex justify-between">
                 <button
                     onClick={onBack}
                     disabled={loading}
-                    className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white/50 border border-white/30 text-[var(--deep-contrast)] font-bold text-sm uppercase tracking-wider hover:bg-white/10 transition-all active:scale-95 disabled:opacity-50"
+                    className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white/50 dark:bg-white/5 border border-white/30 dark:border-white/10 text-[var(--deep-contrast)] font-bold text-sm uppercase tracking-wider hover:bg-white/10 transition-all active:scale-95 disabled:opacity-50"
                 >
                     <ArrowLeft className="h-4 w-4" />
                     Back

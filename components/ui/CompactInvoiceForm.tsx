@@ -38,7 +38,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
     const router = useRouter()
     const supabase = createClient()
     const isEdit = !!initialData?.id
-    const isSale = initialData ? initialData.type === 'SALE' : true // Default to true if creating from sales route
+    const isSale = initialData ? initialData.type === 'SALE' : true
 
     const [loading, setLoading] = useState(false)
     const [deleting, setDeleting] = useState(false)
@@ -58,13 +58,6 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
 
     useEffect(() => {
         async function loadLookupData() {
-            if (parties.length === 0 || items.length === 0 || paymentModes.length === 0) {
-                // Only fetch if initial props were empty (likely static export)
-                // Note: This logic assumes if one is empty, we might need all or just specific ones.
-                // For safety/simplicity, we can check each or just re-fetch all if any major one is missing & we expect them.
-                // Better: Check individually.
-            }
-
             if (parties.length === 0) {
                 const { data } = await supabase.from('parties').select('*').in('type', ['CUSTOMER', 'BOTH']).order('name')
                 if (data) setFetchedParties(data)
@@ -78,11 +71,9 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                 if (data) setFetchedModes(data)
             }
         }
-
         loadLookupData()
     }, [parties.length, items.length, paymentModes.length])
 
-    // Use fetched data preferentially if props were empty
     const displayParties = parties.length > 0 ? parties : fetchedParties
     const displayItems = items.length > 0 ? items : fetchedItems
     const displayModes = paymentModes.length > 0 ? paymentModes : fetchedModes
@@ -105,7 +96,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
     const [notes, setNotes] = useState(initialData?.notes || '')
     const [receivedAmount, setReceivedAmount] = useState<number | string>('')
     const [discount, setDiscount] = useState<number | string>(initialData?.discount_amount || '')
-    const [discountType, setDiscountType] = useState<'percent' | 'fixed'>('fixed') // Default to fixed if editing
+    const [discountType, setDiscountType] = useState<'percent' | 'fixed'>('fixed')
     const [invoiceTax, setInvoiceTax] = useState<number | string>(initialData?.tax_amount ? ((initialData.tax_amount / (initialData.total_amount - initialData.tax_amount)) * 100).toFixed(1) : '')
     const [attachments, setAttachments] = useState<string[]>(initialData?.attachments || [])
     const [isAddBankOpen, setIsAddBankOpen] = useState(false)
@@ -126,13 +117,11 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
     const subtotal = rows.reduce((sum, row) => sum + (row.quantity * row.rate), 0)
     const itemTax = rows.reduce((sum, row) => sum + ((row.quantity * row.rate) * (row.tax / 100)), 0)
 
-    // Apply discount
     const discountValue = Number(discount) || 0
     const discountAmount = discountType === 'percent'
         ? (subtotal * discountValue / 100)
         : discountValue
 
-    // Apply invoice-level tax (on subtotal after discount)
     const invoiceTaxValue = Number(invoiceTax) || 0
     const invoiceTaxAmount = (subtotal - discountAmount) * (invoiceTaxValue / 100)
 
@@ -177,7 +166,6 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
         setRows(rows.filter((_, i) => i !== index))
     }
 
-    // Fetch Mode Balances
     useEffect(() => {
         if (activeBusinessId) {
             const fetchBalances = async () => {
@@ -200,7 +188,6 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
         }
     }, [activeBusinessId])
 
-    // Effect to sync received amount when fully received is ON
     const [prevTotal, setPrevTotal] = useState(totalAmount)
     if (isFullyReceived && prevTotal !== totalAmount) {
         setPrevTotal(totalAmount)
@@ -320,7 +307,6 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
         if (!initialData?.id || !activeBusinessId) return
         setDeleting(true)
         try {
-            // 1. Reverse stock
             for (const item of initialLineItems || []) {
                 if (item.item_id) {
                     const { data: dbItem } = await supabase.from('items').select('stock_quantity').eq('id', item.item_id).single()
@@ -332,7 +318,6 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                 }
             }
 
-            // 2. Delete invoice (cascade will handle items and transactions usually, but let's be safe if RLS/Triggers differ)
             const { error } = await supabase.from('invoices').delete().eq('id', initialData.id)
             if (error) throw error
 
@@ -362,7 +347,6 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
         try {
             if (isEdit) {
                 // UPDATE FLOW
-                // 1. Reverse old stock
                 for (const item of initialLineItems || []) {
                     if (item.item_id) {
                         const { data: dbItem } = await supabase.from('items').select('stock_quantity').eq('id', cleanUUID(item.item_id)).single()
@@ -374,11 +358,9 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                     }
                 }
 
-                // 2. Delete old items
                 const { error: deleteError } = await supabase.from('invoice_items').delete().eq('invoice_id', cleanUUID(initialData.id))
                 if (deleteError) throw deleteError
 
-                // 3. Recalculate Balance
                 const { data: transactions } = await supabase.from('transactions').select('amount, type').eq('invoice_id', cleanUUID(initialData.id))
                 const netPaidOrReceived = transactions?.reduce((acc, t) => {
                     const amount = Number(t.amount) || 0
@@ -394,7 +376,6 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                 if (newBalance <= 0) status = 'PAID'
                 else if (netPaidOrReceived > 0) status = 'PARTIAL'
 
-                // 4. Update Invoice
                 const { error: invoiceError } = await supabase
                     .from('invoices')
                     .update({
@@ -414,7 +395,6 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
 
                 if (invoiceError) throw invoiceError
 
-                // 5. Insert new items
                 const newInvoiceItems = rows.map(row => ({
                     invoice_id: cleanUUID(initialData.id),
                     item_id: cleanUUID(row.itemId),
@@ -429,7 +409,6 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                 const { error: itemsError } = await supabase.from('invoice_items').insert(newInvoiceItems)
                 if (itemsError) throw itemsError
 
-                // 6. Apply new stock
                 for (const row of rows) {
                     if (row.itemId) {
                         const { data: item } = await supabase.from('items').select('stock_quantity').eq('id', cleanUUID(row.itemId)).single()
@@ -441,7 +420,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                     }
                 }
             } else {
-                // CREATE FLOW (Existing logic)
+                // CREATE FLOW
                 const isPaid = paymentMode !== 'UNPAID'
                 const actualReceived = isPaid ? numReceived : 0
                 const currentBalance = isPaid ? balanceDue : totalAmount
@@ -531,10 +510,10 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
     if (success) {
         return (
             <div className="min-h-screen flex items-center justify-center pb-20">
-                <div className="glass rounded-2xl border border-white/40 p-8 text-center">
+                <div className="glass rounded-[32px] border border-[var(--foreground)]/10 p-8 text-center shadow-2xl">
                     <CheckCircle2 className="h-12 w-12 text-[var(--primary-green)] mx-auto mb-3 animate-in zoom-in" />
-                    <h2 className="text-lg font-bold text-[var(--deep-contrast)] uppercase tracking-tight">{isSale ? 'Invoice' : 'Bill'} {isEdit ? 'Updated' : 'Created'}!</h2>
-                    <p className="text-[9px] font-bold text-[var(--foreground)]/60 uppercase mt-1">Redirecting...</p>
+                    <h2 className="text-lg font-black text-[var(--deep-contrast)] uppercase tracking-tight">{isSale ? 'Invoice' : 'Bill'} {isEdit ? 'Updated' : 'Created'}</h2>
+                    <p className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-1">Executing Redirection...</p>
                 </div>
             </div>
         )
@@ -542,19 +521,19 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
 
     return (
         <>
-            <form onSubmit={handleSubmit} className="space-y-3 max-w-6xl mx-auto pb-20 px-4 animate-in fade-in duration-500">
+            <form onSubmit={handleSubmit} className="space-y-4 max-w-6xl mx-auto pb-20 px-4 animate-in fade-in duration-500">
                 {/* Header */}
-                <div className="flex items-center justify-between pb-2 border-b border-[var(--primary-green)]/10">
+                <div className="flex items-center justify-between pb-3 border-b border-[var(--primary-green)]/10">
                     <div className="flex items-center gap-2">
-                        <Link href={isSale ? "/dashboard/sales" : "/dashboard/purchases"} className="p-2 rounded-xl bg-white/50 border border-white/10 hover:bg-[var(--primary-green)] hover:text-white transition-all">
+                        <Link href={isSale ? "/dashboard/sales" : "/dashboard/purchases"} className="p-2 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:bg-[var(--primary-green)] hover:text-[var(--primary-foreground)] transition-all active:scale-95 shadow-sm">
                             <ArrowLeft className="h-4 w-4" />
                         </Link>
                         <div>
-                            <h1 className="text-xs lg:text-[11px] font-bold text-[var(--deep-contrast)] uppercase tracking-tight">
-                                {isEdit ? 'Edit' : 'New'} {isSale ? 'Sale' : 'Purchase'}
+                            <h1 className="text-xs font-black text-[var(--deep-contrast)] uppercase tracking-tight">
+                                {isEdit ? 'Edit' : 'New'} {isSale ? 'Ledger' : 'Purchase'}
                             </h1>
-                            <p className="text-[10px] lg:text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mt-1">
-                                {isEdit ? 'Update existing record' : 'Invoice Creation'}
+                            <p className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">
+                                UID: {invoiceNumber}
                             </p>
                         </div>
                     </div>
@@ -562,7 +541,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                         <button
                             type="button"
                             onClick={handlePreview}
-                            className="flex items-center gap-1.5 px-3 py-2 lg:py-1.5 rounded-xl bg-white border border-white/20 text-[var(--deep-contrast)] text-[10px] lg:text-[9px] font-bold uppercase tracking-wider hover:bg-gray-50 transition-all shadow-sm active:scale-95"
+                            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-[var(--deep-contrast)] text-[9px] font-black uppercase tracking-widest hover:bg-[var(--foreground)]/10 transition-all shadow-sm active:scale-95"
                         >
                             <Printer className="h-3.5 w-3.5" />
                             <span className="hidden sm:inline">Preview</span>
@@ -572,7 +551,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                 type="button"
                                 onClick={() => setIsConfirmOpen(true)}
                                 disabled={loading || deleting}
-                                className="flex items-center gap-1.5 px-3 py-2 lg:py-1.5 rounded-xl bg-rose-50 text-rose-500 text-[10px] lg:text-[9px] font-bold uppercase tracking-wider hover:bg-rose-100 transition-all shadow-sm active:scale-95"
+                                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-500/5 text-rose-500 text-[9px] font-black uppercase tracking-widest hover:bg-rose-500 hover:text-white border border-rose-500/10 transition-all shadow-sm active:scale-95"
                             >
                                 {deleting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
                                 <span className="hidden sm:inline">Delete</span>
@@ -581,237 +560,243 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                         <button
                             type="submit"
                             disabled={loading || !partyId || rows.length === 0}
-                            className="flex items-center gap-1.5 px-4 py-2 lg:py-1.5 rounded-xl bg-[var(--primary-green)] text-white text-[10px] lg:text-[9px] font-bold uppercase tracking-wider hover:bg-[var(--primary-hover)] transition-all disabled:opacity-50 shadow-lg active:scale-95 h-9 lg:h-auto"
+                            className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-[var(--primary-green)] text-[var(--primary-foreground)] text-[9px] font-black uppercase tracking-widest hover:bg-[var(--primary-hover)] transition-all disabled:opacity-50 shadow-lg shadow-[var(--primary-green)]/20 active:scale-95"
                         >
-                            {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
-                            {isEdit ? 'Update' : 'Save'}
+                            {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                            {isEdit ? 'Update' : 'Commit'}
                         </button>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                     {/* Left: Basic Info */}
-                    <div className="lg:col-span-1 space-y-3">
-                        <div className="glass rounded-xl border border-white/40 p-3">
-                            <h3 className="text-[10px] lg:text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-3">Basic Info</h3>
-                            <div className="space-y-3">
+                    <div className="lg:col-span-1 space-y-4">
+                        <div className="glass rounded-[24px] border border-[var(--foreground)]/10 p-4 shadow-lg">
+                            <h3 className="text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-3 border-b border-[var(--foreground)]/5 pb-2">Entry Metadata</h3>
+                            <div className="space-y-4">
                                 <div>
-                                    <label className="block text-[9px] lg:text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1.5 ml-1">{isSale ? 'Customer' : 'Supplier'} *</label>
+                                    <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1.5 ml-1">{isSale ? 'Client Account' : 'Vendor Account'} *</label>
                                     <button
                                         type="button"
                                         onClick={() => setIsPartyPickerOpen(true)}
-                                        className="w-full h-10 lg:h-7 rounded-lg bg-white/50 border border-white/20 px-3 text-[11px] lg:text-[9px] font-bold text-left hover:border-[var(--primary-green)] transition-all flex items-center"
+                                        className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[10px] font-black text-left hover:border-[var(--primary-green)] transition-all flex items-center justify-between shadow-inner"
                                     >
-                                        {filteredParties.find(p => p.id === partyId)?.name || 'Select...'}
+                                        <span className="truncate">{filteredParties.find(p => p.id === partyId)?.name || 'SELECT ACCOUNT...'}</span>
+                                        <Plus className="h-3.5 w-3.5 opacity-20" />
                                     </button>
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                <div className="space-y-3">
                                     <div>
-                                        <label className="block text-[9px] lg:text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1.5 ml-1">{isSale ? 'Invoice' : 'Bill'} #</label>
+                                        <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1.5 ml-1">Reference UID</label>
                                         <input
                                             type="text"
                                             value={invoiceNumber}
                                             onChange={(e) => setInvoiceNumber(e.target.value)}
-                                            className="w-full h-10 lg:h-7 rounded-lg bg-white/50 border border-white/20 px-3 text-[11px] lg:text-[9px] font-bold focus:border-[var(--primary-green)] focus:outline-none"
+                                            className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none shadow-inner transition-all"
                                         />
                                     </div>
-                                    <div>
-                                        <label className="block text-[9px] lg:text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1.5 ml-1">Date</label>
-                                        <input
-                                            type="date"
-                                            value={date}
-                                            onChange={(e) => setDate(e.target.value)}
-                                            className="w-full h-10 lg:h-7 rounded-lg bg-white/50 border border-white/20 px-3 text-[11px] lg:text-[9px] font-bold focus:border-[var(--primary-green)] focus:outline-none"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-[9px] lg:text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1.5 ml-1">Due Date</label>
-                                        <input
-                                            type="date"
-                                            value={dueDate}
-                                            onChange={(e) => setDueDate(e.target.value)}
-                                            className="w-full h-10 lg:h-7 rounded-lg bg-white/50 border border-white/20 px-3 text-[11px] lg:text-[9px] font-bold focus:border-[var(--primary-green)] focus:outline-none"
-                                        />
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1.5 ml-1">Entry Date</label>
+                                            <input
+                                                type="date"
+                                                value={date}
+                                                onChange={(e) => setDate(e.target.value)}
+                                                className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[10px] font-black focus:border-[var(--primary-green)] focus:outline-none shadow-inner transition-all"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1.5 ml-1">Due Date</label>
+                                            <input
+                                                type="date"
+                                                value={dueDate}
+                                                onChange={(e) => setDueDate(e.target.value)}
+                                                className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[10px] font-black focus:border-[var(--primary-green)] focus:outline-none shadow-inner transition-all"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="glass rounded-xl border border-white/40 p-3 space-y-3">
+                        <div className="glass rounded-[24px] border border-[var(--foreground)]/10 p-4 space-y-4 shadow-lg">
                             <div>
-                                <label className="block text-[10px] lg:text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1.5 ml-1">Payment Mode</label>
-                                <div className="flex gap-2 lg:gap-1.5">
+                                <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1.5 ml-1">Liquidation Mode</label>
+                                <div className="flex gap-2">
                                     <button
                                         type="button"
                                         onClick={() => setIsModePickerOpen(true)}
                                         className={clsx(
-                                            "flex-1 h-11 lg:h-8 rounded-lg border px-3 text-[11px] lg:text-[9px] font-bold flex items-center justify-center transition-all shadow-sm",
-                                            paymentMode === 'UNPAID' ? "bg-slate-100/50 border-slate-200 text-slate-400" : "bg-emerald-50 border-emerald-200 text-emerald-600"
+                                            "flex-1 h-10 rounded-xl border px-4 text-[9px] font-black flex items-center justify-center transition-all shadow-sm",
+                                            paymentMode === 'UNPAID' ? "bg-[var(--foreground)]/5 border-[var(--foreground)]/10 text-[var(--foreground)]/30" : "bg-[var(--primary-green)]/10 border-[var(--primary-green)]/30 text-[var(--primary-green)]"
                                         )}
                                     >
-                                        <Wallet className="h-4 w-4 lg:h-3 lg:w-3 mr-2 lg:mr-1.5 opacity-40" />
-                                        {paymentMode === 'UNPAID' ? 'UNPAID' : paymentMode}
+                                        <Wallet className="h-3.5 w-3.5 mr-2 opacity-40" />
+                                        {paymentMode}
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setIsAddBankOpen(true)}
-                                        className="h-11 lg:h-8 px-3 lg:px-2 rounded-lg border border-dashed border-blue-300 bg-blue-50/50 text-blue-500 hover:bg-blue-100 transition-all flex items-center justify-center"
-                                        title="Add Bank"
+                                        className="h-10 px-2 rounded-xl border border-dashed border-blue-500/30 bg-blue-500/5 text-blue-500 hover:bg-blue-500 hover:text-white transition-all active:scale-95"
+                                        title="Attach Bank"
                                     >
-                                        <Building className="h-4 w-4 lg:h-3 lg:w-3" />
+                                        <Building className="h-4 w-4" />
                                     </button>
                                 </div>
                             </div>
-                        </div>
 
-                        {/* Add Bank Mini Modal */}
-                        {isAddBankOpen && (
-                            <div className="p-3 rounded-lg bg-blue-50 border border-blue-200 animate-in slide-in-from-top-2">
-                                <label className="block text-[8px] font-bold uppercase tracking-wider text-blue-600/60 mb-1.5">New Bank/Mode Name</label>
-                                <div className="flex gap-2">
-                                    <input
-                                        type="text"
-                                        value={newBankName}
-                                        onChange={(e) => setNewBankName(e.target.value)}
-                                        placeholder="e.g. M-PESA..."
-                                        className="flex-1 h-9 rounded-lg bg-white border border-blue-200 px-3 text-[11px] font-bold uppercase focus:outline-none"
-                                        onKeyDown={(e) => e.key === 'Enter' && handleAddBank()}
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={handleAddBank}
-                                        disabled={addingBank || !newBankName.trim()}
-                                        className="px-3 h-7 rounded-lg bg-blue-500 text-white text-[8px] font-bold uppercase disabled:opacity-50"
-                                    >
-                                        {addingBank ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Add'}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsAddBankOpen(false)}
-                                        className="h-7 w-7 rounded-lg bg-white border border-blue-200 flex items-center justify-center text-blue-400"
-                                    >
-                                        <X className="h-3 w-3" />
-                                    </button>
+                            {isAddBankOpen && (
+                                <div className="p-3 rounded-xl bg-blue-500/5 border border-blue-500/20 animate-in slide-in-from-top-2">
+                                    <label className="block text-[7px] font-black uppercase tracking-widest text-blue-600/60 mb-1.5 ml-1">Define New Mode</label>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={newBankName}
+                                            onChange={(e) => setNewBankName(e.target.value)}
+                                            placeholder="..."
+                                            className="flex-1 h-8 rounded-lg bg-[var(--background)]/50 border border-blue-500/20 px-3 text-[10px] font-black uppercase focus:outline-none"
+                                            onKeyDown={(e) => e.key === 'Enter' && handleAddBank()}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={handleAddBank}
+                                            disabled={addingBank || !newBankName.trim()}
+                                            className="px-3 h-8 rounded-lg bg-blue-500 text-white text-[8px] font-black uppercase disabled:opacity-50 active:scale-95 shadow-sm"
+                                        >
+                                            {addingBank ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'Set'}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsAddBankOpen(false)}
+                                            className="h-8 w-8 rounded-lg bg-white/50 border border-blue-500/20 flex items-center justify-center text-blue-400 active:scale-95"
+                                        >
+                                            <X className="h-3.5 w-3.5" />
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
 
-                        {paymentMode !== 'UNPAID' && (
-                            <div className="pt-2 animate-in slide-in-from-top-2 duration-300">
-                                <div className="flex items-center justify-between mb-1 ml-1">
-                                    <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40">{isSale ? 'Amount Received' : 'Amount Paid'}</label>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            const newState = !isFullyReceived
-                                            setIsFullyReceived(newState)
-                                            if (newState) setReceivedAmount(totalAmount)
-                                        }}
-                                        className={clsx(
-                                            "flex items-center gap-1.5 px-2 py-0.5 rounded-md border transition-all",
-                                            isFullyReceived
-                                                ? "bg-[var(--primary-green)]/10 border-[var(--primary-green)]/30 text-[var(--primary-green)]"
-                                                : "bg-white/50 border-white/20 text-[var(--foreground)]/30 hover:text-[var(--primary-green)]"
-                                        )}
-                                    >
-                                        <div className={clsx(
-                                            "h-2 w-2 rounded-full border border-current flex items-center justify-center",
-                                            isFullyReceived && "bg-current"
-                                        )}>
-                                            {isFullyReceived && <div className="h-1 w-1 bg-white rounded-full" />}
+                            {paymentMode !== 'UNPAID' && (
+                                <div className="pt-2 animate-in slide-in-from-top-2 duration-400">
+                                    <div className="flex items-center justify-between mb-2 ml-1">
+                                        <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30">{isSale ? 'Credit Received' : 'Balance Settled'}</label>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const newState = !isFullyReceived
+                                                setIsFullyReceived(newState)
+                                                if (newState) setReceivedAmount(totalAmount)
+                                            }}
+                                            className={clsx(
+                                                "flex items-center gap-1.5 px-2 py-0.5 rounded-lg border transition-all active:scale-95",
+                                                isFullyReceived
+                                                    ? "bg-[var(--primary-green)]/10 border-[var(--primary-green)]/30 text-[var(--primary-green)] shadow-sm"
+                                                    : "bg-[var(--foreground)]/5 border-[var(--foreground)]/10 text-[var(--foreground)]/40 hover:text-[var(--primary-green)]"
+                                            )}
+                                        >
+                                            <div className={clsx(
+                                                "h-2 w-2 rounded-full border border-current flex items-center justify-center",
+                                                isFullyReceived && "bg-current"
+                                            )}>
+                                                {isFullyReceived && <div className="h-1 w-1 bg-white rounded-full" />}
+                                            </div>
+                                            <span className="text-[7px] font-black uppercase tracking-wider">Lump Sum</span>
+                                        </button>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <input
+                                            type="number"
+                                            step="any"
+                                            value={receivedAmount}
+                                            onChange={(e) => {
+                                                setReceivedAmount(e.target.value)
+                                                setIsFullyReceived(false)
+                                            }}
+                                            placeholder="0.00"
+                                            className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--primary-green)]/20 px-4 text-[11px] font-black focus:border-[var(--primary-green)] transition-all shadow-inner tabular-nums"
+                                        />
+                                        <div className="flex justify-between px-1">
+                                            <span className="text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/20">
+                                                {numReceived >= totalAmount ? 'EXCESS' : 'ARREARS'}
+                                            </span>
+                                            <span className={clsx(
+                                                "text-[10px] font-black font-mono tracking-tighter tabular-nums",
+                                                numReceived >= totalAmount ? "text-blue-500" : "text-rose-500"
+                                            )}>
+                                                {formatCurrency(numReceived >= totalAmount ? changeAmount : balanceDue)}
+                                            </span>
                                         </div>
-                                        <span className="text-[7px] font-black uppercase tracking-wider">{isSale ? 'Fully Received' : 'Fully Paid'}</span>
-                                    </button>
+                                    </div>
                                 </div>
-                                <div className="space-y-1.5">
-                                    <input
-                                        type="number"
-                                        step="any"
-                                        value={receivedAmount}
-                                        onChange={(e) => {
-                                            setReceivedAmount(e.target.value)
-                                            setIsFullyReceived(false)
-                                        }}
-                                        placeholder="Enter amount..."
-                                        className="w-full h-8 rounded-lg bg-white/60 border border-[var(--primary-green)]/20 px-3 text-[10px] font-bold focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner"
-                                    />
-                                    <div className="flex justify-between px-1">
-                                        <span className="text-[7px] font-bold uppercase text-black/30">
-                                            {numReceived >= totalAmount ? 'Change' : 'Balance Due'}
-                                        </span>
-                                        <span className={clsx(
-                                            "text-[9px] font-bold font-mono",
-                                            numReceived >= totalAmount ? "text-blue-500" : "text-rose-500"
-                                        )}>
-                                            {formatCurrency(numReceived >= totalAmount ? changeAmount : balanceDue)}
-                                        </span>
+                            )}
+
+                            <div className="pt-3 border-t border-[var(--foreground)]/5">
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1.5 ml-1">Discount</label>
+                                        <input
+                                            type="number"
+                                            step="any"
+                                            value={discount}
+                                            onChange={(e) => setDiscount(e.target.value)}
+                                            placeholder="0"
+                                            className="w-full h-9 rounded-lg bg-[var(--foreground)]/5 border border-orange-500/20 px-3 text-[10px] font-black focus:border-orange-500 shadow-inner"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1.5 ml-1">Tax (%)</label>
+                                        <input
+                                            type="number"
+                                            step="any"
+                                            value={invoiceTax}
+                                            onChange={(e) => setInvoiceTax(e.target.value)}
+                                            placeholder="0"
+                                            className="w-full h-9 rounded-lg bg-[var(--foreground)]/5 border border-emerald-500/20 px-3 text-[10px] font-black focus:border-emerald-500 shadow-inner"
+                                        />
                                     </div>
                                 </div>
                             </div>
-                        )}
-
-                        {/* Discount & Tax Inputs */}
-                        <div className="pt-2 border-t border-black/5">
-                            <div className="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1 ml-1">Discount</label>
-                                    <input
-                                        type="number"
-                                        step="any"
-                                        value={discount}
-                                        onChange={(e) => setDiscount(e.target.value)}
-                                        placeholder="0"
-                                        className="w-full h-8 rounded-lg bg-white/60 border border-orange-200 px-3 text-[10px] font-bold focus:border-orange-400 focus:outline-none"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1 ml-1">Tax (%)</label>
-                                    <input
-                                        type="number"
-                                        step="any"
-                                        value={invoiceTax}
-                                        onChange={(e) => setInvoiceTax(e.target.value)}
-                                        placeholder="0"
-                                        className="w-full h-8 rounded-lg bg-white/60 border border-emerald-200 px-3 text-[10px] font-bold focus:border-emerald-400 focus:outline-none"
-                                    />
-                                </div>
-                            </div>
                         </div>
 
-                        {/* Signature */}
-                        <div className="pt-2 border-t border-black/5">
-                            <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1.5 ml-1">Authorized Person Signature</label>
-                            <div className="rounded-xl overflow-hidden border border-dashed border-[var(--primary-green)]/30 bg-white/30 backdrop-blur-sm">
+                        <div className="glass rounded-[24px] border border-[var(--foreground)]/10 p-4 shadow-lg">
+                            <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-2 ml-1">Authentication Pad</label>
+                            <div className="rounded-2xl overflow-hidden border border-dashed border-[var(--primary-green)]/20 bg-white/30 dark:bg-white/5 backdrop-blur-sm relative group">
                                 <SignaturePad ref={sigPadRef} className="h-32" />
+                                <button
+                                    type="button"
+                                    onClick={() => sigPadRef.current?.clear()}
+                                    className="absolute top-2 right-2 p-1.5 rounded-lg bg-rose-500/5 text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity active:scale-95"
+                                >
+                                    <Trash2 size={12} />
+                                </button>
                             </div>
                         </div>
 
-                        {/* Attachments */}
-                        <div className="pt-2 border-t border-black/5">
-                            <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1.5 ml-1">Pictures / Proof Documents</label>
-                            <div className="flex flex-wrap gap-1.5">
+                        <div className="glass rounded-[24px] border border-[var(--foreground)]/10 p-4 shadow-lg">
+                            <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-2 ml-1">Supporting Evidence</label>
+                            <div className="flex flex-wrap gap-2">
                                 {attachments.map((url, i) => (
                                     <div key={i} className="relative group">
-                                        <div className="h-10 w-10 lg:h-12 lg:w-12 rounded-lg bg-white/60 border border-white/20 overflow-hidden shadow-sm">
+                                        <div className="h-12 w-12 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 overflow-hidden shadow-sm">
                                             {url.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
                                                 <img src={url} alt="" className="w-full h-full object-cover" />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center">
-                                                    <Paperclip className="h-4 w-4 text-gray-400" />
+                                                    <Paperclip className="h-4 w-4 text-[var(--foreground)]/20" />
                                                 </div>
                                             )}
                                         </div>
                                         <button
                                             type="button"
                                             onClick={() => removeAttachment(i)}
-                                            className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-rose-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                                            className="absolute -top-1.5 -right-1.5 h-4.5 w-4.5 rounded-full bg-rose-500 text-white flex items-center justify-center shadow-lg active:scale-95 z-10"
                                         >
-                                            <X className="h-2.5 w-2.5" />
+                                            <X className="h-3 w-3" />
                                         </button>
                                     </div>
                                 ))}
-                                <label className="h-10 w-10 lg:h-12 lg:w-12 rounded-lg border border-dashed border-gray-300 bg-white/30 flex items-center justify-center cursor-pointer hover:bg-white/50 transition-all group">
-                                    <ImageIcon className="h-4 w-4 text-gray-400 group-hover:text-[var(--primary-green)]" />
+                                <label className="h-12 w-12 rounded-xl border border-dashed border-[var(--foreground)]/20 bg-[var(--foreground)]/5 flex items-center justify-center cursor-pointer hover:bg-[var(--foreground)]/10 hover:border-[var(--primary-green)]/30 transition-all active:scale-95 group shadow-sm">
+                                    <Plus className="h-4 w-4 text-[var(--foreground)]/20 group-hover:text-[var(--primary-green)]" />
                                     <input
                                         type="file"
                                         multiple
@@ -823,36 +808,33 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                             </div>
                         </div>
 
-                        <div className="space-y-2 pt-3 border-t border-black/5">
-                            <div className="flex justify-between text-[9px] font-bold uppercase tracking-wider">
-                                <span className="text-[var(--foreground)]/40">Subtotal</span>
-                                <span className="text-[var(--deep-contrast)]">{formatCurrency(subtotal)}</span>
+                        <div className="space-y-2 pt-4 border-t border-[var(--foreground)]/5">
+                            <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/30 px-1">
+                                <span>Subtotal</span>
+                                <span className="text-[var(--deep-contrast)] tabular-nums">{formatCurrency(subtotal)}</span>
                             </div>
-                            <div className="flex justify-between text-[9px] font-bold uppercase tracking-wider">
-                                <span className="text-[var(--foreground)]/40">Taxation</span>
-                                <span className="text-[var(--deep-contrast)]">{formatCurrency(totalTax)}</span>
+                            <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/30 px-1">
+                                <span>Accumulated Tax</span>
+                                <span className="text-[var(--deep-contrast)] tabular-nums">{formatCurrency(totalTax)}</span>
                             </div>
                             {discountAmount > 0 && (
-                                <div className="flex justify-between text-[9px] font-bold uppercase tracking-wider text-orange-500">
-                                    <span>Discount</span>
-                                    <span>-{formatCurrency(discountAmount)}</span>
+                                <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-orange-600 px-1">
+                                    <span>Discount (Applied)</span>
+                                    <span className="tabular-nums">-{formatCurrency(discountAmount)}</span>
                                 </div>
                             )}
                             {isSale && (
                                 <div className={clsx(
-                                    "flex justify-between text-[9px] font-bold uppercase tracking-wider p-2 rounded-lg bg-black/5 mt-1",
-                                    isTotalLoss ? "text-rose-600" : "text-blue-600"
+                                    "flex justify-between text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-xl border mt-2",
+                                    isTotalLoss ? "bg-rose-500/5 border-rose-500/10 text-rose-500" : "bg-blue-500/5 border-blue-500/10 text-blue-500"
                                 )}>
-                                    <span>{isTotalLoss ? 'Projected Loss' : 'Projected Profit'}</span>
-                                    <span>{formatCurrency(projectedProfit)}</span>
+                                    <span>{isTotalLoss ? 'PROJECTED LOSS' : 'PROJECTED MARGIN'}</span>
+                                    <span className="tabular-nums font-mono">{formatCurrency(projectedProfit)}</span>
                                 </div>
                             )}
-                            <div className="flex justify-between items-center text-lg font-bold text-[var(--deep-contrast)] pt-3 border-t border-[var(--primary-green)]/10 mt-2">
-                                <span className="text-[10px] font-bold uppercase tracking-wider pt-0.5">Grand Total</span>
-                                <span className={clsx(
-                                    "px-3 py-1 rounded-xl bg-[var(--primary-green)]/10",
-                                    paymentMode !== 'UNPAID' ? "text-[var(--primary-green)]" : "text-[var(--deep-contrast)]"
-                                )}>
+                            <div className="flex justify-between items-center text-xl font-black text-[var(--deep-contrast)] pt-3 border-t border-[var(--primary-green)]/20 mt-3 px-1">
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-30">Total</span>
+                                <span className={clsx(paymentMode !== 'UNPAID' ? "text-[var(--primary-green)] drop-shadow-sm font-mono tracking-tighter" : "font-mono tracking-tighter")}>
                                     {formatCurrency(totalAmount)}
                                 </span>
                             </div>
@@ -860,80 +842,73 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                     </div>
 
                     {/* Right: Items */}
-                    <div className="lg:col-span-3">
-                        <div className="glass rounded-xl border border-white/40 overflow-hidden">
-                            <div className="px-3 py-2 border-b border-white/10 bg-[var(--primary-green)]/5 flex justify-between items-center">
-                                <h3 className="text-[10px] lg:text-[9px] font-bold uppercase tracking-wider text-[var(--deep-contrast)]">Items ({rows.length})</h3>
+                    <div className="lg:col-span-3 space-y-4">
+                        <div className="glass rounded-[32px] border border-[var(--foreground)]/10 overflow-hidden min-h-[500px] shadow-2xl">
+                            <div className="px-6 py-4 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5 flex justify-between items-center">
+                                <div>
+                                    <h3 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">Active Inventory Log</h3>
+                                    <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">{rows.length} RECORDED ENTRIES</p>
+                                </div>
                                 <button
                                     type="button"
                                     onClick={() => setIsAddModalOpen(true)}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--primary-green)] text-white text-[10px] lg:text-[8px] font-bold uppercase hover:bg-[var(--primary-hover)] transition-all h-8 lg:h-auto"
+                                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--primary-green)] text-[var(--primary-foreground)] text-[10px] font-black uppercase tracking-[0.1em] hover:bg-[var(--primary-hover)] transition-all shadow-lg active:scale-95 group"
                                 >
-                                    <Plus className="h-3.5 w-3.5 lg:h-3 lg:w-3" />
-                                    Add
+                                    <Plus className="h-4 w-4 transition-transform group-hover:rotate-90 duration-500" />
+                                    GENERATE LINE
                                 </button>
                             </div>
 
-                            <div className="p-3 space-y-3 lg:space-y-2 max-h-[500px] overflow-y-auto custom-scrollbar">
+                            <div className="p-4 space-y-2.5 max-h-[600px] overflow-y-auto custom-scrollbar">
                                 {rows.length === 0 ? (
-                                    <div className="text-center py-12 lg:py-8 opacity-30">
-                                        <p className="text-[10px] lg:text-[8px] font-bold uppercase tracking-wider">No items added yet</p>
+                                    <div className="text-center py-32 opacity-20">
+                                        <Calculator className="h-12 w-12 mx-auto mb-4 opacity-10" />
+                                        <p className="text-[10px] font-black uppercase tracking-[0.3em]">Ledger is empty</p>
                                     </div>
                                 ) : (
                                     rows.map((row, index) => (
                                         <div
                                             key={index}
                                             onClick={() => openEditModal(index)}
-                                            className="group relative glass p-3 lg:p-2 rounded-xl lg:rounded-lg border border-white/30 hover:bg-white/60 transition-all cursor-pointer active:scale-[0.98]"
+                                            className="group relative p-4 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/5 hover:bg-[var(--foreground)]/10 transition-all cursor-pointer active:scale-[0.99] shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
                                         >
-                                            <button
-                                                type="button"
-                                                onClick={(e) => { e.stopPropagation(); removeRow(index); }}
-                                                className="absolute -top-1.5 -right-1.5 p-1 lg:p-0.5 bg-white rounded-full border border-rose-100 text-rose-500 hover:bg-rose-500 hover:text-white transition-all z-10 shadow-sm"
-                                            >
-                                                <Trash2 className="h-3.5 w-3.5 lg:h-2.5 lg:w-2.5" />
-                                            </button>
-
-                                            <div className="flex flex-col sm:grid sm:grid-cols-5 gap-3 lg:gap-2 items-start sm:items-center">
-                                                <div className="w-full sm:col-span-2">
-                                                    <div className="text-[11px] lg:text-[9px] font-bold text-[var(--deep-contrast)] truncate">{row.name}</div>
+                                            <div className="flex items-center gap-4 flex-1 min-w-0">
+                                                <div className="h-10 w-10 rounded-xl bg-[var(--primary-green)] text-[var(--primary-foreground)] flex items-center justify-center shadow-lg shadow-[var(--primary-green)]/10 group-hover:scale-110 transition-transform">
+                                                    <Calculator size={18} strokeWidth={2.5} />
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <h4 className="text-[11px] font-black text-[var(--deep-contrast)] uppercase truncate tracking-tight">{row.name}</h4>
                                                     <div className={clsx(
-                                                        "text-[9px] lg:text-[7px] font-bold uppercase tracking-wider",
+                                                        "text-[8px] font-black uppercase tracking-wider mt-0.5",
                                                         (row.rate - (row.purchasePrice || 0)) < 0 ? "text-rose-500" : "text-blue-500"
                                                     )}>
-                                                        Profit: {formatCurrency((row.rate - (row.purchasePrice || 0)) * row.quantity)}
+                                                        PROFIT PER UNIT: {formatCurrency(row.rate - (row.purchasePrice || 0))}
                                                     </div>
                                                 </div>
-                                                <div className="flex w-full gap-2 sm:contents">
-                                                    <div className="flex-1 sm:flex-none">
-                                                        <label className="block text-[8px] lg:text-[7px] font-bold uppercase text-[var(--foreground)]/30 mb-1 ml-1">Qty × {row.unit}</label>
-                                                        <input
-                                                            type="number"
-                                                            step="any"
-                                                            value={row.quantity}
-                                                            onChange={(e) => updateRow(index, 'quantity', Number(e.target.value))}
-                                                            className="w-full h-10 lg:h-7 rounded-lg bg-white/40 border border-white/10 px-2 text-[11px] lg:text-[9px] font-bold text-center focus:border-[var(--primary-green)] focus:outline-none"
-                                                            onClick={(e) => e.stopPropagation()}
-                                                        />
+                                            </div>
+
+                                            <div className="flex items-center gap-6 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-[var(--foreground)]/5">
+                                                <div className="flex gap-4">
+                                                    <div className="text-center sm:text-right">
+                                                        <p className="text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-0.5">Quantity</p>
+                                                        <p className="text-[11px] font-black text-[var(--deep-contrast)] tabular-nums">{row.quantity} {row.unit}</p>
                                                     </div>
-                                                    <div className="flex-1 sm:flex-none">
-                                                        <label className="block text-[8px] lg:text-[7px] font-bold uppercase text-[var(--foreground)]/30 mb-1 ml-1">Rate/{row.unit}</label>
-                                                        <input
-                                                            type="number"
-                                                            step="any"
-                                                            value={row.rate}
-                                                            onChange={(e) => updateRow(index, 'rate', Number(e.target.value))}
-                                                            className="w-full h-10 lg:h-7 rounded-lg bg-white/40 border border-white/10 px-2 text-[11px] lg:text-[9px] font-bold text-center focus:border-[var(--primary-green)] focus:outline-none"
-                                                            onClick={(e) => e.stopPropagation()}
-                                                        />
-                                                    </div>
-                                                    <div className="flex-1 sm:flex-none">
-                                                        <label className="block text-[8px] lg:text-[7px] font-bold uppercase text-[var(--foreground)]/30 mb-1 ml-1 text-right">Total</label>
-                                                        <div className="h-10 lg:h-7 flex items-center justify-end px-2 rounded-lg bg-[var(--primary-green)]/10 text-[11px] lg:text-[9px] font-bold text-[var(--primary-green)] border border-[var(--primary-green)]/10">
-                                                            {formatCurrency(row.amount)}
-                                                        </div>
+                                                    <div className="text-center sm:text-right">
+                                                        <p className="text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-0.5">Rate</p>
+                                                        <p className="text-[11px] font-black text-[var(--deep-contrast)] tabular-nums">{formatCurrency(row.rate)}</p>
                                                     </div>
                                                 </div>
+                                                <div className="text-right pl-4 border-l border-[var(--foreground)]/10">
+                                                    <p className="text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-0.5">Valuation</p>
+                                                    <p className="text-[14px] font-black text-[var(--primary-green)] tabular-nums font-mono tracking-tighter">{formatCurrency(row.amount)}</p>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={(e) => { e.stopPropagation(); removeRow(index); }}
+                                                    className="p-2 rounded-xl bg-rose-500/5 text-rose-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-rose-500 hover:text-white z-10 active:scale-95 shadow-sm border border-rose-500/10"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
                                             </div>
                                         </div>
                                     ))
@@ -941,14 +916,16 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                             </div>
                         </div>
 
-                        {/* Notes */}
-                        <div className="mt-3">
+                        <div className="relative group shadow-xl">
                             <textarea
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
-                                placeholder="Internal notes & comments..."
-                                className="w-full h-24 lg:h-16 rounded-xl glass border border-white/40 p-3 text-[11px] lg:text-[9px] font-bold text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none resize-none placeholder-[var(--foreground)]/20"
+                                placeholder="ENTER INTERNAL MEMORANDUM..."
+                                className="w-full h-32 rounded-[32px] glass border border-[var(--foreground)]/10 p-6 text-[11px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none resize-none placeholder:text-[var(--foreground)]/20 transition-all shadow-inner"
                             />
+                            <div className="absolute top-4 right-6 pointer-events-none opacity-10">
+                                <Paperclip size={24} />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -958,8 +935,8 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                 isOpen={isPartyPickerOpen}
                 onClose={() => setIsPartyPickerOpen(false)}
                 onSelect={setPartyId}
-                title="Select Customer"
-                options={filteredParties.map(p => ({ id: p.id, label: p.name, subLabel: p.phone }))}
+                title="Select Account"
+                options={filteredParties.map(p => ({ id: p.id, label: p.name.toUpperCase(), subLabel: p.phone }))}
                 selectedValue={partyId}
             />
 
@@ -967,15 +944,15 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                 isOpen={isModePickerOpen}
                 onClose={() => setIsModePickerOpen(false)}
                 onSelect={setPaymentMode}
-                title="Payment Mode"
+                title="Liquidation Mode"
                 options={[
                     { id: 'UNPAID', label: 'MARK AS UNPAID' },
-                    { id: 'CASH', label: 'CASH', subLabel: formatCurrency(modeBalances['CASH'] || 0) },
-                    { id: 'BANK', label: 'BANK', subLabel: formatCurrency(modeBalances['BANK'] || 0) },
-                    { id: 'ONLINE', label: 'ONLINE', subLabel: formatCurrency(modeBalances['ONLINE'] || 0) },
+                    { id: 'CASH', label: 'PHYSICAL CASH', subLabel: formatCurrency(modeBalances['CASH'] || 0) },
+                    { id: 'BANK', label: 'BANK ACCOUNT', subLabel: formatCurrency(modeBalances['BANK'] || 0) },
+                    { id: 'ONLINE', label: 'ONLINE GATEWAY', subLabel: formatCurrency(modeBalances['ONLINE'] || 0) },
                     ...filteredPaymentModes.map(m => ({
                         id: m.name,
-                        label: m.name,
+                        label: m.name.toUpperCase(),
                         subLabel: formatCurrency(modeBalances[m.name] || 0)
                     }))
                 ]}
@@ -998,10 +975,10 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                 onClose={() => setIsConfirmOpen(false)}
                 onConfirm={handleDelete}
                 isLoading={deleting}
-                title={`Delete ${isSale ? 'Sale' : 'Purchase'}?`}
-                message={`Are you sure you want to permanently delete this ${isSale ? 'sale' : 'purchase'}? This will also reverse all stock changes.`}
-                confirmText="Delete"
-                cancelText="Keep It"
+                title={`Purge ${isSale ? 'Entry' : 'Record'}?`}
+                message={`Permanently purge this ledger entry? All associated stock changes will be immediatey reversed. This action is irreversible.`}
+                confirmText="Purge"
+                variant="danger"
             />
 
             {isPreviewOpen && previewData && (

@@ -48,7 +48,7 @@ export default function Step2AddItems({ items, onNext, onBack }: Step2Props) {
     const subtotal = data.items.reduce((sum, item) => sum + item.amount, 0)
 
     return (
-        <div className="glass rounded-2xl border border-white/40 overflow-hidden">
+        <div className="glass rounded-2xl border border-gray-200 overflow-hidden">
             <div className="px-5 py-3 border-b border-white/10 bg-[var(--primary-green)]/5 flex justify-between items-center">
                 <div>
                     <h2 className="text-[11px] font-bold text-[var(--deep-contrast)] uppercase tracking-tight">Add Line Items</h2>

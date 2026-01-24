@@ -6,6 +6,7 @@ import { useBusiness } from '@/context/business-context'
 import PickerModal from '@/components/ui/PickerModal'
 import ErrorModal from '@/components/ui/ErrorModal'
 import clsx from 'clsx'
+import { motion } from 'framer-motion'
 
 type AddSalesItemModalProps = {
     isOpen: boolean
@@ -82,96 +83,93 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
     const isLoss = totalProfit < 0
 
     return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose} />
-            <div className="glass w-full max-w-sm rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 relative z-10 border border-white/40">
-                <div className="flex items-center justify-between border-b border-white/20 bg-white/40 px-6 py-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center px-4 bg-[var(--modal-backdrop)] backdrop-blur-md animate-in fade-in duration-300">
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                className="glass w-full max-w-sm rounded-[32px] overflow-hidden shadow-2xl relative border border-[var(--foreground)]/10"
+            >
+                <div className="flex items-center justify-between border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5 px-6 py-4">
                     <div className="flex items-center gap-2.5">
-                        <div className="p-2 rounded-xl bg-[var(--primary-green)] text-white shadow-lg">
+                        <div className="p-2 rounded-xl bg-[var(--primary-green)] text-[var(--primary-foreground)] shadow-lg shadow-[var(--primary-green)]/20">
                             <Plus className="h-4 w-4" />
                         </div>
                         <div>
-                            <h2 className="text-sm lg:text-[13px] font-bold text-[var(--deep-contrast)] tracking-tight">Add Sale Item</h2>
-                            <p className="text-[10px] lg:text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-none">Line Detail</p>
+                            <h2 className="text-[13px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">Sales Entry</h2>
+                            <p className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-widest leading-none mt-0.5">Line Specification</p>
                         </div>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-1.5 rounded-full hover:bg-white/50 transition-colors"
+                        className="h-8 w-8 flex items-center justify-center rounded-xl hover:bg-rose-500 hover:text-white text-[var(--foreground)]/40 transition-all active:scale-95"
                     >
                         <X className="h-4 w-4" />
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                <form onSubmit={handleSubmit} className="p-6 space-y-5">
                     {/* Item Selection */}
                     <div>
-                        <label className="block text-xs lg:text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-2 ml-1">Select Product *</label>
+                        <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Inventory Resource *</label>
                         <button
                             type="button"
                             onClick={() => setIsItemPickerOpen(true)}
-                            className="w-full h-12 lg:h-11 flex items-center justify-between rounded-xl bg-white/50 border border-white/20 px-4 text-xs lg:text-[11px] font-bold text-[var(--deep-contrast)] hover:border-[var(--primary-green)] transition-all shadow-inner"
+                            className="w-full h-11 flex items-center justify-between rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-bold text-[var(--deep-contrast)] hover:border-[var(--primary-green)] transition-all shadow-inner text-left"
                         >
-                            <span className="truncate">{selectedItem ? selectedItem.name : 'Choose an item...'}</span>
+                            <span className="truncate">{selectedItem ? selectedItem.name.toUpperCase() : 'SELECT PRODUCT...'}</span>
                             <Package className="h-4 w-4 opacity-20" />
                         </button>
                     </div>
 
                     {selectedItem && (
-                        <div className="animate-in fade-in slide-in-from-top-2 duration-300 space-y-4">
+                        <div className="animate-in fade-in slide-in-from-top-2 duration-400 space-y-4">
                             <div className="grid grid-cols-2 gap-3">
                                 {/* Quantity */}
                                 <div>
-                                    <label className="block text-xs lg:text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-2 ml-1">Quantity ({selectedItem.unit})</label>
+                                    <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Vol ({selectedItem.unit})</label>
                                     <input
                                         type="number"
                                         step="any"
                                         required
                                         value={quantity}
                                         onChange={(e) => setQuantity(Number(e.target.value))}
-                                        className="w-full h-12 lg:h-11 rounded-xl bg-white/50 border border-white/20 px-4 text-sm lg:text-[13px] font-bold text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] transition-all shadow-inner"
+                                        className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[13px] font-black text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] transition-all shadow-inner tabular-nums"
                                     />
                                 </div>
                                 {/* Rate */}
                                 <div>
-                                    <label className="block text-xs lg:text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-2 ml-1">Rate ({selectedItem.unit})</label>
+                                    <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Unit Rate ({selectedItem.unit})</label>
                                     <input
                                         type="number"
                                         step="any"
                                         required
                                         value={rate}
                                         onChange={(e) => setRate(Number(e.target.value))}
-                                        className="w-full h-12 lg:h-11 rounded-xl bg-white/50 border border-white/20 px-4 text-sm lg:text-[13px] font-bold text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] transition-all shadow-inner"
+                                        className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[13px] font-black text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] transition-all shadow-inner tabular-nums"
                                     />
                                 </div>
                             </div>
 
                             {/* Line Total Display */}
                             <div className="grid grid-cols-2 gap-3">
-                                <div className="p-4 rounded-2xl bg-[var(--primary-green)]/5 border border-[var(--primary-green)]/10">
-                                    <div className="flex justify-between items-center">
-                                        <div className="flex items-center gap-2">
-                                            <Calculator className="h-3 w-3 text-[var(--primary-green)]" />
-                                            <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/60">Line Total</span>
-                                        </div>
-                                        <span className="text-sm font-bold text-[var(--primary-green)]">{formatCurrency(total)}</span>
+                                <div className="p-3.5 rounded-2xl bg-[var(--primary-green)]/5 border border-[var(--primary-green)]/20 shadow-sm">
+                                    <div className="flex flex-col">
+                                        <span className="text-[7.5px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 mb-0.5">Line Gross</span>
+                                        <span className="text-[13px] font-black text-[var(--primary-green)] tabular-nums">{formatCurrency(total)}</span>
                                     </div>
                                 </div>
 
                                 <div className={clsx(
-                                    "p-4 rounded-2xl border",
-                                    isLoss ? "bg-rose-500/5 border-rose-500/10" : "bg-blue-500/5 border-blue-500/10"
+                                    "p-3.5 rounded-2xl border shadow-sm",
+                                    isLoss ? "bg-rose-500/5 border-rose-500/20" : "bg-blue-500/5 border-blue-500/20"
                                 )}>
-                                    <div className="flex justify-between items-center">
-                                        <div className="flex items-center gap-2">
-                                            <Calculator className={clsx("h-3 w-3", isLoss ? "text-rose-500" : "text-blue-500")} />
-                                            <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/60">
-                                                {isLoss ? 'Loss' : 'Profit'}
-                                            </span>
-                                        </div>
+                                    <div className="flex flex-col">
+                                        <span className={clsx("text-[7.5px] font-black uppercase tracking-[0.2em] mb-0.5", isLoss ? "text-rose-600/60" : "text-blue-600/60")}>
+                                            {isLoss ? 'Projected Loss' : 'Projected Margin'}
+                                        </span>
                                         <span className={clsx(
-                                            "text-sm font-bold",
-                                            isLoss ? "text-rose-500" : "text-blue-500"
+                                            "text-[13px] font-black tabular-nums",
+                                            isLoss ? "text-rose-600" : "text-blue-600"
                                         )}>
                                             {formatCurrency(totalProfit)}
                                         </span>
@@ -181,21 +179,21 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                         </div>
                     )}
 
-                    <div className="flex justify-end pt-4 gap-2 border-t border-black/5">
+                    <div className="flex justify-end pt-4 gap-2 border-t border-[var(--primary-green)]/10">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 h-11 rounded-xl text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 hover:bg-white/50 transition-all active:scale-95"
+                            className="flex-1 h-11 rounded-xl text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/30 hover:bg-[var(--foreground)]/5 transition-all active:scale-95"
                         >
-                            Cancel
+                            Abort
                         </button>
                         <button
                             type="submit"
                             disabled={!selectedItem || quantity <= 0}
-                            className="flex-1 h-11 flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] text-white shadow-lg text-[10px] font-bold uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50"
+                            className="flex-1 h-11 flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] shadow-xl shadow-[var(--deep-contrast)]/20 text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50 hover:bg-[var(--deep-contrast-hover)]"
                         >
-                            <Plus className="mr-2 h-3 w-3" />
-                            {initialData ? 'Save Changes' : 'Add to Sale'}
+                            <Plus className="mr-2 h-3.5 w-3.5" />
+                            {initialData ? 'Update' : 'Commit'}
                         </button>
                     </div>
                 </form>
@@ -204,7 +202,7 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                     isOpen={isItemPickerOpen}
                     onClose={() => setIsItemPickerOpen(false)}
                     onSelect={handleSelect}
-                    title="Select Product"
+                    title="Select Resource"
                     options={items.map(i => ({
                         id: i.id,
                         label: i.name.toUpperCase(),
@@ -218,7 +216,7 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                     onClose={() => setErrorModal({ ...errorModal, open: false })}
                     message={errorModal.message}
                 />
-            </div>
+            </motion.div>
         </div>
     )
 }

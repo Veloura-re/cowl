@@ -14,31 +14,88 @@
 }
 
 :root {
-  /* Core Palette */
+  /* Light Mode Palette */
   --background: #ffffff;
   --foreground: #052e16;
-  /* Deep Green */
-
-  /* Brand Colors */
   --primary-green: #064e3b;
-  /* Dark Green */
+  --primary-hover: #065f46;
+  --primary-active: #042f2e;
+  --primary-foreground: #ffffff;
+
   --glass-highlight: #10b981;
-  /* Emerald Highlight */
   --deep-contrast: #022c22;
+  --deep-contrast-hover: #064e3b;
+  --deep-contrast-foreground: #ffffff;
 
-  /* Effects */
   --glass-bg: rgba(255, 255, 255, 0.7);
+  --modal-backdrop: rgba(0, 0, 0, 0.4);
 
-  /* Fonts */
-  --font-inter: "Inter", system-ui, sans-serif;
+  /* Status Indicators - More Vibrant */
+  --status-success: #d1fae5;
+  --status-success-foreground: #065f46;
+  --status-success-border: #6ee7b7;
+
+  --status-warning: #fef3c7;
+  --status-warning-foreground: #92400e;
+  --status-warning-border: #fcd34d;
+
+  --status-danger: #fee2e2;
+  --status-danger-foreground: #991b1b;
+  --status-danger-border: #fca5a5;
+
+  --status-info: #dbeafe;
+  --status-info-foreground: #1e40af;
+  --status-info-border: #93c5fd;
+}
+
+.dark {
+  /* Dark Mode Palette */
+  --background: #050505;
+  --foreground: #fafafa;
+
+  --primary-green: #10b981;
+  --primary-hover: #34d399;
+  --primary-active: #059669;
+  --primary-foreground: #052e16;
+  /* Dark text on bright emerald */
+
+  --glass-highlight: #34d399;
+
+  --deep-contrast: #fafafa;
+  /* White background for "Commit" style buttons */
+  --deep-contrast-hover: #f3f4f6;
+  --deep-contrast-foreground: #050505;
+  /* Black text on white buttons */
+
+  --glass-bg: rgba(18, 18, 18, 0.7);
+  --modal-backdrop: rgba(0, 0, 0, 0.6);
+
+  /* Status Indicators - Dark Mode - More Vibrant */
+  --status-success: rgba(16, 185, 129, 0.25);
+  --status-success-foreground: #34d399;
+  --status-success-border: rgba(16, 185, 129, 0.4);
+
+  --status-warning: rgba(245, 158, 11, 0.25);
+  --status-warning-foreground: #fbbf24;
+  --status-warning-border: rgba(245, 158, 11, 0.4);
+
+  --status-danger: rgba(244, 63, 94, 0.25);
+  --status-danger-foreground: #fb7185;
+  --status-danger-border: rgba(244, 63, 94, 0.4);
+
+  --status-info: rgba(59, 130, 246, 0.25);
+  --status-info-foreground: #60a5fa;
+  --status-info-border: rgba(59, 130, 246, 0.4);
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter);
-  font-weight: 450;
-  /* Medium default */
+  font-weight: 400;
+  /* Regular default */
+  transition: background-color 0.5s ease, color 0.5s ease;
+  /* Smooth transition */
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
@@ -49,6 +106,23 @@ body {
   /* Prevent horizontal scroll on mobile */
 }
 
+/* Glass Utility Implementation */
+@layer utilities {
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+  }
+
+  /* Specific Dark Mode Overrides for Glass */
+  .dark .glass {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+}
+
 h1,
 h2,
 h3,
@@ -57,17 +131,16 @@ h5,
 h6 {
   font-family: var(--font-inter);
   color: var(--deep-contrast);
-  font-weight: 600;
-  /* Semibold, not 'fat' */
+  font-weight: 400 !important;
 }
 
-/* Glassmorphism Utility */
-.glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+/* Typography Overrides as requested */
+.font-bold,
+.font-semibold,
+.font-medium,
+.font-black,
+.font-extrabold {
+  font-weight: 400 !important;
 }
 
 /* Animations - Optimized for Mobile */
@@ -99,6 +172,40 @@ h6 {
     transform: scale(1.1);
     /* Reduced scale for performance */
   }
+}
+
+@keyframes glow-red {
+
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(239, 68, 68, 0.2), inset 0 0 2px rgba(239, 68, 68, 0.1);
+  }
+
+  50% {
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.5), inset 0 0 5px rgba(239, 68, 68, 0.2);
+  }
+}
+
+@keyframes glow-amber {
+
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(245, 158, 11, 0.2), inset 0 0 2px rgba(245, 158, 11, 0.1);
+  }
+
+  50% {
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.5), inset 0 0 5px rgba(245, 158, 11, 0.2);
+  }
+}
+
+.critical-glow-red {
+  animation: glow-red 2s infinite ease-in-out;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+}
+
+.critical-glow-amber {
+  animation: glow-amber 2s infinite ease-in-out;
+  border-color: rgba(245, 158, 11, 0.4) !important;
 }
 
 /* Apply slower animations on mobile to save CPU/GPU */

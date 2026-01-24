@@ -32,7 +32,7 @@ export default function PartyLedgerView({ party, initialInvoices, initialTransac
     return (
         <div className="space-y-6 pb-20">
             {/* Header / Profile Card */}
-            <div className="glass p-6 rounded-[32px] border border-white/40 relative overflow-hidden">
+            <div className="glass p-6 rounded-[32px] border border-gray-200 dark:border-white/10 relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-8 opacity-10">
                     <User className="h-32 w-32" />
                 </div>
@@ -44,9 +44,9 @@ export default function PartyLedgerView({ party, initialInvoices, initialTransac
                                 <h1 className="text-3xl font-black text-[var(--deep-contrast)] tracking-tight">{party.name}</h1>
                                 <span className={clsx(
                                     "px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border",
-                                    party.type === 'CUSTOMER' ? "bg-blue-50 text-blue-600 border-blue-100" :
-                                        party.type === 'SUPPLIER' ? "bg-orange-50 text-orange-600 border-orange-100" :
-                                            "bg-purple-50 text-purple-600 border-purple-100"
+                                    party.type === 'CUSTOMER' ? "bg-[var(--status-info)] text-[var(--status-info-foreground)] border-[var(--status-info-border)]" :
+                                        party.type === 'SUPPLIER' ? "bg-[var(--status-warning)] text-[var(--status-warning-foreground)] border-[var(--status-warning-border)]" :
+                                            "bg-purple-50 text-purple-600 border-purple-100 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20"
                                 )}>
                                     {party.type}
                                 </span>
@@ -78,8 +78,8 @@ export default function PartyLedgerView({ party, initialInvoices, initialTransac
                             <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">Current Balance</p>
                             <div className={clsx(
                                 "text-4xl font-black tracking-tighter",
-                                party.opening_balance > 0 ? "text-emerald-600" :
-                                    party.opening_balance < 0 ? "text-rose-600" : "text-[var(--deep-contrast)]"
+                                party.opening_balance > 0 ? "text-[var(--status-success-foreground)]" :
+                                    party.opening_balance < 0 ? "text-[var(--status-danger-foreground)]" : "text-[var(--deep-contrast)]"
                             )}>
                                 {formatCurrency(Math.abs(party.opening_balance))}
                                 <span className="text-lg ml-1 align-top opacity-50">
@@ -93,12 +93,12 @@ export default function PartyLedgerView({ party, initialInvoices, initialTransac
 
             {/* Tabs & Search */}
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                <div className="flex p-1 bg-white/40 rounded-xl border border-white/40">
+                <div className="flex p-1 bg-white/40 dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/5">
                     <button
                         onClick={() => setActiveTab('invoices')}
                         className={clsx(
                             "px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all",
-                            activeTab === 'invoices' ? "bg-[var(--deep-contrast)] text-white shadow-lg" : "text-[var(--foreground)]/60 hover:bg-white/40"
+                            activeTab === 'invoices' ? "bg-[var(--deep-contrast)] text-white shadow-lg" : "text-[var(--foreground)]/60 hover:bg-white/40 dark:hover:bg-white/5"
                         )}
                     >
                         Invoices
@@ -107,7 +107,7 @@ export default function PartyLedgerView({ party, initialInvoices, initialTransac
                         onClick={() => setActiveTab('transactions')}
                         className={clsx(
                             "px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all",
-                            activeTab === 'transactions' ? "bg-[var(--deep-contrast)] text-white shadow-lg" : "text-[var(--foreground)]/60 hover:bg-white/40"
+                            activeTab === 'transactions' ? "bg-[var(--deep-contrast)] text-white shadow-lg" : "text-[var(--foreground)]/60 hover:bg-white/40 dark:hover:bg-white/5"
                         )}
                     >
                         Transactions
@@ -121,7 +121,7 @@ export default function PartyLedgerView({ party, initialInvoices, initialTransac
                         placeholder="Search..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-white/50 border border-white/40 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[var(--primary-green)]/20"
+                        className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[var(--primary-green)]/20 text-[var(--deep-contrast)]"
                     />
                 </div>
             </div>
@@ -130,9 +130,9 @@ export default function PartyLedgerView({ party, initialInvoices, initialTransac
             <div className="space-y-2">
                 {activeTab === 'invoices' ? (
                     filteredInvoices.length > 0 ? filteredInvoices.map((inv) => (
-                        <div key={inv.id} className="glass p-4 rounded-2xl border border-white/40 flex items-center justify-between group hover:bg-white/60 transition-all">
+                        <div key={inv.id} className="glass p-4 rounded-2xl border border-gray-200 dark:border-white/10 flex items-center justify-between group hover:bg-white/60 dark:hover:bg-white/5 transition-all">
                             <div className="flex items-center gap-4">
-                                <div className="h-10 w-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                                <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                                     <FileText className="h-5 w-5" />
                                 </div>
                                 <div>
@@ -145,10 +145,10 @@ export default function PartyLedgerView({ party, initialInvoices, initialTransac
                             <div className="text-right">
                                 <p className="text-sm font-bold text-[var(--deep-contrast)]">{formatCurrency(inv.total_amount)}</p>
                                 <span className={clsx(
-                                    "text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border",
-                                    inv.status === 'PAID' ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
-                                        inv.status === 'UNPAID' ? "bg-rose-50 text-rose-600 border-rose-100" :
-                                            "bg-amber-50 text-amber-600 border-amber-100"
+                                    "text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border",
+                                    inv.status === 'PAID' ? "bg-[var(--status-success)] text-[var(--status-success-foreground)] border-[var(--status-success-border)]" :
+                                        inv.status === 'UNPAID' ? "bg-[var(--status-danger)] text-[var(--status-danger-foreground)] border-[var(--status-danger-border)]" :
+                                            "bg-[var(--status-warning)] text-[var(--status-warning-foreground)] border-[var(--status-warning-border)]"
                                 )}>
                                     {inv.status}
                                 </span>
@@ -157,11 +157,11 @@ export default function PartyLedgerView({ party, initialInvoices, initialTransac
                     )) : <div className="text-center py-10 opacity-40 text-xs font-bold uppercase tracking-wider">No Invoices Found</div>
                 ) : (
                     filteredTransactions.length > 0 ? filteredTransactions.map((tx) => (
-                        <div key={tx.id} className="glass p-4 rounded-2xl border border-white/40 flex items-center justify-between group hover:bg-white/60 transition-all">
+                        <div key={tx.id} className="glass p-4 rounded-2xl border border-gray-200 dark:border-white/10 flex items-center justify-between group hover:bg-white/60 dark:hover:bg-white/5 transition-all">
                             <div className="flex items-center gap-4">
                                 <div className={clsx(
                                     "h-10 w-10 rounded-xl flex items-center justify-center",
-                                    tx.type === 'PAYMENT_IN' ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"
+                                    tx.type === 'PAYMENT_IN' ? "bg-[var(--status-success)] text-[var(--status-success-foreground)]" : "bg-[var(--status-danger)] text-[var(--status-danger-foreground)]"
                                 )}>
                                     {tx.type === 'PAYMENT_IN' ? <ArrowDownRight className="h-5 w-5" /> : <ArrowUpRight className="h-5 w-5" />}
                                 </div>
@@ -175,7 +175,7 @@ export default function PartyLedgerView({ party, initialInvoices, initialTransac
                             <div className="text-right">
                                 <p className={clsx(
                                     "text-sm font-bold",
-                                    tx.type === 'PAYMENT_IN' ? "text-emerald-600" : "text-[var(--deep-contrast)]"
+                                    tx.type === 'PAYMENT_IN' ? "text-[var(--status-success-foreground)]" : "text-[var(--status-danger-foreground)]"
                                 )}>
                                     {tx.type === 'PAYMENT_IN' ? '+' : '-'}{formatCurrency(tx.amount)}
                                 </p>
