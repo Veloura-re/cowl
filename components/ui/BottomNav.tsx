@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Home, Plus, Settings, User, Package, Menu, ShoppingCart, Users, BarChart3, X, CreditCard, LogOut } from "lucide-react";
 import { createClient } from '@/utils/supabase/client'
 import Link from "next/link";
@@ -130,75 +130,71 @@ export const BottomNav = () => {
                 className="fixed left-1/2 -translate-x-1/2 z-50"
                 style={{ bottom: `calc(1.5rem + env(safe-area-inset-bottom, 0px))` }}
             >
-                <LayoutGroup>
-                    <div className="flex items-center gap-1 px-1.5 py-1.5 rounded-full border border-[var(--foreground)]/10 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] bg-[var(--background)]/95 backdrop-blur-2xl relative transition-all duration-500">
+                <div className="flex items-center gap-1 px-1.5 py-1.5 rounded-full border border-[var(--foreground)]/10 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] bg-[var(--background)]/95 backdrop-blur-2xl relative transition-all duration-500">
 
-                        {/* Standard Dock Items */}
-                        {dockItems.map((item) => {
-                            const isActive = pathname === item.path;
-                            return (
-                                <Link
-                                    key={item.label}
-                                    href={item.path}
-                                    className={clsx(
-                                        "relative flex items-center justify-center w-12 h-12 rounded-full transition-all duration-500 overflow-visible group active:scale-90",
-                                        isActive ? "text-[var(--primary-foreground)]" : "text-[var(--foreground)]/60 hover:text-[var(--foreground)]"
-                                    )}
-                                >
-                                    {isActive && (
-                                        <motion.div
-                                            layoutId="nav-pill"
-                                            className="absolute inset-0 bg-[var(--primary-green)] rounded-full shadow-[0_5px_15px_-3px_rgba(6,78,59,0.4)] border border-[var(--primary-foreground)]/10"
-                                            transition={{ type: "spring", bounce: 0.35, duration: 0.6 }}
-                                        />
-                                    )}
-                                    <div className="relative z-10">
-                                        <item.icon
-                                            size={19}
-                                            strokeWidth={isActive ? 2.5 : 2}
-                                            className={clsx(
-                                                "transition-transform group-hover:scale-110",
-                                                isActive ? "scale-110 drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)]" : "opacity-70"
-                                            )}
-                                        />
+                    {/* Standard Dock Items */}
+                    {dockItems.map((item) => {
+                        const isActive = pathname === item.path;
+                        return (
+                            <Link
+                                key={item.label}
+                                href={item.path}
+                                className={clsx(
+                                    "relative flex items-center justify-center w-12 h-12 rounded-full transition-all duration-500 overflow-visible group active:scale-90",
+                                    isActive ? "text-[var(--primary-foreground)]" : "text-[var(--foreground)]/60 hover:text-[var(--foreground)]"
+                                )}
+                            >
+                                {isActive && (
+                                    <div
+                                        className="absolute inset-0 bg-[var(--primary-green)] rounded-full shadow-[0_5px_15px_-3px_rgba(6,78,59,0.4)] border border-[var(--primary-foreground)]/10 transition-all duration-300"
+                                    />
+                                )}
+                                <div className="relative z-10">
+                                    <item.icon
+                                        size={19}
+                                        strokeWidth={isActive ? 2.5 : 2}
+                                        className={clsx(
+                                            "transition-transform group-hover:scale-110",
+                                            isActive ? "scale-110 drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)]" : "opacity-70"
+                                        )}
+                                    />
+                                </div>
+
+                                {/* Tooltip on long press/hover could go here */}
+                                {!isActive && (
+                                    <div className="absolute -top-10 scale-0 group-hover:scale-100 transition-all px-2 py-1 rounded-lg bg-[var(--foreground)] text-[var(--background)] text-[8px] font-black uppercase tracking-wider pointer-events-none">
+                                        {item.label}
                                     </div>
+                                )}
+                            </Link>
+                        );
+                    })}
 
-                                    {/* Tooltip on long press/hover could go here */}
-                                    {!isActive && (
-                                        <div className="absolute -top-10 scale-0 group-hover:scale-100 transition-all px-2 py-1 rounded-lg bg-[var(--foreground)] text-[var(--background)] text-[8px] font-black uppercase tracking-wider pointer-events-none">
-                                            {item.label}
-                                        </div>
-                                    )}
-                                </Link>
-                            );
-                        })}
+                    {/* Separation Line (Subtle) */}
+                    <div className="h-6 w-[1px] bg-[var(--foreground)]/10 mx-1" />
 
-                        {/* Separation Line (Subtle) */}
-                        <div className="h-6 w-[1px] bg-[var(--foreground)]/10 mx-1" />
-
-                        {/* Hamburger Button */}
-                        <button
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className={clsx(
-                                "group relative flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 active:scale-90",
-                                isMenuOpen
-                                    ? "bg-[var(--primary-green)] text-[var(--primary-foreground)] shadow-lg"
-                                    : "text-[var(--foreground)]/40 hover:text-[var(--deep-contrast)] hover:bg-[var(--foreground)]/10"
-                            )}
-                        >
-                            <div className="relative z-10">
-                                <Menu
-                                    size={19}
-                                    strokeWidth={isMenuOpen ? 2.5 : 2}
-                                    className={clsx(
-                                        "transition-transform",
-                                        isMenuOpen ? "rotate-90 scale-110" : "group-hover:rotate-12"
-                                    )}
-                                />
-                            </div>
-                        </button>
-                    </div>
-                </LayoutGroup>
+                    {/* Hamburger Button */}
+                    <button
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        className={clsx(
+                            "group relative flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 active:scale-90",
+                            isMenuOpen
+                                ? "bg-[var(--primary-green)] text-[var(--primary-foreground)] shadow-lg"
+                                : "text-[var(--foreground)]/40 hover:text-[var(--deep-contrast)] hover:bg-[var(--foreground)]/10"
+                        )}
+                    >
+                        <div className="relative z-10">
+                            <Menu
+                                size={19}
+                                strokeWidth={isMenuOpen ? 2.5 : 2}
+                                className={clsx(
+                                    "transition-transform",
+                                    isMenuOpen ? "rotate-90 scale-110" : "group-hover:rotate-12"
+                                )}
+                            />
+                        </div>
+                    </button>
+                </div>
             </div>
         </>
     );

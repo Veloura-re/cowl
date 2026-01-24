@@ -135,10 +135,6 @@ export default function DashboardPage() {
                 <div className="flex items-center gap-2 px-2.5 py-1 bg-[var(--foreground)]/5 dark:bg-white/5 border border-[var(--foreground)]/10 dark:border-white/10 rounded-xl shadow-inner">
                     <span className="relative flex h-2 w-2">
                         <span className={clsx(
-                            "absolute inline-flex h-full w-full rounded-full opacity-75",
-                            loading ? "bg-amber-400 animate-pulse" : "bg-emerald-400 animate-ping"
-                        )}></span>
-                        <span className={clsx(
                             "relative inline-flex rounded-full h-2 w-2",
                             loading ? "bg-amber-500" : "bg-emerald-500"
                         )}></span>
@@ -190,7 +186,7 @@ export default function DashboardPage() {
                 <div className="flex-1 glass p-2.5 rounded-[20px] border border-[var(--foreground)]/10">
                     <div className="flex justify-between items-center">
                         <div className="flex items-center gap-2">
-                            <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                            <div className="h-2 w-2 rounded-full bg-emerald-500" />
                             <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600/60">Total Inbound</span>
                         </div>
                         <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full border border-[var(--status-success-border)] bg-[var(--status-success)] text-[var(--status-success-foreground)] shadow-sm">IN</span>

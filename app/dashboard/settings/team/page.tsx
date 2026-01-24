@@ -60,11 +60,8 @@ export default function TeamManagementPage() {
             const { data, error } = await supabase
                 .from('business_members')
                 .select(`
-                    id,
-                    role,
-                    user_id,
-                    invited_by,
-                    profiles (id, full_name, email, avatar_url, username)
+                    *,
+                    profiles(*)
                 `)
                 .eq('business_id', activeBusinessId)
 
@@ -217,7 +214,7 @@ export default function TeamManagementPage() {
                     {members.map((member) => (
                         <div key={member.id} className="p-4 hover:bg-white/20 transition-all flex items-center justify-between group">
                             <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-xl bg-white border border-black/5 flex items-center justify-center text-[var(--deep-contrast)] font-bold text-sm shadow-inner overflow-hidden">
+                                <div className="h-10 w-10 rounded-xl bg-white dark:bg-white/10 border border-black/5 dark:border-white/10 flex items-center justify-center text-[var(--deep-contrast)] font-bold text-sm shadow-inner overflow-hidden">
                                     {member.profiles?.avatar_url ? (
                                         <img src={member.profiles.avatar_url} alt="" className="h-full w-full object-cover" />
                                     ) : (
@@ -241,10 +238,10 @@ export default function TeamManagementPage() {
                                 <div className="text-right">
                                     <div className={clsx(
                                         "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-wider",
-                                        member.role === 'OWNER' ? "bg-amber-100 text-amber-700" :
-                                            member.role === 'ADMIN' ? "bg-blue-100 text-blue-700" :
-                                                member.role === 'PARTNER' ? "bg-purple-100 text-purple-700" :
-                                                    "bg-slate-100 text-slate-500"
+                                        member.role === 'OWNER' ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800" :
+                                            member.role === 'ADMIN' ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800" :
+                                                member.role === 'PARTNER' ? "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800" :
+                                                    "bg-slate-100 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
                                     )}>
                                         {member.role === 'OWNER' && <ShieldCheck className="h-2.5 w-2.5" />}
                                         {member.role}

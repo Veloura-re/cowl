@@ -194,7 +194,7 @@ export default function OnboardingPage() {
                     <button
                         type="submit"
                         disabled={loading || !formData.name}
-                        className="group relative flex w-full justify-center rounded-xl bg-[var(--deep-contrast)] px-6 py-4 text-sm font-bold text-white uppercase tracking-wider hover:bg-[var(--primary-green)] active:scale-95 disabled:opacity-70 transition-all duration-300 shadow-xl shadow-[var(--deep-contrast)]/20"
+                        className="group relative flex w-full justify-center rounded-xl bg-[var(--deep-contrast)] px-6 py-4 text-sm font-bold text-[var(--deep-contrast-foreground)] uppercase tracking-wider hover:bg-[var(--primary-green)] hover:text-[var(--primary-foreground)] active:scale-95 disabled:opacity-70 transition-all duration-300 shadow-xl shadow-[var(--deep-contrast)]/20"
                     >
                         {loading ? (
                             <Loader2 className="h-5 w-5 animate-spin" />
