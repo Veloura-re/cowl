@@ -35,7 +35,7 @@ const SignaturePad = forwardRef<SignaturePadHandle, { className?: string }>(({ c
                     ref={sigPad}
                     penColor="black"
                     canvasProps={{
-                        className: 'w-full h-32 cursor-crosshair',
+                        className: 'w-full h-full cursor-crosshair',
                     }}
                     onBegin={() => setHasSignature(true)}
                 />

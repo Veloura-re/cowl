@@ -915,7 +915,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                         <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Auth</label>
                                         <button type="button" onClick={() => sigPadRef.current?.clear()} className="text-[7px] font-black uppercase text-rose-500/50">Reset</button>
                                     </div>
-                                    <div className="rounded-xl border border-dashed border-[var(--primary-green)]/20 bg-white/5 backdrop-blur-sm overflow-hidden h-20">
+                                    <div className="rounded-xl border border-dashed border-[var(--primary-green)]/20 bg-white/5 backdrop-blur-sm overflow-hidden h-48">
                                         <SignaturePad ref={sigPadRef} className="h-full" />
                                     </div>
                                 </div>
