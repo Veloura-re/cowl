@@ -23,6 +23,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
     const [isFilterPickerOpen, setIsFilterPickerOpen] = useState(false)
     const [filterLowStock, setFilterLowStock] = useState(false)
     const [loading, setLoading] = useState(!initialItems)
+    const [visibleCount, setVisibleCount] = useState(50)
     const supabase = createClient()
 
     useEffect(() => {
@@ -71,7 +72,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
         })
 
     return (
-        <div className="space-y-4 animate-in fade-in duration-500 pb-20">
+        <div className="space-y-4 animate-in fade-in duration-300 pb-20">
             {/* Header - Compact */}
             <div className="flex flex-col gap-3 pb-3 border-b border-[var(--primary-green)]/10">
                 <div className="flex items-center justify-between">
@@ -87,7 +88,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                         onClick={() => router.push('/dashboard/inventory/new')}
                         className="flex items-center justify-center rounded-xl bg-[var(--primary-green)] px-4 py-2 text-[11px] font-black uppercase tracking-wider text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] transition-all shadow-xl shadow-[var(--primary-green)]/20 active:scale-95 border border-[var(--primary-foreground)]/10 group"
                     >
-                        <Plus className="mr-1.5 h-3.5 w-3.5 transition-transform group-hover:rotate-90 duration-500" />
+                        <Plus className="mr-1.5 h-3.5 w-3.5 transition-transform group-hover:rotate-90 duration-300" />
                         <span>New Item</span>
                     </motion.button>
                 </div>
@@ -162,33 +163,33 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
 
             {/* Grid - Ultra Compact Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                {!isContextLoading && filteredItems.map((item) => (
+                {!isContextLoading && filteredItems.slice(0, visibleCount).map((item) => (
                     <div
                         key={item.id}
                         onClick={() => {
                             router.push(`/dashboard/inventory/edit?id=${item.id}`)
                         }}
                         className={clsx(
-                            "group relative flex flex-col glass rounded-[14px] border border-[var(--foreground)]/10 p-2 hover:bg-[var(--foreground)]/10 transition-all duration-500 cursor-pointer overflow-hidden",
+                            "group relative flex flex-col glass-optimized rounded-[14px] border border-[var(--foreground)]/10 p-2 hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer overflow-hidden",
                             item.stock_quantity <= item.min_stock && "critical-glow-red"
                         )}
                     >
                         {/* Status Stripe */}
                         <div className={clsx(
-                            "absolute top-0 left-0 w-1.5 h-full transition-all duration-500",
+                            "absolute top-0 left-0 w-1.5 h-full transition-all duration-300",
                             item.stock_quantity > item.min_stock ? "bg-emerald-500" :
                                 item.stock_quantity > 0 ? "bg-amber-500" : "bg-rose-500"
                         )} />
                         {/* Status Indicator Stripe */}
                         <div className={clsx(
-                            "absolute top-0 left-0 w-[3px] h-full transition-colors duration-500",
+                            "absolute top-0 left-0 w-[3px] h-full transition-colors duration-300",
                             item.stock_quantity > item.min_stock ? "bg-emerald-500" : "bg-rose-500"
                         )} />
 
                         {/* Identity & Status Header */}
                         <div className="flex items-center gap-2">
                             <div className={clsx(
-                                "h-8 w-8 rounded-[10px] flex items-center justify-center font-black text-[10px] transition-all duration-500 shadow-inner shrink-0 border uppercase",
+                                "h-8 w-8 rounded-[10px] flex items-center justify-center font-black text-[10px] transition-all duration-300 shadow-inner shrink-0 border uppercase",
                                 item.stock_quantity <= item.min_stock
                                     ? "bg-rose-500/10 text-rose-500 border-rose-500/20 shadow-rose-500/5"
                                     : "bg-[var(--foreground)]/5 text-[var(--deep-contrast)]/60 border-[var(--foreground)]/10"
@@ -232,8 +233,19 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                 ))}
             </div>
 
+            {filteredItems.length > visibleCount && (
+                <div className="flex justify-center py-4">
+                    <button
+                        onClick={() => setVisibleCount(prev => prev + 50)}
+                        className="px-4 py-2 rounded-xl bg-[var(--foreground)]/5 text-[10px] font-black uppercase tracking-wider hover:bg-[var(--foreground)]/10 transition-all"
+                    >
+                        Load More ({filteredItems.length - visibleCount} remaining)
+                    </button>
+                </div>
+            )}
+
             {(loading || isContextLoading) ? (
-                <div className="flex flex-col items-center justify-center py-32 animate-in fade-in zoom-in duration-500">
+                <div className="flex flex-col items-center justify-center py-32 animate-in fade-in zoom-in duration-300">
                     <LoadingSpinner size="lg" label="Synchronizing Inventory..." />
                     <p className="text-[8px] font-black text-[var(--foreground)]/20 uppercase tracking-[0.3em] mt-2">Checking your secure vault</p>
                 </div>

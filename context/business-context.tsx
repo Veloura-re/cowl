@@ -43,8 +43,8 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
     const supabase = createClient()
     const router = useRouter()
 
-    const fetchBusinesses = async () => {
-        setIsLoading(true)
+    const fetchBusinesses = async (silent = false) => {
+        if (!silent) setIsLoading(true)
         console.log('BusinessContext: Fetching session...')
         const { data: { session }, error: sessionError } = await supabase.auth.getSession()
 
@@ -58,7 +58,7 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
             if (path.startsWith('/dashboard') || path === '/onboarding') {
                 router.replace('/login')
             }
-            setIsLoading(false)
+            if (!silent) setIsLoading(false)
             return
         }
 
@@ -67,7 +67,7 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
         if (path === '/login' || path === '/register') {
             console.log('BusinessContext: Logged in user on auth page, redirecting to dashboard')
             router.replace('/dashboard')
-            setIsLoading(false)
+            if (!silent) setIsLoading(false)
             return
         }
 
@@ -86,13 +86,18 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
                 ...b,
                 isOwner: b.owner_id === session.user.id
             }))
-            setBusinesses(formattedBusinesses)
+
+            // Only update state if data actually changed to avoid re-renders
+            setBusinesses(prev => {
+                const isSame = JSON.stringify(prev) === JSON.stringify(formattedBusinesses)
+                return isSame ? prev : formattedBusinesses
+            })
 
             // If user has no businesses, redirect to onboarding
             if (data.length === 0 && window.location.pathname !== '/onboarding') {
                 console.log('BusinessContext: No businesses found, redirecting to onboarding')
                 router.replace('/onboarding')
-                setIsLoading(false)
+                if (!silent) setIsLoading(false)
                 return
             }
 
@@ -100,23 +105,21 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
             const savedId = localStorage.getItem('activeBusinessId')
             if (savedId && data.find(b => b.id === savedId)) {
                 setActiveBusinessIdState(savedId)
-                console.log('BusinessContext: Restored active business', savedId)
-            } else if (data.length > 0) {
+            } else if (data.length > 0 && !activeBusinessId) { // Only set default if none selected
                 setActiveBusinessIdState(data[0].id)
-                console.log('BusinessContext: Set default active business', data[0].id)
             }
         }
-        setIsLoading(false)
+        if (!silent) setIsLoading(false)
     }
 
     useEffect(() => {
-        // Init businesses
+        // Init businesses - forceful first load
         fetchBusinesses()
 
-        // Sync on focus (good for PWA/Mobile when resuming)
+        // Sync on focus - silent load
         const handleFocus = () => {
-            console.log('BusinessContext: App focused, refreshing...')
-            fetchBusinesses()
+            console.log('BusinessContext: App focused, refreshing silently...')
+            fetchBusinesses(true) // Silent is true
         }
         window.addEventListener('focus', handleFocus)
 

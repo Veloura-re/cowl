@@ -217,7 +217,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 1.02, y: -4 }}
                             transition={{
-                                duration: 0.25,
+                                duration: 0.15,
                                 ease: [0.23, 1, 0.32, 1]
                             }}
                             className="mx-auto max-w-7xl"

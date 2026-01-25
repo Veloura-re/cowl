@@ -59,6 +59,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
     const [isSortPickerOpen, setIsSortPickerOpen] = useState(false)
     const [isFilterPickerOpen, setIsFilterPickerOpen] = useState(false)
     const [loading, setLoading] = useState(!initialInvoices)
+    const [visibleCount, setVisibleCount] = useState(50)
     const [isPreviewOpen, setIsPreviewOpen] = useState(false)
     const [previewData, setPreviewData] = useState<InvoiceData | null>(null)
 
@@ -144,7 +145,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
     })
 
     return (
-        <div className="space-y-4 animate-in fade-in duration-500 pb-20">
+        <div className="space-y-4 animate-in fade-in duration-300 pb-20">
             {/* Header - Compact */}
             <div className="flex flex-col gap-3 pb-3 border-b border-[var(--primary-green)]/10">
                 <div className="flex items-center justify-between">
@@ -160,7 +161,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                         onClick={() => router.push('/dashboard/purchases/new')}
                         className="flex items-center justify-center rounded-xl bg-[var(--primary-green)] px-4 py-2 text-[11px] font-black uppercase tracking-wider text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] transition-all shadow-xl shadow-[var(--primary-green)]/20 active:scale-95 border border-[var(--primary-foreground)]/10 group"
                     >
-                        <Plus className="mr-1.5 h-3.5 w-3.5 transition-transform group-hover:rotate-90 duration-500" />
+                        <Plus className="mr-1.5 h-3.5 w-3.5 transition-transform group-hover:rotate-90 duration-300" />
                         <span>New Bill</span>
                     </motion.button>
                 </div>
@@ -278,22 +279,22 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
 
             {/* Grid - Ultra Compact Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                {filteredPurchases.map((inv: any) => (
+                {filteredPurchases.slice(0, visibleCount).map((inv: any) => (
                     <div
                         key={inv.id}
                         onClick={() => handleEdit(inv)}
-                        className="group relative flex flex-col glass rounded-[14px] border border-[var(--foreground)]/10 p-2 hover:bg-[var(--foreground)]/10 transition-all duration-500 cursor-pointer overflow-hidden"
+                        className="group relative flex flex-col glass-optimized rounded-[14px] border border-[var(--foreground)]/10 p-2 hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer overflow-hidden"
                     >
                         {/* Status Indicator Stripe */}
                         <div className={clsx(
-                            "absolute top-0 left-0 w-[3px] h-full transition-colors duration-500",
+                            "absolute top-0 left-0 w-[3px] h-full transition-colors duration-300",
                             inv.status === 'PAID' ? "bg-emerald-500" : "bg-rose-500"
                         )} />
 
                         {/* Identity & Status Header */}
                         <div className="flex items-center gap-2">
                             <div className={clsx(
-                                "h-8 w-8 rounded-[10px] flex items-center justify-center font-black text-[10px] transition-all duration-500 shadow-inner shrink-0 border uppercase",
+                                "h-8 w-8 rounded-[10px] flex items-center justify-center font-black text-[10px] transition-all duration-300 shadow-inner shrink-0 border uppercase",
                                 inv.status === 'UNPAID'
                                     ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
                                     : "bg-[var(--foreground)]/5 text-[var(--deep-contrast)]/60 border-[var(--foreground)]/10"
@@ -358,13 +359,24 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                 ))}
             </div>
 
+            {filteredPurchases.length > visibleCount && (
+                <div className="flex justify-center py-4">
+                    <button
+                        onClick={() => setVisibleCount(prev => prev + 50)}
+                        className="px-4 py-2 rounded-xl bg-[var(--foreground)]/5 text-[10px] font-black uppercase tracking-wider hover:bg-[var(--foreground)]/10 transition-all"
+                    >
+                        Load More ({filteredPurchases.length - visibleCount} remaining)
+                    </button>
+                </div>
+            )}
+
             {loading ? (
                 <div className="py-20 flex flex-col items-center justify-center">
                     <LoadingSpinner label="Fetching Bills..." />
                     <p className="text-[8px] font-bold text-[var(--foreground)]/20 uppercase tracking-[0.3em] mt-3">Accessing Ledger Archives</p>
                 </div>
             ) : filteredPurchases.length === 0 && (
-                <div className="text-center py-24 opacity-30 animate-in fade-in duration-700">
+                <div className="text-center py-24 opacity-30 animate-in fade-in duration-300">
                     <ShoppingCart className="h-10 w-10 mx-auto mb-3 opacity-20" />
                     <p className="text-[10px] font-bold uppercase tracking-wider">No bills found</p>
                     <p className="text-[8px] font-bold uppercase tracking-widest mt-1 opacity-50">Record a purchase to update your inventory</p>

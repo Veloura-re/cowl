@@ -28,39 +28,23 @@ export default function DashboardPage() {
         async function fetchDashboardData() {
             setLoading(true);
             try {
-                // 1. Parallel fetch all core stats with error resilience
+                // 1. Optimized RPC Call - Single Round Trip
+                const { data: stats, error } = await supabase.rpc('get_dashboard_stats', {
+                    p_business_id: activeBusinessId
+                });
+
+                if (error) throw error;
+
+                // 2. Fetch Recent Activity (Invoices/Transactions) - Keep separate for now or could be better
+                // Actually, let's keep the activity separate for flexibility, but usage of RPC for heavy stats is key.
                 const results = await Promise.all([
-                    supabase.from('invoices').select('total_amount').eq('business_id', activeBusinessId).eq('type', 'SALE'),
-                    supabase.from('parties').select('*', { count: 'exact', head: true }).eq('business_id', activeBusinessId),
-                    supabase.from('items').select('stock_quantity, min_stock').eq('business_id', activeBusinessId),
-                    supabase.from('invoices').select('*', { count: 'exact', head: true }).eq('business_id', activeBusinessId).eq('status', 'UNPAID'),
-                    supabase.from('invoices').select('total_amount').eq('business_id', activeBusinessId).eq('type', 'PURCHASE'),
-                    supabase.from('transactions').select('amount').eq('business_id', activeBusinessId).eq('type', 'PAYMENT'),
                     supabase.from('invoices').select('id, type, total_amount, created_at, party:parties(name)').eq('business_id', activeBusinessId).order('created_at', { ascending: false }).limit(5),
                     supabase.from('transactions').select('id, type, amount, created_at, party:parties(name)').eq('business_id', activeBusinessId).order('created_at', { ascending: false }).limit(5)
                 ]);
 
-                // Log any query errors
-                results.forEach((r, idx) => {
-                    if (r.error) console.error(`Dashboard Query ${idx} failed:`, r.error);
-                });
-
-                const [salesRes, partiesRes, stockRes, pendingRes, purchasesRes, paymentsRes, latestInvRes, latestTxRes] = results;
-
-                const salesData = salesRes.data || [];
-                const partiesCount = partiesRes.count || 0;
-                const stockData = stockRes.data || [];
-                const pendingCount = pendingRes.count || 0;
-                const purchasesData = purchasesRes.data || [];
-                const paymentsData = paymentsRes.data || [];
+                const [latestInvRes, latestTxRes] = results;
                 const latestInv = latestInvRes.data || [];
                 const latestTx = latestTxRes.data || [];
-
-                const revenue = salesData.reduce((sum, s) => sum + Number(s.total_amount), 0);
-                const totalStock = stockData.reduce((sum, i) => sum + Number(i.stock_quantity), 0);
-                const lowStockCount = stockData.filter(i => Number(i.stock_quantity) <= Number((i as any).min_stock)).length;
-                const totalExpenses = purchasesData.reduce((sum, p) => sum + Number(p.total_amount), 0) +
-                    paymentsData.reduce((sum, p) => sum + Number(p.amount), 0);
 
                 // Combine activities
                 const combined = [
@@ -84,13 +68,15 @@ export default function DashboardPage() {
                     }))
                 ].sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 5);
 
+                const s = stats as any;
+
                 setData({
-                    revenue,
-                    parties: partiesCount,
-                    stock: totalStock,
-                    pending: pendingCount,
-                    totalExpenses,
-                    lowStockCount,
+                    revenue: s.revenue || 0,
+                    parties: s.parties || 0,
+                    stock: s.stock || 0,
+                    pending: s.pending || 0,
+                    totalExpenses: s.totalExpenses || 0,
+                    lowStockCount: s.lowStockCount || 0,
                     activities: combined.map(act => ({
                         ...act,
                         time: act.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -125,7 +111,7 @@ export default function DashboardPage() {
     );
 
     return (
-        <div className="space-y-4 animate-in fade-in duration-500 pb-20">
+        <div className="space-y-4 animate-in fade-in duration-300 pb-20">
             {/* Dashboard Header - Compact */}
             <div className="flex items-center justify-between pb-3 border-b border-[var(--primary-green)]/10">
                 <div>
@@ -195,7 +181,7 @@ export default function DashboardPage() {
                 </div>
 
                 <div className={clsx(
-                    "flex-1 glass p-2.5 rounded-[20px] border border-[var(--foreground)]/10 transition-all duration-500",
+                    "flex-1 glass p-2.5 rounded-[20px] border border-[var(--foreground)]/10 transition-all duration-300",
                     data.totalExpenses > 10000 && "critical-glow-red" // Glow if expenses are high
                 )}>
                     <div className="flex justify-between items-center">
@@ -209,7 +195,7 @@ export default function DashboardPage() {
                 </div>
 
                 <div className={clsx(
-                    "flex-1 glass p-2.5 rounded-[20px] border border-[var(--foreground)]/10 transition-all duration-500",
+                    "flex-1 glass p-2.5 rounded-[20px] border border-[var(--foreground)]/10 transition-all duration-300",
                     data.lowStockCount > 0 && "critical-glow-red"
                 )}>
                     <div className="flex justify-between items-center">

@@ -22,6 +22,7 @@ export default function PartiesClientView() {
     const [confirmModal, setConfirmModal] = useState<{ open: boolean, partyId: string }>({ open: false, partyId: '' })
     const [isDeleting, setIsDeleting] = useState(false)
     const [typeFilter, setTypeFilter] = useState<'ALL' | 'CUSTOMER' | 'SUPPLIER'>('ALL')
+    const [visibleCount, setVisibleCount] = useState(50)
     const [feedbackModal, setFeedbackModal] = useState<{ open: boolean, message: string, variant: 'success' | 'error' }>({ open: false, message: '', variant: 'success' })
     const router = useRouter()
     const supabase = createClient()
@@ -92,7 +93,7 @@ export default function PartiesClientView() {
                         onClick={() => setIsCreateModalOpen(true)}
                         className="flex items-center justify-center rounded-xl bg-[var(--primary-green)] px-4 py-2 text-[11px] font-black uppercase tracking-wider text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] transition-all shadow-xl shadow-[var(--primary-green)]/20 active:scale-95 border border-[var(--primary-foreground)]/10 group"
                     >
-                        <Plus className="mr-1.5 h-3.5 w-3.5 transition-transform group-hover:rotate-90 duration-500" />
+                        <Plus className="mr-1.5 h-3.5 w-3.5 transition-transform group-hover:rotate-90 duration-300" />
                         Add Party
                     </motion.button>
                 </div>
@@ -156,27 +157,25 @@ export default function PartiesClientView() {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5">
-                {filteredParties.map((party) => (
-                    <motion.div
+                {filteredParties.slice(0, visibleCount).map((party) => (
+                    <div
                         key={party.id}
-                        whileHover={{ scale: 1.02, translateY: -2 }}
-                        whileTap={{ scale: 0.98 }}
                         onClick={(e: React.MouseEvent) => handleEdit(e, party)}
                         className={clsx(
-                            "glass p-2 rounded-[14px] group hover:bg-[var(--foreground)]/10 transition-all duration-300 border border-[var(--foreground)]/10 cursor-pointer relative overflow-hidden flex flex-col justify-between min-h-[70px]",
+                            "glass-optimized p-2 rounded-[14px] group hover:bg-[var(--foreground)]/10 transition-all duration-300 border border-[var(--foreground)]/10 cursor-pointer relative overflow-hidden flex flex-col justify-between min-h-[70px]",
                             party.opening_balance < -5000 && "critical-glow-red" // Glow if debt is high
                         )}
                     >
                         {/* Status Indicator Stripe */}
                         <div className={clsx(
-                            "absolute top-0 left-0 w-[3px] h-full transition-colors duration-500",
+                            "absolute top-0 left-0 w-[3px] h-full transition-colors duration-300",
                             party.opening_balance >= 0 ? "bg-emerald-500" : "bg-rose-500"
                         )} />
 
                         {/* Identity & Status Header */}
                         <div className="flex items-center gap-2">
                             <div className={clsx(
-                                "h-8 w-8 rounded-[10px] flex items-center justify-center font-black text-[10px] transition-all duration-500 shadow-inner shrink-0 border uppercase",
+                                "h-8 w-8 rounded-[10px] flex items-center justify-center font-black text-[10px] transition-all duration-300 shadow-inner shrink-0 border uppercase",
                                 party.opening_balance < -5000
                                     ? "bg-rose-500/10 text-rose-500 border-rose-500/20 shadow-rose-500/5"
                                     : "bg-[var(--foreground)]/5 text-[var(--deep-contrast)]/60 border-[var(--foreground)]/10"
@@ -245,9 +244,20 @@ export default function PartiesClientView() {
                             <Phone size={10} />
                             <span className="text-[9px] font-bold">{party.phone || 'No contact'}</span>
                         </div>
-                    </motion.div>
+                    </div>
                 ))}
             </div>
+
+            {filteredParties.length > visibleCount && (
+                <div className="flex justify-center py-4">
+                    <button
+                        onClick={() => setVisibleCount(prev => prev + 50)}
+                        className="px-4 py-2 rounded-xl bg-[var(--foreground)]/5 text-[10px] font-black uppercase tracking-wider hover:bg-[var(--foreground)]/10 transition-all"
+                    >
+                        Load More ({filteredParties.length - visibleCount} remaining)
+                    </button>
+                </div>
+            )}
 
             {loading ? (
                 <div className="py-20 flex flex-col items-center justify-center">
@@ -255,7 +265,7 @@ export default function PartiesClientView() {
                     <p className="text-[8px] font-bold text-[var(--foreground)]/20 uppercase tracking-[0.3em] mt-3">Accessing Secure Vault</p>
                 </div>
             ) : filteredParties.length === 0 ? (
-                <div className="text-center py-24 opacity-30 animate-in fade-in duration-700">
+                <div className="text-center py-24 opacity-30 animate-in fade-in duration-300">
                     <UserIcon className="h-10 w-10 mx-auto mb-3 opacity-20" />
                     <p className="text-[10px] font-bold uppercase tracking-wider">No contacts found</p>
                     <p className="text-[8px] font-bold uppercase tracking-widest mt-1 opacity-50">Add a customer or supplier to get started</p>
