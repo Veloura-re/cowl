@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Building, Lock, Loader2, Globe, Shield, Bell, ChevronDown, LogOut, User, Wallet, X, Users, ChevronRight, Moon, Sparkles, Building2, UserPlus, Plus, Save } from 'lucide-react'
+import { Building, Lock, Loader2, Globe, Shield, Bell, ChevronDown, LogOut, User, Wallet, X, Users, ChevronRight, Moon, Sparkles, Building2, UserPlus, Plus, Save, Database, Upload, Download, Key } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { currencies } from '@/lib/currencies'
 import Link from 'next/link'
@@ -15,6 +15,7 @@ import FeedbackModal from '@/components/ui/FeedbackModal'
 import ConfirmModal from '@/components/ui/ConfirmModal'
 import ChangePasswordModal from '@/components/ui/ChangePasswordModal'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
+import { exportBusinessData, importBusinessData } from '@/utils/backup-service'
 
 export default function SettingsPage() {
     const supabase = createClient()
@@ -49,6 +50,8 @@ export default function SettingsPage() {
         notify_team: true
     })
     const [updatingNotif, setUpdatingNotif] = useState<string | null>(null)
+    const [isBackupLoading, setIsBackupLoading] = useState(false)
+    const [isRestoring, setIsRestoring] = useState(false)
 
     const { activeBusinessId, businesses, setActiveBusinessId, refreshBusinesses } = useBusiness()
 
@@ -241,6 +244,41 @@ export default function SettingsPage() {
         }
     }
 
+    const handleBackup = async () => {
+        if (!activeBusinessId) return
+        setIsBackupLoading(true)
+        try {
+            await exportBusinessData(supabase, activeBusinessId)
+            setFeedbackModal({ open: true, message: 'Backup downloaded successfully.', variant: 'success' })
+        } catch (error: any) {
+            setFeedbackModal({ open: true, message: 'Backup failed: ' + error.message, variant: 'error' })
+        } finally {
+            setIsBackupLoading(false)
+        }
+    }
+
+    const handleRestore = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file || !activeBusinessId) return
+
+        setIsRestoring(true)
+        try {
+            const success = await importBusinessData(supabase, file, activeBusinessId)
+            if (success) {
+                setFeedbackModal({ open: true, message: 'Data restored successfully! Refreshing...', variant: 'success' })
+                setTimeout(() => {
+                    window.location.reload()
+                }, 1500)
+            }
+        } catch (error: any) {
+            setFeedbackModal({ open: true, message: 'Restore failed: ' + error.message, variant: 'error' })
+        } finally {
+            setIsRestoring(false)
+            // Reset input
+            e.target.value = ''
+        }
+    }
+
     if (loading) {
         return (
             <div className="flex items-center justify-center p-24 text-[var(--foreground)]/20">
@@ -249,321 +287,299 @@ export default function SettingsPage() {
         )
     }
 
+    /**
+     * Reusable Card Component for Bento Grid
+     */
+    const BentoCard = ({ children, className, title, icon: Icon, subtitle, action }: any) => (
+        <div className={clsx("glass rounded-[24px] border border-[var(--foreground)]/10 overflow-hidden shadow-lg flex flex-col", className)}>
+            {(title || Icon) && (
+                <div className="px-4 py-3 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/3 flex items-center justify-between min-h-[50px]">
+                    <div className="flex items-center gap-2.5">
+                        {Icon && (
+                            <div className="h-7 w-7 rounded-lg bg-[var(--foreground)]/5 text-[var(--deep-contrast)] flex items-center justify-center shadow-inner">
+                                <Icon className="h-3.5 w-3.5" />
+                            </div>
+                        )}
+                        <div>
+                            {title && <h3 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">{title}</h3>}
+                            {subtitle && <p className="text-[7px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">{subtitle}</p>}
+                        </div>
+                    </div>
+                    {action && <div>{action}</div>}
+                </div>
+            )}
+            <div className="p-4 flex-1">
+                {children}
+            </div>
+        </div>
+    )
+
     return (
-        <div className="space-y-4 pb-20 max-w-2xl mx-auto animate-in fade-in duration-500">
-            <div className="pb-3 border-b border-[var(--primary-green)]/10">
-                <h1 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight">Configuration</h1>
-                <p className="text-[10px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.2em] leading-none mt-1">Platform Control Center</p>
+        <div className="space-y-4 pb-20 max-w-[1400px] mx-auto animate-in fade-in duration-500">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-[var(--primary-green)]/10">
+                <div>
+                    <h1 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight">System Control</h1>
+                    <p className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.2em] leading-none mt-1">Registry Configuration</p>
+                </div>
+                <div className="flex gap-2">
+                    <button
+                        onClick={handleSave}
+                        disabled={saving}
+                        className="flex items-center gap-2 px-5 py-2 rounded-xl bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] font-black text-[9px] uppercase tracking-[0.2em] hover:bg-[var(--deep-contrast-hover)] transition-all shadow-xl active:scale-95 disabled:opacity-50"
+                    >
+                        {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                        Save All
+                    </button>
+                    <button
+                        onClick={handleSignOut}
+                        className="h-9 px-4 rounded-xl bg-orange-500/10 text-orange-500 border border-orange-500/20 hover:bg-orange-500 hover:text-white transition-all active:scale-95 flex items-center gap-2"
+                        title="Sign Out"
+                    >
+                        <LogOut className="h-3.5 w-3.5" />
+                        <span className="text-[9px] font-black uppercase tracking-widest hidden sm:inline">Logout</span>
+                    </button>
+                </div>
             </div>
 
-            <div className="grid gap-3">
-                {/* Interface Control */}
-                <div className="glass rounded-[24px] border border-[var(--foreground)]/10 overflow-hidden shadow-lg">
-                    <div className="px-5 py-3.5 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-xl bg-[var(--foreground)]/5 text-[var(--deep-contrast)] flex items-center justify-center shadow-inner">
-                                <Sparkles className="h-4 w-4" />
-                            </div>
-                            <div>
-                                <h3 className="text-[11px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">Interface</h3>
-                                <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">App Theme Logic</p>
-                            </div>
-                        </div>
-                        <ThemeToggle />
-                    </div>
-                </div>
+            {/* BENTO GRID LAYOUT */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 
-                {/* Account Metadata */}
-                <div className="glass rounded-[24px] border border-[var(--foreground)]/10 overflow-hidden shadow-lg">
-                    <div className="px-5 py-3.5 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-xl bg-[var(--primary-green)]/10 text-[var(--primary-green)] flex items-center justify-center shadow-inner">
-                                <User className="h-4 w-4" />
-                            </div>
-                            <div>
-                                <h3 className="text-[11px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">Personal Identity</h3>
-                                <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Account Master Data</p>
-                            </div>
-                        </div>
-                        <span className="text-[8px] font-black text-[var(--foreground)]/20 uppercase tracking-[0.3em]">SECURE ACCESS</span>
-                    </div>
-
-                    <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Identity Label</label>
-                            <input
-                                type="text"
-                                value={formData.fullName}
-                                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                                className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner"
-                                placeholder="Full Name"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Universal Handle</label>
-                            <div className="relative">
-                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--foreground)]/20 font-black text-[11px]">@</span>
-                                <input
-                                    type="text"
-                                    value={formData.username}
-                                    onChange={(e) => setFormData({ ...formData, username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '') })}
-                                    className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 pl-9 pr-4 text-[11px] font-black text-[var(--primary-green)] focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner"
-                                    placeholder="handle"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Organization Data */}
-                <div className="glass rounded-[24px] border border-[var(--foreground)]/10 overflow-hidden shadow-lg">
-                    <div className="px-5 py-3.5 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-xl bg-[var(--primary-green)] text-[var(--primary-foreground)] flex items-center justify-center shadow-lg shadow-[var(--primary-green)]/20">
-                                <Building2 className="h-4 w-4" />
-                            </div>
-                            <div>
-                                <h3 className="text-[11px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">Organization Profile</h3>
-                                <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Enterprise Registry</p>
-                            </div>
-                        </div>
+                {/* 1. ORGANIZATION (Wide Main) */}
+                <BentoCard
+                    title="Active Registry"
+                    subtitle="Organizational Master Data"
+                    icon={Building2}
+                    className="md:col-span-2 md:row-span-2"
+                    action={
                         <div className="flex items-center gap-2">
-                            <button
-                                onClick={() => setIsSwitcherOpen(true)}
-                                className="px-3 py-1.5 rounded-xl bg-[var(--foreground)]/10 border border-[var(--foreground)]/5 text-[9px] font-black uppercase tracking-widest text-[var(--deep-contrast)] hover:bg-[var(--foreground)]/20 transition-all active:scale-95 shadow-sm"
-                            >
-                                SWITCH
-                            </button>
-                            <button
-                                onClick={() => setIsCreateModalOpen(true)}
-                                className="h-8 w-8 flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] text-[var(--primary-foreground)] shadow-xl shadow-[var(--deep-contrast)]/20 active:scale-95 transition-all hover:bg-[var(--primary-green)]"
-                            >
-                                <Plus className="h-4 w-4" />
-                            </button>
+                            <button onClick={() => setIsSwitcherOpen(true)} className="px-2 py-1 rounded-lg bg-[var(--foreground)]/10 text-[8px] font-black uppercase tracking-wider hover:bg-[var(--foreground)]/20 transition-all">Switch</button>
+                            <button onClick={() => setIsCreateModalOpen(true)} className="h-6 w-6 rounded-lg bg-[var(--primary-green)] text-white flex items-center justify-center hover:bg-[var(--primary-hover)]"><Plus size={12} /></button>
                         </div>
-                    </div>
-
-                    <div className="p-5 space-y-5">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="md:col-span-2">
-                                <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Entity Label</label>
+                    }
+                >
+                    <div className="space-y-4 h-full flex flex-col">
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="col-span-2">
+                                <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1.5 ml-1">Entity Name</label>
                                 <input
                                     type="text"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner"
+                                    className="w-full h-9 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[10px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all"
                                 />
                             </div>
                             <div>
-                                <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Registry Phone</label>
+                                <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1.5 ml-1">Phone</label>
                                 <input
                                     type="text"
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                    className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner"
+                                    className="w-full h-9 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[10px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all"
                                 />
                             </div>
                             <div>
-                                <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1 flex items-center gap-2">
-                                    <Globe className="h-2.5 w-2.5" /> Fiscal Currency
-                                </label>
+                                <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1.5 ml-1 flex items-center gap-1"><Globe size={10} /> Currency</label>
                                 <button
                                     type="button"
                                     onClick={() => setIsCurrencyPickerOpen(true)}
-                                    className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-black text-[var(--deep-contrast)] hover:border-[var(--primary-green)] transition-all flex items-center justify-between shadow-inner"
+                                    className="w-full h-9 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[10px] font-black text-[var(--deep-contrast)] hover:border-[var(--primary-green)] transition-all flex items-center justify-between"
                                 >
-                                    <span className="truncate">
-                                        {currencies.find(c => c.code === formData.currency)?.symbol} - {formData.currency}
-                                    </span>
-                                    <ChevronDown className="h-3.5 w-3.5 opacity-20" />
+                                    <span className="truncate">{currencies.find(c => c.code === formData.currency)?.symbol} - {formData.currency}</span>
+                                    <ChevronDown className="h-3 w-3 opacity-30" />
                                 </button>
                             </div>
                         </div>
-
-                        <div>
-                            <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Registry Address</label>
+                        <div className="flex-1 min-h-[80px]">
+                            <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1.5 ml-1">Locus / Address</label>
                             <textarea
                                 value={formData.address}
                                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                className="w-full h-24 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 p-4 text-[11px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner resize-none"
-                                placeholder="Operational locus..."
+                                className="w-full h-full rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 p-3 text-[10px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all resize-none"
                             />
                         </div>
+                    </div>
+                </BentoCard>
 
-                        <div className="flex justify-end pt-3 border-t border-[var(--foreground)]/5">
-                            <button
-                                onClick={handleSave}
-                                disabled={saving}
-                                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[var(--primary-green)] text-[var(--primary-foreground)] font-black text-[10px] uppercase tracking-[0.2em] hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] transition-all shadow-xl shadow-[var(--primary-green)]/20 active:scale-95 disabled:opacity-50"
-                            >
-                                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                                Commit Changes
-                            </button>
+                {/* 2. PERSONAL Identity */}
+                <BentoCard
+                    title="Operator Identity"
+                    subtitle="User Profile"
+                    icon={User}
+                    className="md:col-span-1"
+                >
+                    <div className="space-y-3">
+                        <div>
+                            <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1 ml-1">Full Name</label>
+                            <input
+                                type="text"
+                                value={formData.fullName}
+                                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                                className="w-full h-9 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[10px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1 ml-1">Handle</label>
+                            <div className="relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--foreground)]/20 font-black text-[9px]">@</span>
+                                <input
+                                    type="text"
+                                    value={formData.username}
+                                    onChange={(e) => setFormData({ ...formData, username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '') })}
+                                    className="w-full h-9 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 pl-7 pr-3 text-[10px] font-black text-[var(--primary-green)] focus:border-[var(--primary-green)] focus:outline-none transition-all"
+                                />
+                            </div>
                         </div>
                     </div>
-                </div>
+                </BentoCard>
 
-                {/* Ledger Config */}
-                <div className="glass rounded-[24px] border border-[var(--foreground)]/10 overflow-hidden shadow-lg">
-                    <div className="px-5 py-3.5 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center shadow-inner">
-                                <Wallet className="h-4 w-4" />
-                            </div>
-                            <div>
-                                <h3 className="text-[11px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">Financial Rails</h3>
-                                <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Payment Liquidation Modes</p>
-                            </div>
+                {/* 3. INTERFACE */}
+                <BentoCard
+                    title="Visuals"
+                    subtitle="Theming"
+                    icon={Sparkles}
+                    className="md:col-span-1"
+                >
+                    <div className="flex items-center justify-between h-full">
+                        <div>
+                            <p className="text-[9px] font-black text-[var(--deep-contrast)] uppercase">Mode</p>
+                            <p className="text-[7px] font-black text-[var(--foreground)]/30 uppercase mt-0.5">Toggle Day/Night</p>
                         </div>
-                        <span className="text-[8px] font-black text-[var(--foreground)]/20 uppercase tracking-[0.3em]">REVENUE CHANNELS</span>
+                        <ThemeToggle />
                     </div>
+                </BentoCard>
 
-                    <div className="p-5 space-y-5">
+                {/* 4. FINANCIAL RAILS (Wide) */}
+                <BentoCard
+                    title="Revenue Channels"
+                    subtitle="Payment Modes"
+                    icon={Wallet}
+                    className="md:col-span-2 md:row-span-1"
+                >
+                    <div className="space-y-3">
                         <div className="flex gap-2">
                             <input
                                 type="text"
                                 value={newModeName}
                                 onChange={(e) => setNewModeName(e.target.value.toUpperCase())}
-                                placeholder="E.G. M-PESA, STRIPE..."
-                                className="flex-1 h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner uppercase"
+                                placeholder="NEW CHANNEL..."
+                                className="flex-1 h-9 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[10px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all uppercase"
                                 onKeyDown={(e) => e.key === 'Enter' && handleAddMode()}
                             />
                             <button
                                 onClick={handleAddMode}
                                 disabled={addingMode || !newModeName.trim()}
-                                className="px-6 h-11 rounded-xl bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] font-black text-[10px] uppercase tracking-widest hover:bg-[var(--deep-contrast-hover)] transition-all shadow-xl active:scale-95 disabled:opacity-40"
+                                className="px-4 h-9 rounded-lg bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] font-black text-[8px] uppercase tracking-widest hover:bg-[var(--deep-contrast-hover)] transition-all disabled:opacity-40"
                             >
-                                {addingMode ? <Loader2 className="h-4 w-4 animate-spin" /> : 'REGISTER'}
+                                {addingMode ? <Loader2 className="h-3 w-3 animate-spin" /> : 'ADD'}
                             </button>
                         </div>
-
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        <div className="flex flex-wrap gap-2 max-h-[100px] overflow-y-auto custom-scrollbar">
                             {paymentModes.map((mode) => (
-                                <div
-                                    key={mode.id}
-                                    className="group relative flex items-center justify-between px-3 py-2.5 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:border-[var(--primary-green)]/30 transition-all shadow-sm"
-                                >
-                                    <span className="text-[9px] font-black text-[var(--deep-contrast)] uppercase tracking-widest">{mode.name}</span>
-                                    <button
-                                        onClick={() => handleDeleteMode(mode.id)}
-                                        className="h-6 w-6 flex items-center justify-center rounded-lg hover:bg-rose-500/10 text-rose-500 opacity-0 group-hover:opacity-100 transition-all active:scale-90"
-                                    >
-                                        <X className="h-3.5 w-3.5" />
-                                    </button>
+                                <div key={mode.id} className="group flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:border-[var(--primary-green)]/30 transition-all">
+                                    <span className="text-[8px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">{mode.name}</span>
+                                    <button onClick={() => handleDeleteMode(mode.id)} className="text-rose-500 opacity-0 group-hover:opacity-100 transition-all hover:scale-125"><X size={10} /></button>
                                 </div>
                             ))}
                         </div>
                     </div>
-                </div>
+                </BentoCard>
 
-                {/* Secure Access Control */}
-                <div className="glass rounded-[24px] border border-[var(--foreground)]/10 overflow-hidden shadow-lg">
-                    <div className="px-5 py-3.5 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-xl bg-orange-600 text-white flex items-center justify-center shadow-lg shadow-orange-600/20">
-                                <Lock className="h-4 w-4" />
-                            </div>
-                            <div>
-                                <h3 className="text-[11px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">Secure Access</h3>
-                                <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Authorization Controls</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="p-5 space-y-3">
-                        <div className="flex items-center justify-between p-4 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/5 hover:border-[var(--primary-green)]/20 transition-all cursor-pointer group" onClick={() => setIsChangePasswordModalOpen(true)}>
-                            <div className="flex items-center gap-3">
-                                <Shield className="h-5 w-5 text-orange-600/40 group-hover:text-orange-600 transition-colors" />
-                                <div>
-                                    <p className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">Cryptographic Key</p>
-                                    <p className="text-[8px] font-black text-[var(--foreground)]/30 uppercase tracking-widest mt-0.5">Mandatory security cycle</p>
-                                </div>
-                            </div>
-                            <ChevronRight className="h-4 w-4 text-[var(--foreground)]/20 group-hover:text-[var(--deep-contrast)] transition-all" />
-                        </div>
-
-                        <div className="flex gap-2">
-                            <Link
-                                href="/dashboard/settings/team"
-                                className="flex-1 flex items-center justify-between p-4 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/5 hover:border-blue-500/20 transition-all group"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <Users className="h-5 w-5 text-blue-500/40 group-hover:text-blue-500 transition-colors" />
-                                    <div>
-                                        <p className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">Network Consortium</p>
-                                        <p className="text-[8px] font-black text-[var(--foreground)]/30 uppercase tracking-widest mt-0.5">Collaborative access</p>
-                                    </div>
-                                </div>
-                                <ChevronRight className="h-4 w-4 text-[var(--foreground)]/20 group-hover:text-[var(--deep-contrast)] transition-all" />
-                            </Link>
+                {/* 5. NOTIFICATIONS */}
+                <BentoCard
+                    title="Signal Matrix"
+                    subtitle="Notification Routing"
+                    icon={Bell}
+                    className="md:col-span-2 md:row-span-1"
+                >
+                    <div className="grid grid-cols-2 gap-2">
+                        {[
+                            { id: 'notify_sales', label: 'Inbound' },
+                            { id: 'notify_purchases', label: 'Outbound' },
+                            { id: 'notify_stock', label: 'Inventory' },
+                            { id: 'notify_team', label: 'Network' },
+                        ].map((item) => (
                             <button
-                                onClick={() => setIsAddTeamModalOpen(true)}
-                                className="w-14 rounded-2xl bg-blue-500 text-white shadow-xl shadow-blue-500/20 hover:bg-blue-600 transition-all active:scale-95 flex items-center justify-center"
-                                title="Invite New Node"
+                                key={item.id}
+                                onClick={() => handleUpdateNotifSetting(item.id as any, !notifSettings[item.id as keyof typeof notifSettings])}
+                                className={clsx(
+                                    "flex items-center justify-between px-3 py-2 rounded-lg border transition-all active:scale-95 group",
+                                    notifSettings[item.id as keyof typeof notifSettings]
+                                        ? "bg-[var(--primary-green)]/5 border-[var(--primary-green)]/20"
+                                        : "bg-[var(--foreground)]/2 border-[var(--foreground)]/5 hover:bg-[var(--foreground)]/5"
+                                )}
                             >
-                                <UserPlus className="h-6 w-6" />
+                                <span className={clsx("text-[8px] font-black uppercase tracking-widest", notifSettings[item.id as keyof typeof notifSettings] ? "text-[var(--primary-green)]" : "text-[var(--foreground)]/50")}>{item.label}</span>
+                                <div className={clsx("h-2 w-2 rounded-full transition-all", notifSettings[item.id as keyof typeof notifSettings] ? "bg-[var(--primary-green)]" : "bg-[var(--foreground)]/10")} />
+                            </button>
+                        ))}
+                    </div>
+                </BentoCard>
+
+                {/* 6. SECURITY */}
+                <BentoCard
+                    title="Protocol Security"
+                    subtitle="Access & Keys"
+                    icon={Shield}
+                    className="md:col-span-1"
+                >
+                    <div className="space-y-2">
+                        <button
+                            onClick={() => setIsChangePasswordModalOpen(true)}
+                            className="w-full flex items-center justify-between p-2.5 rounded-xl bg-orange-500/5 border border-orange-500/10 hover:bg-orange-500/10 transition-all group"
+                        >
+                            <div className="flex items-center gap-2">
+                                <Key className="h-3.5 w-3.5 text-orange-500" />
+                                <span className="text-[9px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">Password</span>
+                            </div>
+                            <ChevronRight size={12} className="opacity-30 group-hover:opacity-100" />
+                        </button>
+                        <Link
+                            href="/dashboard/settings/team"
+                            className="w-full flex items-center justify-between p-2.5 rounded-xl bg-blue-500/5 border border-blue-500/10 hover:bg-blue-500/10 transition-all group"
+                        >
+                            <div className="flex items-center gap-2">
+                                <Users className="h-3.5 w-3.5 text-blue-500" />
+                                <span className="text-[9px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">Team</span>
+                            </div>
+                            <ChevronRight size={12} className="opacity-30 group-hover:opacity-100" />
+                        </Link>
+                    </div>
+                </BentoCard>
+
+                {/* 7. DATA GOVERNANCE */}
+                <BentoCard
+                    title="Governance"
+                    subtitle="Disaster Recovery"
+                    icon={Database}
+                    className="md:col-span-3"
+                >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full items-center">
+                        <div className="flex flex-col gap-2">
+                            <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mb-1">Export</p>
+                            <button
+                                onClick={handleBackup}
+                                disabled={isBackupLoading}
+                                className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-[9px] font-black uppercase tracking-widest text-[var(--deep-contrast)] hover:bg-[var(--foreground)]/10 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+                            >
+                                {isBackupLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Download className="h-3 w-3" />}
+                                Download Snapshot
                             </button>
                         </div>
+                        <div className="flex flex-col gap-2">
+                            <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mb-1">Import</p>
+                            <label className="w-full h-10 rounded-xl bg-[var(--primary-green)]/10 border border-[var(--primary-green)]/20 text-[9px] font-black uppercase tracking-widest text-[var(--primary-green)] hover:bg-[var(--primary-green)] hover:text-[var(--primary-foreground)] transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 relative overflow-hidden">
+                                {isRestoring ? <Loader2 className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
+                                <span>{isRestoring ? 'Restoring...' : 'Upload Backup'}</span>
+                                <input type="file" accept=".json" onChange={handleRestore} disabled={isRestoring} className="hidden" />
+                            </label>
+                        </div>
+                    </div>
+                </BentoCard>
 
-                        <div className="pt-3 border-t border-[var(--foreground)]/5">
-                            <button
-                                onClick={handleSignOut}
-                                className="w-full h-11 flex items-center justify-between px-5 rounded-xl bg-orange-600/5 text-orange-600/40 border border-orange-600/10 hover:bg-orange-600 hover:text-white transition-all active:scale-[0.99] group shadow-inner"
-                            >
-                                <span className="text-[9px] font-black uppercase tracking-[0.3em]">DE-AUTHORIZE SESSION</span>
-                                <LogOut className="h-4 w-4 opacity-40 group-hover:opacity-100 transition-opacity" />
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Alert Configuration */}
-                <div className="glass rounded-[24px] border border-[var(--foreground)]/10 overflow-hidden shadow-lg">
-                    <div className="px-5 py-3.5 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center shadow-inner">
-                                <Bell className="h-4 w-4" />
-                            </div>
-                            <div>
-                                <h3 className="text-[11px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">Signal Matrix</h3>
-                                <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Notification Routing</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="p-5 space-y-4">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            {[
-                                { id: 'notify_sales', label: 'Fiscal Inbound', desc: 'Realtime Sales Data' },
-                                { id: 'notify_purchases', label: 'Fiscal Outbound', desc: 'Registry Expenditures' },
-                                { id: 'notify_stock', label: 'Asset Alert', desc: 'Critical stock levels' },
-                                { id: 'notify_team', label: 'Node Activity', desc: 'Network changes' },
-                            ].map((item) => (
-                                <div key={item.id} className="flex items-center justify-between p-4 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/5 shadow-sm">
-                                    <div className="min-w-0">
-                                        <p className="text-[9px] font-black text-[var(--deep-contrast)] uppercase tracking-widest truncate">{item.label}</p>
-                                        <p className="text-[7px] font-black text-[var(--foreground)]/30 uppercase mt-0.5 truncate">{item.desc}</p>
-                                    </div>
-                                    <button
-                                        onClick={() => handleUpdateNotifSetting(item.id as any, !notifSettings[item.id as keyof typeof notifSettings])}
-                                        disabled={updatingNotif === item.id}
-                                        className={clsx(
-                                            "w-10 h-6 rounded-full p-1 transition-all duration-300 relative shadow-inner",
-                                            notifSettings[item.id as keyof typeof notifSettings] ? "bg-[var(--primary-green)]" : "bg-[var(--foreground)]/10"
-                                        )}
-                                    >
-                                        <div className={clsx(
-                                            "h-4 w-4 rounded-full bg-white shadow-lg transition-all duration-300 transform",
-                                            notifSettings[item.id as keyof typeof notifSettings] ? "translate-x-4" : "translate-x-0"
-                                        )} />
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
             </div>
 
-            {/* Sub-Modals */}
+            {/* Modals */}
             <PickerModal
                 isOpen={isSwitcherOpen}
                 onClose={() => setIsSwitcherOpen(false)}

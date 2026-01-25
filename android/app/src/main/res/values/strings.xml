@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">LUCY-ex</string>
-    <string name="title_activity_main">LUCY-ex</string>
+    <string name="app_name">Claire</string>
+    <string name="title_activity_main">Claire</string>
     <string name="package_name">com.veloura.cowl</string>
     <string name="custom_url_scheme">com.veloura.cowl</string>
 </resources>

@@ -54,7 +54,7 @@ export default function BusinessSwitcherModal({
                             <div className="h-20 w-20 flex items-center justify-center rounded-2xl bg-[var(--foreground)]/5 shadow-inner border border-[var(--foreground)]/10 mb-4 animate-in zoom-in-50 duration-500">
                                 <BrandLogo size="xl" />
                             </div>
-                            <h2 className="text-lg font-black text-[var(--deep-contrast)] tracking-tight uppercase">Lucy-ex</h2>
+                            <h2 className="text-lg font-black text-[var(--deep-contrast)] tracking-tight uppercase">Claire</h2>
                             <p className="text-[10px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.2em] mt-1">Identity Gateway</p>
 
                             <button

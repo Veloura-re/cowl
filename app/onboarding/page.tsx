@@ -94,7 +94,7 @@ export default function OnboardingPage() {
                         <BrandLogo size="lg" />
                     </div>
                     <h2 className="text-2xl font-bold tracking-tight text-[var(--deep-contrast)] uppercase">
-                        Welcome to LUCY-ex
+                        Welcome to Claire
                     </h2>
                     <p className="mt-2 text-xs font-bold text-[var(--foreground)]/50 uppercase tracking-wider">
                         Let's set up your first business

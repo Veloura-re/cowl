@@ -11,12 +11,12 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "LUCY-ex | Business OS",
+  title: "Claire",
   description: "Manage your empire with precision.",
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: "LUCY-ex",
+    title: "Claire",
   },
   manifest: '/manifest.json',
 };

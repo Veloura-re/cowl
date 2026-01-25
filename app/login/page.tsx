@@ -55,7 +55,7 @@ export default function LoginPage() {
                         Welcome Back
                     </h2>
                     <p className="mt-1 text-[10px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.2em]">
-                        Access your LUCY-ex OS
+                        Access your Claire
                     </p>
                 </div>
 

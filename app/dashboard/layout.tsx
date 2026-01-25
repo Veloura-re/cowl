@@ -272,7 +272,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     >
                         <div className="glass p-8 rounded-3xl border border-[var(--foreground)]/10 dark:border-white/50 flex flex-col items-center gap-4">
                             <LoadingSpinner size="lg" label="Processing..." />
-                            <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-[0.3em] animate-pulse">Lucy-ex OS is working</p>
+                            <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-[0.3em] animate-pulse">Claire is working</p>
                         </div>
                     </motion.div>
                 )}

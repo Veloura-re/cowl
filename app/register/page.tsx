@@ -51,7 +51,7 @@ export default function RegisterPage() {
                         Create Account
                     </h2>
                     <p className="mt-1 text-[10px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.2em]">
-                        Start managing with LUCY-ex
+                        Start managing with Claire
                     </p>
                 </div>
 
