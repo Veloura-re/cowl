@@ -44,6 +44,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
     const [isItemModalOpen, setIsItemModalOpen] = useState(false)
     const [isModePickerOpen, setIsModePickerOpen] = useState(false)
     const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null)
+    const [expandedImage, setExpandedImage] = useState<string | null>(null)
 
     // Form State
     const [partyId, setPartyId] = useState('')
@@ -496,7 +497,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                                     <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Sign</label>
                                     <button onClick={() => { }} className="text-[7px] font-black text-rose-500/50 uppercase">Reset</button>
                                 </div>
-                                <div className="rounded-xl border border-dashed border-[var(--primary-green)]/20 bg-white/5 backdrop-blur-sm overflow-hidden h-20">
+                                <div className="rounded-xl border border-dashed border-[var(--primary-green)]/20 bg-[var(--foreground)]/5 backdrop-blur-sm overflow-hidden h-40">
                                     <SignaturePad className="h-full" />
                                 </div>
                             </div>
@@ -507,11 +508,11 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                             <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 mb-3">Evidence</label>
                             <div className="flex flex-wrap gap-2 flex-1 overflow-y-auto custom-scrollbar max-h-[160px]">
                                 {attachments.map((url, i) => (
-                                    <div key={i} className="relative group/attachment h-12 w-12 rounded-lg border border-white/5 overflow-hidden shadow-sm">
+                                    <div key={i} className="relative group/attachment h-12 w-12 rounded-lg border border-white/5 overflow-hidden shadow-sm cursor-pointer" onClick={() => setExpandedImage(url)}>
                                         <img src={url} className="w-full h-full object-cover" />
-                                        <button onClick={() => removeAttachment(i)} className="absolute inset-0 bg-rose-500/80 text-white flex items-center justify-center opacity-0 group-hover/attachment:opacity-100 transition-opacity">
-                                            <X size={12} />
-                                        </button>
+                                        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover/attachment:opacity-100 transition-opacity flex items-center justify-center">
+                                            <Paperclip size={12} className="text-white" />
+                                        </div>
                                     </div>
                                 ))}
                                 <label className="h-12 w-12 rounded-lg border-2 border-dashed border-[var(--foreground)]/10 bg-[var(--foreground)]/2 flex items-center justify-center cursor-pointer hover:border-[var(--primary-green)]/30 transition-all">
@@ -519,6 +520,35 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                                     <input type="file" multiple onChange={handleFileUpload} className="hidden" />
                                 </label>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Image Expansion Lightbox */}
+            {expandedImage && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setExpandedImage(null)}>
+                    <div className="relative max-w-4xl w-full max-h-[90vh] flex flex-col items-center gap-4" onClick={e => e.stopPropagation()}>
+                        <img src={expandedImage} className="w-full h-full object-contain rounded-2xl shadow-2xl" />
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setExpandedImage(null)}
+                                className="h-12 px-6 rounded-2xl bg-white/10 text-white text-[10px] font-black uppercase tracking-widest hover:bg-white/20 transition-all"
+                            >
+                                Close
+                            </button>
+                            <button
+                                onClick={() => {
+                                    const index = attachments.indexOf(expandedImage);
+                                    if (index > -1) removeAttachment(index);
+                                    setExpandedImage(null);
+                                }}
+                                className="h-12 px-6 rounded-2xl bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest hover:bg-rose-600 transition-all shadow-xl shadow-rose-500/20 flex items-center gap-2"
+                            >
+                                <Trash2 size={14} />
+                                Delete Evidence
+                            </button>
                         </div>
                     </div>
                 </div>

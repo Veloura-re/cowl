@@ -24,16 +24,18 @@ export default function Step2AddItems({ items, onNext, onBack }: Step2Props) {
         addItem(itemData)
     }
 
-    const handleQuantityChange = (index: number, quantity: number) => {
+    const handleQuantityChange = (index: number, val: string) => {
+        const quantity = val === '' ? 0 : Number(val)
         const item = data.items[index]
         const amount = quantity * item.rate
-        updateItem(index, { quantity, amount })
+        updateItem(index, { quantity: val as any, amount })
     }
 
-    const handleRateChange = (index: number, rate: number) => {
+    const handleRateChange = (index: number, val: string) => {
+        const rate = val === '' ? 0 : Number(val)
         const item = data.items[index]
         const amount = item.quantity * rate
-        updateItem(index, { rate, amount })
+        updateItem(index, { rate: val as any, amount })
     }
 
     const handleNext = () => {
@@ -103,7 +105,7 @@ export default function Step2AddItems({ items, onNext, onBack }: Step2Props) {
                                                 type="number"
                                                 step="any"
                                                 value={item.quantity}
-                                                onChange={(e) => handleQuantityChange(index, Number(e.target.value))}
+                                                onChange={(e) => handleQuantityChange(index, e.target.value)}
                                                 className="w-full h-11 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/5 px-4 text-[13px] font-black text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] focus:ring-4 focus:ring-[var(--primary-green)]/10 transition-all shadow-inner tabular-nums"
                                             />
                                             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-[var(--foreground)]/20 uppercase tracking-widest">{item.unit}</span>
@@ -116,7 +118,7 @@ export default function Step2AddItems({ items, onNext, onBack }: Step2Props) {
                                                 type="number"
                                                 step="any"
                                                 value={item.rate}
-                                                onChange={(e) => handleRateChange(index, Number(e.target.value))}
+                                                onChange={(e) => handleRateChange(index, e.target.value)}
                                                 className="w-full h-11 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/5 px-4 text-[13px] font-black text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] focus:ring-4 focus:ring-[var(--primary-green)]/10 transition-all shadow-inner tabular-nums"
                                             />
                                             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-[var(--foreground)]/20 uppercase">/ {item.unit}</span>

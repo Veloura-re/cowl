@@ -20,8 +20,8 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
     const { formatCurrency } = useBusiness()
     const [isItemPickerOpen, setIsItemPickerOpen] = useState(false)
     const [selectedItem, setSelectedItem] = useState<any>(null)
-    const [quantity, setQuantity] = useState(1)
-    const [rate, setRate] = useState(0)
+    const [quantity, setQuantity] = useState<number | string>(1)
+    const [rate, setRate] = useState<number | string>('')
     const [errorModal, setErrorModal] = useState<{ open: boolean, message: string }>({ open: false, message: '' })
 
     useEffect(() => {
@@ -33,13 +33,13 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
         } else {
             setSelectedItem(null)
             setQuantity(1)
-            setRate(0)
+            setRate('')
         }
     }, [initialData, isOpen, items])
 
     useEffect(() => {
         if (selectedItem && !initialData) {
-            setRate(selectedItem.selling_price || 0)
+            setRate(selectedItem.selling_price || '')
         }
     }, [selectedItem, initialData])
 
@@ -60,26 +60,28 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
             itemId: selectedItem.id,
             name: selectedItem.name,
             unit: selectedItem.unit || 'PCS',
-            quantity: quantity,
-            rate: rate,
+            quantity: Number(quantity) || 0,
+            rate: Number(rate) || 0,
             purchasePrice: selectedItem.purchase_price || 0,
             tax: selectedItem.tax_rate || 0,
-            amount: quantity * rate
+            amount: (Number(quantity) || 0) * (Number(rate) || 0)
         })
 
         // Reset and Close
         setSelectedItem(null)
         setQuantity(1)
-        setRate(0)
+        setRate('')
         onClose()
     }
 
     if (!isOpen) return null
 
-    const total = quantity * rate
+    const numQty = Number(quantity) || 0
+    const numRate = Number(rate) || 0
+    const total = numQty * numRate
     const purchasePrice = selectedItem?.purchase_price || 0
-    const profitPerUnit = rate - purchasePrice
-    const totalProfit = profitPerUnit * quantity
+    const profitPerUnit = numRate - purchasePrice
+    const totalProfit = profitPerUnit * numQty
     const isLoss = totalProfit < 0
 
     return (
@@ -158,7 +160,7 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                                         required
                                         autoFocus
                                         value={quantity}
-                                        onChange={(e) => setQuantity(Number(e.target.value))}
+                                        onChange={(e) => setQuantity(e.target.value)}
                                         className="w-full h-12 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-5 text-[14px] font-black text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] focus:ring-4 focus:ring-[var(--primary-green)]/10 transition-all shadow-inner tabular-nums"
                                     />
                                 </div>
@@ -170,14 +172,14 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                                         step="any"
                                         required
                                         value={rate}
-                                        onChange={(e) => setRate(Number(e.target.value))}
+                                        onChange={(e) => setRate(e.target.value)}
                                         className="w-full h-12 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-5 text-[14px] font-black text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] focus:ring-4 focus:ring-[var(--primary-green)]/10 transition-all shadow-inner tabular-nums"
                                     />
                                 </div>
                             </div>
 
                             {/* Summary Card */}
-                            <div className="relative overflow-hidden rounded-[24px] bg-[var(--deep-contrast)] p-5 shadow-2xl shadow-[var(--deep-contrast)]/20 border border-white/10">
+                            <div className="relative overflow-hidden rounded-[24px] bg-[var(--deep-contrast)] dark:bg-emerald-950/40 p-5 shadow-2xl shadow-[var(--deep-contrast)]/20 border border-white/10">
                                 <div className="relative z-10 flex flex-col gap-4">
                                     <div className="flex justify-between items-end border-b border-white/5 pb-3">
                                         <div>
@@ -204,7 +206,7 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
 
                                     <div className="flex items-center justify-between text-[8px] font-black uppercase tracking-widest text-white/20">
                                         <span>Unit Cost: {formatCurrency(purchasePrice)}</span>
-                                        <span>Margin: {((totalProfit / total) * 100).toFixed(1)}%</span>
+                                        <span>Margin: {total > 0 ? ((totalProfit / total) * 100).toFixed(1) : 0}%</span>
                                     </div>
                                 </div>
                                 {/* Decorative elements */}
@@ -224,7 +226,7 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                         </button>
                         <button
                             type="submit"
-                            disabled={!selectedItem || !quantity || quantity <= 0}
+                            disabled={!selectedItem || !numQty || numQty <= 0}
                             className="flex-[2] h-12 flex items-center justify-center rounded-2xl bg-[var(--primary-green)] text-white shadow-xl shadow-[var(--primary-green)]/20 text-[10px] font-black uppercase tracking-[0.2em] transition-all active:scale-95 disabled:opacity-50 hover:bg-[var(--primary-hover)] ring-offset-2 focus:ring-2 ring-[var(--primary-green)]"
                         >
                             <Plus className="mr-2 h-4 w-4" />

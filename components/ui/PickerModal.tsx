@@ -95,14 +95,14 @@ export default function PickerModal({
                                         <p className="text-[11px] lg:text-[10px] font-bold tracking-tight leading-tight">{opt.label}</p>
                                         {opt.subLabel && (
                                             <p className={clsx(
-                                                "text-[8px] lg:text-[7px] font-black uppercase tracking-wider leading-none mt-1.5 px-2 py-1 lg:py-0.5 rounded-full inline-block border",
+                                                "text-[8px] lg:text-[7px] font-black uppercase tracking-wider leading-none mt-1.5 px-2 py-1 lg:py-0.5 rounded-full inline-block border transition-all",
                                                 selectedValue === opt.id
                                                     ? "bg-white/20 text-white border-white/20"
                                                     : opt.subLabel === 'OWNER'
-                                                        ? "bg-amber-100/50 text-amber-600 border-amber-200/50"
+                                                        ? "bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/20"
                                                         : opt.subLabel === 'JOINED TEAM'
-                                                            ? "bg-blue-100/50 text-blue-600 border-blue-200/50"
-                                                            : "text-[var(--foreground)]/40 border-transparent"
+                                                            ? "bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 border-blue-500/20"
+                                                            : "text-[var(--foreground)]/40 border-[var(--foreground)]/10 bg-[var(--foreground)]/5"
                                             )}>
                                                 {opt.subLabel}
                                             </p>

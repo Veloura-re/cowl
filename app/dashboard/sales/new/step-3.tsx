@@ -211,8 +211,8 @@ export default function Step3Review({ onNext, onBack }: Step3Props) {
 
                     <div className="glass rounded-[32px] border border-[var(--foreground)]/10 p-6 space-y-4 shadow-2xl">
                         <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/30 ml-1">Client Authentication</label>
-                        <div className="rounded-2xl border border-dashed border-[var(--primary-green)]/30 bg-white/40 dark:bg-white/5 backdrop-blur-sm overflow-hidden relative group">
-                            <SignaturePad className="h-32" />
+                        <div className="rounded-2xl border border-dashed border-[var(--primary-green)]/30 bg-[var(--foreground)]/5 backdrop-blur-sm overflow-hidden relative group">
+                            <SignaturePad className="h-48" />
                             <div className="absolute top-2 right-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <div className="h-1.5 w-1.5 rounded-full bg-[var(--primary-green)] animate-pulse" />
                             </div>

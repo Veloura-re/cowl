@@ -237,11 +237,14 @@ export default function TeamManagementPage() {
                             <div className="flex items-center gap-3">
                                 <div className="text-right">
                                     <div className={clsx(
-                                        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-wider",
-                                        member.role === 'OWNER' ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800" :
-                                            member.role === 'ADMIN' ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800" :
-                                                member.role === 'PARTNER' ? "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800" :
-                                                    "bg-slate-100 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
+                                        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-wider border transition-all",
+                                        member.role === 'OWNER'
+                                            ? "bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/20"
+                                            : member.role === 'ADMIN'
+                                                ? "bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 border-blue-500/20"
+                                                : member.role === 'PARTNER'
+                                                    ? "bg-purple-500/10 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 border-purple-500/20"
+                                                    : "bg-[var(--foreground)]/5 text-[var(--foreground)]/40 border-[var(--foreground)]/10"
                                     )}>
                                         {member.role === 'OWNER' && <ShieldCheck className="h-2.5 w-2.5" />}
                                         {member.role}
