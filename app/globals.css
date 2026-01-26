@@ -88,6 +88,19 @@
   --status-info-border: rgba(59, 130, 246, 0.4);
 }
 
+/* Universal scrollbar hide */
+* {
+  scrollbar-width: none !important;
+  /* Firefox */
+  -ms-overflow-style: none !important;
+  /* IE and Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none !important;
+  /* Chrome, Safari, Opera */
+}
+
 body {
   background-color: var(--background);
   color: var(--foreground);
