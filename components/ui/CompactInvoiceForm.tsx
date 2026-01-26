@@ -318,6 +318,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
             businessName: activeBusiness?.name || 'Business',
             businessAddress: (activeBusiness as any)?.address,
             businessPhone: (activeBusiness as any)?.phone,
+            businessLogoUrl: (activeBusiness as any)?.logo_url,
             partyName: selectedParty?.name || 'Walk-in Customer',
             partyAddress: selectedParty?.address,
             partyPhone: selectedParty?.phone,
@@ -912,13 +913,15 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                     </div>
                                 </div>
 
-                                <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md space-y-2">
+                                <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md space-y-3 bg-gradient-to-br from-transparent to-[var(--primary-green)]/[0.02]">
                                     <div className="flex justify-between items-center">
                                         <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Auth</label>
-                                        <button type="button" onClick={() => sigPadRef.current?.clear()} className="text-[7px] font-black uppercase text-rose-500/50">Reset</button>
+                                        <div className="px-1.5 py-0.5 rounded-full bg-[var(--primary-green)]/10 border border-[var(--primary-green)]/20 text-[6px] font-black text-[var(--primary-green)] uppercase tracking-widest">
+                                            Signature
+                                        </div>
                                     </div>
-                                    <div className="rounded-xl border border-dashed border-[var(--primary-green)]/20 bg-white/5 backdrop-blur-sm overflow-hidden h-48">
-                                        <SignaturePad ref={sigPadRef} className="h-full" />
+                                    <div className="relative group">
+                                        <SignaturePad ref={sigPadRef} className="h-56" />
                                     </div>
                                 </div>
                             </div>

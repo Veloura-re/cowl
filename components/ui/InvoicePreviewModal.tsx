@@ -1,6 +1,6 @@
 'use client'
 
-import { X, Printer, Download, Share2 } from 'lucide-react'
+import { X, Printer, Download, Share2, Mail, MessageCircle } from 'lucide-react'
 import { InvoiceData } from '@/utils/invoice-generator'
 import { format } from 'date-fns'
 import clsx from 'clsx'
@@ -24,6 +24,34 @@ export default function InvoicePreviewModal({
 
     const isSale = data.type === 'SALE'
 
+    const handleEmailShare = () => {
+        const subject = encodeURIComponent(`Invoice ${data.invoiceNumber} from ${data.businessName}`)
+        const body = encodeURIComponent(
+            `Dear ${data.partyName},\n\n` +
+            `Please find the details of Invoice ${data.invoiceNumber}:\n\n` +
+            `Total Amount: ${data.currencySymbol}${data.totalAmount.toFixed(2)}\n` +
+            `Status: ${data.status}\n` +
+            `Date: ${data.date}\n\n` +
+            `Thank you for your business!\n\n` +
+            `Best regards,\n${data.businessName}`
+        )
+        window.open(`mailto:?subject=${subject}&body=${body}`, '_blank')
+    }
+
+    const handleWhatsAppShare = () => {
+        const message = encodeURIComponent(
+            `*Invoice ${data.invoiceNumber}*\n` +
+            `From: ${data.businessName}\n` +
+            `To: ${data.partyName}\n\n` +
+            `📋 *Invoice Details:*\n` +
+            `Amount: ${data.currencySymbol}${data.totalAmount.toFixed(2)}\n` +
+            `Status: ${data.status}\n` +
+            `Date: ${data.date}\n\n` +
+            `Thank you for your business! 🙏`
+        )
+        window.open(`https://wa.me/?text=${message}`, '_blank')
+    }
+
     return (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-md animate-in fade-in duration-300" onClick={onClose} />
@@ -37,12 +65,29 @@ export default function InvoicePreviewModal({
                     </div>
                     <div className="flex items-center gap-2">
                         <button
+                            onClick={handleEmailShare}
+                            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all shadow-lg active:scale-95"
+                            title="Share via Email"
+                        >
+                            <Mail className="h-4 w-4" />
+                            <span className="text-[10px] font-bold uppercase tracking-wider hidden sm:inline">Email</span>
+                        </button>
+                        <button
+                            onClick={handleWhatsAppShare}
+                            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-green-600 text-white hover:bg-green-700 transition-all shadow-lg active:scale-95"
+                            title="Share via WhatsApp"
+                        >
+                            <MessageCircle className="h-4 w-4" />
+                            <span className="text-[10px] font-bold uppercase tracking-wider hidden sm:inline">WhatsApp</span>
+                        </button>
+                        <div className="w-px h-6 bg-black/10 dark:bg-white/10 mx-1" />
+                        <button
                             onClick={onPrint}
                             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--primary-green)] text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] transition-all shadow-lg active:scale-95"
                             title="Print"
                         >
                             <Printer className="h-4 w-4" />
-                            <span className="text-[10px] font-bold uppercase tracking-wider">Print</span>
+                            <span className="text-[10px] font-bold uppercase tracking-wider hidden sm:inline">Print</span>
                         </button>
                         <button
                             onClick={onDownload}
@@ -50,7 +95,7 @@ export default function InvoicePreviewModal({
                             title="Download PDF"
                         >
                             <Download className="h-4 w-4" />
-                            <span className="text-[10px] font-bold uppercase tracking-wider">Download</span>
+                            <span className="text-[10px] font-bold uppercase tracking-wider hidden sm:inline">Download</span>
                         </button>
                         <div className="w-px h-6 bg-black/10 dark:bg-white/10 mx-1" />
                         <button onClick={onClose} className="p-2 rounded-full hover:bg-[var(--foreground)]/5 transition-all text-[var(--foreground)]/40 hover:text-[var(--deep-contrast)]">
@@ -66,11 +111,20 @@ export default function InvoicePreviewModal({
                         <div className="p-8 md:p-10 space-y-6 flex-1">
                             {/* Brand Header */}
                             <div className="flex justify-between items-start border-b border-[var(--primary-green)] pb-1.5">
-                                <div>
-                                    <h1 className="text-[12px] font-black text-[var(--primary-green)] tracking-tighter leading-none">
-                                        {isSale ? 'SALES INVOICE' : 'PURCHASE BILL'}
-                                    </h1>
-                                    <p className="text-[6px] font-bold text-black/60 mt-0.5 uppercase tracking-widest leading-none">{data.businessName}</p>
+                                <div className="flex items-center gap-3">
+                                    {data.businessLogoUrl && (
+                                        <img
+                                            src={data.businessLogoUrl}
+                                            alt="Logo"
+                                            className="h-12 w-12 object-contain"
+                                        />
+                                    )}
+                                    <div>
+                                        <h1 className="text-[12px] font-black text-[var(--primary-green)] tracking-tighter leading-none">
+                                            {isSale ? 'SALES INVOICE' : 'PURCHASE BILL'}
+                                        </h1>
+                                        <p className="text-[6px] font-bold text-black/60 mt-0.5 uppercase tracking-widest leading-none">{data.businessName}</p>
+                                    </div>
                                 </div>
                                 <div className="text-right">
                                     <p className="text-[5px] font-black text-black/40 uppercase tracking-widest leading-none">No.</p>
@@ -188,9 +242,9 @@ export default function InvoicePreviewModal({
 
                             {/* Notes */}
                             {data.notes && (
-                                <div className="bg-slate-50 p-6 rounded-xl border-l-4 border-[var(--primary-green)] mt-8">
-                                    <h4 className="text-[10px] font-black text-black/40 uppercase tracking-widest mb-2">ADDITIONAL NOTES</h4>
-                                    <p className="text-xs text-black/80 leading-relaxed font-medium">{data.notes}</p>
+                                <div className="bg-slate-50 px-4 py-2.5 rounded-lg border-l-2 border-[var(--primary-green)] mt-6">
+                                    <h4 className="text-[7px] font-black text-black/40 uppercase tracking-widest mb-1">Notes</h4>
+                                    <p className="text-[8px] text-black/70 leading-snug font-medium">{data.notes}</p>
                                 </div>
                             )}
 
@@ -218,15 +272,23 @@ export default function InvoicePreviewModal({
 
                             {/* Signature */}
                             <div className="mt-16 flex justify-end">
-                                <div className="text-center w-48 space-y-2">
-                                    {data.signature ? (
-                                        <div className="border-b-2 border-black pb-1">
-                                            <img src={data.signature} className="h-16 mx-auto object-contain" alt="Signature" />
+                                <div className="text-center w-52 space-y-3">
+                                    <div className="relative group">
+                                        <div className="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                            <span className="px-2 py-0.5 rounded bg-[var(--primary-green)] text-[6px] font-black text-white uppercase tracking-[0.2em]">Verified Secure</span>
                                         </div>
-                                    ) : (
-                                        <div className="h-16 border-b-2 border-black/10" />
-                                    )}
-                                    <p className="text-[10px] font-black text-black/40 uppercase tracking-widest pt-1">AUTHORIZED SIGNATURE</p>
+                                        {data.signature ? (
+                                            <div className="border-b-2 border-black pb-1 relative z-10">
+                                                <img src={data.signature} className="h-16 mx-auto object-contain transition-transform group-hover:scale-110 duration-500" alt="Signature" />
+                                            </div>
+                                        ) : (
+                                            <div className="h-16 border-b-2 border-black/10 relative z-10" />
+                                        )}
+                                    </div>
+                                    <div className="space-y-1">
+                                        <p className="text-[10px] font-black text-black leading-none uppercase tracking-[0.2em]">Authorized Signature</p>
+                                        <p className="text-[6px] font-bold text-black/30 uppercase tracking-widest">Digitally Validated Document</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>

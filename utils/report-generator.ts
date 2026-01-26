@@ -142,8 +142,14 @@ export const ReportGenerator = {
             doc.line(15, signatureY + 22, 55, signatureY + 22);
 
             doc.setFontSize(8);
+            doc.setFont('helvetica', 'bold');
+            doc.text('AUTHORIZED SIGNATURE', 15, signatureY + 27);
+
+            doc.setFontSize(6);
             doc.setFont('helvetica', 'normal');
-            doc.text('Authorized Signature', 15, signatureY + 27);
+            doc.setTextColor(150, 150, 150);
+            doc.text('Digitally Validated', 15, signatureY + 30);
+            doc.setTextColor(0, 0, 0); // Reset color
         }
 
         // Save File

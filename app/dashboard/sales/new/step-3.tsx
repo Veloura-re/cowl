@@ -209,14 +209,19 @@ export default function Step3Review({ onNext, onBack }: Step3Props) {
                         />
                     </div>
 
-                    <div className="glass rounded-[32px] border border-[var(--foreground)]/10 p-6 space-y-4 shadow-2xl">
-                        <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/30 ml-1">Client Authentication</label>
-                        <div className="rounded-2xl border border-dashed border-[var(--primary-green)]/30 bg-[var(--foreground)]/5 backdrop-blur-sm overflow-hidden relative group">
-                            <SignaturePad className="h-48" />
-                            <div className="absolute top-2 right-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <div className="h-1.5 w-1.5 rounded-full bg-[var(--primary-green)] animate-pulse" />
+                    <div className="glass rounded-[32px] border border-[var(--foreground)]/10 p-6 space-y-4 shadow-2xl bg-gradient-to-br from-transparent to-[var(--primary-green)]/[0.02]">
+                        <div className="flex items-center justify-between mb-2">
+                            <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/30 ml-1">Client Authentication</label>
+                            <div className="px-2 py-0.5 rounded-full bg-[var(--primary-green)]/10 border border-[var(--primary-green)]/20 text-[7px] font-black text-[var(--primary-green)] uppercase tracking-widest">
+                                Required for validation
                             </div>
                         </div>
+                        <div className="relative group">
+                            <SignaturePad className="h-64" />
+                        </div>
+                        <p className="text-[7px] font-bold text-[var(--foreground)]/30 text-center uppercase tracking-widest leading-relaxed px-4">
+                            By signing above, the client acknowledges and accepts the terms of this transaction as documented in the items manifest.
+                        </p>
                     </div>
                 </div>
 

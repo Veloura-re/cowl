@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Building, Lock, Loader2, Globe, Shield, Bell, ChevronDown, LogOut, User, Wallet, X, Users, ChevronRight, Moon, Sparkles, Building2, UserPlus, Plus, Save, Database, Upload, Download, Key } from 'lucide-react'
+import { Building, Lock, Loader2, Globe, Shield, Bell, ChevronDown, LogOut, User, Wallet, X, Users, ChevronRight, Moon, Sparkles, Building2, UserPlus, Plus, Save, Database, Upload, Download, Key, ImageIcon, Trash2 } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { currencies } from '@/lib/currencies'
 import Link from 'next/link'
@@ -52,6 +52,8 @@ export default function SettingsPage() {
     const [updatingNotif, setUpdatingNotif] = useState<string | null>(null)
     const [isBackupLoading, setIsBackupLoading] = useState(false)
     const [isRestoring, setIsRestoring] = useState(false)
+    const [uploadingLogo, setUploadingLogo] = useState(false)
+    const [logoUrl, setLogoUrl] = useState<string | null>(null)
 
     const { activeBusinessId, businesses, setActiveBusinessId, refreshBusinesses } = useBusiness()
 
@@ -86,6 +88,7 @@ export default function SettingsPage() {
                                 fullName: profile?.full_name || '',
                                 username: profile?.username || ''
                             }))
+                            setLogoUrl(bus.logo_url || null)
                         }
 
                         const { data: modes } = await supabase
@@ -279,6 +282,89 @@ export default function SettingsPage() {
         }
     }
 
+    const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file || !activeBusinessId) return
+
+        // Validate file type
+        if (!['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml'].includes(file.type)) {
+            setFeedbackModal({ open: true, message: 'Please upload PNG, JPG, or SVG only.', variant: 'error' })
+            return
+        }
+
+        // Validate file size (2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            setFeedbackModal({ open: true, message: 'Logo must be less than 2MB.', variant: 'error' })
+            return
+        }
+
+        setUploadingLogo(true)
+        try {
+            // Delete old logo if exists
+            if (logoUrl) {
+                const oldPath = logoUrl.split('/').slice(-2).join('/')
+                await supabase.storage.from('logos').remove([oldPath])
+            }
+
+            // Upload new logo
+            const fileExt = file.name.split('.').pop()
+            const fileName = `${activeBusinessId}/${Date.now()}.${fileExt}`
+            const { error: uploadError } = await supabase.storage
+                .from('logos')
+                .upload(fileName, file)
+
+            if (uploadError) throw uploadError
+
+            // Get public URL
+            const { data: urlData } = supabase.storage
+                .from('logos')
+                .getPublicUrl(fileName)
+
+            // Update database
+            const { error: updateError } = await supabase
+                .from('businesses')
+                .update({ logo_url: urlData.publicUrl })
+                .eq('id', activeBusinessId)
+
+            if (updateError) throw updateError
+
+            setLogoUrl(urlData.publicUrl)
+            await refreshBusinesses()
+            setFeedbackModal({ open: true, message: 'Logo uploaded successfully!', variant: 'success' })
+        } catch (error: any) {
+            setFeedbackModal({ open: true, message: 'Failed to upload logo: ' + error.message, variant: 'error' })
+        } finally {
+            setUploadingLogo(false)
+            e.target.value = ''
+        }
+    }
+
+    const handleLogoRemove = async () => {
+        if (!activeBusinessId || !logoUrl) return
+        setUploadingLogo(true)
+        try {
+            // Delete from storage
+            const path = logoUrl.split('/').slice(-2).join('/')
+            await supabase.storage.from('logos').remove([path])
+
+            // Update database
+            const { error } = await supabase
+                .from('businesses')
+                .update({ logo_url: null })
+                .eq('id', activeBusinessId)
+
+            if (error) throw error
+
+            setLogoUrl(null)
+            await refreshBusinesses()
+            setFeedbackModal({ open: true, message: 'Logo removed successfully.', variant: 'success' })
+        } catch (error: any) {
+            setFeedbackModal({ open: true, message: 'Failed to remove logo: ' + error.message, variant: 'error' })
+        } finally {
+            setUploadingLogo(false)
+        }
+    }
+
     if (loading) {
         return (
             <div className="flex items-center justify-center p-24 text-[var(--foreground)]/20">
@@ -334,6 +420,38 @@ export default function SettingsPage() {
                     }
                 >
                     <div className="space-y-4 h-full flex flex-col">
+                        {/* Logo Upload Section */}
+                        <div className="flex items-center gap-4 pb-4 border-b border-[var(--foreground)]/5">
+                            <div className="flex-shrink-0">
+                                {logoUrl ? (
+                                    <div className="relative group">
+                                        <img src={logoUrl} alt="Business Logo" className="h-16 w-16 object-contain rounded-lg border border-[var(--foreground)]/10 bg-white p-1" />
+                                        <button
+                                            onClick={handleLogoRemove}
+                                            disabled={uploadingLogo}
+                                            className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-rose-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-rose-600 disabled:opacity-50"
+                                            title="Remove Logo"
+                                        >
+                                            <X size={12} />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="h-16 w-16 rounded-lg border-2 border-dashed border-[var(--foreground)]/20 bg-[var(--foreground)]/5 flex items-center justify-center">
+                                        <ImageIcon className="h-6 w-6 text-[var(--foreground)]/20" />
+                                    </div>
+                                )}
+                            </div>
+                            <div className="flex-1">
+                                <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1.5">Brand Logo</label>
+                                <label className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--primary-green)]/10 text-[var(--primary-green)] border border-[var(--primary-green)]/20 hover:bg-[var(--primary-green)] hover:text-white transition-all cursor-pointer text-[8px] font-black uppercase tracking-wider">
+                                    {uploadingLogo ? <Loader2 className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
+                                    {uploadingLogo ? 'Uploading...' : (logoUrl ? 'Change' : 'Upload')}
+                                    <input type="file" accept="image/png,image/jpeg,image/jpg,image/svg+xml" onChange={handleLogoUpload} disabled={uploadingLogo} className="hidden" />
+                                </label>
+                                <p className="text-[6px] text-[var(--foreground)]/30 mt-1">PNG, JPG, SVG • Max 2MB</p>
+                            </div>
+                        </div>
+
                         <div className="grid grid-cols-2 gap-3">
                             <div className="col-span-2">
                                 <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1.5 ml-1">Entity Name</label>

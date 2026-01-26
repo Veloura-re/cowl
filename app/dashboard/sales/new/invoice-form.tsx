@@ -159,6 +159,7 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                     businessName: activeBusiness?.name || 'Business',
                     businessAddress: (activeBusiness as any)?.address,
                     businessPhone: (activeBusiness as any)?.phone,
+                    businessLogoUrl: (activeBusiness as any)?.logo_url,
                     partyName: selectedParty?.name || 'Walk-in Customer',
                     partyAddress: selectedParty?.address,
                     partyPhone: selectedParty?.phone,

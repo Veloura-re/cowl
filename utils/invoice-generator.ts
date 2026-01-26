@@ -12,6 +12,7 @@ export type InvoiceData = {
     businessName: string
     businessAddress?: string
     businessPhone?: string
+    businessLogoUrl?: string
 
     // Party Info (Customer/Supplier)
     partyName: string
@@ -276,10 +277,19 @@ export function generateInvoiceHTML(data: InvoiceData): string {
         }
         .sig-image { height: 50px; width: auto; }
         .sig-label {
-            font-size: 10px;
+            font-size: 8px;
             font-weight: 900;
+            color: #0f172a;
+            text-transform: uppercase;
+            letter-spacing: 0.2px;
+            margin-top: 4px;
+        }
+        .sig-status {
+            font-size: 5px;
+            font-weight: 700;
             color: #94a3b8;
             text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .attachments { margin-top: 40px; }
@@ -307,6 +317,7 @@ export function generateInvoiceHTML(data: InvoiceData): string {
     <div class="invoice-page">
         <div class="header">
             <div>
+                ${data.businessLogoUrl ? `<img src="${data.businessLogoUrl}" alt="Logo" style="max-width: 60px; max-height: 40px; object-fit: contain; margin-bottom: 4px;" />` : ''}
                 <h1>${title}</h1>
                 <p class="biz-name">${data.businessName}</p>
             </div>
@@ -417,6 +428,7 @@ export function generateInvoiceHTML(data: InvoiceData): string {
                     ${data.signature ? `<img src="${data.signature}" class="sig-image">` : ''}
                 </div>
                 <p class="sig-label">Authorized Signature</p>
+                <p class="sig-status">Digitally Validated Document</p>
             </div>
         </div>
 
@@ -476,35 +488,47 @@ export async function downloadInvoice(data: InvoiceData) {
     const isSale = data.type === 'SALE'
     const title = isSale ? 'SALES INVOICE' : 'PURCHASE BILL'
 
-    // Colors
-    const primaryColor = [16, 185, 129] // #10b981
-    const darkColor = [15, 23, 42] // #0f172a
-    const grayColor = [100, 116, 139] // #64748b
+    // Colors (using RGB)
+    const primaryGreen = [16, 185, 129] // #10b981
+    const primaryColor = [16, 185, 129]
+    const darkColor = [15, 23, 42] // slate-900
+    const grayColor = [100, 116, 139] // slate-500
 
-    // Header
+    // Add Logo if available
+    let logoHeight = 0
+    if (data.businessLogoUrl) {
+        try {
+            doc.addImage(data.businessLogoUrl, 'PNG', 8, 8, 15, 10)
+            logoHeight = 12
+        } catch (e) {
+            // If logo fails to load, just skip it
+        }
+    }
+
+    // Title
+    doc.setFontSize(7)
     doc.setFont('helvetica', 'bold')
-    doc.setFontSize(8)
     doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
-    doc.text(title, 8, 10)
+    doc.text(title, 8, 8 + logoHeight)
 
     doc.setFontSize(3.5)
     doc.setTextColor(grayColor[0], grayColor[1], grayColor[2])
-    doc.text(data.businessName.toUpperCase(), 8, 13)
+    doc.text(data.businessName.toUpperCase(), 8, 11 + logoHeight)
 
     // Document No
     doc.setFontSize(3)
-    doc.text('NO.', 118, 9, { align: 'right' })
+    doc.text('NO.', 118, 7 + logoHeight, { align: 'right' })
     doc.setFontSize(5)
     doc.setTextColor(darkColor[0], darkColor[1], darkColor[2])
-    doc.text(data.invoiceNumber, 118, 13, { align: 'right' })
+    doc.text(data.invoiceNumber, 118, 11 + logoHeight, { align: 'right' })
 
     // Divider
     doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2])
     doc.setLineWidth(0.2)
-    doc.line(8, 16, 118, 16)
+    doc.line(8, 14 + logoHeight, 118, 14 + logoHeight)
 
     // Parties
-    let y = 22
+    let y = 20 + logoHeight
 
     // FROM
     doc.setFontSize(2.5)
@@ -621,7 +645,9 @@ export async function downloadInvoice(data: InvoiceData) {
     doc.setFontSize(2.5)
     doc.setTextColor(grayColor[0], grayColor[1], grayColor[2])
     doc.line(88, ty + 12, 118, ty + 12)
-    doc.text('AUTH SIGNATURE', 103, ty + 14, { align: 'center' })
+    doc.text('AUTHORIZED SIGNATURE', 103, ty + 14, { align: 'center' })
+    doc.setFontSize(2)
+    doc.text('DIGITALLY VALIDATED DOCUMENT', 103, ty + 16, { align: 'center' })
 
     // Footer
     doc.setFontSize(2.5)

@@ -88,6 +88,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                 businessName: activeBusiness?.name || 'Business',
                 businessAddress: (activeBusiness as any)?.address,
                 businessPhone: (activeBusiness as any)?.phone,
+                businessLogoUrl: (activeBusiness as any)?.logo_url,
                 partyName: invoice.party?.name || 'Walk-in Customer',
                 partyAddress: invoice.party?.address,
                 partyPhone: invoice.party?.phone,

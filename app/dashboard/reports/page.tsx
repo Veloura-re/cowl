@@ -281,7 +281,10 @@ export default function ReportsPage() {
 
                     {/* Signature Pad */}
                     <div className="space-y-1">
-                        <SignaturePad ref={sigPadRef} />
+                        <label className="text-[9px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider">Authorization</label>
+                        <div className="relative group rounded-xl overflow-hidden border border-gray-200 dark:border-white/10 bg-white/50 dark:bg-white/5">
+                            <SignaturePad ref={sigPadRef} className="h-48" />
+                        </div>
                     </div>
 
                     {/* Actions */}
