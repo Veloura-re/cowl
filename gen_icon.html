@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            margin: 0;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        canvas {
+            background: transparent;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="icon" width="512" height="512"></canvas>
+    <script>
+        function drawRoundedRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        const canvas = document.getElementById('icon');
+        const ctx = canvas.getContext('2d');
+        const size = 512;
+
+        // Logo configuration - making it significantly smaller in the 512x512 space
+        const logoTargetSize = 256; // 50% of total size
+        const barHeight = 24;
+        const gap = 20;
+        const totalHeight = (barHeight * 3) + (gap * 2);
+
+        const startX = (size - logoTargetSize) / 2;
+        const startY = (size - totalHeight) / 2;
+
+        // Bar 1: 1/2 width
+        ctx.fillStyle = '#34d399';
+        drawRoundedRect(ctx, startX + (logoTargetSize * 0.25), startY, logoTargetSize * 0.5, barHeight, barHeight / 2);
+
+        // Bar 2: Full width
+        ctx.fillStyle = '#10b981';
+        drawRoundedRect(ctx, startX, startY + barHeight + gap, logoTargetSize, barHeight, barHeight / 2);
+
+        // Bar 3: 3/4 width
+        ctx.fillStyle = '#059669';
+        drawRoundedRect(ctx, startX + (logoTargetSize * 0.125), startY + (barHeight + gap) * 2, logoTargetSize * 0.75, barHeight, barHeight / 2);
+    </script>
+</body>
+
+</html>
