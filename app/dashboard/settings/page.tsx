@@ -287,32 +287,7 @@ export default function SettingsPage() {
         )
     }
 
-    /**
-     * Reusable Card Component for Bento Grid
-     */
-    const BentoCard = ({ children, className, title, icon: Icon, subtitle, action }: any) => (
-        <div className={clsx("glass rounded-[24px] border border-[var(--foreground)]/10 overflow-hidden shadow-lg flex flex-col", className)}>
-            {(title || Icon) && (
-                <div className="px-4 py-3 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/3 flex items-center justify-between min-h-[50px]">
-                    <div className="flex items-center gap-2.5">
-                        {Icon && (
-                            <div className="h-7 w-7 rounded-lg bg-[var(--foreground)]/5 text-[var(--deep-contrast)] flex items-center justify-center shadow-inner">
-                                <Icon className="h-3.5 w-3.5" />
-                            </div>
-                        )}
-                        <div>
-                            {title && <h3 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">{title}</h3>}
-                            {subtitle && <p className="text-[7px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">{subtitle}</p>}
-                        </div>
-                    </div>
-                    {action && <div>{action}</div>}
-                </div>
-            )}
-            <div className="p-4 flex-1">
-                {children}
-            </div>
-        </div>
-    )
+
 
     return (
         <div className="space-y-4 pb-20 max-w-[1400px] mx-auto animate-in fade-in duration-500">
@@ -633,3 +608,27 @@ export default function SettingsPage() {
         </div>
     )
 }
+
+const BentoCard = ({ children, className, title, icon: Icon, subtitle, action }: any) => (
+    <div className={clsx("glass rounded-[24px] border border-[var(--foreground)]/10 overflow-hidden shadow-lg flex flex-col", className)}>
+        {(title || Icon) && (
+            <div className="px-4 py-3 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/3 flex items-center justify-between min-h-[50px]">
+                <div className="flex items-center gap-2.5">
+                    {Icon && (
+                        <div className="h-7 w-7 rounded-lg bg-[var(--foreground)]/5 text-[var(--deep-contrast)] flex items-center justify-center shadow-inner">
+                            <Icon className="h-3.5 w-3.5" />
+                        </div>
+                    )}
+                    <div>
+                        {title && <h3 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">{title}</h3>}
+                        {subtitle && <p className="text-[7px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">{subtitle}</p>}
+                    </div>
+                </div>
+                {action && <div>{action}</div>}
+            </div>
+        )}
+        <div className="p-4 flex-1">
+            {children}
+        </div>
+    </div>
+)
