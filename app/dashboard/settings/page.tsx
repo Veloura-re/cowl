@@ -571,6 +571,22 @@ export default function SettingsPage() {
                 selectedValue={activeBusinessId}
             />
 
+            <PickerModal
+                isOpen={isCurrencyPickerOpen}
+                onClose={() => setIsCurrencyPickerOpen(false)}
+                onSelect={(code) => {
+                    setFormData({ ...formData, currency: code })
+                    setIsCurrencyPickerOpen(false)
+                }}
+                title="Select Currency"
+                options={currencies.map(c => ({
+                    id: c.code,
+                    label: `${c.symbol} - ${c.code}`,
+                    subLabel: c.name
+                }))}
+                selectedValue={formData.currency}
+            />
+
             <CreateBusinessModal
                 isOpen={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}

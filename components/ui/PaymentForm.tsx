@@ -49,6 +49,7 @@ export default function PaymentForm({
     const [isAddBankOpen, setIsAddBankOpen] = useState(false)
     const [newBankName, setNewBankName] = useState('')
     const [addingBank, setAddingBank] = useState(false)
+    const [itemToRemoveIndex, setItemToRemoveIndex] = useState<number | null>(null)
 
     // Form State
     const [formData, setFormData] = useState({
@@ -253,6 +254,7 @@ export default function PaymentForm({
         setBillingEntries(newEntries)
         const newTotal = newEntries.reduce((sum, e) => sum + e.amount, 0)
         setFormData(prev => ({ ...prev, amount: newTotal }))
+        setItemToRemoveIndex(null)
     }
 
     if (success) {
@@ -476,8 +478,8 @@ export default function PaymentForm({
                                             <span className="text-[11px] font-black text-[var(--primary-green)] tabular-nums">{formatCurrency(e.amount)}</span>
                                             <button
                                                 type="button"
-                                                onClick={(e) => { e.stopPropagation(); removeEntry(idx); }}
-                                                className="p-1.5 rounded-lg text-rose-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-rose-500 hover:text-white"
+                                                onClick={(e) => { e.stopPropagation(); setItemToRemoveIndex(idx); }}
+                                                className="p-1.5 rounded-lg text-rose-500 transition-all hover:bg-rose-500 hover:text-white"
                                             >
                                                 <X className="h-3.5 w-3.5" />
                                             </button>
@@ -525,6 +527,20 @@ export default function PaymentForm({
             />
 
             <ConfirmModal
+                isOpen={itemToRemoveIndex !== null}
+                onClose={() => setItemToRemoveIndex(null)}
+                onConfirm={() => {
+                    if (itemToRemoveIndex !== null) {
+                        removeEntry(itemToRemoveIndex)
+                    }
+                }}
+                title="Remove Line Item?"
+                message="Are you sure you want to remove this item? You can re-add it later if needed."
+                confirmText="Remove"
+                variant="danger"
+            />
+
+            <ConfirmModal
                 isOpen={isConfirmOpen}
                 onClose={() => setIsConfirmOpen(false)}
                 onConfirm={handleDelete}
@@ -543,6 +559,7 @@ export default function PaymentForm({
                     onAdd={handleUpdateEntry}
                     items={displayItems}
                     initialData={editingEntryIndex !== null ? billingEntries[editingEntryIndex] : null}
+                    onDelete={editingEntryIndex !== null ? () => setItemToRemoveIndex(editingEntryIndex) : undefined}
                 />
             ) : (
                 <AddPurchaseItemModal
@@ -551,6 +568,7 @@ export default function PaymentForm({
                     onAdd={handleUpdateEntry}
                     items={displayItems}
                     initialData={editingEntryIndex !== null ? billingEntries[editingEntryIndex] : null}
+                    onDelete={editingEntryIndex !== null ? () => setItemToRemoveIndex(editingEntryIndex) : undefined}
                 />
             )}
         </form>

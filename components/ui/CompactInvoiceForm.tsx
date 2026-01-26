@@ -53,6 +53,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
     const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null)
     const [isPreviewOpen, setIsPreviewOpen] = useState(false)
     const [previewData, setPreviewData] = useState<InvoiceData | null>(null)
+    const [itemToRemoveIndex, setItemToRemoveIndex] = useState<number | null>(null)
 
     // Data State (Client-side fetch if props missing)
     const [fetchedParties, setFetchedParties] = useState<any[]>(parties)
@@ -216,6 +217,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
 
     const removeRow = (index: number) => {
         setRows(rows.filter((_, i) => i !== index))
+        setItemToRemoveIndex(null)
     }
 
     useEffect(() => {
@@ -785,8 +787,8 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                                         </div>
                                                         <button
                                                             type="button"
-                                                            onClick={(e) => { e.stopPropagation(); removeRow(index); }}
-                                                            className="p-1.5 rounded-lg bg-rose-500/5 text-rose-500 hover:bg-rose-500 transition-all active:scale-95 opacity-0 group-hover:opacity-100"
+                                                            onClick={(e) => { e.stopPropagation(); setItemToRemoveIndex(index); }}
+                                                            className="p-1.5 rounded-lg bg-rose-500/5 text-rose-500 hover:bg-rose-500 transition-all active:scale-95 shadow-sm"
                                                         >
                                                             <Trash2 size={12} />
                                                         </button>
@@ -1006,6 +1008,21 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                 onAdd={handleAddItem}
                 items={filteredItems}
                 initialData={editingItemIndex !== null && editingItemIndex >= 0 ? rows[editingItemIndex] : null}
+                onDelete={editingItemIndex !== null ? () => setItemToRemoveIndex(editingItemIndex) : undefined}
+            />
+
+            <ConfirmModal
+                isOpen={itemToRemoveIndex !== null}
+                onClose={() => setItemToRemoveIndex(null)}
+                onConfirm={() => {
+                    if (itemToRemoveIndex !== null) {
+                        removeRow(itemToRemoveIndex)
+                    }
+                }}
+                title="Remove Line Item?"
+                message="Are you sure you want to remove this item from the invoice? You can re-add it later if needed."
+                confirmText="Remove"
+                variant="danger"
             />
 
             <ConfirmModal

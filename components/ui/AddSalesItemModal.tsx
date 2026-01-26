@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, Loader2, Package, Plus, Calculator } from 'lucide-react'
+import { X, Loader2, Package, Plus, Calculator, Trash2 } from 'lucide-react'
 import { useBusiness } from '@/context/business-context'
 import PickerModal from '@/components/ui/PickerModal'
 import ErrorModal from '@/components/ui/ErrorModal'
@@ -14,9 +14,10 @@ type AddSalesItemModalProps = {
     onAdd: (itemData: any) => void
     items: any[]
     initialData?: any
+    onDelete?: () => void
 }
 
-export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initialData }: AddSalesItemModalProps) {
+export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initialData, onDelete }: AddSalesItemModalProps) {
     const { formatCurrency } = useBusiness()
     const [isItemPickerOpen, setIsItemPickerOpen] = useState(false)
     const [selectedItem, setSelectedItem] = useState<any>(null)
@@ -216,7 +217,20 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                         </div>
                     )}
 
-                    <div className="flex justify-end pt-2 gap-3">
+                    <div className="flex justify-between pt-2 gap-3">
+                        {initialData && onDelete && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    onDelete()
+                                    onClose()
+                                }}
+                                className="h-12 w-12 rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all active:scale-95 border border-rose-500/20"
+                                title="Remove Entry"
+                            >
+                                <Trash2 className="h-4 w-4" />
+                            </button>
+                        )}
                         <button
                             type="button"
                             onClick={onClose}
@@ -229,7 +243,6 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                             disabled={!selectedItem || !numQty || numQty <= 0}
                             className="flex-[2] h-12 flex items-center justify-center rounded-2xl bg-[var(--primary-green)] text-white shadow-xl shadow-[var(--primary-green)]/20 text-[10px] font-black uppercase tracking-[0.2em] transition-all active:scale-95 disabled:opacity-50 hover:bg-[var(--primary-hover)] ring-offset-2 focus:ring-2 ring-[var(--primary-green)]"
                         >
-                            <Plus className="mr-2 h-4 w-4" />
                             {initialData ? 'Update Record' : 'Add to Ledger'}
                         </button>
                     </div>

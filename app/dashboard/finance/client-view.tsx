@@ -296,7 +296,7 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                                                 {t.type === 'RECEIPT' ? '+' : '-'} {formatCurrency(t.amount)}
                                             </p>
                                         </div>
-                                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className="flex items-center gap-1 transition-opacity">
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); handleEdit(e, t); }}
                                                 className="p-1.5 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-blue-500 hover:bg-blue-500 hover:text-white transition-all active:scale-90"

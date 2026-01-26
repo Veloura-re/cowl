@@ -98,12 +98,40 @@ export async function exportBusinessData(supabase: SupabaseClient, businessId: s
         data: fetchedData
     }
 
-    // 6. Trigger Download
-    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' })
+    const fileName = `backup-${business.name.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.json`
+    const fileContent = JSON.stringify(backup, null, 2)
+
+    // 6. Trigger Download with "Save As" support where available
+    try {
+        if ('showSaveFilePicker' in window) {
+            const handle = await (window as any).showSaveFilePicker({
+                suggestedName: fileName,
+                types: [{
+                    description: 'JSON Backup File',
+                    accept: { 'application/json': ['.json'] },
+                }],
+            })
+            const writable = await handle.createWritable()
+            await writable.write(fileContent)
+            await writable.close()
+            return true
+        }
+    } catch (err: any) {
+        // If user cancels or if there's a permission error, we might not want to fallback
+        // but for general errors or browser context issues, we fallback to standard download.
+        if (err.name === 'AbortError') {
+            console.log('Save cancelled by user')
+            return false
+        }
+        console.warn('showSaveFilePicker failed, falling back to standard download:', err)
+    }
+
+    // Fallback: Standard Anchor Download
+    const blob = new Blob([fileContent], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `backup-${business.name.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.json`
+    a.download = fileName
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
@@ -140,11 +168,49 @@ export async function importBusinessData(supabase: SupabaseClient, file: File, c
     // Let's go with: IDs must match for "Restore".
     // "Sync Back" implies same entity.
 
+    let remapToCurrent = false
     if (backup.business.id !== currentBusinessId) {
-        const confirm = window.confirm(`Backup ID (${backup.business.id}) does not match active business ID (${currentBusinessId}).\n\nDo you want to proceed? This implies merging data from another business context?`)
-        if (!confirm) return false
+        const confirm = window.confirm(`Backup ID (${backup.business.id}) does not match active business ID (${currentBusinessId}).\n\nDo you want to remap this data to the active business? (Choose Cancel to try literal restore)`)
+        if (confirm) {
+            remapToCurrent = true
+        } else {
+            const proceed = window.confirm('Proceed with literal restore? This might fail RLS checks if you don\'t have ownership of the original business IDs.')
+            if (!proceed) return false
+        }
     }
 
+    // [WIPE PHASE] Delete existing data to ensure a clean restore
+    // We delete in reverse order of dependencies
+    const tablesToWipe = [
+        'transactions',
+        'invoice_items',
+        'invoices',
+        'notifications',
+        'notification_settings',
+        'items',
+        'parties',
+        'payment_modes'
+    ]
+
+    for (const table of tablesToWipe) {
+        // For invoice_items, we need a special join or subquery if we don't have business_id on them.
+        // Usually invoice_items are joined via invoice_id.
+        if (table === 'invoice_items') {
+            // Get invoice IDs first
+            const { data: invs } = await supabase.from('invoices').select('id').eq('business_id', currentBusinessId)
+            if (invs && invs.length > 0) {
+                const invIds = invs.map(i => i.id)
+                await supabase.from('invoice_items').delete().in('invoice_id', invIds)
+            }
+        } else {
+            const { error: wipeError } = await supabase.from(table).delete().eq('business_id', currentBusinessId)
+            if (wipeError) {
+                console.warn(`Non-critical wipe failure on ${table}: ${wipeError.message}`)
+            }
+        }
+    }
+
+    // [RESTORE PHASE] Insert data from backup
     // Order of operations matters for foreign keys.
     // 1. Parties
     // 2. Items
@@ -153,15 +219,36 @@ export async function importBusinessData(supabase: SupabaseClient, file: File, c
     // 5. Invoice Items
     // 6. Transactions
 
-    // We use upsert. 
-
-    // Helper to batch upsert with chunking
+    // Helper to batch upsert with chunking and optional ID remapping
     const upsertTable = async (table: string, rows: any[]) => {
         if (!rows || rows.length === 0) return
 
-        const batches = chunk(rows, 100)
+        let processedRows = rows.map(row => {
+            const newRow = { ...row }
+
+            // Remap business ID if requested
+            if (remapToCurrent && 'business_id' in newRow) {
+                newRow.business_id = currentBusinessId
+            }
+
+            // [SECURITY FIX] For settings, we strip the 'id' (PK) to avoid collisions
+            // and rely on the composite unique key (user_id, business_id) to match existing records.
+            if (table === 'notification_settings') {
+                delete (newRow as any).id
+            }
+
+            return newRow
+        })
+
+        const batches = chunk(processedRows, 100)
         for (const batch of batches) {
-            const { error } = await supabase.from(table).upsert(batch)
+            // Special handling for tables with composite unique keys other than PK
+            const options: any = {}
+            if (table === 'notification_settings') {
+                options.onConflict = 'user_id,business_id'
+            }
+
+            const { error } = await supabase.from(table).upsert(batch, options)
             if (error) throw new Error(`Failed to restore ${table}: ${error.message}`)
         }
     }

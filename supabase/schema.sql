@@ -157,6 +157,8 @@ create policy "Members can update invoices" on invoices for update using (is_bus
 
 create policy "Members can view transactions" on transactions for select using (is_business_member(business_id));
 create policy "Members can insert transactions" on transactions for insert with check (is_business_member(business_id));
+create policy "Members can update transactions" on transactions for update using (is_business_member(business_id));
+create policy "Members can delete transactions" on transactions for delete using (is_business_member(business_id));
 
 create policy "Members can view payment modes" on payment_modes for select using (is_business_member(business_id));
 create policy "Members can manage payment modes" on payment_modes for all using (is_business_member(business_id));
@@ -195,9 +197,12 @@ alter table notifications enable row level security;
 alter table notification_settings enable row level security;
 
 create policy "Users can view their notifications" on notifications for select using (user_id = auth.uid());
+create policy "Users can insert their notifications" on notifications for insert with check (user_id = auth.uid());
 create policy "Users can update their notifications" on notifications for update using (user_id = auth.uid());
+create policy "Users can delete their notifications" on notifications for delete using (user_id = auth.uid());
+
 create policy "Users can view their notification settings" on notification_settings for select using (user_id = auth.uid());
-create policy "Users can update their notification settings" on notification_settings for all using (user_id = auth.uid());
+create policy "Users can manage their notification settings" on notification_settings for all using (user_id = auth.uid());
 
 -- Helper to find who to notify in a business based on settings
 create or replace function public.notify_members(_business_id uuid, _type text, _title text, _message text, _link text default null)
