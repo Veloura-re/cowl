@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Plus, Search, Package, ShoppingBag, AlertTriangle, Boxes, Filter, SortAsc, ChevronDown, Edit2 } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { Plus, Search, Package, ShoppingBag, AlertTriangle, Boxes, Filter, SortAsc, ChevronDown, Edit2, Trash2, Printer } from 'lucide-react'
+import ConfirmModal from '@/components/ui/ConfirmModal'
 import { motion } from 'framer-motion'
 import PickerModal from '@/components/ui/PickerModal'
 import clsx from 'clsx'
@@ -24,7 +25,45 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
     const [filterLowStock, setFilterLowStock] = useState(false)
     const [loading, setLoading] = useState(!initialItems)
     const [visibleCount, setVisibleCount] = useState(50)
+    const [itemToDelete, setItemToDelete] = useState<any>(null)
+    const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
+    const [isDeleting, setIsDeleting] = useState(false)
+    const longPressTimer = React.useRef<NodeJS.Timeout | null>(null)
     const supabase = createClient()
+
+    const handleTouchStart = (item: any) => {
+        longPressTimer.current = setTimeout(() => {
+            setItemToDelete(item)
+            setIsDeleteConfirmOpen(true)
+        }, 800) // 800ms long press
+    }
+
+    const handleTouchEnd = () => {
+        if (longPressTimer.current) {
+            clearTimeout(longPressTimer.current)
+        }
+    }
+
+    const confirmDelete = async () => {
+        if (!itemToDelete) return
+        setIsDeleting(true)
+        const id = itemToDelete.id
+
+        try {
+            const { error } = await supabase.from('items').delete().eq('id', id)
+
+            if (error) throw error
+
+            setItems(prev => prev.filter(i => i.id !== id))
+            setIsDeleteConfirmOpen(false)
+            setItemToDelete(null)
+        } catch (error: any) {
+            console.error('Delete error:', error)
+            alert('Failed to delete: ' + error.message)
+        } finally {
+            setIsDeleting(false)
+        }
+    }
 
     useEffect(() => {
         const fetchItems = async () => {
@@ -170,6 +209,11 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                             if (item.id === 'temp-id') return
                             router.push(`/dashboard/inventory/edit?id=${item.id}`)
                         }}
+                        onMouseDown={() => handleTouchStart(item)}
+                        onMouseUp={handleTouchEnd}
+                        onMouseLeave={handleTouchEnd}
+                        onTouchStart={() => handleTouchStart(item)}
+                        onTouchEnd={handleTouchEnd}
                         className={clsx(
                             "group relative flex items-center glass-optimized rounded-[10px] border border-[var(--foreground)]/10 p-1.5 hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer overflow-hidden h-[54px] gap-2",
                             item.stock_quantity <= (item.min_stock || 0) && "critical-glow"
@@ -214,7 +258,17 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                                     {item.stock_quantity} <span className="text-[8px] opacity-40 lowercase">{item.unit || 'units'}</span>
                                 </p>
                             </div>
-                            <div className="flex items-center gap-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="flex items-center gap-1 mt-1 transition-opacity">
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        // Generic print for item - could be label or info card
+                                        window.print()
+                                    }}
+                                    className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
+                                >
+                                    <Printer size={8} />
+                                </button>
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation()
@@ -223,6 +277,16 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                                     className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
                                 >
                                     <Edit2 size={8} />
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        setItemToDelete(item)
+                                        setIsDeleteConfirmOpen(true)
+                                    }}
+                                    className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-rose-500 hover:text-white border border-[var(--foreground)]/10 transition-all"
+                                >
+                                    <Trash2 size={8} />
                                 </button>
                             </div>
                         </div>
@@ -294,6 +358,15 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                     label: cat.toUpperCase()
                 }))}
                 selectedValue={filterCategory}
+            />
+
+            <ConfirmModal
+                isOpen={isDeleteConfirmOpen}
+                onClose={() => setIsDeleteConfirmOpen(false)}
+                onConfirm={confirmDelete}
+                title="Delete Item?"
+                message="This will permanently delete the item. This action cannot be undone."
+                confirmText={isDeleting ? "Deleting..." : "Delete Permanently"}
             />
         </div>
     )

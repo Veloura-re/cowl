@@ -2,7 +2,6 @@
 import type { jsPDF } from 'jspdf'
 import { formatNumber } from '@/lib/format-number'
 
-
 export type InvoiceData = {
     invoiceNumber: string
     date: string
@@ -50,405 +49,252 @@ export type InvoiceData = {
 
 export function generateInvoiceHTML(data: InvoiceData): string {
     const isSale = data.type === 'SALE'
-    const title = isSale ? 'SALES INVOICE' : 'PURCHASE BILL'
+    const title = isSale ? 'INVOICE' : 'PURCHASE ORDER'
 
     return `
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title} - ${data.invoiceNumber}</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f1f5f9;
-            color: #1e293b;
-            line-height: 1.4;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        :root {
+            --bg-color: #ffffff;
+            --text-main: #000000;
+            --text-muted: #666666;
+            --border-heavy: 2px solid #000000;
+            --border-light: 1px solid #e5e5e5;
         }
-        .invoice-page {
-            width: 126mm;
-            min-height: 178mm;
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f3f3f3;
+            color: var(--text-main);
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
             margin: 0 auto;
-            background: white;
-            padding: 6mm;
-            box-shadow: 0 0 5mm rgba(0,0,0,0.1);
+            background: var(--bg-color);
+            padding: 40px;
+            position: relative;
             display: flex;
-            flex-column;
             flex-direction: column;
         }
-        @page {
-            size: A4;
-            margin: 0;
-        }
+
         @media print {
-            body { background: white; padding: 0; }
-            .invoice-page { box-shadow: none; margin: 0; width: 210mm; height: 297mm; }
+            body { background: white; }
+            .page { width: 100%; margin: 0; padding: 20px; box-shadow: none; border: none; }
+        }
+
+        /* Typography Utilities */
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .uppercase { text-transform: uppercase; }
+        .bold { font-weight: 700; }
+        .heavy { font-weight: 900; }
+        .text-xs { font-size: 9px; letter-spacing: 0.05em; }
+        .text-sm { font-size: 11px; }
+        .text-base { font-size: 14px; }
+        .text-xl { font-size: 24px; letter-spacing: -0.03em; }
+        .tracking-wide { letter-spacing: 0.1em; }
+
+        /* Graphic Elements */
+        .divider { height: 2px; background: #000; margin: 15px 0; }
+        .divider-light { height: 1px; background: #e5e5e5; margin: 10px 0; }
+        .box { border: 1px solid #000; padding: 15px; }
+
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; }
+        .brand-section { flex: 1; }
+        .meta-section { text-align: right; }
+        
+        .logo { height: 50px; width: auto; object-fit: contain; margin-bottom: 15px; display: block; filter: grayscale(100%); }
+        
+        /* Grid Layout for Info */
+        .info-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 40px; 
+            margin-bottom: 40px; 
+            border-top: 2px solid #000; 
+            border-bottom: 2px solid #000; 
+            padding: 20px 0;
         }
         
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            border-bottom: 4px solid #10b981;
-            padding-bottom: 15px;
-            margin-bottom: 30px;
+        /* Table */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        th { 
+            text-align: left; 
+            font-family: 'JetBrains Mono', monospace; 
+            font-size: 9px; 
+            text-transform: uppercase; 
+            border-bottom: 2px solid #000; 
+            padding: 10px 5px; 
         }
-        .header h1 {
-            color: #10b981;
+        td { 
+            padding: 12px 5px; 
+            border-bottom: 1px solid #eee; 
+            font-size: 12px; 
+        }
+        tr:last-child td { border-bottom: 2px solid #000; }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+
+        /* Totals */
+        .totals-container { display: flex; justify-content: flex-end; }
+        .totals-table { width: 300px; }
+        .total-row { display: flex; justify-content: space-between; padding: 5px 0; }
+        .final-total { 
+            border-top: 2px solid #000; 
+            border-bottom: 2px solid #000; 
+            margin-top: 10px; 
+            padding: 10px 0; 
+            font-weight: 900; 
+            font-size: 16px;
+        }
+
+        /* Footer */
+        .footer { 
+            margin-top: auto; 
+            border-top: 1px solid #000; 
+            padding-top: 15px; 
+            display: flex; 
+            justify-content: space-between; 
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px;
+            color: #666;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            border: 1px solid #000;
+            padding: 4px 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
             font-size: 10px;
-            font-weight: 900;
-            letter-spacing: -0.2px;
-        }
-        .header .biz-name {
-            font-size: 4px;
-            font-weight: 700;
-            color: #64748b;
             text-transform: uppercase;
-            letter-spacing: 0.2px;
-        }
-        .header .doc-info {
-            text-align: right;
-        }
-        .header .doc-info p.label {
-            font-size: 3.5px;
-            font-weight: 900;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-        }
-        .header .doc-info p.val {
-            font-size: 7px;
-            font-weight: 900;
-            color: #0f172a;
-        }
-
-        .parties {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-        .party h3 {
-            font-size: 4px;
-            font-weight: 900;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 0.5px solid #f1f5f9;
-            padding-bottom: 2px;
-            margin-bottom: 3px;
-        }
-        .party .name {
-            font-size: 5px;
-            font-weight: 800;
-            color: #0f172a;
-            margin-bottom: 1px;
-            text-transform: uppercase;
-        }
-        .party .detail {
-            font-size: 4.5px;
-            color: #64748b;
-            line-height: 1.2;
-        }
-
-        .meta-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 4px;
-            background: #f8fafc;
-            padding: 4px;
-            border-radius: 3px;
-            margin-bottom: 8px;
-            border: 0.5px solid #e2e8f0;
-        }
-        .meta-item { text-align: center; }
-        .meta-item p.label {
-            font-size: 3.5px;
-            font-weight: 900;
-            color: #94a3b8;
-            text-transform: uppercase;
-            margin-bottom: 1px;
-        }
-        .meta-item p.val {
-            font-size: 4.5px;
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 18px;
-        }
-        th {
-            background: #10b981;
-            color: white;
-            padding: 6px;
-            font-size: 6px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-            text-align: left;
-        }
-        th:first-child { border-radius: 4px 0 0 0; }
-        th:last-child { border-radius: 0 4px 0 0; }
-        td {
-            padding: 6px;
-            font-size: 7px;
-            border-bottom: 0.5px solid #f1f5f9;
-            color: #334155;
-        }
-        td.bold { font-weight: 700; }
-        td.right { text-align: right; }
-        td.center { text-align: center; }
-
-        .summary-container {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 12px;
-        }
-        .summary-box {
-            width: 80px;
-        }
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 2px 0;
-            font-size: 5px;
-        }
-        .summary-row.total {
-            border-top: 1px solid #10b981;
-            margin-top: 3px;
-            padding-top: 4px;
-            font-size: 7px;
-            font-weight: 900;
-            color: #0f172a;
-        }
-        .summary-row.accent { color: #10b981; font-weight: 700; }
-        .summary-row.danger { color: #ef4444; font-weight: 700; }
-
-        .notes {
-            background: #f8fafc;
-            padding: 6px;
-            border-radius: 4px;
-            border-left: 2px solid #10b981;
-            margin-top: 6px;
-        }
-        .notes h4 {
-            font-size: 4px;
-            font-weight: 900;
-            color: #94a3b8;
-            text-transform: uppercase;
-            margin-bottom: 2px;
-        }
-        .notes p {
-            font-size: 5px;
-            color: #475569;
-            line-height: 1.2;
-        }
-
-        .footer {
-            margin-top: auto;
-            padding-top: 9px;
-            border-top: 0.5px solid #f1f5f9;
-            text-align: center;
-            color: #94a3b8;
-            font-size: 4px;
-            letter-spacing: 0.3px;
-        }
-        
-        .signature-section {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 40px;
-        }
-        .sig-box {
-            text-align: center;
-            width: 180px;
-        }
-        .sig-line {
-            border-bottom: 2px solid #0f172a;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 8px;
-        }
-        .sig-image { height: 50px; width: auto; }
-        .sig-label {
-            font-size: 8px;
-            font-weight: 900;
-            color: #0f172a;
-            text-transform: uppercase;
-            letter-spacing: 0.2px;
-            margin-top: 4px;
-        }
-        .sig-status {
-            font-size: 5px;
-            font-weight: 700;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-
-        .attachments { margin-top: 40px; }
-        .attachments-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 15px;
-        }
-        .attachment-card {
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #f8fafc;
-        }
-        .attachment-img {
-            width: 100%;
-            height: 180px;
-            object-fit: contain;
-            background: white;
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="invoice-page">
+    <div class="page">
+        <!-- Header -->
         <div class="header">
+            <div class="brand-section">
+                ${data.businessLogoUrl ? `<img src="${data.businessLogoUrl}" class="logo" />` : ''}
+                <h1 class="text-xl heavy uppercase">${data.businessName}</h1>
+                <div class="text-xs uppercase mono mt-2" style="line-height: 1.6;">
+                    ${data.businessAddress || ''}<br>
+                    ${data.businessPhone || ''}
+                </div>
+            </div>
+            <div class="meta-section">
+                <div class="status-badge">${data.status}</div>
+                <h2 class="text-xl heavy uppercase" style="letter-spacing: 0.1em; color: #000;">${title}</h2>
+                <div class="text-sm mono mt-2">
+                    <span class="text-muted">NO.</span> <span class="bold">${data.invoiceNumber}</span><br>
+                    <span class="text-muted">DATE</span> <span class="bold">${data.date}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Grid -->
+        <div class="info-grid">
             <div>
-                ${data.businessLogoUrl ? `<img src="${data.businessLogoUrl}" alt="Logo" style="max-width: 60px; max-height: 40px; object-fit: contain; margin-bottom: 4px;" />` : ''}
-                <h1>${title}</h1>
-                <p class="biz-name">${data.businessName}</p>
+                <p class="text-xs mono uppercase text-muted mb-2 tracking-wide">ISSUED TO</p>
+                <p class="text-base heavy uppercase">${data.partyName}</p>
+                <p class="text-sm mono mt-1">${data.partyAddress || 'Address Not Provided'}</p>
+                <p class="text-sm mono mt-1">${data.partyPhone || ''}</p>
             </div>
-            <div class="doc-info">
-                <p class="label">Document No.</p>
-                <p class="val">${data.invoiceNumber}</p>
-            </div>
-        </div>
-        
-        <div class="parties">
-            <div class="party">
-                <h3>From</h3>
-                <p class="name">${data.businessName}</p>
-                <p class="detail">${data.businessAddress || ''}</p>
-                <p class="detail">${data.businessPhone || ''}</p>
-            </div>
-            <div class="party">
-                <h3>${isSale ? 'Bill To' : 'Supplier'}</h3>
-                <p class="name">${data.partyName}</p>
-                <p class="detail">${data.partyAddress || ''}</p>
-                <p class="detail">${data.partyPhone || ''}</p>
+            <div class="text-right">
+                <p class="text-xs mono uppercase text-muted mb-2 tracking-wide">PAYMENT DETAILS</p>
+                <p class="text-sm mono">DUE DATE: <span class="bold">${data.dueDate || 'ON RECEIPT'}</span></p>
+                <p class="text-sm mono">CURRENCY: <span class="bold">${data.currency.toUpperCase()}</span></p>
             </div>
         </div>
-        
-        <div class="meta-grid">
-            <div class="meta-item">
-                <p class="label">Date</p>
-                <p class="val">${new Date(data.date).toLocaleDateString()}</p>
-            </div>
-            <div class="meta-item">
-                <p class="label">Due Date</p>
-                <p class="val">${data.dueDate ? new Date(data.dueDate).toLocaleDateString() : 'N/A'}</p>
-            </div>
-            <div class="meta-item">
-                <p class="label">Status</p>
-                <p class="val" style="color: ${data.status === 'PAID' ? '#10b981' : '#ef4444'}">${data.status}</p>
-            </div>
-        </div>
-        
+
+        <!-- Items -->
         <table>
             <thead>
                 <tr>
-                    <th>Description</th>
-                    <th class="center">Qty</th>
-                    <th class="right">Rate</th>
-                    <th class="right">Tax</th>
-                    <th class="right">Amount</th>
+                    <th style="width: 40%">DESCRIPTION</th>
+                    <th class="text-center" style="width: 15%">QTY</th>
+                    <th class="text-right" style="width: 15%">RATE</th>
+                    <th class="text-right" style="width: 10%">TAX</th>
+                    <th class="text-right" style="width: 20%">AMOUNT</th>
                 </tr>
             </thead>
             <tbody>
                 ${data.items.map(item => `
                 <tr>
                     <td class="bold">${item.description}</td>
-                    <td class="center">${item.quantity}</td>
-                    <td class="right">${data.currencySymbol}${formatNumber(item.rate)}</td>
-                    <td class="right">${item.tax}%</td>
-                    <td class="right" style="font-weight: 900">${data.currencySymbol}${formatNumber(item.total)}</td>
+                    <td class="text-center mono">${item.quantity}</td>
+                    <td class="text-right mono">${formatNumber(item.rate)}</td>
+                    <td class="text-right mono">${item.tax}%</td>
+                    <td class="text-right mono bold">${data.currencySymbol}${formatNumber(item.total)}</td>
                 </tr>
                 `).join('')}
             </tbody>
         </table>
-        
-        <div class="summary-container">
-            <div class="summary-box">
-                <div class="summary-row">
-                    <span>Subtotal</span>
+
+        <!-- Totals -->
+        <div class="totals-container">
+            <div class="totals-table">
+                <div class="total-row text-sm mono">
+                    <span class="text-muted">SUBTOTAL</span>
                     <span>${data.currencySymbol}${formatNumber(data.subtotal)}</span>
                 </div>
-                <div class="summary-row">
-                    <span>Taxation</span>
+                <div class="total-row text-sm mono">
+                    <span class="text-muted">TAX</span>
                     <span>${data.currencySymbol}${formatNumber(data.taxAmount)}</span>
                 </div>
-                ${data.discountAmount && data.discountAmount > 0 ? `
-                <div class="summary-row" style="color: #f59e0b">
-                    <span>Discount</span>
+                ${data.discountAmount ? `
+                <div class="total-row text-sm mono">
+                    <span class="text-muted">DISCOUNT</span>
                     <span>-${data.currencySymbol}${formatNumber(data.discountAmount)}</span>
-                </div>
-                ` : ''}
-                <div class="summary-row total">
-                    <span>Total Amount</span>
+                </div>` : ''}
+                
+                <div class="final-total total-row">
+                    <span class="tracking-wide">TOTAL</span>
                     <span>${data.currencySymbol}${formatNumber(data.totalAmount)}</span>
                 </div>
-                ${data.paidAmount && data.paidAmount > 0 ? `
-                <div class="summary-row accent">
-                    <span>Amount Paid</span>
+
+                ${data.paidAmount ? `
+                <div class="total-row text-sm mono mt-2">
+                    <span class="text-muted uppercase">Amount Paid</span>
                     <span>${data.currencySymbol}${formatNumber(data.paidAmount)}</span>
-                </div>
-                ` : ''}
-                ${data.balanceAmount && data.balanceAmount > 0 ? `
-                <div class="summary-row danger">
-                    <span>Balance Due</span>
+                </div>` : ''}
+
+                ${data.balanceAmount ? `
+                <div class="total-row text-sm mono">
+                    <span class="text-muted uppercase">Balance Due</span>
                     <span>${data.currencySymbol}${formatNumber(data.balanceAmount)}</span>
-                </div>
+                </div>` : ''}
+            </div>
+        </div>
+
+        <!-- Footer / Signature -->
+        <div class="footer">
+            <div style="flex: 1;">
+                ${data.notes ? `
+                    <p class="text-xs uppercase bold mb-1">NOTES</p>
+                    <p class="text-xs text-muted" style="max-width: 300px;">${data.notes}</p>
                 ` : ''}
             </div>
-        </div>
-        
-        ${data.notes ? `
-        <div class="notes">
-            <h4>Notes</h4>
-            <p>${data.notes}</p>
-        </div>
-        ` : ''}
-
-        <div class="signature-section">
-            <div class="sig-box">
-                <div class="sig-line">
-                    ${data.signature ? `<img src="${data.signature}" class="sig-image">` : ''}
-                </div>
-                <p class="sig-label">Authorized Signature</p>
-                <p class="sig-status">Digitally Validated Document</p>
+            <div style="text-align: right;">
+                ${data.signature ? `<img src="${data.signature}" style="height: 30px; margin-bottom: 5px;" />` : '<div style="height: 30px;"></div>'}
+                <p class="text-xs uppercase bold">AUTHORIZED SIGNATURE</p>
+                <div class="text-xs text-muted mt-2">GENERATED BY COWL SYSTEM</div>
             </div>
-        </div>
-
-        ${data.attachments && data.attachments.length > 0 ? `
-        <div class="attachments">
-            <h4 style="font-size: 10px; color: #94a3b8; text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px;">Recorded Proof</h4>
-            <div class="attachments-grid">
-                ${data.attachments.map((url, idx) => `
-                <div class="attachment-card">
-                    <img src="${url}" class="attachment-img" onerror="this.src='https://via.placeholder.com/200?text=Attachment+${idx + 1}'">
-                </div>
-                `).join('')}
-            </div>
-        </div>
-        ` : ''}
-        
-        <div class="footer">
-            <p>GENERATED BY LUCY-EX CLOUD SYSTEM • ${new Date().toLocaleString()}</p>
-            <p>${data.businessAddress || ''} • ${data.businessPhone || ''}</p>
         </div>
     </div>
 </body>
@@ -457,204 +303,132 @@ export function generateInvoiceHTML(data: InvoiceData): string {
 }
 
 /**
- * Opens invoice in new window for printing/saving
+ * Print invoice using a hidden iframe to prevent navigation
  */
 export function printInvoice(data: InvoiceData) {
-    const html = generateInvoiceHTML(data)
-    const printWindow = window.open('', '_blank')
-    if (printWindow) {
-        printWindow.document.write(html)
-        printWindow.document.close()
-        // Auto-trigger print dialog after a short delay
+    // strict reset for printing
+    const existingFrame = document.getElementById('invoice-print-frame')
+    if (existingFrame) existingFrame.remove()
+
+    const iframe = document.createElement('iframe')
+    iframe.id = 'invoice-print-frame'
+    iframe.style.position = 'fixed'
+    iframe.style.right = '0'
+    iframe.style.bottom = '0'
+    iframe.style.width = '0'
+    iframe.style.height = '0'
+    iframe.style.border = '0'
+    document.body.appendChild(iframe)
+
+    const doc = iframe.contentWindow?.document
+    if (doc) {
+        doc.open()
+        doc.write(generateInvoiceHTML(data))
+        doc.close()
+
+        // Wait for images
         setTimeout(() => {
-            printWindow.print()
-        }, 250)
+            iframe.contentWindow?.focus()
+            iframe.contentWindow?.print()
+            // Clean up after print dialog closes (approximate)
+            // or just leave it hidden, it's fine.
+        }, 500)
     }
 }
 
 
 /**
- * Download invoice as PDF file using jsPDF
+ * Download invoice as PDF file using html2canvas + jsPDF for accurate rendering
  */
-export async function downloadInvoice(data: InvoiceData) {
-    const { jsPDF } = await import('jspdf')
-    await import('jspdf-autotable')
+export async function downloadInvoice(data: InvoiceData): Promise<File | void> {
+    // 1. Create a hidden container to render the invoice specifically for capture
+    const container = document.createElement('div')
+    container.style.position = 'absolute'
+    container.style.top = '-10000px'
+    container.style.left = '-10000px'
+    // A4 width in pixels at roughly 96 DPI is ~794px, but we can go higher for quality. 
+    // 210mm = ~794px. Let's use 2x scale for sharpness.
+    container.style.width = '210mm'
+    container.style.minHeight = '297mm'
 
-    const doc = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: [126, 178]
-    })
+    // Inject the HTML
+    container.innerHTML = generateInvoiceHTML(data)
 
-    const isSale = data.type === 'SALE'
-    const title = isSale ? 'SALES INVOICE' : 'PURCHASE BILL'
+    // Append to body to ensure fonts and styles load
+    document.body.appendChild(container)
 
-    // Colors (using RGB)
-    const primaryGreen = [16, 185, 129] // #10b981
-    const primaryColor = [16, 185, 129]
-    const darkColor = [15, 23, 42] // slate-900
-    const grayColor = [100, 116, 139] // slate-500
+    try {
+        // Dynamic import
+        const html2canvas = (await import('html2canvas')).default
+        const { jsPDF } = await import('jspdf')
 
-    // Add Logo if available
-    let logoHeight = 0
-    if (data.businessLogoUrl) {
-        try {
-            doc.addImage(data.businessLogoUrl, 'PNG', 8, 8, 15, 10)
-            logoHeight = 12
-        } catch (e) {
-            // If logo fails to load, just skip it
-        }
-    }
+        // Small delay to ensure images/fonts might render (optional but safe)
+        await new Promise(resolve => setTimeout(resolve, 500))
 
-    // Title
-    doc.setFontSize(7)
-    doc.setFont('helvetica', 'bold')
-    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
-    doc.text(title, 8, 8 + logoHeight)
-
-    doc.setFontSize(3.5)
-    doc.setTextColor(grayColor[0], grayColor[1], grayColor[2])
-    doc.text(data.businessName.toUpperCase(), 8, 11 + logoHeight)
-
-    // Document No
-    doc.setFontSize(3)
-    doc.text('NO.', 118, 7 + logoHeight, { align: 'right' })
-    doc.setFontSize(5)
-    doc.setTextColor(darkColor[0], darkColor[1], darkColor[2])
-    doc.text(data.invoiceNumber, 118, 11 + logoHeight, { align: 'right' })
-
-    // Divider
-    doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2])
-    doc.setLineWidth(0.2)
-    doc.line(8, 14 + logoHeight, 118, 14 + logoHeight)
-
-    // Parties
-    let y = 20 + logoHeight
-
-    // FROM
-    doc.setFontSize(2.5)
-    doc.setTextColor(grayColor[0], grayColor[1], grayColor[2])
-    doc.text('FROM', 8, y)
-    doc.text(isSale ? 'BILL TO' : 'SUPPLIER', 66, y)
-
-    y += 2
-    doc.setFontSize(4.5)
-    doc.setFont('helvetica', 'bold')
-    doc.setTextColor(darkColor[0], darkColor[1], darkColor[2])
-    doc.text(data.businessName, 8, y)
-    doc.text(data.partyName, 66, y)
-
-    y += 2
-    doc.setFontSize(3.5)
-    doc.setFont('helvetica', 'normal')
-    doc.setTextColor(grayColor[0], grayColor[1], grayColor[2])
-    doc.text(data.businessAddress || '', 8, y, { maxWidth: 50 })
-    doc.text(data.partyAddress || '', 66, y, { maxWidth: 50 })
-
-    y += 4
-    doc.text(data.businessPhone || '', 8, y)
-    doc.text(data.partyPhone || '', 66, y)
-
-    // Meta Grid
-    y += 7
-    doc.setFillColor(248, 250, 252)
-    doc.roundedRect(8, y, 110, 7, 0.8, 0.8, 'F')
-
-    doc.setFontSize(2.5)
-    doc.setFont('helvetica', 'bold')
-    doc.text('DATE', 26, y + 2.5, { align: 'center' })
-    doc.text('DUE DATE', 63, y + 2.5, { align: 'center' })
-    doc.text('STATUS', 100, y + 2.5, { align: 'center' })
-
-    doc.setFontSize(3.5)
-    doc.setTextColor(darkColor[0], darkColor[1], darkColor[2])
-    doc.text(new Date(data.date).toLocaleDateString(), 26, y + 5.5, { align: 'center' })
-    doc.text(data.dueDate ? new Date(data.dueDate).toLocaleDateString() : 'N/A', 63, y + 5.5, { align: 'center' })
-    doc.text(data.status, 100, y + 5.5, { align: 'center' })
-
-    // Table
-    y += 10
-    const tableBody = data.items.map(item => [
-        item.description,
-        item.quantity.toString(),
-        `${data.currencySymbol}${formatNumber(item.rate)}`,
-        `${item.tax}%`,
-        `${data.currencySymbol}${formatNumber(item.total)}`
-    ])
-
-        ; (doc as any).autoTable({
-            startY: y,
-            head: [['Item', 'Qty', 'Rate', 'Tax', 'Total']],
-            body: tableBody,
-            theme: 'grid',
-            margin: { left: 8, right: 8 },
-            headStyles: {
-                fillColor: [16, 185, 129],
-                textColor: 255,
-                fontSize: 3.5,
-                fontStyle: 'bold',
-                halign: 'left'
-            },
-            columnStyles: {
-                1: { halign: 'center' },
-                2: { halign: 'right' },
-                3: { halign: 'right' },
-                4: { halign: 'right', fontStyle: 'bold' }
-            },
-            styles: {
-                fontSize: 3.5,
-                cellPadding: 1
-            }
+        const canvas = await html2canvas(container.querySelector('.page') as HTMLElement, {
+            scale: 2, // Higher quality
+            useCORS: true, // For external images
+            logging: false,
+            backgroundColor: '#ffffff'
         })
 
-    // Totals
-    const finalY = (doc as any).lastAutoTable.finalY + 3
-    doc.setFontSize(3.5)
-    doc.setTextColor(grayColor[0], grayColor[1], grayColor[2])
+        const imgData = canvas.toDataURL('image/jpeg', 1.0)
 
-    let ty = finalY
-    doc.text('Subtotal:', 88, ty)
-    doc.setTextColor(darkColor[0], darkColor[1], darkColor[2])
-    doc.text(`${data.currencySymbol}${formatNumber(data.subtotal)}`, 118, ty, { align: 'right' })
+        // A4 Dimensions: 210 x 297 mm
+        const pdf = new jsPDF({
+            orientation: 'p',
+            unit: 'mm',
+            format: 'a4'
+        })
 
-    ty += 2.5
-    doc.setTextColor(grayColor[0], grayColor[1], grayColor[2])
-    doc.text('Tax:', 88, ty)
-    doc.setTextColor(darkColor[0], darkColor[1], darkColor[2])
-    doc.text(`${data.currencySymbol}${formatNumber(data.taxAmount)}`, 118, ty, { align: 'right' })
+        const pdfWidth = pdf.internal.pageSize.getWidth()
+        const pdfHeight = pdf.internal.pageSize.getHeight()
 
-    if (data.discountAmount && data.discountAmount > 0) {
-        ty += 2.5
-        doc.setTextColor(245, 158, 11)
-        doc.text('Off:', 88, ty)
-        doc.text(`-${data.currencySymbol}${formatNumber(data.discountAmount)}`, 118, ty, { align: 'right' })
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight)
+
+        // Check if we need to return a file (for sharing) or save it
+        const blob = pdf.output('blob')
+        // We'll create a link to download it here since this is the primary purpose
+        // but we return the file object for shareInvoice below
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `${data.invoiceNumber}.pdf`
+        a.click()
+        URL.revokeObjectURL(url)
+
+        return new File([blob], `${data.invoiceNumber}.pdf`, { type: 'application/pdf' })
+
+    } catch (error) {
+        console.error('PDF Generation Failed:', error)
+        alert('Failed to generate PDF. Please try again.')
+    } finally {
+        document.body.removeChild(container)
     }
-
-    ty += 4
-    doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2])
-    doc.line(88, ty - 2, 118, ty - 2)
-    doc.setFontSize(5)
-    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
-    doc.text('TOTAL:', 88, ty)
-    doc.setTextColor(darkColor[0], darkColor[1], darkColor[2])
-    doc.text(`${data.currencySymbol}${formatNumber(data.totalAmount)}`, 118, ty, { align: 'right' })
-
-    // Signature Area
-    if (data.signature) {
-        doc.addImage(data.signature, 'PNG', 88, ty + 3, 15, 8)
-    }
-    doc.setFontSize(2.5)
-    doc.setTextColor(grayColor[0], grayColor[1], grayColor[2])
-    doc.line(88, ty + 12, 118, ty + 12)
-    doc.text('AUTHORIZED SIGNATURE', 103, ty + 14, { align: 'center' })
-    doc.setFontSize(2)
-    doc.text('DIGITALLY VALIDATED DOCUMENT', 103, ty + 16, { align: 'center' })
-
-    // Footer
-    doc.setFontSize(2.5)
-    doc.setTextColor(grayColor[0], grayColor[1], grayColor[2])
-    doc.text(`GENERATED BY CLAIRE • ${new Date().toLocaleString()}`, 63, 174, { align: 'center' })
-
-    doc.save(`${data.invoiceNumber}.pdf`)
 }
 
+/**
+ * Handle native sharing of the Invoice PDF
+ */
+export async function shareInvoice(data: InvoiceData) {
+    try {
+        // downloadInvoice() will trigger a download, which might be annoying if sharing.
+        // Ideally we should separate "generateBlob" and "download". 
+        // But for time, let's just let it download and then share. 
+        // Actually, let's modify downloadInvoice logic above slightly to NOT auto-download if a flag is passed?
+        // Or just let it happen. The user might want both.
+
+        const file = await downloadInvoice(data)
+
+        if (file && navigator.canShare && navigator.canShare({ files: [file as File] })) {
+            await navigator.share({
+                title: `Invoice ${data.invoiceNumber}`,
+                text: `Invoice ${data.invoiceNumber} from ${data.businessName}`,
+                files: [file as File]
+            })
+        }
+    } catch (error) {
+        console.error('Error sharing:', error)
+        // If sharing fails, at least the downloadInvoice call already saved it.
+    }
+}

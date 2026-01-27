@@ -1,7 +1,7 @@
 'use client'
 
 import { X, Printer, Download, Share2, Mail, MessageCircle } from 'lucide-react'
-import { InvoiceData } from '@/utils/invoice-generator'
+import { InvoiceData, shareInvoice, downloadInvoice } from '@/utils/invoice-generator'
 import { format } from 'date-fns'
 import clsx from 'clsx'
 import { formatNumber } from '@/lib/format-number'
@@ -66,8 +66,16 @@ export default function InvoicePreviewModal({
                     </div>
                     <div className="flex items-center gap-2">
                         <button
+                            onClick={() => shareInvoice(data)}
+                            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition-all shadow-lg active:scale-95"
+                            title="Share"
+                        >
+                            <Share2 className="h-4 w-4" />
+                            <span className="text-[10px] font-bold uppercase tracking-wider hidden sm:inline">Share</span>
+                        </button>
+                        <button
                             onClick={handleEmailShare}
-                            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all shadow-lg active:scale-95"
+                            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all shadow-lg active:scale-95 hidden md:flex"
                             title="Share via Email"
                         >
                             <Mail className="h-4 w-4" />
@@ -75,7 +83,7 @@ export default function InvoicePreviewModal({
                         </button>
                         <button
                             onClick={handleWhatsAppShare}
-                            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-green-600 text-white hover:bg-green-700 transition-all shadow-lg active:scale-95"
+                            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-green-600 text-white hover:bg-green-700 transition-all shadow-lg active:scale-95 hidden md:flex"
                             title="Share via WhatsApp"
                         >
                             <MessageCircle className="h-4 w-4" />
@@ -91,7 +99,7 @@ export default function InvoicePreviewModal({
                             <span className="text-[10px] font-bold uppercase tracking-wider hidden sm:inline">Print</span>
                         </button>
                         <button
-                            onClick={onDownload}
+                            onClick={() => downloadInvoice(data)}
                             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--deep-contrast)] text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] transition-all shadow-lg active:scale-95"
                             title="Download PDF"
                         >
@@ -106,209 +114,134 @@ export default function InvoicePreviewModal({
                 </div>
 
                 {/* Preview Content */}
-                <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-100/50 custom-scrollbar">
-                    <div className="w-full max-w-[126mm] mx-auto bg-white shadow-2xl overflow-hidden border border-black/5 flex flex-col min-h-[178mm]">
-                        {/* Internal Invoice Styling */}
-                        <div className="p-8 md:p-10 space-y-6 flex-1">
-                            {/* Brand Header */}
-                            <div className="flex justify-between items-start border-b border-[var(--primary-green)] pb-1.5">
-                                <div className="flex items-center gap-3">
-                                    {data.businessLogoUrl && (
-                                        <img
-                                            src={data.businessLogoUrl}
-                                            alt="Logo"
-                                            className="h-12 w-12 object-contain"
-                                        />
-                                    )}
-                                    <div>
-                                        <h1 className="text-[12px] font-black text-[var(--primary-green)] tracking-tighter leading-none">
-                                            {isSale ? 'SALES INVOICE' : 'PURCHASE BILL'}
-                                        </h1>
-                                        <p className="text-[6px] font-bold text-black/60 mt-0.5 uppercase tracking-widest leading-none">{data.businessName}</p>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-[5px] font-black text-black/40 uppercase tracking-widest leading-none">No.</p>
-                                    <p className="text-[9px] font-black text-black leading-none mt-0.5">{data.invoiceNumber}</p>
+                <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-[#f3f3f3] custom-scrollbar">
+                    <div className="w-full max-w-[210mm] mx-auto bg-white shadow-xl overflow-hidden flex flex-col min-h-[297mm] p-[40px] text-black font-['Inter'] relative">
+
+                        {/* Header */}
+                        <div className="flex justify-between items-start mb-10">
+                            <div className="flex-1">
+                                {data.businessLogoUrl && (
+                                    <img
+                                        src={data.businessLogoUrl}
+                                        alt="Logo"
+                                        className="h-[50px] w-auto object-contain mb-4 grayscale filter block"
+                                    />
+                                )}
+                                <h1 className="text-2xl font-black uppercase tracking-tight">{data.businessName}</h1>
+                                <div className="text-[9px] font-mono uppercase tracking-wider mt-2 leading-relaxed text-neutral-500">
+                                    <p>{data.businessAddress}</p>
+                                    <p>{data.businessPhone}</p>
                                 </div>
                             </div>
-
-                            {/* Parties Info */}
-                            <div className="grid grid-cols-2 gap-3">
-                                <div className="space-y-0.5">
-                                    <h3 className="text-[5px] font-black text-black/40 uppercase tracking-widest border-b border-black/5 pb-0.5">FROM</h3>
-                                    <div className="space-y-0.5 pt-0.5">
-                                        <p className="text-[8px] font-black text-black uppercase leading-tight">{data.businessName}</p>
-                                        <p className="text-[6px] text-black/60 leading-tight max-w-[120px] font-medium">{data.businessAddress}</p>
-                                        <p className="text-[6px] font-bold text-black/80">{data.businessPhone}</p>
-                                    </div>
+                            <div className="text-right">
+                                <div className="inline-block border border-black px-3 py-1 text-[10px] font-mono font-bold uppercase mb-3">
+                                    {data.status}
                                 </div>
-                                <div className="space-y-0.5">
-                                    <h3 className="text-[5px] font-black text-black/40 uppercase tracking-widest border-b border-black/5 pb-0.5">
-                                        {isSale ? 'BILL TO' : 'SUPPLIER'}
-                                    </h3>
-                                    <div className="space-y-0.5 pt-0.5">
-                                        <p className="text-[8px] font-black text-black uppercase leading-tight">{data.partyName}</p>
-                                        <p className="text-[6px] text-black/60 leading-tight max-w-[120px] font-medium">{data.partyAddress}</p>
-                                        <p className="text-[6px] font-bold text-black/80">{data.partyPhone}</p>
-                                    </div>
+                                <h2 className="text-2xl font-black uppercase tracking-widest text-black mb-2">{isSale ? 'INVOICE' : 'PURCHASE'}</h2>
+                                <div className="text-[11px] font-mono">
+                                    <div className="mb-0.5"><span className="text-neutral-500">NO.</span> <span className="font-bold">{data.invoiceNumber}</span></div>
+                                    <div><span className="text-neutral-500">DATE</span> <span className="font-bold">{data.date}</span></div>
                                 </div>
                             </div>
+                        </div>
 
-                            {/* Dates & Status */}
-                            <div className="grid grid-cols-3 gap-2 bg-slate-50 p-2 rounded border border-black/5">
-                                <div>
-                                    <p className="text-[5px] font-black text-black/40 uppercase tracking-widest text-center">ISSUE DATE</p>
-                                    <p className="text-[8px] font-bold text-center leading-none mt-0.5">{data.date}</p>
-                                </div>
-                                <div>
-                                    <p className="text-[5px] font-black text-black/40 uppercase tracking-widest text-center">DUE DATE</p>
-                                    <p className="text-[8px] font-bold text-center leading-none mt-0.5">{data.dueDate || 'N/A'}</p>
-                                </div>
-                                <div>
-                                    <p className="text-[5px] font-black text-black/40 uppercase tracking-widest text-center">STATUS</p>
-                                    <div className="flex justify-center mt-0.5">
-                                        <span className={clsx(
-                                            "text-[6px] font-black uppercase tracking-tighter px-1 py-0.5 rounded border leading-none",
-                                            data.status === 'PAID' ? "bg-emerald-50 text-emerald-600 border-emerald-200" :
-                                                data.status === 'PARTIAL' ? "bg-amber-50 text-amber-600 border-amber-200" :
-                                                    "bg-rose-50 text-rose-600 border-rose-200"
-                                        )}>
-                                            {data.status}
-                                        </span>
-                                    </div>
-                                </div>
+                        {/* Info Grid */}
+                        <div className="grid grid-cols-2 gap-10 py-6 border-y-2 border-black mb-10">
+                            <div>
+                                <p className="text-[9px] font-mono uppercase text-neutral-500 mb-2 tracking-widest">ISSUED TO</p>
+                                <p className="text-sm font-black uppercase tracking-tight">{data.partyName}</p>
+                                <p className="text-[11px] font-mono mt-1 text-neutral-800">{data.partyAddress || 'Address Not Provided'}</p>
+                                <p className="text-[11px] font-mono mt-0.5 text-neutral-800">{data.partyPhone}</p>
                             </div>
+                            <div className="text-right">
+                                <p className="text-[9px] font-mono uppercase text-neutral-500 mb-2 tracking-widest">PAYMENT DETAILS</p>
+                                <p className="text-[11px] font-mono mb-1">DUE DATE: <span className="font-bold">{data.dueDate || 'ON RECEIPT'}</span></p>
+                                <p className="text-[11px] font-mono">CURRENCY: <span className="font-bold">{data.currency.toUpperCase()}</span></p>
+                            </div>
+                        </div>
 
-                            {/* Items Table */}
-                            <table className="w-full text-left">
-                                <thead>
-                                    <tr className="bg-[var(--primary-green)] text-white">
-                                        <th className="p-1.5 rounded-tl text-[6px] font-black uppercase tracking-widest leading-none">Item</th>
-                                        <th className="p-1.5 text-[6px] font-black uppercase tracking-widest text-center leading-none">Qty</th>
-                                        <th className="p-1.5 text-[6px] font-black uppercase tracking-widest text-right leading-none">Rate</th>
-                                        <th className="p-1.5 text-[6px] font-black uppercase tracking-widest text-right leading-none">Tax</th>
-                                        <th className="p-1.5 rounded-tr text-[6px] font-black uppercase tracking-widest text-right leading-none">Total</th>
+                        {/* Items Table */}
+                        <table className="w-full border-collapse mb-8">
+                            <thead>
+                                <tr className="border-b-2 border-black">
+                                    <th className="text-left font-mono text-[9px] uppercase tracking-wider text-black pb-2 pl-1 w-1/2">DESCRIPTION</th>
+                                    <th className="text-center font-mono text-[9px] uppercase tracking-wider text-black pb-2 w-[10%]">QTY</th>
+                                    <th className="text-right font-mono text-[9px] uppercase tracking-wider text-black pb-2 w-[15%]">RATE</th>
+                                    <th className="text-right font-mono text-[9px] uppercase tracking-wider text-black pb-2 w-[10%]">TAX</th>
+                                    <th className="text-right font-mono text-[9px] uppercase tracking-wider text-black pb-2 w-[15%] pr-1">AMOUNT</th>
+                                </tr>
+                            </thead>
+                            <tbody className="text-[12px]">
+                                {data.items.map((item, idx) => (
+                                    <tr key={idx} className="border-b border-neutral-200 last:border-b-2 last:border-black">
+                                        <td className="py-3 pl-1 font-bold">{item.description}</td>
+                                        <td className="py-3 text-center font-mono">{item.quantity}</td>
+                                        <td className="py-3 text-right font-mono text-neutral-600">{formatNumber(item.rate)}</td>
+                                        <td className="py-3 text-right font-mono text-neutral-600">{item.tax}%</td>
+                                        <td className="py-3 pr-1 text-right font-mono font-bold">{data.currencySymbol}{formatNumber(item.total)}</td>
                                     </tr>
-                                </thead>
-                                <tbody className="divide-y divide-black/5">
-                                    {data.items.map((item, idx) => (
-                                        <tr key={idx} className="hover:bg-slate-50/50">
-                                            <td className="p-1 px-1.5 text-[7px] font-bold text-black tracking-tight leading-tight">{item.description}</td>
-                                            <td className="p-1 px-1.5 text-[7px] font-medium text-center leading-none">{item.quantity}</td>
-                                            <td className="p-1 px-1.5 text-[7px] font-medium text-right leading-none">{data.currencySymbol}{formatNumber(item.rate)}</td>
-                                            <td className="p-1 px-1.5 text-[7px] font-medium text-right leading-none">{item.tax}%</td>
-                                            <td className="p-1 px-1.5 text-[7px] font-black text-right leading-none">{data.currencySymbol}{formatNumber(item.total)}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                ))}
+                            </tbody>
+                        </table>
 
-                            {/* Totals Section */}
-                            <div className="flex justify-end pt-1">
-                                <div className="w-28 space-y-0.5">
-                                    <div className="flex justify-between text-[6px]">
-                                        <span className="text-black/40 font-bold uppercase">Sub</span>
-                                        <span className="text-black font-bold">{data.currencySymbol}{formatNumber(data.subtotal)}</span>
-                                    </div>
-                                    <div className="flex justify-between text-[6px]">
-                                        <span className="text-black/40 font-bold uppercase">Tax</span>
-                                        <span className="text-black font-bold">{data.currencySymbol}{formatNumber(data.taxAmount)}</span>
-                                    </div>
-                                    {data.discountAmount !== undefined && data.discountAmount > 0 && (
-                                        <div className="flex justify-between text-[6px] text-amber-600">
-                                            <span className="font-bold uppercase">Off</span>
-                                            <span className="font-bold">-{data.currencySymbol}{formatNumber(data.discountAmount)}</span>
-                                        </div>
-                                    )}
-                                    <div className="flex justify-between pt-0.5 border-t border-[var(--primary-green)]">
-                                        <span className="text-[8px] font-black uppercase text-[var(--primary-green)] leading-none pt-0.5">Total</span>
-                                        <span className="text-[10px] font-black text-black leading-none pt-0.5">{data.currencySymbol}{formatNumber(data.totalAmount)}</span>
-                                    </div>
-
-                                    {data.paidAmount !== undefined && data.paidAmount > 0 && (
-                                        <div className="flex justify-between text-[6px] pt-0.5">
-                                            <span className="text-emerald-600 font-bold uppercase">Paid</span>
-                                            <span className="text-emerald-600 font-bold">{data.currencySymbol}{formatNumber(data.paidAmount)}</span>
-                                        </div>
-                                    )}
-                                    {data.balanceAmount !== undefined && data.balanceAmount > 0 && (
-                                        <div className="flex justify-between text-[6px]">
-                                            <span className="text-rose-600 font-bold uppercase">Due</span>
-                                            <span className="text-rose-600 font-bold">{data.currencySymbol}{formatNumber(data.balanceAmount)}</span>
-                                        </div>
-                                    )}
+                        {/* Totals */}
+                        <div className="flex justify-end mb-auto">
+                            <div className="w-[300px] space-y-1">
+                                <div className="flex justify-between text-[11px] font-mono">
+                                    <span className="text-neutral-500">SUBTOTAL</span>
+                                    <span>{data.currencySymbol}{formatNumber(data.subtotal)}</span>
                                 </div>
-                            </div>
-
-                            {/* Notes */}
-                            {data.notes && (
-                                <div className="bg-slate-50 px-4 py-2.5 rounded-lg border-l-2 border-[var(--primary-green)] mt-6">
-                                    <h4 className="text-[7px] font-black text-black/40 uppercase tracking-widest mb-1">Notes</h4>
-                                    <p className="text-[8px] text-black/70 leading-snug font-medium">{data.notes}</p>
+                                <div className="flex justify-between text-[11px] font-mono">
+                                    <span className="text-neutral-500">TAX</span>
+                                    <span>{data.currencySymbol}{formatNumber(data.taxAmount)}</span>
                                 </div>
-                            )}
+                                {data.discountAmount ? (
+                                    <div className="flex justify-between text-[11px] font-mono text-neutral-800">
+                                        <span className="text-neutral-500">DISCOUNT</span>
+                                        <span>-{data.currencySymbol}{formatNumber(data.discountAmount)}</span>
+                                    </div>
+                                ) : null}
 
-                            {/* Attachments / Proof */}
-                            {data.attachments && data.attachments.length > 0 && (
-                                <div className="mt-12 space-y-4">
-                                    <h4 className="text-[10px] font-black text-black/40 uppercase tracking-widest border-b border-black/5 pb-1">ATTACHMENTS / RECORDED PROOF</h4>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        {data.attachments.map((url, idx) => (
-                                            <div key={idx} className="rounded-xl overflow-hidden border border-black/5 bg-slate-50">
-                                                <img
-                                                    src={url}
-                                                    className="w-full h-48 object-contain bg-white"
-                                                    alt={`Proof ${idx + 1}`}
-                                                    onError={(e) => (e.currentTarget.src = 'https://via.placeholder.com/200?text=Attachment+Error')}
-                                                />
-                                                <div className="p-3 text-[9px] font-black text-black/40 text-center uppercase tracking-widest bg-white border-t border-black/5">
-                                                    RECORDED PROOF DOCUMENT #{idx + 1}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
+                                <div className="flex justify-between items-center py-3 mt-2 border-y-2 border-black">
+                                    <span className="text-sm font-black uppercase tracking-widest">TOTAL</span>
+                                    <span className="text-lg font-black font-mono">{data.currencySymbol}{formatNumber(data.totalAmount)}</span>
                                 </div>
-                            )}
 
-                            {/* Signature */}
-                            <div className="mt-16 flex justify-end">
-                                <div className="text-center w-52 space-y-3">
-                                    <div className="relative group">
-                                        <div className="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                                            <span className="px-2 py-0.5 rounded bg-[var(--primary-green)] text-[6px] font-black text-white uppercase tracking-[0.2em]">Verified Secure</span>
-                                        </div>
-                                        {data.signature ? (
-                                            <div className="border-b-2 border-black pb-1 relative z-10">
-                                                <img src={data.signature} className="h-16 mx-auto object-contain transition-transform group-hover:scale-110 duration-500" alt="Signature" />
-                                            </div>
-                                        ) : (
-                                            <div className="h-16 border-b-2 border-black/10 relative z-10" />
-                                        )}
+                                {data.paidAmount ? (
+                                    <div className="flex justify-between text-[11px] font-mono mt-2 pt-1">
+                                        <span className="text-neutral-500 uppercase">Amount Paid</span>
+                                        <span>{data.currencySymbol}{formatNumber(data.paidAmount)}</span>
                                     </div>
-                                    <div className="space-y-1">
-                                        <p className="text-[10px] font-black text-black leading-none uppercase tracking-[0.2em]">Authorized Signature</p>
-                                        <p className="text-[6px] font-bold text-black/30 uppercase tracking-widest">Digitally Validated Document</p>
+                                ) : null}
+                                {data.balanceAmount ? (
+                                    <div className="flex justify-between text-[11px] font-mono">
+                                        <span className="text-neutral-500 uppercase">Balance Due</span>
+                                        <span>{data.currencySymbol}{formatNumber(data.balanceAmount)}</span>
                                     </div>
-                                </div>
+                                ) : null}
                             </div>
                         </div>
 
                         {/* Footer */}
-                        <div className="bg-slate-50 p-4 border-t border-black/5 text-center mt-auto">
-                            <p className="text-[7px] font-black text-black/20 uppercase tracking-[0.2em]">
-                                Generated by Claire • Official Transaction Document
-                            </p>
-                            <p className="text-[6px] font-medium text-black/30 mt-0.5">
-                                {data.businessAddress} • {data.businessPhone}
-                            </p>
+                        <div className="mt-12 pt-4 border-t border-black flex items-end justify-between">
+                            <div className="flex-1">
+                                {data.notes && (
+                                    <div className="max-w-xs">
+                                        <p className="text-[9px] font-bold uppercase mb-1">NOTES</p>
+                                        <p className="text-[10px] text-neutral-500 leading-relaxed uppercase">{data.notes}</p>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="text-right">
+                                {data.signature ? (
+                                    <img src={data.signature} className="h-8 mb-2 ml-auto object-contain grayscale" alt="Signature" />
+                                ) : <div className="h-8" />}
+                                <p className="text-[9px] font-bold uppercase tracking-wider">AUTHORIZED SIGNATURE</p>
+                                <p className="text-[9px] font-mono text-neutral-400 mt-1 uppercase">GENERATED BY COWL SYSTEM</p>
+                            </div>
                         </div>
-                    </div>
-                </div>
 
-                {/* Bottom Bar Mobile Only or Extra Info */}
-                <div className="p-4 border-t border-black/5 bg-white/50 text-center text-[10px] font-bold text-black/20 uppercase tracking-widest">
-                    Safe & Secure Cloud Ledger
+                    </div>
                 </div>
             </div>
         </div>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Wallet, ArrowUpRight, ArrowDownRight, Plus, TrendingUp, TrendingDown, Receipt, ArrowRightLeft, Search, Filter, ArrowUpDown, Trash2, Edit2, Calendar } from 'lucide-react'
+import { Wallet, ArrowUpRight, ArrowDownRight, Plus, TrendingUp, TrendingDown, Receipt, ArrowRightLeft, Search, Filter, ArrowUpDown, Trash2, Edit2, Calendar, Printer } from 'lucide-react'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -296,7 +296,16 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                                                 {t.type === 'RECEIPT' ? '+' : '-'} {formatCurrency(t.amount)}
                                             </p>
                                         </div>
-                                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                                        <div className="flex items-center gap-1 transition-opacity shrink-0">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    window.print()
+                                                }}
+                                                className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white transition-all"
+                                            >
+                                                <Printer className="h-2.5 w-2.5" />
+                                            </button>
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); handleEdit(e, t); }}
                                                 className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-blue-500 hover:bg-blue-500 hover:text-white transition-all"

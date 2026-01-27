@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Save, Loader2, CheckCircle2, Package, Tag, Trash2, Box, Layers, ChevronDown, ChevronUp } from 'lucide-react'
+import { ArrowLeft, Save, Loader2, CheckCircle2, Package, Tag, Box, Layers, ChevronDown, ChevronUp } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/context/business-context'
 import Link from 'next/link'
@@ -20,10 +20,8 @@ export default function CompactItemForm({ initialData }: CompactItemFormProps) {
     const router = useRouter()
     const supabase = createClient()
     const [loading, setLoading] = useState(false)
-    const [deleting, setDeleting] = useState(false)
     const [success, setSuccess] = useState(false)
     const [isUnitPickerOpen, setIsUnitPickerOpen] = useState(false)
-    const [isConfirmOpen, setIsConfirmOpen] = useState(false)
     const [showMore, setShowMore] = useState(false)
 
     const isEdit = !!initialData?.id
@@ -99,25 +97,7 @@ export default function CompactItemForm({ initialData }: CompactItemFormProps) {
         }
     }
 
-    const handleDelete = async () => {
-        if (!initialData?.id) return
-        setDeleting(true)
-        try {
-            const { error } = await supabase.from('items').delete().eq('id', initialData.id)
-            if (error) throw error
-            setSuccess(true)
-            router.refresh()
-            setTimeout(() => {
-                setSuccess(false)
-                router.push('/dashboard/inventory')
-            }, 1000)
-        } catch (err: any) {
-            alert('Error deleting item: ' + err.message)
-        } finally {
-            setDeleting(false)
-            setIsConfirmOpen(false)
-        }
-    }
+
 
     if (success) {
         return (
@@ -145,16 +125,7 @@ export default function CompactItemForm({ initialData }: CompactItemFormProps) {
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
-                    {isEdit && (
-                        <button
-                            type="button"
-                            onClick={() => setIsConfirmOpen(true)}
-                            className="flex items-center gap-1.5 px-4 py-2 lg:py-1.5 rounded-xl bg-rose-500/5 text-rose-500 text-[11px] lg:text-[9px] font-black uppercase tracking-wider hover:bg-rose-500 hover:text-white border border-rose-500/10 transition-all shadow-sm active:scale-95"
-                        >
-                            <Trash2 className="h-4 w-4 lg:h-3 lg:w-3" />
-                            <span className="hidden sm:inline">Delete</span>
-                        </button>
-                    )}
+
                     <button
                         type="submit"
                         disabled={loading || !formData.name}
@@ -371,16 +342,7 @@ export default function CompactItemForm({ initialData }: CompactItemFormProps) {
                 selectedValue={formData.unit}
             />
 
-            <ConfirmModal
-                isOpen={isConfirmOpen}
-                onClose={() => setIsConfirmOpen(false)}
-                onConfirm={handleDelete}
-                isLoading={deleting}
-                title="Purge Resource?"
-                message="Irreversibly delete this item from the central registry? All historical data will be decoupled."
-                confirmText="Purge"
-                variant="danger"
-            />
+
         </form>
     )
 }

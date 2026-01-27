@@ -121,8 +121,6 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
     const [partyId, setPartyId] = useState(initialData?.party_id || '')
     const [date, setDate] = useState(initialData?.date || new Date().toISOString().split('T')[0])
     const [invoiceNumber, setInvoiceNumber] = useState(initialData?.invoice_number || 'INV-' + Math.floor(Math.random() * 10000))
-    const [category, setCategory] = useState(initialData?.category || '')
-    const [sku, setSku] = useState(initialData?.sku || '')
     const [paymentMode, setPaymentMode] = useState<string>('UNPAID')
     const [rows, setRows] = useState<InvoiceItem[]>(initialLineItems?.map(item => ({
         itemId: item.item_id,
@@ -364,22 +362,42 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
     }
 
     const handleDelete = async () => {
-        if (!initialData?.id || !activeBusinessId) return
+        // Robust ID cleaning
+        const cleanUUID = (id: any) => (id && id !== 'undefined' && id !== '') ? id : null
+        const id = cleanUUID(initialData?.id)
+
+        if (!id || !activeBusinessId) {
+            console.error('Delete aborted: Missing ID')
+            alert('Cannot delete: Invalid ID. Please refresh and try again.')
+            return
+        }
+
         setDeleting(true)
         try {
+            console.log('Starting delete for invoice:', id)
+
+            // 1. Revert Stock (Soft Fail)
             for (const item of initialLineItems || []) {
                 if (item.item_id) {
-                    const { data: dbItem } = await supabase.from('items').select('stock_quantity').eq('id', item.item_id).single()
+                    const { data: dbItem } = await supabase.from('items').select('stock_quantity').eq('id', cleanUUID(item.item_id)).maybeSingle()
                     if (dbItem) {
                         const multiplier = isSale ? 1 : -1
                         const newStock = (dbItem.stock_quantity || 0) + (item.quantity * multiplier)
-                        await supabase.from('items').update({ stock_quantity: newStock }).eq('id', item.item_id)
+                        await supabase.from('items').update({ stock_quantity: newStock }).eq('id', cleanUUID(item.item_id))
                     }
                 }
             }
 
-            const { error } = await supabase.from('invoices').delete().eq('id', initialData.id)
-            if (error) throw error
+            // 2. Cascade Delete Dependencies
+            const { error: txError } = await supabase.from('transactions').delete().eq('invoice_id', id)
+            if (txError) throw new Error(`Transaction Error: ${txError.message}`)
+
+            const { error: itemsError } = await supabase.from('invoice_items').delete().eq('invoice_id', id)
+            if (itemsError) throw new Error(`Items Error: ${itemsError.message}`)
+
+            // 3. Delete Parent Invoice
+            const { error } = await supabase.from('invoices').delete().eq('id', id)
+            if (error) throw new Error(`Invoice Error: ${error.message}`)
 
             setSuccess(true)
             router.refresh()
@@ -387,8 +405,11 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                 setSuccess(false)
                 router.push(isSale ? '/dashboard/sales' : '/dashboard/purchases')
             }, 1000)
+
         } catch (err: any) {
-            alert('Error deleting: ' + err.message)
+            console.error('Delete Failure:', err)
+            // Ensure message is never undefined "nothin edetine"
+            alert(`Deletion Failed: ${err.message || 'Unknown Network Error'}`)
         } finally {
             setDeleting(false)
             setIsConfirmOpen(false)
@@ -446,8 +467,6 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                         total_amount: totalAmount,
                         balance_amount: newBalance,
                         status: status,
-                        category: category,
-                        sku: sku,
                         notes: notes,
                         discount_amount: discountAmount,
                         tax_amount: invoiceTaxAmount,
@@ -506,8 +525,6 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                         balance_amount: currentBalance,
                         type: isSale ? 'SALE' : 'PURCHASE',
                         status: status,
-                        category: category,
-                        sku: sku,
                         notes: notes,
                         discount_amount: discountAmount,
                         tax_amount: invoiceTaxAmount,
@@ -610,17 +627,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                             <Printer className="h-3 w-3" />
                             <span className="hidden sm:inline">Preview</span>
                         </button>
-                        {isEdit && (
-                            <button
-                                type="button"
-                                onClick={() => setIsConfirmOpen(true)}
-                                disabled={loading || deleting}
-                                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-500/5 text-rose-500 text-[8px] font-black uppercase tracking-widest hover:bg-rose-500 hover:text-white border border-rose-500/10 transition-all shadow-sm active:scale-95"
-                            >
-                                {deleting ? <Loader2 className="h-2.5 w-2.5 animate-spin" /> : <Trash2 className="h-2.5 w-2.5" />}
-                                <span className="hidden sm:inline">Delete</span>
-                            </button>
-                        )}
+
                         <button
                             type="submit"
                             disabled={loading || !partyId || rows.length === 0}
@@ -698,27 +705,8 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                                             className="w-full h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[10px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all"
                                                         />
                                                     </div>
-                                                    <div className="grid grid-cols-2 gap-1.5">
-                                                        <div>
-                                                            <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1 ml-0.5">Classification</label>
-                                                            <input
-                                                                type="text"
-                                                                value={category}
-                                                                onChange={(e) => setCategory(e.target.value)}
-                                                                className="w-full h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[9px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all"
-                                                                placeholder="Category..."
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1 ml-0.5">Registry SKU</label>
-                                                            <input
-                                                                type="text"
-                                                                value={sku}
-                                                                onChange={(e) => setSku(e.target.value)}
-                                                                className="w-full h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[9px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all"
-                                                                placeholder="Code..."
-                                                            />
-                                                        </div>
+                                                    <div className="grid grid-cols-1 gap-1.5">
+                                                        {/* SKU Input Removed */}
                                                     </div>
                                                     <div className="grid grid-cols-2 gap-1.5">
                                                         <div>

@@ -1,8 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
+
+// ... existing code ...
+
+
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
-import { Plus, Search, ShoppingCart, Calendar, User, Filter, ArrowUpDown, Printer, Edit2 } from 'lucide-react'
+import { Plus, Search, ShoppingCart, Calendar, User, Filter, ArrowUpDown, Printer, Edit2, Trash2 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -10,6 +14,7 @@ import clsx from 'clsx'
 import dynamic from 'next/dynamic'
 import { useBusiness } from '@/context/business-context'
 import { Loader2 } from 'lucide-react'
+import ConfirmModal from '@/components/ui/ConfirmModal'
 import PickerModal from '@/components/ui/PickerModal'
 import { createClient } from '@/utils/supabase/client'
 import { printInvoice, InvoiceData, downloadInvoice } from '@/utils/invoice-generator'
@@ -62,6 +67,67 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
     const [visibleCount, setVisibleCount] = useState(50)
     const [isPreviewOpen, setIsPreviewOpen] = useState(false)
     const [previewData, setPreviewData] = useState<InvoiceData | null>(null)
+
+    const [invoiceToDelete, setInvoiceToDelete] = useState<any>(null)
+    const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
+    const [isDeleting, setIsDeleting] = useState(false)
+    const longPressTimer = React.useRef<NodeJS.Timeout | null>(null)
+
+    const handleTouchStart = (invoice: any) => {
+        longPressTimer.current = setTimeout(() => {
+            setInvoiceToDelete(invoice)
+            setIsDeleteConfirmOpen(true)
+        }, 800) // 800ms long press
+    }
+
+    const handleTouchEnd = () => {
+        if (longPressTimer.current) {
+            clearTimeout(longPressTimer.current)
+        }
+    }
+
+    const confirmDelete = async () => {
+        if (!invoiceToDelete) return
+        setIsDeleting(true)
+        const id = invoiceToDelete.id
+
+        try {
+            // 1. Fetch Items for Stock Reversion
+            const { data: invoiceItems } = await supabase.from('invoice_items').select('*').eq('invoice_id', id)
+
+            // 2. Revert Stock
+            if (invoiceItems) {
+                for (const item of invoiceItems) {
+                    if (item.item_id) {
+                        const { data: dbItem } = await supabase.from('items').select('stock_quantity').eq('id', item.item_id).maybeSingle()
+                        if (dbItem) {
+                            // For PURCHASE: We INCREASED stock, so deleting means substracting
+                            // If user bought 10 items, removing the invoice means we remove 10 items from stock
+                            const newStock = (dbItem.stock_quantity || 0) - item.quantity
+                            await supabase.from('items').update({ stock_quantity: newStock }).eq('id', item.item_id)
+                        }
+                    }
+                }
+            }
+
+            // 3. Cascade Delete
+            await supabase.from('transactions').delete().eq('invoice_id', id)
+            await supabase.from('invoice_items').delete().eq('invoice_id', id)
+            const { error } = await supabase.from('invoices').delete().eq('id', id)
+
+            if (error) throw error
+
+            // Update UI
+            setInvoices(prev => prev.filter(i => i.id !== id))
+            setIsDeleteConfirmOpen(false)
+            setInvoiceToDelete(null)
+        } catch (error: any) {
+            console.error('Delete error:', error)
+            alert('Failed to delete: ' + error.message)
+        } finally {
+            setIsDeleting(false)
+        }
+    }
 
     const handleEdit = (invoice: any) => {
         router.push(`/dashboard/purchases/edit?id=${invoice.id}`)
@@ -284,7 +350,12 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                     <div
                         key={inv.id}
                         onClick={() => handleEdit(inv)}
-                        className="group relative flex items-center glass-optimized rounded-[10px] border border-[var(--foreground)]/10 p-1.5 hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer overflow-hidden h-[54px] gap-2"
+                        onMouseDown={() => handleTouchStart(inv)}
+                        onMouseUp={handleTouchEnd}
+                        onMouseLeave={handleTouchEnd}
+                        onTouchStart={() => handleTouchStart(inv)}
+                        onTouchEnd={handleTouchEnd}
+                        className="group relative flex items-center glass-optimized rounded-[10px] border border-[var(--foreground)]/10 p-1.5 hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer overflow-hidden h-[54px] gap-2 select-none active:scale-[0.98]"
                     >
                         {/* Status Indicator Stripe */}
                         <div className={clsx(
@@ -332,7 +403,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                             )}>
                                 {formatCurrency(inv.total_amount)}
                             </p>
-                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="flex items-center gap-1 transition-opacity">
                                 <button
                                     onClick={(e) => handlePrintInvoice(e, inv)}
                                     className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
@@ -347,6 +418,16 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                                     className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
                                 >
                                     <Edit2 size={8} />
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        setInvoiceToDelete(inv)
+                                        setIsDeleteConfirmOpen(true)
+                                    }}
+                                    className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-rose-500 hover:text-white border border-[var(--foreground)]/10 transition-all"
+                                >
+                                    <Trash2 size={8} />
                                 </button>
                             </div>
                         </div>
@@ -364,6 +445,15 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                     </button>
                 </div>
             )}
+
+            <ConfirmModal
+                isOpen={isDeleteConfirmOpen}
+                onClose={() => setIsDeleteConfirmOpen(false)}
+                onConfirm={confirmDelete}
+                title="Delete Purchase Bill?"
+                message="This will delete the bill and reduce the added stock. This action cannot be undone."
+                confirmText={isDeleting ? "Deleting..." : "Delete Permanently"}
+            />
 
             {loading ? (
                 <div className="py-20 flex flex-col items-center justify-center">

@@ -21,15 +21,30 @@ export default function AppInitializer() {
                 // 2. Set Status Bar Background to Transparent (handled by overlay)
                 await StatusBar.setBackgroundColor({ color: '#00000000' })
 
-                // 3. Request Notification Permissions
-                const permissionStatus = await PushNotifications.checkPermissions()
-                if (permissionStatus.receive === 'prompt') {
+                // 3. Request Notification Permissions (Remote & Local)
+                const pushPermission = await PushNotifications.checkPermissions()
+                if (pushPermission.receive === 'prompt') {
                     await PushNotifications.requestPermissions()
+                }
+
+                const { LocalNotifications } = await import('@capacitor/local-notifications')
+                const localPermission = await LocalNotifications.checkPermissions()
+                if (localPermission.display === 'prompt') {
+                    await LocalNotifications.requestPermissions()
                 }
 
             } catch (err) {
                 // Likely running on web or plugins not available
                 console.log('Non-native environment or plugin missing', err)
+
+                // Fallback: Register Service Worker for PWA notifications
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('/sw.js').then(reg => {
+                        console.log('Service Worker registered:', reg.scope);
+                    }).catch(err => {
+                        console.log('Service Worker registration failed:', err);
+                    });
+                }
             }
         }
 

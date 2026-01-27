@@ -7,6 +7,7 @@ import { useBusiness } from '@/context/business-context'
 import { motion, AnimatePresence } from 'framer-motion'
 import clsx from 'clsx'
 import { formatDistanceToNow } from 'date-fns'
+import { showNotification } from '@/utils/notifications'
 
 type Notification = {
     id: string
@@ -41,18 +42,7 @@ export default function NotificationCenter() {
     }, [])
 
     const sendBrowserNotification = (notif: Notification) => {
-        if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
-            const n = new window.Notification(notif.title, {
-                body: notif.message,
-                icon: '/logo.png',
-                tag: notif.id // Prevent duplicates
-            })
-            n.onclick = () => {
-                window.focus()
-                setIsOpen(true)
-                n.close()
-            }
-        }
+        showNotification(notif.title, notif.message, notif.id)
     }
 
     const fetchNotifications = async () => {

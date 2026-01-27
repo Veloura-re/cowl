@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, Search, Filter, Phone, User as UserIcon, Trash2, Edit2, Loader2 } from 'lucide-react'
+import { Plus, Search, Filter, Phone, User as UserIcon, Trash2, Edit2, Loader2, Printer } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import CreatePartyModal from './create-party-modal'
@@ -204,12 +204,27 @@ export default function PartiesClientView() {
                             )}>
                                 {party.opening_balance > 0 ? '+' : ''}{formatCurrency(party.opening_balance).replace(/^-/, '')}
                             </p>
-                            <div className="flex items-center gap-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="flex items-center gap-1 mt-1 transition-opacity">
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        window.print()
+                                    }}
+                                    className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
+                                >
+                                    <Printer size={8} />
+                                </button>
                                 <button
                                     onClick={(e) => handleEdit(e, party)}
                                     className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
                                 >
                                     <Edit2 size={8} />
+                                </button>
+                                <button
+                                    onClick={(e) => handleDelete(e, party.id)}
+                                    className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-rose-500 hover:text-white border border-[var(--foreground)]/10 transition-all"
+                                >
+                                    <Trash2 size={8} />
                                 </button>
                             </div>
                         </div>

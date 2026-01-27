@@ -153,6 +153,66 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
         })
     }, [invoices, searchQuery, statusFilter, sortBy, sortOrder])
 
+    const [invoiceToDelete, setInvoiceToDelete] = useState<any>(null)
+    const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
+    const [isDeleting, setIsDeleting] = useState(false)
+    const longPressTimer = React.useRef<NodeJS.Timeout | null>(null)
+
+    const handleTouchStart = (invoice: any) => {
+        longPressTimer.current = setTimeout(() => {
+            setInvoiceToDelete(invoice)
+            setIsDeleteConfirmOpen(true)
+        }, 800) // 800ms long press
+    }
+
+    const handleTouchEnd = () => {
+        if (longPressTimer.current) {
+            clearTimeout(longPressTimer.current)
+        }
+    }
+
+    const confirmDelete = async () => {
+        if (!invoiceToDelete) return
+        setIsDeleting(true)
+        const id = invoiceToDelete.id
+
+        try {
+            // 1. Fetch Items for Stock Reversion
+            const { data: invoiceItems } = await supabase.from('invoice_items').select('*').eq('invoice_id', id)
+
+            // 2. Revert Stock
+            if (invoiceItems) {
+                for (const item of invoiceItems) {
+                    if (item.item_id) {
+                        const { data: dbItem } = await supabase.from('items').select('stock_quantity').eq('id', item.item_id).maybeSingle()
+                        if (dbItem) {
+                            // For SALE: We decreased stock, so adding back means + quantity
+                            const newStock = (dbItem.stock_quantity || 0) + item.quantity
+                            await supabase.from('items').update({ stock_quantity: newStock }).eq('id', item.item_id)
+                        }
+                    }
+                }
+            }
+
+            // 3. Cascade Delete
+            await supabase.from('transactions').delete().eq('invoice_id', id)
+            await supabase.from('invoice_items').delete().eq('invoice_id', id)
+            const { error } = await supabase.from('invoices').delete().eq('id', id)
+
+            if (error) throw error
+
+            // Update UI
+            setInvoices(prev => prev.filter(i => i.id !== id))
+            setIsDeleteConfirmOpen(false)
+            setInvoiceToDelete(null)
+        } catch (error: any) {
+            console.error('Delete error:', error)
+            alert('Failed to delete: ' + error.message)
+        } finally {
+            setIsDeleting(false)
+        }
+    }
+
     return (
         <div className="space-y-4 animate-in fade-in duration-300 pb-20">
             {/* Header - Compact */}
@@ -313,7 +373,12 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                     <div
                         key={invoice.id}
                         onClick={() => handleEdit(invoice)}
-                        className="group relative flex items-center glass-optimized rounded-[10px] border border-[var(--foreground)]/10 p-1.5 hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer overflow-hidden h-[54px] gap-2"
+                        onMouseDown={() => handleTouchStart(invoice)}
+                        onMouseUp={handleTouchEnd}
+                        onMouseLeave={handleTouchEnd}
+                        onTouchStart={() => handleTouchStart(invoice)}
+                        onTouchEnd={handleTouchEnd}
+                        className="group relative flex items-center glass-optimized rounded-[10px] border border-[var(--foreground)]/10 p-1.5 hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer overflow-hidden h-[54px] gap-2 select-none active:scale-[0.98]"
                     >
                         {/* Status Indicator Stripe */}
                         <div className={clsx(
@@ -361,7 +426,7 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                             )}>
                                 {formatCurrency(invoice.total_amount)}
                             </p>
-                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="flex items-center gap-1 transition-opacity">
                                 <button
                                     onClick={(e) => handlePrintInvoice(e, invoice)}
                                     className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
@@ -376,6 +441,16 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                                     className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
                                 >
                                     <Edit2 size={8} />
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        setInvoiceToDelete(invoice)
+                                        setIsDeleteConfirmOpen(true)
+                                    }}
+                                    className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-rose-500 hover:text-white border border-[var(--foreground)]/10 transition-all"
+                                >
+                                    <Trash2 size={8} />
                                 </button>
                             </div>
                         </div>
@@ -393,6 +468,15 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                     </button>
                 </div>
             )}
+
+            <ConfirmModal
+                isOpen={isDeleteConfirmOpen}
+                onClose={() => setIsDeleteConfirmOpen(false)}
+                onConfirm={confirmDelete}
+                title="Delete Invoice?"
+                message="This will delete the invoice and revert stock changes. This action cannot be undone."
+                confirmText={isDeleting ? "Deleting..." : "Delete Permanently"}
+            />
 
             {(loading || isContextLoading) ? (
                 <div className="flex flex-col items-center justify-center py-32 animate-in fade-in zoom-in duration-300">
