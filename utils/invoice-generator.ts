@@ -1,5 +1,6 @@
 // Types only imports
 import type { jsPDF } from 'jspdf'
+import { formatNumber } from '@/lib/format-number'
 
 
 export type InvoiceData = {
@@ -372,9 +373,9 @@ export function generateInvoiceHTML(data: InvoiceData): string {
                 <tr>
                     <td class="bold">${item.description}</td>
                     <td class="center">${item.quantity}</td>
-                    <td class="right">${data.currencySymbol}${item.rate.toFixed(2)}</td>
+                    <td class="right">${data.currencySymbol}${formatNumber(item.rate)}</td>
                     <td class="right">${item.tax}%</td>
-                    <td class="right" style="font-weight: 900">${data.currencySymbol}${item.total.toFixed(2)}</td>
+                    <td class="right" style="font-weight: 900">${data.currencySymbol}${formatNumber(item.total)}</td>
                 </tr>
                 `).join('')}
             </tbody>
@@ -384,32 +385,32 @@ export function generateInvoiceHTML(data: InvoiceData): string {
             <div class="summary-box">
                 <div class="summary-row">
                     <span>Subtotal</span>
-                    <span>${data.currencySymbol}${data.subtotal.toFixed(2)}</span>
+                    <span>${data.currencySymbol}${formatNumber(data.subtotal)}</span>
                 </div>
                 <div class="summary-row">
                     <span>Taxation</span>
-                    <span>${data.currencySymbol}${data.taxAmount.toFixed(2)}</span>
+                    <span>${data.currencySymbol}${formatNumber(data.taxAmount)}</span>
                 </div>
                 ${data.discountAmount && data.discountAmount > 0 ? `
                 <div class="summary-row" style="color: #f59e0b">
                     <span>Discount</span>
-                    <span>-${data.currencySymbol}${data.discountAmount.toFixed(2)}</span>
+                    <span>-${data.currencySymbol}${formatNumber(data.discountAmount)}</span>
                 </div>
                 ` : ''}
                 <div class="summary-row total">
                     <span>Total Amount</span>
-                    <span>${data.currencySymbol}${data.totalAmount.toFixed(2)}</span>
+                    <span>${data.currencySymbol}${formatNumber(data.totalAmount)}</span>
                 </div>
                 ${data.paidAmount && data.paidAmount > 0 ? `
                 <div class="summary-row accent">
                     <span>Amount Paid</span>
-                    <span>${data.currencySymbol}${data.paidAmount.toFixed(2)}</span>
+                    <span>${data.currencySymbol}${formatNumber(data.paidAmount)}</span>
                 </div>
                 ` : ''}
                 ${data.balanceAmount && data.balanceAmount > 0 ? `
                 <div class="summary-row danger">
                     <span>Balance Due</span>
-                    <span>${data.currencySymbol}${data.balanceAmount.toFixed(2)}</span>
+                    <span>${data.currencySymbol}${formatNumber(data.balanceAmount)}</span>
                 </div>
                 ` : ''}
             </div>
@@ -576,9 +577,9 @@ export async function downloadInvoice(data: InvoiceData) {
     const tableBody = data.items.map(item => [
         item.description,
         item.quantity.toString(),
-        `${data.currencySymbol}${item.rate.toFixed(2)}`,
+        `${data.currencySymbol}${formatNumber(item.rate)}`,
         `${item.tax}%`,
-        `${data.currencySymbol}${item.total.toFixed(2)}`
+        `${data.currencySymbol}${formatNumber(item.total)}`
     ])
 
         ; (doc as any).autoTable({
@@ -614,19 +615,19 @@ export async function downloadInvoice(data: InvoiceData) {
     let ty = finalY
     doc.text('Subtotal:', 88, ty)
     doc.setTextColor(darkColor[0], darkColor[1], darkColor[2])
-    doc.text(`${data.currencySymbol}${data.subtotal.toFixed(2)}`, 118, ty, { align: 'right' })
+    doc.text(`${data.currencySymbol}${formatNumber(data.subtotal)}`, 118, ty, { align: 'right' })
 
     ty += 2.5
     doc.setTextColor(grayColor[0], grayColor[1], grayColor[2])
     doc.text('Tax:', 88, ty)
     doc.setTextColor(darkColor[0], darkColor[1], darkColor[2])
-    doc.text(`${data.currencySymbol}${data.taxAmount.toFixed(2)}`, 118, ty, { align: 'right' })
+    doc.text(`${data.currencySymbol}${formatNumber(data.taxAmount)}`, 118, ty, { align: 'right' })
 
     if (data.discountAmount && data.discountAmount > 0) {
         ty += 2.5
         doc.setTextColor(245, 158, 11)
         doc.text('Off:', 88, ty)
-        doc.text(`-${data.currencySymbol}${data.discountAmount.toFixed(2)}`, 118, ty, { align: 'right' })
+        doc.text(`-${data.currencySymbol}${formatNumber(data.discountAmount)}`, 118, ty, { align: 'right' })
     }
 
     ty += 4
@@ -636,7 +637,7 @@ export async function downloadInvoice(data: InvoiceData) {
     doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
     doc.text('TOTAL:', 88, ty)
     doc.setTextColor(darkColor[0], darkColor[1], darkColor[2])
-    doc.text(`${data.currencySymbol}${data.totalAmount.toFixed(2)}`, 118, ty, { align: 'right' })
+    doc.text(`${data.currencySymbol}${formatNumber(data.totalAmount)}`, 118, ty, { align: 'right' })
 
     // Signature Area
     if (data.signature) {

@@ -4,6 +4,7 @@ import { X, Printer, Download, Share2, Mail, MessageCircle } from 'lucide-react'
 import { InvoiceData } from '@/utils/invoice-generator'
 import { format } from 'date-fns'
 import clsx from 'clsx'
+import { formatNumber } from '@/lib/format-number'
 
 type InvoicePreviewModalProps = {
     isOpen: boolean
@@ -29,7 +30,7 @@ export default function InvoicePreviewModal({
         const body = encodeURIComponent(
             `Dear ${data.partyName},\n\n` +
             `Please find the details of Invoice ${data.invoiceNumber}:\n\n` +
-            `Total Amount: ${data.currencySymbol}${data.totalAmount.toFixed(2)}\n` +
+            `Total Amount: ${data.currencySymbol}${formatNumber(data.totalAmount)}\n` +
             `Status: ${data.status}\n` +
             `Date: ${data.date}\n\n` +
             `Thank you for your business!\n\n` +
@@ -44,7 +45,7 @@ export default function InvoicePreviewModal({
             `From: ${data.businessName}\n` +
             `To: ${data.partyName}\n\n` +
             `📋 *Invoice Details:*\n` +
-            `Amount: ${data.currencySymbol}${data.totalAmount.toFixed(2)}\n` +
+            `Amount: ${data.currencySymbol}${formatNumber(data.totalAmount)}\n` +
             `Status: ${data.status}\n` +
             `Date: ${data.date}\n\n` +
             `Thank you for your business! 🙏`
@@ -195,9 +196,9 @@ export default function InvoicePreviewModal({
                                         <tr key={idx} className="hover:bg-slate-50/50">
                                             <td className="p-1 px-1.5 text-[7px] font-bold text-black tracking-tight leading-tight">{item.description}</td>
                                             <td className="p-1 px-1.5 text-[7px] font-medium text-center leading-none">{item.quantity}</td>
-                                            <td className="p-1 px-1.5 text-[7px] font-medium text-right leading-none">{data.currencySymbol}{item.rate.toFixed(2)}</td>
+                                            <td className="p-1 px-1.5 text-[7px] font-medium text-right leading-none">{data.currencySymbol}{formatNumber(item.rate)}</td>
                                             <td className="p-1 px-1.5 text-[7px] font-medium text-right leading-none">{item.tax}%</td>
-                                            <td className="p-1 px-1.5 text-[7px] font-black text-right leading-none">{data.currencySymbol}{item.total.toFixed(2)}</td>
+                                            <td className="p-1 px-1.5 text-[7px] font-black text-right leading-none">{data.currencySymbol}{formatNumber(item.total)}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -208,33 +209,33 @@ export default function InvoicePreviewModal({
                                 <div className="w-28 space-y-0.5">
                                     <div className="flex justify-between text-[6px]">
                                         <span className="text-black/40 font-bold uppercase">Sub</span>
-                                        <span className="text-black font-bold">{data.currencySymbol}{data.subtotal.toFixed(2)}</span>
+                                        <span className="text-black font-bold">{data.currencySymbol}{formatNumber(data.subtotal)}</span>
                                     </div>
                                     <div className="flex justify-between text-[6px]">
                                         <span className="text-black/40 font-bold uppercase">Tax</span>
-                                        <span className="text-black font-bold">{data.currencySymbol}{data.taxAmount.toFixed(2)}</span>
+                                        <span className="text-black font-bold">{data.currencySymbol}{formatNumber(data.taxAmount)}</span>
                                     </div>
                                     {data.discountAmount !== undefined && data.discountAmount > 0 && (
                                         <div className="flex justify-between text-[6px] text-amber-600">
                                             <span className="font-bold uppercase">Off</span>
-                                            <span className="font-bold">-{data.currencySymbol}{data.discountAmount.toFixed(2)}</span>
+                                            <span className="font-bold">-{data.currencySymbol}{formatNumber(data.discountAmount)}</span>
                                         </div>
                                     )}
                                     <div className="flex justify-between pt-0.5 border-t border-[var(--primary-green)]">
                                         <span className="text-[8px] font-black uppercase text-[var(--primary-green)] leading-none pt-0.5">Total</span>
-                                        <span className="text-[10px] font-black text-black leading-none pt-0.5">{data.currencySymbol}{data.totalAmount.toFixed(2)}</span>
+                                        <span className="text-[10px] font-black text-black leading-none pt-0.5">{data.currencySymbol}{formatNumber(data.totalAmount)}</span>
                                     </div>
 
                                     {data.paidAmount !== undefined && data.paidAmount > 0 && (
                                         <div className="flex justify-between text-[6px] pt-0.5">
                                             <span className="text-emerald-600 font-bold uppercase">Paid</span>
-                                            <span className="text-emerald-600 font-bold">{data.currencySymbol}{data.paidAmount.toFixed(2)}</span>
+                                            <span className="text-emerald-600 font-bold">{data.currencySymbol}{formatNumber(data.paidAmount)}</span>
                                         </div>
                                     )}
                                     {data.balanceAmount !== undefined && data.balanceAmount > 0 && (
                                         <div className="flex justify-between text-[6px]">
                                             <span className="text-rose-600 font-bold uppercase">Due</span>
-                                            <span className="text-rose-600 font-bold">{data.currencySymbol}{data.balanceAmount.toFixed(2)}</span>
+                                            <span className="text-rose-600 font-bold">{data.currencySymbol}{formatNumber(data.balanceAmount)}</span>
                                         </div>
                                     )}
                                 </div>

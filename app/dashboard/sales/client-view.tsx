@@ -332,26 +332,7 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                                 {(invoice.party?.name || 'W').charAt(0)}
                             </div>
                             <div className="min-w-0 flex-1">
-                                <div className="flex items-center justify-between">
-                                    <h3 className="text-[10px] font-black text-[var(--deep-contrast)] truncate">{invoice.party?.name || 'Walk-in'}</h3>
-                                    <div className="flex items-center gap-1 transition-opacity">
-                                        <button
-                                            onClick={(e) => handlePrintInvoice(e, invoice)}
-                                            className="h-6 w-6 flex items-center justify-center rounded-lg bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all shadow-sm"
-                                        >
-                                            <Printer size={10} />
-                                        </button>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation()
-                                                handleEdit(invoice)
-                                            }}
-                                            className="h-6 w-6 flex items-center justify-center rounded-lg bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all shadow-sm"
-                                        >
-                                            <Edit2 size={10} />
-                                        </button>
-                                    </div>
-                                </div>
+                                <h3 className="text-[10px] font-black text-[var(--deep-contrast)] truncate">{invoice.party?.name || 'Walk-in'}</h3>
                                 <div className="flex items-center gap-1 mt-0 opacity-40">
                                     <span className="text-[6.5px] font-black uppercase tracking-[0.1em] leading-none shrink-0">SALE</span>
                                     <div className="h-0.5 w-0.5 rounded-full bg-current opacity-20" />
@@ -384,6 +365,25 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                                     {new Date(invoice.date).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}
                                 </span>
                             </div>
+                        </div>
+
+                        {/* Action Buttons - Below content on mobile */}
+                        <div className="mt-2 flex items-center gap-1 justify-end">
+                            <button
+                                onClick={(e) => handlePrintInvoice(e, invoice)}
+                                className="h-6 w-6 flex items-center justify-center rounded-lg bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all shadow-sm"
+                            >
+                                <Printer size={10} />
+                            </button>
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleEdit(invoice)
+                                }}
+                                className="h-6 w-6 flex items-center justify-center rounded-lg bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all shadow-sm"
+                            >
+                                <Edit2 size={10} />
+                            </button>
                         </div>
                     </div>
                 ))}
