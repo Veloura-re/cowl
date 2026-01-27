@@ -88,7 +88,10 @@ export default function AddPurchaseItemModal({ isOpen, onClose, onAdd, items, in
                 isOpen={isOpen}
                 onClose={() => {
                     setIsItemPickerOpen(false)
-                    onClose()
+                    if (!justSelected.current && !selectedItem && !initialData) {
+                        onClose()
+                    }
+                    justSelected.current = false
                 }}
                 onSelect={handleSelect}
                 title="Select Procurement Item"

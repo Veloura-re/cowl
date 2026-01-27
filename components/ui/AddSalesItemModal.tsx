@@ -88,7 +88,10 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                 isOpen={isOpen}
                 onClose={() => {
                     setIsItemPickerOpen(false)
-                    onClose()
+                    if (!justSelected.current && !selectedItem && !initialData) {
+                        onClose()
+                    }
+                    justSelected.current = false
                 }}
                 onSelect={handleSelect}
                 title="Select Inventory Item"

@@ -101,32 +101,7 @@ export async function exportBusinessData(supabase: SupabaseClient, businessId: s
     const fileName = `backup-${business.name.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.json`
     const fileContent = JSON.stringify(backup, null, 2)
 
-    // 6. Trigger Download with "Save As" support where available
-    try {
-        if ('showSaveFilePicker' in window) {
-            const handle = await (window as any).showSaveFilePicker({
-                suggestedName: fileName,
-                types: [{
-                    description: 'JSON Backup File',
-                    accept: { 'application/json': ['.json'] },
-                }],
-            })
-            const writable = await handle.createWritable()
-            await writable.write(fileContent)
-            await writable.close()
-            return true
-        }
-    } catch (err: any) {
-        // If user cancels or if there's a permission error, we might not want to fallback
-        // but for general errors or browser context issues, we fallback to standard download.
-        if (err.name === 'AbortError') {
-            console.log('Save cancelled by user')
-            return false
-        }
-        console.warn('showSaveFilePicker failed, falling back to standard download:', err)
-    }
-
-    // Fallback: Standard Anchor Download
+    // 6. Trigger Download (Standard Anchor Download for universal compatibility)
     const blob = new Blob([fileContent], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
