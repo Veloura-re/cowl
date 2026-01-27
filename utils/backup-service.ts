@@ -1,3 +1,6 @@
+import { Capacitor } from '@capacitor/core'
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem'
+import { Share } from '@capacitor/share'
 import { SupabaseClient } from '@supabase/supabase-js'
 
 export type BackupData = {
@@ -101,16 +104,41 @@ export async function exportBusinessData(supabase: SupabaseClient, businessId: s
     const fileName = `backup-${business.name.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.json`
     const fileContent = JSON.stringify(backup, null, 2)
 
-    // 6. Trigger Download (Standard Anchor Download for universal compatibility)
-    const blob = new Blob([fileContent], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = fileName
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
+    // 6. Trigger Download
+    if (Capacitor.isNativePlatform()) {
+        try {
+            // Write to cachedir
+            const writeResult = await Filesystem.writeFile({
+                path: fileName,
+                data: fileContent,
+                directory: Directory.Cache,
+                encoding: Encoding.UTF8
+            });
+
+            // Share the file
+            await Share.share({
+                title: 'Backup Snapshot',
+                text: `Backup for ${business.name}`,
+                url: writeResult.uri,
+                dialogTitle: 'Save Backup'
+            });
+
+        } catch (e) {
+            console.error('Native export failed', e);
+            throw new Error('Failed to export on device: ' + (e instanceof Error ? e.message : String(e)));
+        }
+    } else {
+        // Standard Web Download
+        const blob = new Blob([fileContent], { type: 'application/json' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = fileName
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+    }
 
     return true
 }
