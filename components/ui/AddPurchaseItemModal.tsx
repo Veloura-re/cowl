@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { X, Package, Plus, Calculator, Trash2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/context/business-context'
 import PickerModal from '@/components/ui/PickerModal'
 import ErrorModal from '@/components/ui/ErrorModal'
@@ -18,12 +19,14 @@ type AddPurchaseItemModalProps = {
 }
 
 export default function AddPurchaseItemModal({ isOpen, onClose, onAdd, items, initialData, onDelete }: AddPurchaseItemModalProps) {
+    const router = useRouter()
     const { formatCurrency } = useBusiness()
     const [isItemPickerOpen, setIsItemPickerOpen] = useState(false)
     const [selectedItem, setSelectedItem] = useState<any>(null)
     const [quantity, setQuantity] = useState<number | string>(1)
     const [rate, setRate] = useState<number | string>('')
     const [errorModal, setErrorModal] = useState<{ open: boolean, message: string }>({ open: false, message: '' })
+    const justSelected = useRef(false)
 
     useEffect(() => {
         if (initialData) {
@@ -47,6 +50,7 @@ export default function AddPurchaseItemModal({ isOpen, onClose, onAdd, items, in
     const handleSelect = (itemId: string) => {
         const item = items.find(i => i.id === itemId)
         if (item) {
+            justSelected.current = true
             setSelectedItem(item)
             setIsItemPickerOpen(false)
         }
@@ -76,6 +80,37 @@ export default function AddPurchaseItemModal({ isOpen, onClose, onAdd, items, in
     }
 
     if (!isOpen) return null
+
+    // "Picker-First" Flow: If new entry and no item selected, only show the picker
+    if (!selectedItem && !initialData) {
+        return (
+            <PickerModal
+                isOpen={isOpen}
+                onClose={() => {
+                    setIsItemPickerOpen(false)
+                    onClose()
+                }}
+                onSelect={handleSelect}
+                title="Select Procurement Item"
+                options={items.map(i => ({
+                    id: i.id,
+                    label: i.name.toUpperCase(),
+                    subLabel: `${i.stock_quantity ?? 0} ${i.unit ?? 'Units'} currently in stock`
+                }))}
+                selectedValue={null}
+                action={{
+                    label: "Register New Asset",
+                    onClick: () => {
+                        setIsItemPickerOpen(false)
+                        onClose()
+                        router.push('/dashboard/inventory/new')
+                    },
+                    icon: <Plus size={14} />
+                }}
+                autoFocus
+            />
+        )
+    }
 
     const numQty = Number(quantity) || 0
     const numRate = Number(rate) || 0
@@ -156,7 +191,7 @@ export default function AddPurchaseItemModal({ isOpen, onClose, onAdd, items, in
                                         step="any"
                                         required
                                         autoFocus
-                                        value={quantity}
+                                        value={quantity || ''}
                                         onChange={(e) => setQuantity(e.target.value)}
                                         className="w-full h-12 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-5 text-[14px] font-black text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] focus:ring-4 focus:ring-[var(--primary-green)]/10 transition-all shadow-inner tabular-nums"
                                     />
@@ -168,7 +203,7 @@ export default function AddPurchaseItemModal({ isOpen, onClose, onAdd, items, in
                                         type="number"
                                         step="any"
                                         required
-                                        value={rate}
+                                        value={rate || ''}
                                         onChange={(e) => setRate(e.target.value)}
                                         className="w-full h-12 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-5 text-[14px] font-black text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] focus:ring-4 focus:ring-[var(--primary-green)]/10 transition-all shadow-inner tabular-nums"
                                     />
@@ -231,7 +266,14 @@ export default function AddPurchaseItemModal({ isOpen, onClose, onAdd, items, in
 
                 <PickerModal
                     isOpen={isItemPickerOpen}
-                    onClose={() => setIsItemPickerOpen(false)}
+                    onClose={() => {
+                        setIsItemPickerOpen(false)
+                        // Only close parent if no selection occurred and in "new" mode
+                        if (!justSelected.current && !selectedItem && !initialData) {
+                            onClose()
+                        }
+                        justSelected.current = false
+                    }}
                     onSelect={handleSelect}
                     title="Select Procurement Item"
                     options={items.map(i => ({
@@ -240,6 +282,15 @@ export default function AddPurchaseItemModal({ isOpen, onClose, onAdd, items, in
                         subLabel: `${i.stock_quantity ?? 0} ${i.unit ?? 'Units'} currently in stock`
                     }))}
                     selectedValue={selectedItem?.id}
+                    action={{
+                        label: "Register New Asset",
+                        onClick: () => {
+                            setIsItemPickerOpen(false)
+                            onClose()
+                            router.push('/dashboard/inventory/new')
+                        },
+                        icon: <Plus size={14} />
+                    }}
                 />
 
                 <ErrorModal

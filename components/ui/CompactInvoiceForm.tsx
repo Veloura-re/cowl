@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
-import { ArrowLeft, Save, Plus, Trash2, Loader2, CheckCircle2, Wallet, Calculator, Paperclip, Image as ImageIcon, X, Building, Printer } from 'lucide-react'
+import { ArrowLeft, Save, Plus, Trash2, Loader2, CheckCircle2, Wallet, Calculator, Paperclip, Image as ImageIcon, X, Building, Printer, ChevronDown, ChevronUp } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/context/business-context'
 import Link from 'next/link'
@@ -15,6 +15,7 @@ import { currencies } from '@/lib/currencies'
 import SignaturePad, { SignaturePadHandle } from '@/components/ui/signature-pad'
 import InvoicePreviewModal from '@/components/ui/InvoicePreviewModal'
 import CreatePartyModal from '@/app/dashboard/parties/create-party-modal'
+import { motion, AnimatePresence } from 'framer-motion'
 
 type InvoiceFormProps = {
     parties?: any[]
@@ -54,6 +55,8 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
     const [isPreviewOpen, setIsPreviewOpen] = useState(false)
     const [previewData, setPreviewData] = useState<InvoiceData | null>(null)
     const [itemToRemoveIndex, setItemToRemoveIndex] = useState<number | null>(null)
+    const [showTopMore, setShowTopMore] = useState(false)
+    const [showBottomMore, setShowBottomMore] = useState(false)
 
     // Data State (Client-side fetch if props missing)
     const [fetchedParties, setFetchedParties] = useState<any[]>(parties)
@@ -118,6 +121,8 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
     const [partyId, setPartyId] = useState(initialData?.party_id || '')
     const [date, setDate] = useState(initialData?.date || new Date().toISOString().split('T')[0])
     const [invoiceNumber, setInvoiceNumber] = useState(initialData?.invoice_number || 'INV-' + Math.floor(Math.random() * 10000))
+    const [category, setCategory] = useState(initialData?.category || '')
+    const [sku, setSku] = useState(initialData?.sku || '')
     const [paymentMode, setPaymentMode] = useState<string>('UNPAID')
     const [rows, setRows] = useState<InvoiceItem[]>(initialLineItems?.map(item => ({
         itemId: item.item_id,
@@ -441,6 +446,8 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                         total_amount: totalAmount,
                         balance_amount: newBalance,
                         status: status,
+                        category: category,
+                        sku: sku,
                         notes: notes,
                         discount_amount: discountAmount,
                         tax_amount: invoiceTaxAmount,
@@ -499,6 +506,8 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                         balance_amount: currentBalance,
                         type: isSale ? 'SALE' : 'PURCHASE',
                         status: status,
+                        category: category,
+                        sku: sku,
                         notes: notes,
                         discount_amount: discountAmount,
                         tax_amount: invoiceTaxAmount,
@@ -660,37 +669,80 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                                 <span className="truncate">{filteredParties.find(p => p.id === partyId)?.name || 'SELECT...'}</span>
                                             </button>
                                         </div>
-                                        <div className="space-y-2">
-                                            <div>
-                                                <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1 ml-0.5">UID</label>
-                                                <input
-                                                    type="text"
-                                                    value={invoiceNumber}
-                                                    onChange={(e) => setInvoiceNumber(e.target.value)}
-                                                    className="w-full h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[10px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all"
-                                                />
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-1.5">
-                                                <div>
-                                                    <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1 ml-0.5">Date</label>
-                                                    <input
-                                                        type="date"
-                                                        value={date}
-                                                        onChange={(e) => setDate(e.target.value)}
-                                                        className="w-full h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-2 text-[8px] font-black focus:border-[var(--primary-green)] focus:outline-none transition-all"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1 ml-0.5">Due</label>
-                                                    <input
-                                                        type="date"
-                                                        value={dueDate}
-                                                        onChange={(e) => setDueDate(e.target.value)}
-                                                        className="w-full h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-2 text-[8px] font-black focus:border-[var(--primary-green)] focus:outline-none transition-all"
-                                                    />
-                                                </div>
-                                            </div>
+                                        <div className="pt-1">
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowTopMore(!showTopMore)}
+                                                className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[var(--foreground)]/3 hover:bg-[var(--foreground)]/8 text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/40 transition-all border border-[var(--foreground)]/5"
+                                            >
+                                                {showTopMore ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
+                                                {showTopMore ? 'Less' : 'More Details'}
+                                            </button>
                                         </div>
+
+                                        <AnimatePresence>
+                                            {showTopMore && (
+                                                <motion.div
+                                                    initial={{ height: 0, opacity: 0 }}
+                                                    animate={{ height: 'auto', opacity: 1 }}
+                                                    exit={{ height: 0, opacity: 0 }}
+                                                    transition={{ duration: 0.3, ease: 'easeInOut' }}
+                                                    className="overflow-hidden space-y-2 pt-2"
+                                                >
+                                                    <div>
+                                                        <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1 ml-0.5">UID</label>
+                                                        <input
+                                                            type="text"
+                                                            value={invoiceNumber}
+                                                            onChange={(e) => setInvoiceNumber(e.target.value)}
+                                                            className="w-full h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[10px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all"
+                                                        />
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-1.5">
+                                                        <div>
+                                                            <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1 ml-0.5">Classification</label>
+                                                            <input
+                                                                type="text"
+                                                                value={category}
+                                                                onChange={(e) => setCategory(e.target.value)}
+                                                                className="w-full h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[9px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all"
+                                                                placeholder="Category..."
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1 ml-0.5">Registry SKU</label>
+                                                            <input
+                                                                type="text"
+                                                                value={sku}
+                                                                onChange={(e) => setSku(e.target.value)}
+                                                                className="w-full h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[9px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all"
+                                                                placeholder="Code..."
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-1.5">
+                                                        <div>
+                                                            <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1 ml-0.5">Date</label>
+                                                            <input
+                                                                type="date"
+                                                                value={date}
+                                                                onChange={(e) => setDate(e.target.value)}
+                                                                className="w-full h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-2 text-[8px] font-black focus:border-[var(--primary-green)] focus:outline-none transition-all"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1 ml-0.5">Due</label>
+                                                            <input
+                                                                type="date"
+                                                                value={dueDate}
+                                                                onChange={(e) => setDueDate(e.target.value)}
+                                                                className="w-full h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-2 text-[8px] font-black focus:border-[var(--primary-green)] focus:outline-none transition-all"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
                                     </div>
                                 </div>
 
@@ -748,7 +800,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                             className="relative z-10 flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--primary-green)] text-[var(--primary-foreground)] text-[9px] font-black uppercase tracking-wider hover:bg-[var(--primary-hover)] transition-all shadow-md active:scale-95 group"
                                         >
                                             <Plus size={12} />
-                                            NEW LINE
+                                            {isSale ? 'ADD PRODUCT' : 'ADD ITEM'}
                                         </button>
                                     </div>
 
@@ -815,7 +867,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                             <div className="flex items-center">
                                                 <input
                                                     type="number"
-                                                    value={discount}
+                                                    value={discount || ''}
                                                     onChange={(e) => setDiscount(e.target.value)}
                                                     className="w-full bg-transparent text-[11px] font-black text-[var(--deep-contrast)] focus:outline-none tabular-nums"
                                                 />
@@ -826,7 +878,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                             <div className="flex items-center">
                                                 <input
                                                     type="number"
-                                                    value={invoiceTax}
+                                                    value={invoiceTax || ''}
                                                     onChange={(e) => setInvoiceTax(e.target.value)}
                                                     className="w-full bg-transparent text-[11px] font-black text-[var(--deep-contrast)] focus:outline-none tabular-nums"
                                                 />
@@ -846,103 +898,130 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                 </div>
                             </div>
 
-                            {/* 2. Authentication & Liquidation */}
-                            <div className="space-y-2">
-                                <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md space-y-2">
-                                    <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Liquidation</label>
-                                    <div className="space-y-2">
-                                        <div className="flex gap-2">
-                                            <button
-                                                type="button"
-                                                onClick={() => setIsModePickerOpen(true)}
-                                                className={clsx(
-                                                    "flex-1 h-10 rounded-xl border px-3 text-[9px] font-black flex items-center justify-center transition-all",
-                                                    paymentMode === 'UNPAID' ? "bg-rose-500/5 border-rose-500/10 text-rose-500" : "bg-[var(--primary-green)]/10 border-[var(--primary-green)]/40 text-[var(--primary-green)]"
-                                                )}
-                                            >
-                                                {paymentMode}
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => setIsAddBankOpen(true)}
-                                                className="h-10 w-10 rounded-xl border border-dashed border-blue-500/20 bg-blue-500/5 text-blue-500 flex items-center justify-center"
-                                            >
-                                                <Building size={14} />
-                                            </button>
-                                        </div>
+                            <div className="lg:col-span-3">
+                                <div className="pt-2 flex justify-center">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowBottomMore(!showBottomMore)}
+                                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--foreground)]/5 hover:bg-[var(--foreground)]/10 text-[9px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/60 transition-all border border-[var(--foreground)]/10 shadow-sm"
+                                    >
+                                        {showBottomMore ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                                        {showBottomMore ? 'Less Options' : 'More Options'}
+                                    </button>
+                                </div>
 
-                                        {paymentMode !== 'UNPAID' && (
-                                            <div className="p-2.5 rounded-xl bg-[var(--foreground)]/3 border border-white/5 space-y-2">
-                                                <div className="flex items-center justify-between">
-                                                    <label className="text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30">Receipt</label>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => {
-                                                            const newState = !isFullyReceived
-                                                            setIsFullyReceived(newState)
-                                                            if (newState) setReceivedAmount(totalAmount)
-                                                        }}
-                                                        className={clsx(
-                                                            "px-1.5 py-0.5 rounded text-[6px] font-black uppercase transition-all",
-                                                            isFullyReceived ? "bg-[var(--primary-green)] text-white" : "bg-[var(--foreground)]/10 text-[var(--foreground)]/40"
-                                                        )}
-                                                    >
-                                                        Full
-                                                    </button>
+                                <AnimatePresence>
+                                    {showBottomMore && (
+                                        <motion.div
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: 'auto', opacity: 1 }}
+                                            exit={{ height: 0, opacity: 0 }}
+                                            transition={{ duration: 0.4, ease: 'easeInOut' }}
+                                            className="overflow-hidden mt-3"
+                                        >
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                                                {/* 2. Authentication & Liquidation */}
+                                                <div className="space-y-2">
+                                                    <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md space-y-2">
+                                                        <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Liquidation</label>
+                                                        <div className="space-y-2">
+                                                            <div className="flex gap-2">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => setIsModePickerOpen(true)}
+                                                                    className={clsx(
+                                                                        "flex-1 h-10 rounded-xl border px-3 text-[9px] font-black flex items-center justify-center transition-all",
+                                                                        paymentMode === 'UNPAID' ? "bg-rose-500/5 border-rose-500/10 text-rose-500" : "bg-[var(--primary-green)]/10 border-[var(--primary-green)]/40 text-[var(--primary-green)]"
+                                                                    )}
+                                                                >
+                                                                    {paymentMode}
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => setIsAddBankOpen(true)}
+                                                                    className="h-10 w-10 rounded-xl border border-dashed border-blue-500/20 bg-blue-500/5 text-blue-500 flex items-center justify-center"
+                                                                >
+                                                                    <Building size={14} />
+                                                                </button>
+                                                            </div>
+
+                                                            {paymentMode !== 'UNPAID' && (
+                                                                <div className="p-2.5 rounded-xl bg-[var(--foreground)]/3 border border-white/5 space-y-2">
+                                                                    <div className="flex items-center justify-between">
+                                                                        <label className="text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30">Receipt</label>
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => {
+                                                                                const newState = !isFullyReceived
+                                                                                setIsFullyReceived(newState)
+                                                                                if (newState) setReceivedAmount(totalAmount)
+                                                                            }}
+                                                                            className={clsx(
+                                                                                "px-1.5 py-0.5 rounded text-[6px] font-black uppercase transition-all",
+                                                                                isFullyReceived ? "bg-[var(--primary-green)] text-white" : "bg-[var(--foreground)]/10 text-[var(--foreground)]/40"
+                                                                            )}
+                                                                        >
+                                                                            Full
+                                                                        </button>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-2">
+                                                                        <input
+                                                                            type="number"
+                                                                            value={receivedAmount || ''}
+                                                                            onChange={(e) => {
+                                                                                setReceivedAmount(e.target.value)
+                                                                                setIsFullyReceived(false)
+                                                                            }}
+                                                                            className="flex-1 bg-transparent text-base font-black text-[var(--deep-contrast)] focus:outline-none tabular-nums"
+                                                                            placeholder="0.00"
+                                                                        />
+                                                                        <div className="text-right">
+                                                                            <p className={clsx(
+                                                                                "text-[10px] font-black tabular-nums font-mono leading-none",
+                                                                                balanceDue > 0 ? "text-rose-500" : "text-[var(--primary-green)]"
+                                                                            )}>{formatCurrency(balanceDue)}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md space-y-3 bg-gradient-to-br from-transparent to-[var(--primary-green)]/[0.02]">
+                                                        <div className="flex justify-between items-center">
+                                                            <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Auth</label>
+                                                            <div className="px-1.5 py-0.5 rounded-full bg-[var(--primary-green)]/10 border border-[var(--primary-green)]/20 text-[6px] font-black text-[var(--primary-green)] uppercase tracking-widest">
+                                                                Signature
+                                                            </div>
+                                                        </div>
+                                                        <div className="relative group">
+                                                            <SignaturePad ref={sigPadRef} className="h-56" />
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div className="flex items-center gap-2">
-                                                    <input
-                                                        type="number"
-                                                        value={receivedAmount}
-                                                        onChange={(e) => {
-                                                            setReceivedAmount(e.target.value)
-                                                            setIsFullyReceived(false)
-                                                        }}
-                                                        className="flex-1 bg-transparent text-base font-black text-[var(--deep-contrast)] focus:outline-none tabular-nums"
-                                                        placeholder="0.00"
-                                                    />
-                                                    <div className="text-right">
-                                                        <p className={clsx(
-                                                            "text-[10px] font-black tabular-nums font-mono leading-none",
-                                                            balanceDue > 0 ? "text-rose-500" : "text-[var(--primary-green)]"
-                                                        )}>{formatCurrency(balanceDue)}</p>
+
+                                                {/* 3. Evidence & Media */}
+                                                <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md flex flex-col">
+                                                    <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 mb-3 ml-1">Evidence</label>
+                                                    <div className="flex flex-wrap gap-2 flex-1 overflow-y-auto custom-scrollbar max-h-[160px]">
+                                                        {attachments.map((url, i) => (
+                                                            <div key={i} className="relative group/attachment h-12 w-12 rounded-lg border border-white/5 overflow-hidden shadow-sm">
+                                                                <img src={url} className="w-full h-full object-cover" />
+                                                                <button type="button" onClick={() => removeAttachment(i)} className="absolute inset-0 bg-rose-500/80 text-white flex items-center justify-center opacity-0 group-hover/attachment:opacity-100 transition-opacity">
+                                                                    <X size={12} />
+                                                                </button>
+                                                            </div>
+                                                        ))}
+                                                        <label className="h-12 w-12 rounded-lg border-2 border-dashed border-[var(--foreground)]/10 bg-[var(--foreground)]/2 flex items-center justify-center cursor-pointer hover:border-[var(--primary-green)]/30 transition-all">
+                                                            <Plus size={14} className="text-[var(--foreground)]/10" />
+                                                            <input type="file" multiple onChange={handleFileUpload} className="hidden" />
+                                                        </label>
                                                     </div>
                                                 </div>
                                             </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md space-y-3 bg-gradient-to-br from-transparent to-[var(--primary-green)]/[0.02]">
-                                    <div className="flex justify-between items-center">
-                                        <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Auth</label>
-                                        <div className="px-1.5 py-0.5 rounded-full bg-[var(--primary-green)]/10 border border-[var(--primary-green)]/20 text-[6px] font-black text-[var(--primary-green)] uppercase tracking-widest">
-                                            Signature
-                                        </div>
-                                    </div>
-                                    <div className="relative group">
-                                        <SignaturePad ref={sigPadRef} className="h-56" />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* 3. Evidence & Media */}
-                            <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md flex flex-col">
-                                <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 mb-3 ml-1">Evidence</label>
-                                <div className="flex flex-wrap gap-2 flex-1 overflow-y-auto custom-scrollbar max-h-[160px]">
-                                    {attachments.map((url, i) => (
-                                        <div key={i} className="relative group/attachment h-12 w-12 rounded-lg border border-white/5 overflow-hidden shadow-sm">
-                                            <img src={url} className="w-full h-full object-cover" />
-                                            <button type="button" onClick={() => removeAttachment(i)} className="absolute inset-0 bg-rose-500/80 text-white flex items-center justify-center opacity-0 group-hover/attachment:opacity-100 transition-opacity">
-                                                <X size={12} />
-                                            </button>
-                                        </div>
-                                    ))}
-                                    <label className="h-12 w-12 rounded-lg border-2 border-dashed border-[var(--foreground)]/10 bg-[var(--foreground)]/2 flex items-center justify-center cursor-pointer hover:border-[var(--primary-green)]/30 transition-all">
-                                        <Plus size={14} className="text-[var(--foreground)]/10" />
-                                        <input type="file" multiple onChange={handleFileUpload} className="hidden" />
-                                    </label>
-                                </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
                         </div>
                     </>

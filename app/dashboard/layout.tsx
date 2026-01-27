@@ -41,6 +41,19 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     const [isSwitcherOpen, setIsSwitcherOpen] = useState(false)
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)
+    const [shouldHideDock, setShouldHideDock] = useState(false)
+
+    useEffect(() => {
+        const hideDockRoutes = [
+            '/dashboard/sales/new',
+            '/dashboard/sales/edit',
+            '/dashboard/purchases/new',
+            '/dashboard/purchases/edit',
+            '/dashboard/inventory/new',
+            '/dashboard/inventory/edit'
+        ]
+        setShouldHideDock(hideDockRoutes.some(route => pathname.startsWith(route)))
+    }, [pathname])
 
     useEffect(() => {
         let lastScrollY = window.scrollY
@@ -209,7 +222,10 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     </div>
                 </header>
 
-                <main className="flex-1 overflow-y-auto lg:overflow-visible p-3 lg:p-6 pb-24 lg:pb-6 scrollbar-hide relative pt-4">
+                <main className={clsx(
+                    "flex-1 overflow-y-auto lg:overflow-visible p-3 lg:p-6 scrollbar-hide relative pt-4",
+                    shouldHideDock ? "pb-6" : "pb-24 lg:pb-6"
+                )}>
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={pathname}
@@ -228,9 +244,11 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                 </main>
 
                 {/* Mobile Bottom Dock */}
-                <div className="lg:hidden">
-                    <BottomNav />
-                </div>
+                {!shouldHideDock && (
+                    <div className="lg:hidden">
+                        <BottomNav />
+                    </div>
+                )}
             </div>
 
             <CreateBusinessModal

@@ -162,87 +162,56 @@ export default function PartiesClientView() {
                         key={party.id}
                         onClick={(e: React.MouseEvent) => handleEdit(e, party)}
                         className={clsx(
-                            "glass-optimized p-2 rounded-[14px] group hover:bg-[var(--foreground)]/10 transition-all duration-300 border border-[var(--foreground)]/10 cursor-pointer relative overflow-hidden flex flex-col justify-between min-h-[70px]",
-                            party.opening_balance < -5000 && "critical-glow-red" // Glow if debt is high
+                            "glass-optimized p-1.5 rounded-[10px] group hover:bg-[var(--foreground)]/10 transition-all duration-300 border border-[var(--foreground)]/10 cursor-pointer relative overflow-hidden flex items-center h-[54px] gap-2",
+                            party.opening_balance < -5000 && "critical-glow"
                         )}
                     >
-                        {/* Status Indicator Stripe */}
+                        {/* Indicator Stripe */}
                         <div className={clsx(
-                            "absolute top-0 left-0 w-[3px] h-full transition-colors duration-300",
+                            "absolute top-0 left-0 w-[2px] h-full transition-colors duration-300",
                             party.opening_balance >= 0 ? "bg-emerald-500" : "bg-rose-500"
                         )} />
 
-                        {/* Identity & Status Header */}
-                        <div className="flex items-center gap-2">
-                            <div className={clsx(
-                                "h-8 w-8 rounded-[10px] flex items-center justify-center font-black text-[10px] transition-all duration-300 shadow-inner shrink-0 border uppercase",
-                                party.opening_balance < -5000
-                                    ? "bg-rose-500/10 text-rose-500 border-rose-500/20 shadow-rose-500/5"
-                                    : "bg-[var(--foreground)]/5 text-[var(--deep-contrast)]/60 border-[var(--foreground)]/10"
-                            )}>
-                                {party.name.charAt(0)}
-                            </div>
-                            <div className="min-w-0 flex-1">
-                                <div className="flex items-center justify-between">
-                                    <h3 className="text-[10px] font-black text-[var(--deep-contrast)] truncate">{party.name}</h3>
-                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation()
-                                                handleEdit(e, party)
-                                            }}
-                                            className="h-6 w-6 flex items-center justify-center rounded-lg bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all shadow-sm"
-                                        >
-                                            <Edit2 size={10} />
-                                        </button>
-                                        <button
-                                            onClick={(e) => handleDelete(e, party.id)}
-                                            className="h-6 w-6 flex items-center justify-center rounded-lg bg-rose-500/5 text-rose-500 hover:bg-rose-500 hover:text-white border border-rose-500/10 transition-all shadow-sm"
-                                        >
-                                            <Trash2 size={10} />
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-1.5 mt-0 opacity-40">
-                                    <span className={clsx(
-                                        "text-[6.5px] font-black uppercase tracking-[0.1em] leading-none shrink-0",
-                                        party.type === 'CUSTOMER' ? "text-blue-600/60" : "text-orange-600/60"
-                                    )}>{party.type}</span>
-                                    <div className="h-0.5 w-0.5 rounded-full bg-current opacity-20" />
-                                    <span className="text-[6.5px] font-bold uppercase tracking-widest truncate">{party.phone || 'NO CONTACT'}</span>
-                                </div>
-                            </div>
+                        {/* Avatar */}
+                        <div className={clsx(
+                            "h-7 w-7 rounded-lg flex items-center justify-center font-black text-[9px] transition-all duration-300 shadow-inner shrink-0 border uppercase",
+                            party.opening_balance < -5000
+                                ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
+                                : "bg-[var(--foreground)]/5 text-[var(--deep-contrast)]/60 border-[var(--foreground)]/10"
+                        )}>
+                            {party.name.charAt(0)}
                         </div>
 
-                        {/* Metric & Info Bar */}
-                        <div className="mt-2.5 flex items-center justify-between">
-                            <div className="flex flex-col">
-                                <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.15em] ml-0.5">Bal</span>
-                                <p className={clsx(
-                                    "text-[15px] font-black tracking-tighter tabular-nums leading-none",
-                                    party.opening_balance > 0 ? "text-[var(--status-success-foreground)]" :
-                                        party.opening_balance < 0 ? "text-[var(--status-danger-foreground)]" : "text-[var(--foreground)]/30"
-                                )}>
-                                    {party.opening_balance > 0 ? '+' : ''}{formatCurrency(party.opening_balance).replace(/^-/, '')}
-                                </p>
-                            </div>
-                            <div className="flex flex-col items-end gap-1">
+                        {/* Identity Info */}
+                        <div className="flex-1 min-w-0">
+                            <h3 className="text-[9.5px] font-black text-[var(--deep-contrast)] truncate leading-none uppercase tracking-tight">{party.name}</h3>
+                            <div className="flex items-center gap-1.5 mt-1.5">
                                 <span className={clsx(
-                                    "text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full border shadow-sm",
-                                    party.type === 'CUSTOMER' ? "bg-[var(--status-info)] text-[var(--status-info-foreground)] border-[var(--status-info-border)]" : "bg-[var(--status-warning)] text-[var(--status-warning-foreground)] border-[var(--status-warning-border)]"
-                                )}>
-                                    {party.type === 'CUSTOMER' ? 'CLEAN' : 'DEBT'}
-                                </span>
-                                <span className="text-[6.5px] font-black text-[var(--foreground)]/30 uppercase tracking-widest leading-none opacity-60">
-                                    {party.phone ? `T-ID ${party.phone.slice(-4)}` : 'G-ID 0000'}
-                                </span>
+                                    "text-[6px] font-black uppercase tracking-widest shrink-0 px-1 py-0.5 rounded bg-[var(--foreground)]/5",
+                                    party.type === 'CUSTOMER' ? "text-blue-500/60" : "text-orange-500/60"
+                                )}>{party.type}</span>
+                                <div className="h-0.5 w-0.5 rounded-full bg-[var(--foreground)]/20" />
+                                <span className="text-[6.5px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">{party.phone || 'NO PHONE'}</span>
                             </div>
                         </div>
 
-                        {/* Subtle Phone Indicator */}
-                        <div className="mt-2 pt-2 border-t border-[var(--foreground)]/5 flex items-center gap-1 opacity-20 group-hover:opacity-60 transition-opacity">
-                            <Phone size={10} />
-                            <span className="text-[9px] font-bold">{party.phone || 'No contact'}</span>
+                        {/* Balance Metric */}
+                        <div className="flex flex-col items-end shrink-0">
+                            <p className={clsx(
+                                "text-[12px] font-black tracking-tighter tabular-nums leading-none",
+                                party.opening_balance > 0 ? "text-emerald-500" :
+                                    party.opening_balance < 0 ? "text-rose-500" : "text-[var(--foreground)]/30"
+                            )}>
+                                {party.opening_balance > 0 ? '+' : ''}{formatCurrency(party.opening_balance).replace(/^-/, '')}
+                            </p>
+                            <div className="flex items-center gap-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button
+                                    onClick={(e) => handleEdit(e, party)}
+                                    className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
+                                >
+                                    <Edit2 size={8} />
+                                </button>
+                            </div>
                         </div>
                     </div>
                 ))}

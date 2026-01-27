@@ -32,13 +32,7 @@ export const BottomNav = () => {
 
     useEffect(() => setMounted(true), []);
 
-    const hiddenPaths = [
-        "/dashboard/sales/new",
-        "/dashboard/purchases/new",
-        "/dashboard/inventory/new"
-    ];
-
-    if (!mounted || hiddenPaths.includes(pathname)) return null;
+    if (!mounted) return null;
 
     return (
         <>
@@ -57,7 +51,7 @@ export const BottomNav = () => {
                             initial={{ y: "100%", opacity: 0, scale: 0.95 }}
                             animate={{ y: 0, opacity: 1, scale: 1 }}
                             exit={{ y: "100%", opacity: 0, scale: 0.95 }}
-                            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 400 }}
                             className="relative z-10 glass rounded-[40px] p-8 border border-[var(--foreground)]/10 shadow-[0_-20px_50px_-12px_rgba(0,0,0,0.3)] bg-[var(--background)]/95 backdrop-blur-3xl"
                         >
                             <div className="flex justify-between items-center mb-8">

@@ -10,6 +10,7 @@ type Business = {
     name: string
     currency: string
     isOwner: boolean
+    logo_url?: string
 }
 
 type BusinessContextType = {
@@ -28,7 +29,7 @@ type BusinessContextType = {
     showError: (message: string, title?: string) => void
 }
 
-const BusinessContext = createContext<BusinessContextType | undefined>(undefined)
+export const BusinessContext = createContext<BusinessContextType | undefined>(undefined)
 
 export function BusinessProvider({ children }: { children: React.ReactNode }) {
     const [businesses, setBusinesses] = useState<Business[]>([])
@@ -74,7 +75,7 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
         console.log('BusinessContext: Session confirmed for', session.user.email)
         const { data, error } = await supabase
             .from('businesses')
-            .select('id, name, currency, owner_id')
+            .select('id, name, currency, owner_id, logo_url')
             .order('name')
 
         if (error) {

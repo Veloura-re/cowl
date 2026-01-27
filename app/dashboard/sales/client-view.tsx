@@ -313,77 +313,71 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                     <div
                         key={invoice.id}
                         onClick={() => handleEdit(invoice)}
-                        className="group relative flex flex-col glass-optimized rounded-[14px] border border-[var(--foreground)]/10 p-2 hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer overflow-hidden"
+                        className="group relative flex items-center glass-optimized rounded-[10px] border border-[var(--foreground)]/10 p-1.5 hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer overflow-hidden h-[54px] gap-2"
                     >
                         {/* Status Indicator Stripe */}
                         <div className={clsx(
-                            "absolute top-0 left-0 w-[3px] h-full transition-colors duration-300",
+                            "absolute top-0 left-0 w-[2px] h-full transition-colors duration-300",
                             invoice.status === 'PAID' ? "bg-emerald-500" : "bg-rose-500"
                         )} />
 
-                        {/* Identity & Status Header */}
-                        <div className="flex items-center gap-2">
-                            <div className={clsx(
-                                "h-8 w-8 rounded-[10px] flex items-center justify-center font-black text-[10px] transition-all duration-300 shadow-inner shrink-0 border uppercase",
-                                invoice.status === 'UNPAID'
-                                    ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
-                                    : "bg-[var(--foreground)]/5 text-[var(--deep-contrast)]/60 border-[var(--foreground)]/10"
-                            )}>
-                                {(invoice.party?.name || 'W').charAt(0)}
-                            </div>
-                            <div className="min-w-0 flex-1">
-                                <h3 className="text-[10px] font-black text-[var(--deep-contrast)] truncate">{invoice.party?.name || 'Walk-in'}</h3>
-                                <div className="flex items-center gap-1 mt-0 opacity-40">
-                                    <span className="text-[6.5px] font-black uppercase tracking-[0.1em] leading-none shrink-0">SALE</span>
-                                    <div className="h-0.5 w-0.5 rounded-full bg-current opacity-20" />
-                                    <span className="text-[6.5px] font-bold uppercase tracking-widest truncate">{invoice.invoice_number}</span>
-                                </div>
-                            </div>
+                        {/* Avatar */}
+                        <div className={clsx(
+                            "h-7 w-7 rounded-lg flex items-center justify-center font-black text-[9px] transition-all duration-300 shadow-inner shrink-0 border uppercase",
+                            invoice.status === 'UNPAID'
+                                ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
+                                : "bg-[var(--foreground)]/5 text-[var(--deep-contrast)]/60 border-[var(--foreground)]/10"
+                        )}>
+                            {(invoice.party?.name || 'W').charAt(0)}
                         </div>
 
-                        {/* Status & Date Bar */}
-                        <div className="mt-2.5 flex items-center justify-between">
-                            <div className="flex flex-col">
-                                <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.15em]">Value</span>
-                                <p className={clsx(
-                                    "text-[15px] font-black tracking-tighter tabular-nums leading-none",
-                                    invoice.balance_amount > 0 ? "text-[var(--status-danger-foreground)]" : "text-[var(--status-success-foreground)]"
-                                )}>
-                                    {formatCurrency(invoice.total_amount)}
-                                </p>
-                            </div>
-                            <div className="flex flex-col items-end gap-1">
+                        {/* Identity & Status Header - Compact */}
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-1">
+                                <h3 className="text-[9.5px] font-black text-[var(--deep-contrast)] truncate leading-none uppercase tracking-tight">{invoice.party?.name || 'Walk-in'}</h3>
                                 <span className={clsx(
-                                    "text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full border shadow-sm",
-                                    invoice.status === 'PAID' ? "bg-[var(--status-success)] text-[var(--status-success-foreground)] border-[var(--status-success-border)]" :
-                                        invoice.status === 'PENDING' ? "bg-[var(--status-warning)] text-[var(--status-warning-foreground)] border-[var(--status-warning-border)]" :
-                                            "bg-[var(--status-danger)] text-[var(--status-danger-foreground)] border-[var(--status-danger-border)]"
+                                    "text-[5.5px] font-black uppercase tracking-widest px-1 py-0.5 rounded-md border shrink-0",
+                                    invoice.status === 'PAID' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/10" :
+                                        invoice.status === 'PENDING' ? "bg-amber-500/10 text-amber-500 border-amber-500/10" :
+                                            "bg-rose-500/10 text-rose-500 border-rose-500/10"
                                 )}>
                                     {invoice.status}
                                 </span>
-                                <span className="text-[6.5px] font-black text-[var(--foreground)]/30 uppercase tracking-widest opacity-60">
+                            </div>
+                            <div className="flex items-center gap-1.5 mt-1.5">
+                                <span className="text-[6.5px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">{invoice.invoice_number}</span>
+                                <div className="h-0.5 w-0.5 rounded-full bg-[var(--foreground)]/20" />
+                                <span className="text-[6.5px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">
                                     {new Date(invoice.date).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}
                                 </span>
                             </div>
                         </div>
 
-                        {/* Action Buttons - Below content on mobile */}
-                        <div className="mt-2 flex items-center gap-1 justify-end">
-                            <button
-                                onClick={(e) => handlePrintInvoice(e, invoice)}
-                                className="h-6 w-6 flex items-center justify-center rounded-lg bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all shadow-sm"
-                            >
-                                <Printer size={10} />
-                            </button>
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleEdit(invoice)
-                                }}
-                                className="h-6 w-6 flex items-center justify-center rounded-lg bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all shadow-sm"
-                            >
-                                <Edit2 size={10} />
-                            </button>
+                        {/* Value & Actions Row */}
+                        <div className="flex flex-col items-end gap-1 shrink-0">
+                            <p className={clsx(
+                                "text-[12px] font-black tracking-tighter tabular-nums leading-none",
+                                invoice.balance_amount > 0 ? "text-rose-500" : "text-emerald-500"
+                            )}>
+                                {formatCurrency(invoice.total_amount)}
+                            </p>
+                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button
+                                    onClick={(e) => handlePrintInvoice(e, invoice)}
+                                    className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
+                                >
+                                    <Printer size={8} />
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        handleEdit(invoice)
+                                    }}
+                                    className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
+                                >
+                                    <Edit2 size={8} />
+                                </button>
+                            </div>
                         </div>
                     </div>
                 ))}

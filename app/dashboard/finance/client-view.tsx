@@ -258,54 +258,54 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                                 <div
                                     key={t.id}
                                     onClick={(e) => handleEdit(e, t)}
-                                    className="group p-3 hover:bg-[var(--foreground)]/5 transition-all flex justify-between items-center cursor-pointer active:scale-[0.99]"
+                                    className="group p-1.5 hover:bg-[var(--foreground)]/5 transition-all flex justify-between items-center cursor-pointer active:scale-[0.99] border-b border-[var(--foreground)]/5 last:border-0 h-[48px]"
                                 >
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-2">
                                         <div className={clsx(
-                                            "h-8 w-8 rounded-xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-110",
+                                            "h-6 w-6 rounded-lg flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 shrink-0",
                                             t.type === 'RECEIPT' ? "bg-emerald-500 text-white" : "bg-rose-500 text-white"
                                         )}>
-                                            {t.type === 'RECEIPT' ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
+                                            {t.type === 'RECEIPT' ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
                                         </div>
                                         <div className="min-w-0">
-                                            <div className="flex items-center gap-2">
-                                                <h4 className="text-[11px] font-black text-[var(--deep-contrast)] truncate uppercase tracking-tight">{t.party?.name || t.description || 'General Log'}</h4>
+                                            <div className="flex items-center gap-1.5">
+                                                <h4 className="text-[9.5px] font-black text-[var(--deep-contrast)] truncate uppercase tracking-tight leading-none">{t.party?.name || t.description || 'General Log'}</h4>
+                                            </div>
+                                            <div className="flex items-center gap-1.5 mt-1">
                                                 <span className={clsx(
-                                                    "text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest border shadow-sm",
-                                                    t.mode === 'CASH' ? "bg-[var(--status-warning)] text-[var(--status-warning-foreground)] border-[var(--status-warning-border)]" :
-                                                        t.mode === 'BANK' ? "bg-[var(--status-info)] text-[var(--status-info-foreground)] border-[var(--status-info-border)]" :
-                                                            "bg-purple-100/50 text-purple-700 border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20"
+                                                    "text-[5.5px] font-black px-1 py-0.5 rounded-md uppercase tracking-widest border shrink-0",
+                                                    t.mode === 'CASH' ? "bg-amber-100/50 text-amber-700 border-amber-200" :
+                                                        t.mode === 'BANK' ? "bg-blue-100/50 text-blue-700 border-blue-200" :
+                                                            "bg-purple-100/50 text-purple-700 border-purple-200"
                                                 )}>
                                                     {t.mode}
                                                 </span>
-                                            </div>
-                                            <div className="flex items-center gap-2 mt-0.5">
-                                                <Calendar className="h-2 w-2 text-[var(--foreground)]/20" />
-                                                <span className="text-[8px] font-black text-[var(--foreground)]/30 uppercase tracking-widest">
+                                                <div className="h-0.5 w-0.5 rounded-full bg-[var(--foreground)]/20" />
+                                                <span className="text-[6.5px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">
                                                     {new Date(t.date).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-3">
                                         <div className="text-right">
                                             <p className={clsx(
-                                                "text-[13px] font-black tabular-nums tracking-tighter",
-                                                t.type === 'RECEIPT' ? "text-[var(--status-success-foreground)]" : "text-[var(--status-danger-foreground)]"
+                                                "text-[11px] font-black tabular-nums tracking-tighter leading-none",
+                                                t.type === 'RECEIPT' ? "text-emerald-500" : "text-rose-500"
                                             )}>
                                                 {t.type === 'RECEIPT' ? '+' : '-'} {formatCurrency(t.amount)}
                                             </p>
                                         </div>
-                                        <div className="flex items-center gap-1 transition-opacity">
+                                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); handleEdit(e, t); }}
-                                                className="p-1.5 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-blue-500 hover:bg-blue-500 hover:text-white transition-all active:scale-90"
+                                                className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-blue-500 hover:bg-blue-500 hover:text-white transition-all"
                                             >
                                                 <Edit2 className="h-2.5 w-2.5" />
                                             </button>
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); handleDelete(e, t.id); }}
-                                                className="p-1.5 rounded-lg bg-rose-500/5 border border-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-all active:scale-90"
+                                                className="h-4 w-4 flex items-center justify-center rounded-md bg-rose-500/5 border border-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-all"
                                             >
                                                 <Trash2 className="h-2.5 w-2.5" />
                                             </button>

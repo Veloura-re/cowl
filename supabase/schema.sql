@@ -76,6 +76,8 @@ create table invoices (
   total_amount numeric not null default 0,
   balance_amount numeric not null default 0, -- Track unpaid
   status text check (status in ('PAID', 'PARTIAL', 'UNPAID', 'CANCELLED')) default 'UNPAID',
+  category text,
+  sku text,
   notes text,
   discount_amount numeric default 0,
   tax_amount numeric default 0,

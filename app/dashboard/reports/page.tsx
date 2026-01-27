@@ -157,23 +157,26 @@ export default function ReportsPage() {
             // 3. Generate
             const businessInfo: any = {
                 name: 'My Business',
-                ...business
+                ...business,
+                logoUrl: business?.logo_url
             }
 
             // We need to fetch real business info if not in context or missing details
             if (!business || !business.name) {
-                const { data: bData } = await supabase.from('businesses').select('name, address, phone').eq('id', activeBusinessId).single()
+                const { data: bData } = await supabase.from('businesses').select('name, address, phone, logo_url').eq('id', activeBusinessId).single()
                 if (bData) {
                     businessInfo.name = bData.name
                     businessInfo.address = bData.address
                     businessInfo.phone = bData.phone
+                    businessInfo.logoUrl = bData.logo_url
                 }
             } else {
                 // Try to fetch specific details even if we have basic business info
-                const { data: extraData } = await supabase.from('businesses').select('address, phone').eq('id', activeBusinessId).single()
+                const { data: extraData } = await supabase.from('businesses').select('address, phone, logo_url').eq('id', activeBusinessId).single()
                 if (extraData) {
                     businessInfo.address = extraData.address
                     businessInfo.phone = extraData.phone
+                    businessInfo.logoUrl = extraData.logo_url
                 }
             }
 

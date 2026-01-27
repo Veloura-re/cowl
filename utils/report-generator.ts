@@ -15,6 +15,7 @@ interface BusinessInfo {
     address?: string;
     phone?: string;
     email?: string;
+    logoUrl?: string;
 }
 
 export const ReportGenerator = {
@@ -41,6 +42,18 @@ export const ReportGenerator = {
         doc.setFont('helvetica', 'bold');
         doc.text(businessInfo.name, pageWidth / 2, yPos, { align: 'center' });
         yPos += 8;
+
+        // Add Logo if available
+        if (businessInfo.logoUrl) {
+            try {
+                // Determine if it's base64 or URL
+                // If it's a URL, jsPDF might have trouble fetching it synchronously in some environments without a proxy,
+                // but for web-based Supabase URLs, it's generally fine if CORS allows.
+                doc.addImage(businessInfo.logoUrl, 'PNG', 15, 10, 15, 15);
+            } catch (e) {
+                console.error('Failed to add logo to report', e);
+            }
+        }
 
         // Business Details
         doc.setFontSize(10);

@@ -136,76 +136,79 @@ export default function DashboardPage() {
                 {stats.map((s, i) => (
                     <motion.div
                         key={s.label}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: i * 0.1, duration: 0.4, ease: "easeOut" }}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.05, duration: 0.3 }}
                         className={clsx(
-                            "glass p-2.5 rounded-xl border border-[var(--foreground)]/10 flex flex-col justify-between group hover:bg-[var(--foreground)]/5 dark:hover:bg-white/10 transition-all duration-300",
+                            "glass p-2 rounded-[14px] border border-[var(--foreground)]/10 flex flex-col gap-0.5 group hover:bg-[var(--foreground)]/10 transition-all duration-300 relative overflow-hidden",
                             s.label === 'Pending' && data.pending > 0 && "critical-glow-amber",
                             s.label === 'Stock' && data.lowStockCount > 0 && "critical-glow-red"
                         )}
                     >
-                        <div className="flex items-center justify-between gap-2">
-                            <div className="flex items-center gap-2">
-                                <s.icon className={clsx(
-                                    "h-3 w-3",
-                                    s.color === 'emerald' ? "text-emerald-600" :
-                                        s.color === 'blue' ? "text-blue-600" :
-                                            s.color === 'purple' ? "text-purple-600" :
-                                                "text-orange-600"
-                                )} />
-                                <span className="text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 truncate">{s.label}</span>
-                            </div>
-                            <p className={clsx(
-                                "text-lg font-black tracking-tighter truncate tabular-nums",
-                                s.color === 'emerald' ? "text-emerald-600" :
-                                    s.color === 'orange' ? "text-orange-600" :
-                                        "text-[var(--deep-contrast)] dark:text-[var(--foreground)]"
-                            )}>{s.value}</p>
+                        <div className="flex items-center gap-1.5 opacity-40">
+                            <s.icon className={clsx(
+                                "h-2.5 w-2.5",
+                                s.color === 'emerald' ? "text-emerald-500" :
+                                    s.color === 'blue' ? "text-blue-500" :
+                                        s.color === 'purple' ? "text-purple-500" :
+                                            "text-orange-500"
+                            )} />
+                            <span className="text-[7.5px] font-black uppercase tracking-widest">{s.label}</span>
+                        </div>
+                        <p className={clsx(
+                            "text-base font-black tracking-tighter tabular-nums leading-none",
+                            s.color === 'emerald' ? "text-emerald-500" :
+                                s.color === 'orange' ? "text-orange-500" :
+                                    "text-[var(--deep-contrast)]"
+                        )}>{s.value}</p>
+
+                        {/* Background Decoration */}
+                        <div className="absolute -bottom-2 -right-2 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
+                            <s.icon className="h-10 w-10" />
                         </div>
                     </motion.div>
                 ))}
             </div>
 
             {/* Dashboard Quick Stats Bar (In/Out) */}
-            <div className="flex gap-2">
-                <div className="flex-1 glass p-2.5 rounded-[20px] border border-[var(--foreground)]/10">
+            <div className="flex gap-1.5 h-20">
+                <div className="flex-1 glass p-2 rounded-[18px] border border-[var(--foreground)]/10 flex flex-col justify-between group hover:bg-[var(--foreground)]/5 transition-all">
                     <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-2">
-                            <div className="h-2 w-2 rounded-full bg-emerald-500" />
-                            <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600/60">Total Inbound</span>
+                        <div className="flex items-center gap-1.5">
+                            <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                            <span className="text-[7.5px] font-black uppercase tracking-widest text-emerald-500/60">Total In</span>
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full border border-[var(--status-success-border)] bg-[var(--status-success)] text-[var(--status-success-foreground)] shadow-sm">IN</span>
+                        <span className="text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 text-emerald-500 shadow-sm">REVENUE</span>
                     </div>
-                    <p className="text-xl font-black text-emerald-600 mt-2 tabular-nums">{formatCurrency(data.revenue)}</p>
+                    <p className="text-lg font-black text-emerald-500 tabular-nums leading-none mb-1">{formatCurrency(data.revenue)}</p>
                 </div>
 
                 <div className={clsx(
-                    "flex-1 glass p-2.5 rounded-[20px] border border-[var(--foreground)]/10 transition-all duration-300",
-                    data.totalExpenses > 10000 && "critical-glow-red" // Glow if expenses are high
+                    "flex-1 glass p-2 rounded-[18px] border border-[var(--foreground)]/10 flex flex-col justify-between group hover:bg-[var(--foreground)]/5 transition-all",
+                    data.totalExpenses > 10000 && "critical-glow-red"
                 )}>
                     <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-2">
-                            <div className="h-2 w-2 rounded-full bg-rose-500" />
-                            <span className="text-[9px] font-black uppercase tracking-widest text-rose-600/60">Total Outbound</span>
+                        <div className="flex items-center gap-1.5">
+                            <div className="h-1.5 w-1.5 rounded-full bg-rose-500" />
+                            <span className="text-[7.5px] font-black uppercase tracking-widest text-rose-500/60">Total Out</span>
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full border border-[var(--status-danger-border)] bg-[var(--status-danger)] text-[var(--status-danger-foreground)] shadow-sm">OUT</span>
+                        <span className="text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-lg border border-rose-500/20 bg-rose-500/10 text-rose-500 shadow-sm">PAYABLE</span>
                     </div>
-                    <p className="text-xl font-black text-rose-600 mt-2 tabular-nums">{formatCurrency(data.totalExpenses)}</p>
+                    <p className="text-lg font-black text-rose-500 tabular-nums leading-none mb-1">{formatCurrency(data.totalExpenses)}</p>
                 </div>
 
                 <div className={clsx(
-                    "flex-1 glass p-2.5 rounded-[20px] border border-[var(--foreground)]/10 transition-all duration-300",
+                    "flex-1 glass p-2 rounded-[18px] border border-[var(--foreground)]/10 flex flex-col justify-between group hover:bg-[var(--foreground)]/5 transition-all",
                     data.lowStockCount > 0 && "critical-glow-red"
                 )}>
                     <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-2">
-                            <div className="h-2 w-2 rounded-full bg-blue-500" />
-                            <span className="text-[9px] font-black uppercase tracking-widest text-blue-600/60">Stock Alerts</span>
+                        <div className="flex items-center gap-1.5">
+                            <div className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+                            <span className="text-[7.5px] font-black uppercase tracking-widest text-blue-500/60">Stock Alert</span>
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full border border-[var(--status-info-border)] bg-[var(--status-info)] text-[var(--status-info-foreground)] shadow-sm">LOW</span>
+                        <span className="text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-lg border border-blue-500/20 bg-blue-500/10 text-blue-500 shadow-sm">LOW</span>
                     </div>
-                    <p className="text-xl font-black text-blue-600 mt-2 tabular-nums">{(data as any).lowStockCount || 0}</p>
+                    <p className="text-lg font-black text-blue-500 tabular-nums leading-none mb-1">{(data as any).lowStockCount || 0}</p>
                 </div>
             </div>
 

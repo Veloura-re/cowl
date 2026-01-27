@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Save, Loader2, CheckCircle2, Package, Tag, Trash2, Box, Layers } from 'lucide-react'
+import { ArrowLeft, Save, Loader2, CheckCircle2, Package, Tag, Trash2, Box, Layers, ChevronDown, ChevronUp } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/context/business-context'
 import Link from 'next/link'
@@ -10,6 +10,7 @@ import clsx from 'clsx'
 import PickerModal from '@/components/ui/PickerModal'
 import ConfirmModal from '@/components/ui/ConfirmModal'
 import { units } from '@/lib/units'
+import { motion, AnimatePresence } from 'framer-motion'
 
 type CompactItemFormProps = {
     initialData?: any
@@ -23,6 +24,7 @@ export default function CompactItemForm({ initialData }: CompactItemFormProps) {
     const [success, setSuccess] = useState(false)
     const [isUnitPickerOpen, setIsUnitPickerOpen] = useState(false)
     const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+    const [showMore, setShowMore] = useState(false)
 
     const isEdit = !!initialData?.id
 
@@ -209,39 +211,70 @@ export default function CompactItemForm({ initialData }: CompactItemFormProps) {
                                 </button>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-2 ml-1">Classification</label>
-                                    <input
-                                        type="text"
-                                        value={formData.category}
-                                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                        className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] transition-all shadow-inner"
-                                        placeholder="Category..."
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-2 ml-1">Registry SKU</label>
-                                    <input
-                                        type="text"
-                                        value={formData.sku}
-                                        onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-                                        className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] transition-all shadow-inner"
-                                        placeholder="Stock code..."
-                                    />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-2 ml-1">Resource memorandum</label>
-                                <textarea
-                                    value={formData.description}
-                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    className="w-full h-32 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 p-4 text-[11px] font-black text-[var(--deep-contrast)] placeholder:text-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none transition-all resize-none shadow-inner"
-                                    placeholder="Enter internal details..."
-                                />
-                            </div>
                         </div>
+                    </div>
+                    {/* Bottom Documentation / More Options - Moved under core spec */}
+                    <div className="pt-2">
+                        <div className="flex justify-start ml-2">
+                            <button
+                                type="button"
+                                onClick={() => setShowMore(!showMore)}
+                                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--foreground)]/5 hover:bg-[var(--foreground)]/10 text-[9px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/60 transition-all border border-[var(--foreground)]/10 shadow-sm"
+                            >
+                                {showMore ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                                {showMore ? 'Less Options' : 'More Options'}
+                            </button>
+                        </div>
+
+                        <AnimatePresence>
+                            {showMore && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.4, ease: 'easeInOut' }}
+                                    className="overflow-hidden mt-4"
+                                >
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="glass rounded-[24px] border border-[var(--foreground)]/10 p-5 shadow-lg space-y-4">
+                                            <h3 className="text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 border-b border-[var(--foreground)]/5 pb-2">Identification</h3>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div>
+                                                    <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-2 ml-1">Classification</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.category}
+                                                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                                        className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] transition-all shadow-inner"
+                                                        placeholder="Category..."
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-2 ml-1">Registry SKU</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.sku}
+                                                        onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                                                        className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] transition-all shadow-inner"
+                                                        placeholder="Stock code..."
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="glass rounded-[24px] border border-[var(--foreground)]/10 p-5 shadow-lg">
+                                            <h3 className="text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 border-b border-[var(--foreground)]/5 pb-2">Resource Memorandum</h3>
+                                            <textarea
+                                                value={formData.description}
+                                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                                className="w-full h-[68px] rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 p-3 text-[11px] font-black text-[var(--deep-contrast)] placeholder:text-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none transition-all resize-none shadow-inner"
+                                                placeholder="Enter internal details..."
+                                            />
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
                 </div>
 
@@ -268,7 +301,7 @@ export default function CompactItemForm({ initialData }: CompactItemFormProps) {
                                     <input
                                         type="number"
                                         step="any"
-                                        value={formData.selling_price}
+                                        value={formData.selling_price || ''}
                                         onChange={(e) => setFormData({ ...formData, selling_price: Number(e.target.value) })}
                                         className="w-full h-11 rounded-xl bg-emerald-500/5 border border-emerald-500/10 px-4 text-[14px] font-black text-[var(--primary-green)] focus:border-emerald-500 focus:outline-none transition-all tabular-nums text-center shadow-inner"
                                     />
@@ -278,7 +311,7 @@ export default function CompactItemForm({ initialData }: CompactItemFormProps) {
                                     <input
                                         type="number"
                                         step="any"
-                                        value={formData.purchase_price}
+                                        value={formData.purchase_price || ''}
                                         onChange={(e) => setFormData({ ...formData, purchase_price: Number(e.target.value) })}
                                         className="w-full h-11 rounded-xl bg-rose-500/5 border border-rose-500/10 px-4 text-[11px] font-black text-rose-500 focus:border-rose-500 transition-all tabular-nums text-center shadow-inner"
                                     />
@@ -297,7 +330,7 @@ export default function CompactItemForm({ initialData }: CompactItemFormProps) {
                                         <input
                                             type="number"
                                             step="any"
-                                            value={formData.stock_quantity}
+                                            value={formData.stock_quantity || ''}
                                             onChange={(e) => setFormData({ ...formData, stock_quantity: Number(e.target.value) })}
                                             className="flex-1 h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[13px] font-black text-[var(--deep-contrast)] text-right focus:border-[var(--primary-green)] transition-all shadow-inner tabular-nums"
                                         />
@@ -311,7 +344,7 @@ export default function CompactItemForm({ initialData }: CompactItemFormProps) {
                                         <input
                                             type="number"
                                             step="any"
-                                            value={formData.min_stock}
+                                            value={formData.min_stock || ''}
                                             onChange={(e) => setFormData({ ...formData, min_stock: Number(e.target.value) })}
                                             className="flex-1 h-11 rounded-xl bg-orange-500/5 border border-orange-500/20 px-4 text-[13px] font-black text-orange-600 text-right focus:border-orange-500 transition-all shadow-inner tabular-nums"
                                         />
