@@ -16,9 +16,10 @@ type AddSalesItemModalProps = {
     items: any[]
     initialData?: any
     onDelete?: () => void
+    isSale?: boolean
 }
 
-export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initialData, onDelete }: AddSalesItemModalProps) {
+export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initialData, onDelete, isSale = true }: AddSalesItemModalProps) {
     const router = useRouter()
     const { formatCurrency } = useBusiness()
     const [isItemPickerOpen, setIsItemPickerOpen] = useState(false)
@@ -43,9 +44,10 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
 
     useEffect(() => {
         if (selectedItem && !initialData) {
-            setRate(selectedItem.selling_price || '')
+            // Default to Selling Price for Sales, Purchase Price for Purchases
+            setRate(isSale ? (selectedItem.selling_price || '') : (selectedItem.purchase_price || ''))
         }
-    }, [selectedItem, initialData])
+    }, [selectedItem, initialData, isSale])
 
     const handleSelect = (itemId: string) => {
         const item = items.find(i => i.id === itemId)
@@ -136,7 +138,7 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                             <Plus className="h-4 w-4" />
                         </div>
                         <div>
-                            <h2 className="text-[13px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">Sales Entry</h2>
+                            <h2 className="text-[13px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">{isSale ? 'Sales Entry' : 'Purchase Record'}</h2>
                             <p className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-widest leading-none mt-0.5">Line Specification</p>
                         </div>
                     </div>
@@ -177,7 +179,7 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                                         {selectedItem ? selectedItem.name : 'Choose Item'}
                                     </p>
                                     <p className="text-[8px] font-black opacity-40 uppercase tracking-widest">
-                                        {selectedItem ? `${selectedItem.stock_quantity ?? 0} in stock` : 'Select from inventory'}
+                                        {selectedItem ? `${selectedItem.stock_quantity ?? 0} in stock • ${isSale ? 'Price' : 'Cost'}: ${formatCurrency(isSale ? selectedItem.selling_price : selectedItem.purchase_price)}` : 'Select from inventory'}
                                     </p>
                                 </div>
                             </div>
@@ -230,22 +232,22 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                                         <div className="text-right">
                                             <p className={clsx(
                                                 "text-[8px] font-black uppercase tracking-[0.2em] mb-1",
-                                                isLoss ? "text-rose-400" : "text-[var(--primary-green)]"
+                                                isSale ? (isLoss ? "text-rose-400" : "text-[var(--primary-green)]") : "text-blue-400"
                                             )}>
-                                                {isLoss ? 'Net Deficit' : 'Potential Yield'}
+                                                {isSale ? (isLoss ? 'Net Deficit' : 'Potential Yield') : 'Inventory Value'}
                                             </p>
                                             <p className={clsx(
                                                 "text-[14px] font-black tabular-nums tracking-tighter",
-                                                isLoss ? "text-rose-400" : "text-[var(--primary-green)]"
+                                                isSale ? (isLoss ? "text-rose-400" : "text-[var(--primary-green)]") : "text-blue-400"
                                             )}>
-                                                {isLoss ? '-' : '+'}{formatCurrency(Math.abs(totalProfit))}
+                                                {isSale ? (isLoss ? '-' : '+') : ''}{formatCurrency(isSale ? Math.abs(totalProfit) : total)}
                                             </p>
                                         </div>
                                     </div>
 
                                     <div className="flex items-center justify-between text-[8px] font-black uppercase tracking-widest text-white/20">
-                                        <span>Unit Cost: {formatCurrency(purchasePrice)}</span>
-                                        <span>Margin: {total > 0 ? ((totalProfit / total) * 100).toFixed(1) : 0}%</span>
+                                        <span>Unit {isSale ? 'Cost' : 'Landed'}: {formatCurrency(purchasePrice)}</span>
+                                        {isSale && <span>Margin: {total > 0 ? ((totalProfit / total) * 100).toFixed(1) : 0}%</span>}
                                     </div>
                                 </div>
                                 {/* Decorative elements */}

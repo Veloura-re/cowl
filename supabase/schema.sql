@@ -120,12 +120,20 @@ alter table invoices enable row level security;
 alter table invoice_items enable row level security;
 alter table transactions enable row level security;
 alter table payment_modes enable row level security;
+alter table profiles enable row level security;
+alter table daily_check_logs enable row level security;
 
 -- Business Policies
 -- Using security definer function to avoid recursion
 create policy "Owners can view their businesses" on businesses for select using (auth.uid() = owner_id or is_business_member(id));
 create policy "Owners can insert businesses" on businesses for insert with check (auth.uid() = owner_id);
 create policy "Owners can update their businesses" on businesses for update using (auth.uid() = owner_id);
+create policy "Owners can delete their businesses" on businesses for delete using (auth.uid() = owner_id);
+
+-- Profile Policies
+create policy "Users can view their own profile" on profiles for select using (auth.uid() = id);
+create policy "Users can update their own profile" on profiles for update using (auth.uid() = id);
+create policy "Users can insert their own profile" on profiles for insert with check (auth.uid() = id);
 
 -- Business Member Policies
 create policy "Members can view membership" on business_members for select using (user_id = auth.uid() or is_business_member(business_id));
@@ -148,14 +156,17 @@ $$ language plpgsql security definer;
 create policy "Members can view parties" on parties for select using (is_business_member(business_id));
 create policy "Members can insert parties" on parties for insert with check (is_business_member(business_id));
 create policy "Members can update parties" on parties for update using (is_business_member(business_id));
+create policy "Members can delete parties" on parties for delete using (is_business_member(business_id));
 
 create policy "Members can view items" on items for select using (is_business_member(business_id));
 create policy "Members can insert items" on items for insert with check (is_business_member(business_id));
 create policy "Members can update items" on items for update using (is_business_member(business_id));
+create policy "Members can delete items" on items for delete using (is_business_member(business_id));
 
 create policy "Members can view invoices" on invoices for select using (is_business_member(business_id));
 create policy "Members can insert invoices" on invoices for insert with check (is_business_member(business_id));
 create policy "Members can update invoices" on invoices for update using (is_business_member(business_id));
+create policy "Members can delete invoices" on invoices for delete using (is_business_member(business_id));
 
 create policy "Members can view transactions" on transactions for select using (is_business_member(business_id));
 create policy "Members can insert transactions" on transactions for insert with check (is_business_member(business_id));
@@ -164,6 +175,8 @@ create policy "Members can delete transactions" on transactions for delete using
 
 create policy "Members can view payment modes" on payment_modes for select using (is_business_member(business_id));
 create policy "Members can manage payment modes" on payment_modes for all using (is_business_member(business_id));
+
+create policy "Members can manage daily check logs" on daily_check_logs for all using (is_business_member(business_id));
 
 create policy "Members can view invoice items" on invoice_items for select using (exists (select 1 from invoices where id = invoice_id and is_business_member(business_id)));
 create policy "Members can insert invoice items" on invoice_items for insert with check (exists (select 1 from invoices where id = invoice_id and is_business_member(business_id)));

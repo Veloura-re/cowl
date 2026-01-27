@@ -114,31 +114,31 @@ export default function InvoicePreviewModal({
                 </div>
 
                 {/* Preview Content */}
-                <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-[#f3f3f3] custom-scrollbar">
-                    <div className="w-full max-w-[210mm] mx-auto bg-white shadow-xl overflow-hidden flex flex-col min-h-[297mm] p-[40px] text-black font-['Inter'] relative">
+                <div className="flex-1 overflow-y-auto p-2 md:p-4 bg-[#f3f3f3] custom-scrollbar">
+                    <div className="w-full max-w-[210mm] mx-auto bg-white shadow-xl overflow-hidden flex flex-col min-h-[297mm] p-[24px] text-black font-['Inter'] relative">
 
                         {/* Header */}
-                        <div className="flex justify-between items-start mb-10">
+                        <div className="flex justify-between items-start mb-6">
                             <div className="flex-1">
                                 {data.businessLogoUrl && (
                                     <img
                                         src={data.businessLogoUrl}
                                         alt="Logo"
-                                        className="h-[50px] w-auto object-contain mb-4 grayscale filter block"
+                                        className="h-[35px] w-auto object-contain mb-2 grayscale filter block"
                                     />
                                 )}
-                                <h1 className="text-2xl font-black uppercase tracking-tight">{data.businessName}</h1>
-                                <div className="text-[9px] font-mono uppercase tracking-wider mt-2 leading-relaxed text-neutral-500">
+                                <h1 className="text-lg font-black uppercase tracking-tight">{data.businessName}</h1>
+                                <div className="text-[8px] font-mono uppercase tracking-wider mt-1 leading-relaxed text-neutral-500">
                                     <p>{data.businessAddress}</p>
                                     <p>{data.businessPhone}</p>
                                 </div>
                             </div>
                             <div className="text-right">
-                                <div className="inline-block border border-black px-3 py-1 text-[10px] font-mono font-bold uppercase mb-3">
+                                <div className="inline-block border border-black px-2 py-0.5 text-[8px] font-mono font-bold uppercase mb-2">
                                     {data.status}
                                 </div>
-                                <h2 className="text-2xl font-black uppercase tracking-widest text-black mb-2">{isSale ? 'INVOICE' : 'PURCHASE'}</h2>
-                                <div className="text-[11px] font-mono">
+                                <h2 className="text-lg font-black uppercase tracking-widest text-black mb-1">{isSale ? 'INVOICE' : 'PURCHASE'}</h2>
+                                <div className="text-[10px] font-mono">
                                     <div className="mb-0.5"><span className="text-neutral-500">NO.</span> <span className="font-bold">{data.invoiceNumber}</span></div>
                                     <div><span className="text-neutral-500">DATE</span> <span className="font-bold">{data.date}</span></div>
                                 </div>
@@ -146,39 +146,39 @@ export default function InvoicePreviewModal({
                         </div>
 
                         {/* Info Grid */}
-                        <div className="grid grid-cols-2 gap-10 py-6 border-y-2 border-black mb-10">
+                        <div className="grid grid-cols-2 gap-4 py-3 border-y-2 border-black mb-6">
                             <div>
-                                <p className="text-[9px] font-mono uppercase text-neutral-500 mb-2 tracking-widest">ISSUED TO</p>
-                                <p className="text-sm font-black uppercase tracking-tight">{data.partyName}</p>
-                                <p className="text-[11px] font-mono mt-1 text-neutral-800">{data.partyAddress || 'Address Not Provided'}</p>
-                                <p className="text-[11px] font-mono mt-0.5 text-neutral-800">{data.partyPhone}</p>
+                                <p className="text-[8px] font-mono uppercase text-neutral-500 mb-1 tracking-widest">ISSUED TO</p>
+                                <p className="text-xs font-black uppercase tracking-tight">{data.partyName}</p>
+                                <p className="text-[10px] font-mono mt-0.5 text-neutral-800">{data.partyAddress || 'Address Not Provided'}</p>
+                                <p className="text-[10px] font-mono mt-0.5 text-neutral-800">{data.partyPhone}</p>
                             </div>
                             <div className="text-right">
-                                <p className="text-[9px] font-mono uppercase text-neutral-500 mb-2 tracking-widest">PAYMENT DETAILS</p>
-                                <p className="text-[11px] font-mono mb-1">DUE DATE: <span className="font-bold">{data.dueDate || 'ON RECEIPT'}</span></p>
-                                <p className="text-[11px] font-mono">CURRENCY: <span className="font-bold">{data.currency.toUpperCase()}</span></p>
+                                <p className="text-[8px] font-mono uppercase text-neutral-500 mb-1 tracking-widest">PAYMENT DETAILS</p>
+                                <p className="text-[10px] font-mono mb-0.5">DUE DATE: <span className="font-bold">{data.dueDate || 'ON RECEIPT'}</span></p>
+                                <p className="text-[10px] font-mono">CURRENCY: <span className="font-bold">{data.currency.toUpperCase()}</span></p>
                             </div>
                         </div>
 
                         {/* Items Table */}
-                        <table className="w-full border-collapse mb-8">
+                        <table className="w-full border-collapse mb-4">
                             <thead>
                                 <tr className="border-b-2 border-black">
-                                    <th className="text-left font-mono text-[9px] uppercase tracking-wider text-black pb-2 pl-1 w-1/2">DESCRIPTION</th>
-                                    <th className="text-center font-mono text-[9px] uppercase tracking-wider text-black pb-2 w-[10%]">QTY</th>
-                                    <th className="text-right font-mono text-[9px] uppercase tracking-wider text-black pb-2 w-[15%]">RATE</th>
-                                    <th className="text-right font-mono text-[9px] uppercase tracking-wider text-black pb-2 w-[10%]">TAX</th>
-                                    <th className="text-right font-mono text-[9px] uppercase tracking-wider text-black pb-2 w-[15%] pr-1">AMOUNT</th>
+                                    <th className="text-left font-mono text-[8px] uppercase tracking-wider text-black pb-1 pl-1 w-1/2">DESCRIPTION</th>
+                                    <th className="text-center font-mono text-[8px] uppercase tracking-wider text-black pb-1 w-[10%]">QTY</th>
+                                    <th className="text-right font-mono text-[8px] uppercase tracking-wider text-black pb-1 w-[15%]">RATE</th>
+                                    <th className="text-right font-mono text-[8px] uppercase tracking-wider text-black pb-1 w-[10%]">TAX</th>
+                                    <th className="text-right font-mono text-[8px] uppercase tracking-wider text-black pb-1 w-[15%] pr-1">AMOUNT</th>
                                 </tr>
                             </thead>
-                            <tbody className="text-[12px]">
+                            <tbody className="text-[10px]">
                                 {data.items.map((item, idx) => (
                                     <tr key={idx} className="border-b border-neutral-200 last:border-b-2 last:border-black">
-                                        <td className="py-3 pl-1 font-bold">{item.description}</td>
-                                        <td className="py-3 text-center font-mono">{item.quantity}</td>
-                                        <td className="py-3 text-right font-mono text-neutral-600">{formatNumber(item.rate)}</td>
-                                        <td className="py-3 text-right font-mono text-neutral-600">{item.tax}%</td>
-                                        <td className="py-3 pr-1 text-right font-mono font-bold">{data.currencySymbol}{formatNumber(item.total)}</td>
+                                        <td className="py-2 pl-1 font-bold">{item.description}</td>
+                                        <td className="py-2 text-center font-mono">{item.quantity}</td>
+                                        <td className="py-2 text-right font-mono text-neutral-600">{formatNumber(item.rate)}</td>
+                                        <td className="py-2 text-right font-mono text-neutral-600">{item.tax}%</td>
+                                        <td className="py-2 pr-1 text-right font-mono font-bold">{data.currencySymbol}{formatNumber(item.total)}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -202,9 +202,9 @@ export default function InvoicePreviewModal({
                                     </div>
                                 ) : null}
 
-                                <div className="flex justify-between items-center py-3 mt-2 border-y-2 border-black">
-                                    <span className="text-sm font-black uppercase tracking-widest">TOTAL</span>
-                                    <span className="text-lg font-black font-mono">{data.currencySymbol}{formatNumber(data.totalAmount)}</span>
+                                <div className="flex justify-between items-center py-2 mt-1 border-y-2 border-black">
+                                    <span className="text-xs font-black uppercase tracking-widest">TOTAL</span>
+                                    <span className="text-base font-black font-mono">{data.currencySymbol}{formatNumber(data.totalAmount)}</span>
                                 </div>
 
                                 {data.paidAmount ? (

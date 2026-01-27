@@ -83,7 +83,7 @@ export function generateInvoiceHTML(data: InvoiceData): string {
             min-height: 297mm;
             margin: 0 auto;
             background: var(--bg-color);
-            padding: 40px;
+            padding: 24px;
             position: relative;
             display: flex;
             flex-direction: column;
@@ -99,33 +99,33 @@ export function generateInvoiceHTML(data: InvoiceData): string {
         .uppercase { text-transform: uppercase; }
         .bold { font-weight: 700; }
         .heavy { font-weight: 900; }
-        .text-xs { font-size: 9px; letter-spacing: 0.05em; }
-        .text-sm { font-size: 11px; }
-        .text-base { font-size: 14px; }
-        .text-xl { font-size: 24px; letter-spacing: -0.03em; }
+        .text-xs { font-size: 8px; letter-spacing: 0.05em; }
+        .text-sm { font-size: 10px; }
+        .text-base { font-size: 12px; }
+        .text-xl { font-size: 18px; letter-spacing: -0.02em; }
         .tracking-wide { letter-spacing: 0.1em; }
 
         /* Graphic Elements */
-        .divider { height: 2px; background: #000; margin: 15px 0; }
-        .divider-light { height: 1px; background: #e5e5e5; margin: 10px 0; }
-        .box { border: 1px solid #000; padding: 15px; }
+        .divider { height: 2px; background: #000; margin: 10px 0; }
+        .divider-light { height: 1px; background: #e5e5e5; margin: 8px 0; }
+        .box { border: 1px solid #000; padding: 10px; }
 
         /* Header */
-        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
         .brand-section { flex: 1; }
         .meta-section { text-align: right; }
         
-        .logo { height: 50px; width: auto; object-fit: contain; margin-bottom: 15px; display: block; filter: grayscale(100%); }
+        .logo { height: 35px; width: auto; object-fit: contain; margin-bottom: 10px; display: block; filter: grayscale(100%); }
         
         /* Grid Layout for Info */
         .info-grid { 
             display: grid; 
             grid-template-columns: 1fr 1fr; 
-            gap: 40px; 
-            margin-bottom: 40px; 
+            gap: 20px; 
+            margin-bottom: 24px; 
             border-top: 2px solid #000; 
             border-bottom: 2px solid #000; 
-            padding: 20px 0;
+            padding: 12px 0;
         }
         
         /* Table */
@@ -139,9 +139,9 @@ export function generateInvoiceHTML(data: InvoiceData): string {
             padding: 10px 5px; 
         }
         td { 
-            padding: 12px 5px; 
+            padding: 6px 4px; 
             border-bottom: 1px solid #eee; 
-            font-size: 12px; 
+            font-size: 10px; 
         }
         tr:last-child td { border-bottom: 2px solid #000; }
         .text-right { text-align: right; }
@@ -154,10 +154,10 @@ export function generateInvoiceHTML(data: InvoiceData): string {
         .final-total { 
             border-top: 2px solid #000; 
             border-bottom: 2px solid #000; 
-            margin-top: 10px; 
-            padding: 10px 0; 
+            margin-top: 8px; 
+            padding: 8px 0; 
             font-weight: 900; 
-            font-size: 16px;
+            font-size: 14px;
         }
 
         /* Footer */

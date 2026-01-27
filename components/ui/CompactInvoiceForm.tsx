@@ -609,13 +609,11 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                         <Link href={isSale ? "/dashboard/sales" : "/dashboard/purchases"} className="p-1.5 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:bg-[var(--primary-green)] hover:text-[var(--primary-foreground)] transition-all active:scale-95 shadow-sm">
                             <ArrowLeft className="h-3.5 w-3.5" />
                         </Link>
-                        <div>
-                            <h1 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">
+                        <div className="flex flex-col">
+                            <h1 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight">
                                 {isEdit ? 'Edit' : 'New'} {isSale ? 'Ledger' : 'Purchase'}
                             </h1>
-                            <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest">
-                                UID: {invoiceNumber}
-                            </p>
+                            <p className="text-[8px] font-black text-[var(--foreground)]/60 uppercase tracking-widest leading-none mt-0.5">Specifications Gateway</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-1.5">
@@ -634,7 +632,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                             className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[var(--primary-green)] text-[var(--primary-foreground)] text-[8px] font-black uppercase tracking-widest hover:bg-[var(--primary-hover)] transition-all disabled:opacity-50 shadow-md active:scale-95"
                         >
                             {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
-                            {isEdit ? 'Update' : 'Commit'}
+                            <span>{isEdit ? 'Update' : (isSale ? 'Commit' : 'Record')}</span>
                         </button>
                     </div>
                 </div>
@@ -936,7 +934,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                                             {paymentMode !== 'UNPAID' && (
                                                                 <div className="p-2.5 rounded-xl bg-[var(--foreground)]/3 border border-white/5 space-y-2">
                                                                     <div className="flex items-center justify-between">
-                                                                        <label className="text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30">Receipt</label>
+                                                                        <label className="text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30">{isSale ? 'Receipt' : 'Disbursement'}</label>
                                                                         <button
                                                                             type="button"
                                                                             onClick={() => {
@@ -1079,6 +1077,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                 items={filteredItems}
                 initialData={editingItemIndex !== null && editingItemIndex >= 0 ? rows[editingItemIndex] : null}
                 onDelete={editingItemIndex !== null ? () => setItemToRemoveIndex(editingItemIndex) : undefined}
+                isSale={isSale}
             />
 
             <ConfirmModal
