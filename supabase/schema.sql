@@ -8,6 +8,7 @@ create table businesses (
   address text,
   phone text,
   currency text default 'USD',
+  logo_url text,
   owner_id uuid references auth.users(id) not null,
   created_at timestamp with time zone default now()
 );
@@ -127,7 +128,7 @@ alter table daily_check_logs enable row level security;
 -- Using security definer function to avoid recursion
 create policy "Owners can view their businesses" on businesses for select using (auth.uid() = owner_id or is_business_member(id));
 create policy "Owners can insert businesses" on businesses for insert with check (auth.uid() = owner_id);
-create policy "Owners can update their businesses" on businesses for update using (auth.uid() = owner_id);
+create policy "Members can update their businesses" on businesses for update using (is_business_member(id));
 create policy "Owners can delete their businesses" on businesses for delete using (auth.uid() = owner_id);
 
 -- Profile Policies
@@ -344,4 +345,49 @@ create table daily_check_logs (
   check_type text not null,
   last_check_at date default CURRENT_DATE,
   unique(business_id, check_type, last_check_at)
+);
+
+-- 13. Storage Policies (Logos & Attachments)
+-- Ensure buckets exist in Supabase Dashboard (logos, attachments)
+
+-- Logos Bucket Policies
+drop policy if exists "Members can upload logos" on storage.objects;
+create policy "Members can upload logos" on storage.objects for insert with check (
+  bucket_id = 'logos' and is_business_member((storage.foldername(name))[1]::uuid)
+);
+
+drop policy if exists "Members can update logos" on storage.objects;
+create policy "Members can update logos" on storage.objects for update using (
+  bucket_id = 'logos' and is_business_member((storage.foldername(name))[1]::uuid)
+);
+
+drop policy if exists "Members can delete logos" on storage.objects;
+create policy "Members can delete logos" on storage.objects for delete using (
+  bucket_id = 'logos' and is_business_member((storage.foldername(name))[1]::uuid)
+);
+
+drop policy if exists "Anyone can view logos" on storage.objects;
+create policy "Anyone can view logos" on storage.objects for select using (
+  bucket_id = 'logos'
+);
+
+-- Attachments Bucket Policies
+drop policy if exists "Members can upload attachments" on storage.objects;
+create policy "Members can upload attachments" on storage.objects for insert with check (
+  bucket_id = 'attachments' and is_business_member((storage.foldername(name))[1]::uuid)
+);
+
+drop policy if exists "Members can update attachments" on storage.objects;
+create policy "Members can update attachments" on storage.objects for update using (
+  bucket_id = 'attachments' and is_business_member((storage.foldername(name))[1]::uuid)
+);
+
+drop policy if exists "Members can delete attachments" on storage.objects;
+create policy "Members can delete attachments" on storage.objects for delete using (
+  bucket_id = 'attachments' and is_business_member((storage.foldername(name))[1]::uuid)
+);
+
+drop policy if exists "Members can view attachments" on storage.objects;
+create policy "Members can view attachments" on storage.objects for select using (
+  bucket_id = 'attachments' and is_business_member((storage.foldername(name))[1]::uuid)
 );

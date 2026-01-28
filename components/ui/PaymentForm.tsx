@@ -343,7 +343,7 @@ export default function PaymentForm({
                                 <input
                                     type="number"
                                     required
-                                    value={formData.amount}
+                                    value={formData.amount === 0 ? '' : formData.amount}
                                     onChange={(e) => setFormData({ ...formData, amount: Number(e.target.value) })}
                                     className={clsx(
                                         "w-full h-11 rounded-xl border px-4 text-[14px] font-black text-center focus:outline-none transition-all shadow-inner tabular-nums",

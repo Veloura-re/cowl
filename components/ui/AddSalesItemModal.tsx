@@ -33,11 +33,11 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
         if (initialData) {
             const item = items.find(i => i.id === initialData.itemId)
             setSelectedItem(item || null)
-            setQuantity(initialData.quantity || 1)
-            setRate(initialData.rate || 0)
+            setQuantity(initialData.quantity || '')
+            setRate(initialData.rate || '')
         } else {
             setSelectedItem(null)
-            setQuantity(1)
+            setQuantity('')
             setRate('')
         }
     }, [initialData, isOpen, items])
@@ -76,7 +76,7 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
 
         // Reset and Close
         setSelectedItem(null)
-        setQuantity(1)
+        setQuantity('')
         setRate('')
         onClose()
     }
@@ -200,7 +200,7 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                                         step="any"
                                         required
                                         autoFocus
-                                        value={quantity || ''}
+                                        value={quantity === 0 ? '' : quantity}
                                         onChange={(e) => setQuantity(e.target.value)}
                                         className="w-full h-12 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-5 text-[14px] font-black text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] focus:ring-4 focus:ring-[var(--primary-green)]/10 transition-all shadow-inner tabular-nums"
                                     />
@@ -212,7 +212,7 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                                         type="number"
                                         step="any"
                                         required
-                                        value={rate || ''}
+                                        value={rate === 0 ? '' : rate}
                                         onChange={(e) => setRate(e.target.value)}
                                         className="w-full h-12 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-5 text-[14px] font-black text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] focus:ring-4 focus:ring-[var(--primary-green)]/10 transition-all shadow-inner tabular-nums"
                                     />

@@ -29,10 +29,10 @@ type InvoiceItem = {
     itemId: string
     name: string
     unit: string
-    quantity: number
-    rate: number
-    purchasePrice: number
-    tax: number
+    quantity: number | string
+    rate: number | string
+    purchasePrice: number | string
+    tax: number | string
     amount: number
 }
 
@@ -128,8 +128,8 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
         unit: item.items?.unit || '',
         quantity: item.quantity,
         rate: item.rate,
-        purchasePrice: item.purchase_price || 0,
-        tax: (item.tax_amount / (item.quantity * item.rate)) * 100 || 0,
+        purchasePrice: item.purchase_price || '',
+        tax: (item.tax_amount / (item.quantity * item.rate)) * 100 || '',
         amount: item.total
     })) || [])
     const [notes, setNotes] = useState(initialData?.notes || '')
@@ -170,8 +170,8 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
     const filteredItems = displayItems.filter(i => !activeBusinessId || i.business_id === activeBusinessId)
     const filteredPaymentModes = displayModes.filter(m => !activeBusinessId || m.business_id === activeBusinessId)
 
-    const subtotal = rows.reduce((sum, row) => sum + (row.quantity * row.rate), 0)
-    const itemTax = rows.reduce((sum, row) => sum + ((row.quantity * row.rate) * (row.tax / 100)), 0)
+    const subtotal = rows.reduce((sum, row) => sum + ((Number(row.quantity) || 0) * (Number(row.rate) || 0)), 0)
+    const itemTax = rows.reduce((sum, row) => sum + (((Number(row.quantity) || 0) * (Number(row.rate) || 0)) * (Number(row.tax || 0) / 100)), 0)
 
     const discountValue = Number(discount) || 0
     const discountAmount = discountType === 'percent'
@@ -184,7 +184,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
     const totalTax = itemTax + invoiceTaxAmount
     const totalAmount = subtotal + totalTax - discountAmount
 
-    const totalCost = rows.reduce((sum, row) => sum + (row.quantity * (row.purchasePrice || 0)), 0)
+    const totalCost = rows.reduce((sum, row) => sum + ((Number(row.quantity) || 0) * (Number(row.purchasePrice) || 0)), 0)
     const projectedProfit = subtotal - totalCost - discountAmount
     const isTotalLoss = projectedProfit < 0
 
@@ -213,7 +213,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
         const newRows = [...rows]
         newRows[index] = { ...newRows[index], [field]: value }
         if (field === 'quantity' || field === 'rate') {
-            newRows[index].amount = newRows[index].quantity * newRows[index].rate
+            newRows[index].amount = (Number(newRows[index].quantity) || 0) * (Number(newRows[index].rate) || 0)
         }
         setRows(newRows)
     }
@@ -327,9 +327,9 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
             partyPhone: selectedParty?.phone,
             items: rows.map(row => ({
                 description: row.name,
-                quantity: row.quantity,
-                rate: row.rate,
-                tax: row.tax,
+                quantity: Number(row.quantity) || 0,
+                rate: Number(row.rate) || 0,
+                tax: Number(row.tax) || 0,
                 total: row.amount
             })),
             subtotal: subtotal,
@@ -480,11 +480,11 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                     invoice_id: cleanUUID(initialData.id),
                     item_id: cleanUUID(row.itemId),
                     description: row.name,
-                    quantity: row.quantity,
-                    rate: row.rate,
-                    tax_amount: (row.quantity * row.rate) * (row.tax / 100),
+                    quantity: Number(row.quantity) || 0,
+                    rate: Number(row.rate) || 0,
+                    tax_amount: (Number(row.quantity) || 0) * (Number(row.rate) || 0) * (Number(row.tax || 0) / 100),
                     total: row.amount,
-                    purchase_price: row.purchasePrice
+                    purchase_price: Number(row.purchasePrice) || 0
                 }))
 
                 const { error: itemsError } = await supabase.from('invoice_items').insert(newInvoiceItems)
@@ -495,7 +495,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                         const { data: item } = await supabase.from('items').select('stock_quantity').eq('id', cleanUUID(row.itemId)).single()
                         if (item) {
                             const multiplier = isSale ? -1 : 1
-                            const newStock = (item.stock_quantity || 0) + (row.quantity * multiplier)
+                            const newStock = (item.stock_quantity || 0) + ((Number(row.quantity) || 0) * multiplier)
                             await supabase.from('items').update({ stock_quantity: newStock }).eq('id', cleanUUID(row.itemId))
                         }
                     }
@@ -539,11 +539,11 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                     invoice_id: invoice.id,
                     item_id: cleanUUID(row.itemId),
                     description: row.name,
-                    quantity: row.quantity,
-                    rate: row.rate,
-                    tax_amount: (row.quantity * row.rate) * (row.tax / 100),
+                    quantity: Number(row.quantity) || 0,
+                    rate: Number(row.rate) || 0,
+                    tax_amount: (Number(row.quantity) || 0) * (Number(row.rate) || 0) * (Number(row.tax || 0) / 100),
                     total: row.amount,
-                    purchase_price: row.purchasePrice
+                    purchase_price: Number(row.purchasePrice) || 0
                 }))
 
                 const { error: itemsError } = await supabase.from('invoice_items').insert(invoiceItems)
@@ -568,7 +568,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                         const { data: item } = await supabase.from('items').select('stock_quantity').eq('id', cleanUUID(row.itemId)).single()
                         if (item) {
                             const multiplier = isSale ? -1 : 1
-                            const newStock = (item.stock_quantity || 0) + (row.quantity * multiplier)
+                            const newStock = (item.stock_quantity || 0) + ((Number(row.quantity) || 0) * multiplier)
                             await supabase.from('items').update({ stock_quantity: newStock }).eq('id', cleanUUID(row.itemId))
                         }
                     }
@@ -810,16 +810,14 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                                         <div className="min-w-0 flex-1">
                                                             <h4 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase truncate tracking-tight">{row.name}</h4>
                                                             <p className="text-[7px] font-black uppercase tracking-wider text-blue-500 mt-0.5">
-                                                                P/U: {formatCurrency(row.rate - (row.purchasePrice || 0))}
+                                                                P/U: {formatCurrency(Number(row.rate) - (Number(row.purchasePrice) || 0))}
                                                             </p>
                                                         </div>
                                                     </div>
 
                                                     <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
-                                                        <div className="flex gap-4">
-                                                            <div className="text-right">
-                                                                <p className="text-[10px] font-black text-[var(--deep-contrast)] tabular-nums">{row.quantity} {row.unit} × {formatCurrency(row.rate)}</p>
-                                                            </div>
+                                                        <div className="text-right">
+                                                            <p className="text-[10px] font-black text-[var(--deep-contrast)] tabular-nums">{Number(row.quantity) || 0} {row.unit} × {formatCurrency(Number(row.rate))}</p>
                                                         </div>
                                                         <div className="text-right pl-3 border-l border-[var(--foreground)]/10">
                                                             <p className="text-[12px] font-black text-[var(--primary-green)] tabular-nums font-mono tracking-tighter">{formatCurrency(row.amount)}</p>
@@ -853,7 +851,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                             <div className="flex items-center">
                                                 <input
                                                     type="number"
-                                                    value={discount || ''}
+                                                    value={discount === 0 ? '' : discount}
                                                     onChange={(e) => setDiscount(e.target.value)}
                                                     className="w-full bg-transparent text-[11px] font-black text-[var(--deep-contrast)] focus:outline-none tabular-nums"
                                                 />
@@ -864,7 +862,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                             <div className="flex items-center">
                                                 <input
                                                     type="number"
-                                                    value={invoiceTax || ''}
+                                                    value={invoiceTax === 0 ? '' : invoiceTax}
                                                     onChange={(e) => setInvoiceTax(e.target.value)}
                                                     className="w-full bg-transparent text-[11px] font-black text-[var(--deep-contrast)] focus:outline-none tabular-nums"
                                                 />
@@ -953,7 +951,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                                                     <div className="flex items-center gap-2">
                                                                         <input
                                                                             type="number"
-                                                                            value={receivedAmount || ''}
+                                                                            value={receivedAmount === 0 ? '' : receivedAmount}
                                                                             onChange={(e) => {
                                                                                 setReceivedAmount(e.target.value)
                                                                                 setIsFullyReceived(false)

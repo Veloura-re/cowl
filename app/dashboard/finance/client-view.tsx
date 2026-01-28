@@ -302,21 +302,21 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                                                     e.stopPropagation()
                                                     window.print()
                                                 }}
-                                                className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white transition-all"
+                                                className="h-7 w-7 flex items-center justify-center rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white transition-all shadow-sm active:scale-90"
                                             >
-                                                <Printer className="h-2.5 w-2.5" />
+                                                <Printer className="h-3.5 w-3.5" />
                                             </button>
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); handleEdit(e, t); }}
-                                                className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-blue-500 hover:bg-blue-500 hover:text-white transition-all"
+                                                className="h-7 w-7 flex items-center justify-center rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-blue-500 hover:bg-blue-500 hover:text-white transition-all shadow-sm active:scale-90"
                                             >
-                                                <Edit2 className="h-2.5 w-2.5" />
+                                                <Edit2 className="h-3.5 w-3.5" />
                                             </button>
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); handleDelete(e, t.id); }}
-                                                className="h-4 w-4 flex items-center justify-center rounded-md bg-rose-500/5 border border-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-all"
+                                                className="h-7 w-7 flex items-center justify-center rounded-lg bg-rose-500/5 border border-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-all shadow-sm active:scale-90"
                                             >
-                                                <Trash2 className="h-2.5 w-2.5" />
+                                                <Trash2 className="h-3.5 w-3.5" />
                                             </button>
                                         </div>
                                     </div>

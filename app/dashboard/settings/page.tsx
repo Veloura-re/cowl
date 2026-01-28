@@ -136,7 +136,7 @@ export default function SettingsPage() {
         if (!business || !activeBusinessId) return
         setSaving(true)
         try {
-            const { error } = await supabase
+            const { data: updatedBus, error } = await supabase
                 .from('businesses')
                 .update({
                     currency: formData.currency,
@@ -145,6 +145,12 @@ export default function SettingsPage() {
                     address: formData.address,
                 })
                 .eq('id', activeBusinessId)
+                .select()
+
+            if (error) throw error
+            if (!updatedBus || updatedBus.length === 0) {
+                throw new Error('Update failed. You might not have permission to modify this business.')
+            }
 
             const { data: { user } } = await supabase.auth.getUser()
             if (user) {
@@ -157,7 +163,6 @@ export default function SettingsPage() {
                     .eq('id', user.id)
             }
 
-            if (error) throw error
             await refreshBusinesses()
             router.refresh()
             setFeedbackModal({ open: true, message: 'Settings saved successfully!', variant: 'success' })
@@ -321,12 +326,16 @@ export default function SettingsPage() {
                 .getPublicUrl(fileName)
 
             // Update database
-            const { error: updateError } = await supabase
+            const { data: updatedBus, error: updateError } = await supabase
                 .from('businesses')
                 .update({ logo_url: urlData.publicUrl })
                 .eq('id', activeBusinessId)
+                .select()
 
             if (updateError) throw updateError
+            if (!updatedBus || updatedBus.length === 0) {
+                throw new Error('Persistence failed. You might not have permission to modify this business.')
+            }
 
             setLogoUrl(urlData.publicUrl)
             await refreshBusinesses()
