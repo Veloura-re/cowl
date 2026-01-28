@@ -1,7 +1,11 @@
 -- Enable UUID extension
 create extension if not exists "uuid-ossp";
 
--- 1. Businesses (Support multi-business)
+-- ==========================================
+-- 1. TABLES
+-- ==========================================
+
+-- Businesses (Support multi-business)
 create table businesses (
   id uuid primary key default uuid_generate_v4(),
   name text not null,
@@ -13,7 +17,7 @@ create table businesses (
   created_at timestamp with time zone default now()
 );
 
--- 2. Profiles (User details)
+-- Profiles (User details)
 create table profiles (
   id uuid primary key references auth.users(id),
   full_name text,
@@ -23,7 +27,7 @@ create table profiles (
   updated_at timestamp with time zone
 );
 
--- 3. Business Members (Roles)
+-- Business Members (Roles)
 create table business_members (
   id uuid primary key default uuid_generate_v4(),
   business_id uuid references businesses(id) on delete cascade not null,
@@ -32,7 +36,7 @@ create table business_members (
   unique(business_id, user_id)
 );
 
--- 4. Parties (Customers & Suppliers)
+-- Parties (Customers & Suppliers)
 create table parties (
   id uuid primary key default uuid_generate_v4(),
   business_id uuid references businesses(id) on delete cascade not null,
@@ -47,7 +51,7 @@ create table parties (
   created_at timestamp with time zone default now()
 );
 
--- 5. Items (Inventory)
+-- Items (Inventory)
 create table items (
   id uuid primary key default uuid_generate_v4(),
   business_id uuid references businesses(id) on delete cascade not null,
@@ -65,7 +69,7 @@ create table items (
   created_at timestamp with time zone default now()
 );
 
--- 6. Invoices (Sales & Purchases)
+-- Invoices (Sales & Purchases)
 create table invoices (
   id uuid primary key default uuid_generate_v4(),
   business_id uuid references businesses(id) on delete cascade not null,
@@ -86,7 +90,7 @@ create table invoices (
   created_at timestamp with time zone default now()
 );
 
--- 7. Invoice Items
+-- Invoice Items
 create table invoice_items (
   id uuid primary key default uuid_generate_v4(),
   invoice_id uuid references invoices(id) on delete cascade not null,
@@ -98,7 +102,7 @@ create table invoice_items (
   total numeric not null default 0
 );
 
--- 8. Transactions (Payments)
+-- Transactions (Payments)
 create table transactions (
   id uuid primary key default uuid_generate_v4(),
   business_id uuid references businesses(id) on delete cascade not null,
@@ -112,79 +116,17 @@ create table transactions (
   created_at timestamp with time zone default now()
 );
 
--- RLS Helpers
-alter table businesses enable row level security;
-alter table business_members enable row level security;
-alter table parties enable row level security;
-alter table items enable row level security;
-alter table invoices enable row level security;
-alter table invoice_items enable row level security;
-alter table transactions enable row level security;
-alter table payment_modes enable row level security;
-alter table profiles enable row level security;
-alter table daily_check_logs enable row level security;
+-- Payment Modes (Custom Business Modes)
+create table payment_modes (
+  id uuid primary key default uuid_generate_v4(),
+  business_id uuid references businesses(id) on delete cascade not null,
+  name text not null,
+  is_default boolean default false,
+  created_at timestamp with time zone default now(),
+  unique(business_id, name)
+);
 
--- Business Policies
--- Using security definer function to avoid recursion
-create policy "Owners can view their businesses" on businesses for select using (auth.uid() = owner_id or is_business_member(id));
-create policy "Owners can insert businesses" on businesses for insert with check (auth.uid() = owner_id);
-create policy "Members can update their businesses" on businesses for update using (is_business_member(id));
-create policy "Owners can delete their businesses" on businesses for delete using (auth.uid() = owner_id);
-
--- Profile Policies
-create policy "Users can view their own profile" on profiles for select using (auth.uid() = id);
-create policy "Users can update their own profile" on profiles for update using (auth.uid() = id);
-create policy "Users can insert their own profile" on profiles for insert with check (auth.uid() = id);
-
--- Business Member Policies
-create policy "Members can view membership" on business_members for select using (user_id = auth.uid() or is_business_member(business_id));
-create policy "Owners can manage members" on business_members for all using (exists (select 1 from businesses where id = business_id and owner_id = auth.uid()));
-
--- Simple "Member Access" Policy Helper
--- SECURITY DEFINER is key here to avoid recursion by bypassing RLS during the check
-create or replace function is_business_member(_business_id uuid)
-returns boolean as $$
-begin
-  return exists (
-    select 1 from public.business_members
-    where business_id = _business_id
-    and user_id = auth.uid()
-  );
-end;
-$$ language plpgsql security definer;
-
--- Apply Policy to Parties
-create policy "Members can view parties" on parties for select using (is_business_member(business_id));
-create policy "Members can insert parties" on parties for insert with check (is_business_member(business_id));
-create policy "Members can update parties" on parties for update using (is_business_member(business_id));
-create policy "Members can delete parties" on parties for delete using (is_business_member(business_id));
-
-create policy "Members can view items" on items for select using (is_business_member(business_id));
-create policy "Members can insert items" on items for insert with check (is_business_member(business_id));
-create policy "Members can update items" on items for update using (is_business_member(business_id));
-create policy "Members can delete items" on items for delete using (is_business_member(business_id));
-
-create policy "Members can view invoices" on invoices for select using (is_business_member(business_id));
-create policy "Members can insert invoices" on invoices for insert with check (is_business_member(business_id));
-create policy "Members can update invoices" on invoices for update using (is_business_member(business_id));
-create policy "Members can delete invoices" on invoices for delete using (is_business_member(business_id));
-
-create policy "Members can view transactions" on transactions for select using (is_business_member(business_id));
-create policy "Members can insert transactions" on transactions for insert with check (is_business_member(business_id));
-create policy "Members can update transactions" on transactions for update using (is_business_member(business_id));
-create policy "Members can delete transactions" on transactions for delete using (is_business_member(business_id));
-
-create policy "Members can view payment modes" on payment_modes for select using (is_business_member(business_id));
-create policy "Members can manage payment modes" on payment_modes for all using (is_business_member(business_id));
-
-create policy "Members can manage daily check logs" on daily_check_logs for all using (is_business_member(business_id));
-
-create policy "Members can view invoice items" on invoice_items for select using (exists (select 1 from invoices where id = invoice_id and is_business_member(business_id)));
-create policy "Members can insert invoice items" on invoice_items for insert with check (exists (select 1 from invoices where id = invoice_id and is_business_member(business_id)));
-create policy "Members can update invoice items" on invoice_items for update using (exists (select 1 from invoices where id = invoice_id and is_business_member(business_id)));
-create policy "Members can delete invoice items" on invoice_items for delete using (exists (select 1 from invoices where id = invoice_id and is_business_member(business_id)));
-
--- 10. Notifications
+-- Notifications
 create table notifications (
   id uuid primary key default uuid_generate_v4(),
   business_id uuid references businesses(id) on delete cascade not null,
@@ -197,7 +139,7 @@ create table notifications (
   created_at timestamp with time zone default now()
 );
 
--- 11. Notification Settings
+-- Notification Settings
 create table notification_settings (
   id uuid primary key default uuid_generate_v4(),
   user_id uuid references auth.users(id) on delete cascade not null,
@@ -209,16 +151,31 @@ create table notification_settings (
   unique(user_id, business_id)
 );
 
-alter table notifications enable row level security;
-alter table notification_settings enable row level security;
+-- Daily Check Logs (Throttling)
+create table daily_check_logs (
+  id uuid primary key default uuid_generate_v4(),
+  business_id uuid references businesses(id) on delete cascade not null,
+  check_type text not null,
+  last_check_at date default CURRENT_DATE,
+  unique(business_id, check_type, last_check_at)
+);
 
-create policy "Users can view their notifications" on notifications for select using (user_id = auth.uid());
-create policy "Users can insert their notifications" on notifications for insert with check (user_id = auth.uid());
-create policy "Users can update their notifications" on notifications for update using (user_id = auth.uid());
-create policy "Users can delete their notifications" on notifications for delete using (user_id = auth.uid());
+-- ==========================================
+-- 2. HELPERS & FUNCTIONS
+-- ==========================================
 
-create policy "Users can view their notification settings" on notification_settings for select using (user_id = auth.uid());
-create policy "Users can manage their notification settings" on notification_settings for all using (user_id = auth.uid());
+-- Simple "Member Access" Policy Helper
+-- SECURITY DEFINER is key here to avoid recursion by bypassing RLS during the check
+create or replace function public.is_business_member(_business_id uuid)
+returns boolean as $$
+begin
+  return exists (
+    select 1 from public.business_members
+    where business_id = _business_id
+    and user_id = auth.uid()
+  );
+end;
+$$ language plpgsql security definer;
 
 -- Helper to find who to notify in a business based on settings
 create or replace function public.notify_members(_business_id uuid, _type text, _title text, _message text, _link text default null)
@@ -237,11 +194,120 @@ begin
       (_type = 'TEAM' and ns.notify_team)
     )
   loop
-    insert into notifications (business_id, user_id, title, message, type, link)
+    insert into public.notifications (business_id, user_id, title, message, type, link)
     values (_business_id, member_record.user_id, _title, _message, _type, _link);
   end loop;
 end;
 $$ language plpgsql security definer;
+
+-- ==========================================
+-- 3. RLS ENABLEMENT
+-- ==========================================
+
+alter table businesses enable row level security;
+alter table profiles enable row level security;
+alter table business_members enable row level security;
+alter table parties enable row level security;
+alter table items enable row level security;
+alter table invoices enable row level security;
+alter table invoice_items enable row level security;
+alter table transactions enable row level security;
+alter table payment_modes enable row level security;
+alter table notifications enable row level security;
+alter table notification_settings enable row level security;
+alter table daily_check_logs enable row level security;
+
+-- ==========================================
+-- 4. POLICIES
+-- ==========================================
+
+-- Business Policies
+create policy "Owners can view their businesses" on businesses for select using (auth.uid() = owner_id or is_business_member(id));
+create policy "Owners can insert businesses" on businesses for insert with check (auth.uid() = owner_id);
+create policy "Members can update their businesses" on businesses for update using (is_business_member(id));
+create policy "Owners can delete their businesses" on businesses for delete using (auth.uid() = owner_id);
+
+-- Profile Policies
+create policy "Users can view their own profile" on profiles for select using (auth.uid() = id);
+create policy "Users can update their own profile" on profiles for update using (auth.uid() = id);
+create policy "Users can insert their own profile" on profiles for insert with check (auth.uid() = id);
+
+-- Business Member Policies
+create policy "Members can view membership" on business_members for select using (user_id = auth.uid() or is_business_member(business_id));
+create policy "Owners can manage members" on business_members for all using (exists (select 1 from businesses where id = business_id and owner_id = auth.uid()));
+
+-- Entities Policies (is_business_member based)
+create policy "Members can manage parties" on parties for all using (is_business_member(business_id));
+create policy "Members can manage items" on items for all using (is_business_member(business_id));
+create policy "Members can manage invoices" on invoices for all using (is_business_member(business_id));
+create policy "Members can manage transactions" on transactions for all using (is_business_member(business_id));
+create policy "Members can manage payment modes" on payment_modes for all using (is_business_member(business_id));
+create policy "Members can manage daily check logs" on daily_check_logs for all using (is_business_member(business_id));
+
+-- Invoice Items Policies (linked via invoices)
+create policy "Members can view invoice items" on invoice_items for select using (exists (select 1 from invoices where id = invoice_id and is_business_member(business_id)));
+create policy "Members can insert invoice items" on invoice_items for insert with check (exists (select 1 from invoices where id = invoice_id and is_business_member(business_id)));
+create policy "Members can update invoice items" on invoice_items for update using (exists (select 1 from invoices where id = invoice_id and is_business_member(business_id)));
+create policy "Members can delete invoice items" on invoice_items for delete using (exists (select 1 from invoices where id = invoice_id and is_business_member(business_id)));
+
+-- Notification Policies
+create policy "Users can view their notifications" on notifications for select using (user_id = auth.uid());
+create policy "Users can insert their notifications" on notifications for insert with check (user_id = auth.uid());
+create policy "Users can update their notifications" on notifications for update using (user_id = auth.uid());
+create policy "Users can delete their notifications" on notifications for delete using (user_id = auth.uid());
+
+create policy "Users can view their notification settings" on notification_settings for select using (user_id = auth.uid());
+create policy "Users can manage their notification settings" on notification_settings for all using (user_id = auth.uid());
+
+-- ==========================================
+-- 5. STORAGE POLICIES
+-- ==========================================
+
+-- Logos Bucket Policies
+drop policy if exists "Members can upload logos" on storage.objects;
+create policy "Members can upload logos" on storage.objects for insert with check (
+  bucket_id = 'logos' and is_business_member((storage.foldername(name))[1]::uuid)
+);
+
+drop policy if exists "Members can update logos" on storage.objects;
+create policy "Members can update logos" on storage.objects for update using (
+  bucket_id = 'logos' and is_business_member((storage.foldername(name))[1]::uuid)
+);
+
+drop policy if exists "Members can delete logos" on storage.objects;
+create policy "Members can delete logos" on storage.objects for delete using (
+  bucket_id = 'logos' and is_business_member((storage.foldername(name))[1]::uuid)
+);
+
+drop policy if exists "Anyone can view logos" on storage.objects;
+create policy "Anyone can view logos" on storage.objects for select using (
+  bucket_id = 'logos'
+);
+
+-- Attachments Bucket Policies
+drop policy if exists "Members can upload attachments" on storage.objects;
+create policy "Members can upload attachments" on storage.objects for insert with check (
+  bucket_id = 'attachments' and is_business_member((storage.foldername(name))[1]::uuid)
+);
+
+drop policy if exists "Members can update attachments" on storage.objects;
+create policy "Members can update attachments" on storage.objects for update using (
+  bucket_id = 'attachments' and is_business_member((storage.foldername(name))[1]::uuid)
+);
+
+drop policy if exists "Members can delete attachments" on storage.objects;
+create policy "Members can delete attachments" on storage.objects for delete using (
+  bucket_id = 'attachments' and is_business_member((storage.foldername(name))[1]::uuid)
+);
+
+drop policy if exists "Members can view attachments" on storage.objects;
+create policy "Members can view attachments" on storage.objects for select using (
+  bucket_id = 'attachments' and is_business_member((storage.foldername(name))[1]::uuid)
+);
+
+-- ==========================================
+-- 6. TRIGGERS
+-- ==========================================
 
 -- Trigger for Sales/Purchases
 create or replace function public.handle_new_invoice_notification()
@@ -249,12 +315,12 @@ returns trigger as $$
 declare
   party_name text;
 begin
-  select name into party_name from parties where id = new.party_id;
+  select name into party_name from public.parties where id = new.party_id;
   
   if new.type = 'SALE' then
-    perform notify_members(new.business_id, 'SALE', 'New Sale: ' || new.invoice_number, 'A sale of ' || new.total_amount || ' to ' || coalesce(party_name, 'Walking Customer') || ' was recorded.');
+    perform public.notify_members(new.business_id, 'SALE', 'New Sale: ' || new.invoice_number, 'A sale of ' || new.total_amount || ' to ' || coalesce(party_name, 'Walking Customer') || ' was recorded.');
   elsif new.type = 'PURCHASE' then
-    perform notify_members(new.business_id, 'PURCHASE', 'New Purchase: ' || new.invoice_number, 'A purchase of ' || new.total_amount || ' from ' || coalesce(party_name, 'Supplier') || ' was recorded.');
+    perform public.notify_members(new.business_id, 'PURCHASE', 'New Purchase: ' || new.invoice_number, 'A purchase of ' || new.total_amount || ' from ' || coalesce(party_name, 'Supplier') || ' was recorded.');
   end if;
   return new;
 end;
@@ -269,7 +335,7 @@ create or replace function public.handle_stock_alert()
 returns trigger as $$
 begin
   if new.stock_quantity <= new.min_stock and old.stock_quantity > new.min_stock then
-    perform notify_members(new.business_id, 'STOCK', 'Low Stock: ' || new.name, 'Item ' || new.name || ' is running low on stock (' || new.stock_quantity || ' remaining).');
+    perform public.notify_members(new.business_id, 'STOCK', 'Low Stock: ' || new.name, 'Item ' || new.name || ' is running low on stock (' || new.stock_quantity || ' remaining).');
   end if;
   return new;
 end;
@@ -328,66 +394,12 @@ create trigger on_business_created
   after insert on public.businesses
   for each row execute procedure public.handle_new_business();
 
--- 9. Payment Modes (Custom Business Modes)
-create table payment_modes (
-  id uuid primary key default uuid_generate_v4(),
-  business_id uuid references businesses(id) on delete cascade not null,
-  name text not null,
-  is_default boolean default false,
-  created_at timestamp with time zone default now(),
-  unique(business_id, name)
-);
+-- ==========================================
+-- 7. PERFORMANCE INDEXES
+-- ==========================================
 
--- 12. Daily Check Logs (Throttling)
-create table daily_check_logs (
-  id uuid primary key default uuid_generate_v4(),
-  business_id uuid references businesses(id) on delete cascade not null,
-  check_type text not null,
-  last_check_at date default CURRENT_DATE,
-  unique(business_id, check_type, last_check_at)
-);
-
--- 13. Storage Policies (Logos & Attachments)
--- Ensure buckets exist in Supabase Dashboard (logos, attachments)
-
--- Logos Bucket Policies
-drop policy if exists "Members can upload logos" on storage.objects;
-create policy "Members can upload logos" on storage.objects for insert with check (
-  bucket_id = 'logos' and is_business_member((storage.foldername(name))[1]::uuid)
-);
-
-drop policy if exists "Members can update logos" on storage.objects;
-create policy "Members can update logos" on storage.objects for update using (
-  bucket_id = 'logos' and is_business_member((storage.foldername(name))[1]::uuid)
-);
-
-drop policy if exists "Members can delete logos" on storage.objects;
-create policy "Members can delete logos" on storage.objects for delete using (
-  bucket_id = 'logos' and is_business_member((storage.foldername(name))[1]::uuid)
-);
-
-drop policy if exists "Anyone can view logos" on storage.objects;
-create policy "Anyone can view logos" on storage.objects for select using (
-  bucket_id = 'logos'
-);
-
--- Attachments Bucket Policies
-drop policy if exists "Members can upload attachments" on storage.objects;
-create policy "Members can upload attachments" on storage.objects for insert with check (
-  bucket_id = 'attachments' and is_business_member((storage.foldername(name))[1]::uuid)
-);
-
-drop policy if exists "Members can update attachments" on storage.objects;
-create policy "Members can update attachments" on storage.objects for update using (
-  bucket_id = 'attachments' and is_business_member((storage.foldername(name))[1]::uuid)
-);
-
-drop policy if exists "Members can delete attachments" on storage.objects;
-create policy "Members can delete attachments" on storage.objects for delete using (
-  bucket_id = 'attachments' and is_business_member((storage.foldername(name))[1]::uuid)
-);
-
-drop policy if exists "Members can view attachments" on storage.objects;
-create policy "Members can view attachments" on storage.objects for select using (
-  bucket_id = 'attachments' and is_business_member((storage.foldername(name))[1]::uuid)
-);
+create index if not exists idx_daily_check_logs_business_id on public.daily_check_logs(business_id);
+create index if not exists idx_invoices_business_id on public.invoices(business_id);
+create index if not exists idx_transactions_business_id on public.transactions(business_id);
+create index if not exists idx_parties_business_id on public.parties(business_id);
+create index if not exists idx_items_business_id on public.items(business_id);
