@@ -4,30 +4,35 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Home, Plus, Settings, User, Package, Menu, ShoppingCart, Users, BarChart3, X, CreditCard, LogOut } from "lucide-react";
 import { createClient } from '@/utils/supabase/client'
+import { SignOutModal } from "./SignOutModal";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 
 // Items always on the dock
 const dockItems = [
-    { icon: ShoppingCart, label: "Purchases", path: "/dashboard/purchases" },
-    { icon: Package, label: "Inventory", path: "/dashboard/inventory" },
-    { icon: Plus, label: "Sales", path: "/dashboard/sales", isAction: true },
-    { icon: Users, label: "Parties", path: "/dashboard/parties" },
+    { icon: ShoppingCart, label: "Purchase", path: "/dashboard/purchases" },
+    { icon: Package, label: "Stock", path: "/dashboard/inventory" },
+    { icon: Plus, label: "Sell", path: "/dashboard/sales", isAction: true },
+    { icon: Users, label: "People", path: "/dashboard/parties" },
 ];
 
 // Items in the hamburger menu
 const menuItems = [
-    { icon: Home, label: "Dashboard", path: "/dashboard" },
-    { icon: CreditCard, label: "Payments", path: "/dashboard/finance" },
-    { icon: BarChart3, label: "Reports", path: "/dashboard/reports" },
+    { icon: Home, label: "Home", path: "/dashboard" },
+    { icon: CreditCard, label: "Finances", path: "/dashboard/finance" },
+    { icon: CreditCard, label: "Expenses", path: "/dashboard/expenses" },
+    { icon: BarChart3, label: "Business Reports", path: "/dashboard/reports" },
     { icon: Settings, label: "Settings", path: "/dashboard/settings" },
 ];
+
 
 export const BottomNav = () => {
     const supabase = createClient()
     const pathname = usePathname();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
+    const [isSigningOut, setIsSigningOut] = useState(false);
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => setMounted(true), []);
@@ -94,16 +99,11 @@ export const BottomNav = () => {
                                 })}
 
                                 <button
-                                    onClick={async () => {
-                                        try {
-                                            await supabase.auth.signOut()
-                                            localStorage.clear()
-                                            window.location.href = '/login'
-                                        } catch (error) {
-                                            window.location.href = '/login'
-                                        }
-                                    }}
-                                    className="col-span-2 relative flex items-center justify-center gap-3 p-5 rounded-[28px] transition-all border bg-rose-500/5 border-rose-500/10 hover:bg-rose-500 hover:text-white group text-rose-600 active:scale-95"
+                                    onClick={() => setIsSignOutModalOpen(true)}
+                                    className={clsx(
+                                        "relative flex flex-col items-center gap-3 p-5 rounded-[28px] transition-all border group",
+                                        "bg-rose-500/5 border-rose-500/10 hover:bg-rose-500 hover:text-white text-rose-600 shadow-sm active:scale-95"
+                                    )}
                                 >
                                     <div className="p-3 rounded-2xl bg-rose-500/10 text-rose-600 group-hover:bg-white/10 group-hover:text-white transition-all shadow-lg">
                                         <LogOut size={22} strokeWidth={2.5} />
@@ -190,6 +190,24 @@ export const BottomNav = () => {
                     </button>
                 </div>
             </div>
+
+            <SignOutModal
+                isOpen={isSignOutModalOpen}
+                onClose={() => !isSigningOut && setIsSignOutModalOpen(false)}
+                isLoading={isSigningOut}
+                onConfirm={async () => {
+                    setIsSigningOut(true)
+                    try {
+                        await supabase.auth.signOut()
+                        localStorage.clear()
+                        sessionStorage.clear()
+                        window.location.href = '/login'
+                    } catch (error) {
+                        console.error('Sign out error:', error)
+                        window.location.href = '/login'
+                    }
+                }}
+            />
         </>
     );
 };

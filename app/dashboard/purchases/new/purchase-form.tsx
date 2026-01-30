@@ -283,8 +283,8 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                         <ArrowLeft className="h-3.5 w-3.5" />
                     </Link>
                     <div>
-                        <h1 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">Record Bill</h1>
-                        <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-wider leading-none">Stock Entry</p>
+                        <h1 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">New Purchase</h1>
+                        <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-wider leading-none">Record Bill</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-1.5">
@@ -302,7 +302,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                         className="flex items-center justify-center rounded-lg bg-[var(--primary-green)] px-4 h-8 text-[9px] font-black uppercase tracking-wider text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] transition-all disabled:opacity-50 shadow-md active:scale-95"
                     >
                         {loading ? <Loader2 className="mr-1.5 h-3 w-3 animate-spin" /> : <Save className="mr-1.5 h-3 w-3" />}
-                        Save Bill
+                        Save Entry
                     </button>
                 </div>
             </div>
@@ -314,15 +314,15 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                         <div className="h-16 w-16 bg-blue-500/10 text-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-500 shadow-xl">
                             <Building size={28} strokeWidth={2} />
                         </div>
-                        <h2 className="text-sm font-black text-[var(--deep-contrast)] uppercase tracking-tight mb-1">Identity Verification</h2>
-                        <p className="text-[9px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.2em] mb-6 max-w-xs mx-auto leading-tight">Identify vendor to initialize ledger</p>
+                        <h2 className="text-sm font-black text-[var(--deep-contrast)] uppercase tracking-tight mb-1">Who is this for?</h2>
+                        <p className="text-[9px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.2em] mb-6 max-w-xs mx-auto leading-tight">Identify person to record entry</p>
 
                         <button
                             type="button"
                             onClick={() => setIsPartyPickerOpen(true)}
                             className="inline-flex items-center gap-3 px-8 py-3 rounded-xl bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[var(--deep-contrast-hover)] transition-all shadow-xl active:scale-95 group/btn"
                         >
-                            Select Vendor
+                            Choose Person
                         </button>
                     </div>
                 </div>
@@ -335,7 +335,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                                 <Building size={20} />
                             </div>
                             <div className="min-w-0 flex-1">
-                                <p className="text-[7px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Vendor</p>
+                                <p className="text-[7px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Person</p>
                                 <h3 className="text-sm font-black text-[var(--deep-contrast)] uppercase tracking-tight truncate leading-none mt-0.5">
                                     {filteredParties.find(p => p.id === partyId)?.name}
                                 </h3>
@@ -350,7 +350,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                                     value={invoiceNumber}
                                     onChange={(e) => setInvoiceNumber(e.target.value)}
                                     className="w-full md:w-32 h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[10px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all uppercase"
-                                    placeholder="UID"
+                                    placeholder="Number"
                                 />
                             </div>
                             <div className="flex-1 md:flex-none">
@@ -376,8 +376,8 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                     <div className="glass rounded-[24px] border border-[var(--foreground)]/10 overflow-hidden shadow-lg">
                         <div className="px-4 py-2.5 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5 flex justify-between items-center relative overflow-hidden">
                             <div className="relative z-10">
-                                <h3 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">Line Specification</h3>
-                                <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest">{rows.length} ENTRIES</p>
+                                <h3 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">Items List</h3>
+                                <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest">{rows.length} ITEMS</p>
                             </div>
                             <button
                                 type="button"
@@ -385,7 +385,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                                 className="relative z-10 flex items-center gap-2 px-4 py-1.5 rounded-lg bg-[var(--primary-green)] text-[var(--primary-foreground)] text-[9px] font-black uppercase tracking-wider hover:bg-[var(--primary-hover)] transition-all shadow-md active:scale-95 group"
                             >
                                 <Plus size={12} />
-                                APPEND ITEM
+                                ADD ITEM
                             </button>
                         </div>
 
@@ -440,7 +440,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                         {/* Left: Metadata & Notes */}
                         <div className="space-y-2">
                             <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md space-y-3">
-                                <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Overlays</label>
+                                <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Taxes & Discounts</label>
                                 <div className="grid grid-cols-2 gap-2">
                                     <div className="p-2.5 rounded-xl bg-[var(--foreground)]/3 border border-white/5 space-y-1">
                                         <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 font-mono">ADJ %</label>
@@ -478,7 +478,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                         {/* Center: Signature & Liquidation */}
                         <div className="space-y-2">
                             <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md space-y-2">
-                                <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Liquidation</label>
+                                <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Payment Status</label>
                                 <div className="flex gap-2">
                                     <button
                                         type="button"
@@ -495,7 +495,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
 
                             <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md space-y-3 bg-gradient-to-br from-transparent to-[var(--primary-green)]/[0.02]">
                                 <div className="flex justify-between items-center">
-                                    <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Authentication</label>
+                                    <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Signature</label>
                                     <div className="px-1.5 py-0.5 rounded-full bg-[var(--primary-green)]/10 border border-[var(--primary-green)]/20 text-[6px] font-black text-[var(--primary-green)] uppercase tracking-widest">
                                         SECURE
                                     </div>
@@ -508,7 +508,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
 
                         {/* Right: Evidence (Attachments) */}
                         <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md flex flex-col">
-                            <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 mb-3">Evidence</label>
+                            <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 mb-3">Bill Photo / Receipt</label>
                             <div className="flex flex-wrap gap-2 flex-1 overflow-y-auto custom-scrollbar max-h-[160px]">
                                 {attachments.map((url, i) => (
                                     <div key={i} className="relative group/attachment h-12 w-12 rounded-lg border border-white/5 overflow-hidden shadow-sm cursor-pointer" onClick={() => setExpandedImage(url)}>
@@ -550,7 +550,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                                 className="h-12 px-6 rounded-2xl bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest hover:bg-rose-600 transition-all shadow-xl shadow-rose-500/20 flex items-center gap-2"
                             >
                                 <Trash2 size={14} />
-                                Delete Evidence
+                                Delete Photo
                             </button>
                         </div>
                     </div>
@@ -562,7 +562,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                 isOpen={isPartyPickerOpen}
                 onClose={() => setIsPartyPickerOpen(false)}
                 onSelect={(id) => setPartyId(id)}
-                title="Select Supplier"
+                title="Choose Person"
                 options={filteredParties.map(p => ({ id: p.id, label: p.name.toUpperCase(), subLabel: p.phone }))}
                 selectedValue={partyId}
             />

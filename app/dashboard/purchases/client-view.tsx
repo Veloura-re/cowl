@@ -217,8 +217,8 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
             <div className="flex flex-col gap-3 pb-3 border-b border-[var(--primary-green)]/10">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight">Purchases</h1>
-                        <p className="text-[10px] font-black text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Stock Inward Log</p>
+                        <h1 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight">Purchase</h1>
+                        <p className="text-[10px] font-black text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Purchase Log</p>
                     </div>
                     <motion.button
                         initial={{ opacity: 0, scale: 0.9, y: 10 }}
@@ -229,7 +229,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                         className="flex items-center justify-center rounded-xl bg-[var(--primary-green)] px-4 py-2 text-[11px] font-black uppercase tracking-wider text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] transition-all shadow-xl shadow-[var(--primary-green)]/20 active:scale-95 border border-[var(--primary-foreground)]/10 group"
                     >
                         <Plus className="mr-1.5 h-3.5 w-3.5 transition-transform group-hover:rotate-90 duration-300" />
-                        <span>New Bill</span>
+                        <span>New Entry</span>
                     </motion.button>
                 </div>
 
@@ -238,7 +238,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--foreground)]/40" />
                         <input
                             type="text"
-                            placeholder="Search bills..."
+                            placeholder="Search..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="w-full h-9 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 pl-9 pr-4 text-[10px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:ring-1 focus:ring-[var(--primary-green)]/20 focus:outline-none transition-all shadow-inner placeholder:text-[var(--foreground)]/40"
@@ -269,13 +269,15 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                     onClick={() => setStatusFilter(statusFilter === 'PAID' ? 'ALL' : 'PAID')}
                     className={clsx(
                         "flex-1 glass p-2 rounded-xl border transition-all cursor-pointer group",
-                        statusFilter === 'PAID' ? "bg-[var(--status-success)] border-[var(--status-success-border)]" : "bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:bg-[var(--foreground)]/10"
+                        statusFilter === 'PAID'
+                            ? "bg-[var(--status-success)] border-emerald-500 shadow-lg shadow-emerald-500/20 ring-2 ring-emerald-500/50 scale-[1.02]"
+                            : "bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:bg-[var(--foreground)]/10"
                     )}
                 >
                     <div className="flex justify-between items-center">
                         <div className="flex items-center gap-1.5">
                             <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                            <span className="text-[7.5px] font-black uppercase tracking-widest text-[var(--status-success-foreground)]/60">Paid Bills</span>
+                            <span className="text-[7.5px] font-black uppercase tracking-widest text-[var(--status-success-foreground)]/60">Total Out</span>
                         </div>
                         <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full border border-[var(--status-success-border)] bg-[var(--status-success)] text-[var(--status-success-foreground)] shadow-sm">DONE</span>
                     </div>
@@ -290,7 +292,9 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                     onClick={() => setStatusFilter(statusFilter === 'UNPAID' ? 'ALL' : 'UNPAID')}
                     className={clsx(
                         "flex-1 glass p-2 rounded-xl border transition-all cursor-pointer group",
-                        statusFilter === 'UNPAID' ? "bg-[var(--status-danger)] border-[var(--status-danger-border)]" : "bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:bg-[var(--foreground)]/10"
+                        statusFilter === 'UNPAID'
+                            ? "bg-[var(--status-danger)] border-rose-500 shadow-lg shadow-rose-500/20 ring-2 ring-rose-500/50 scale-[1.02]"
+                            : "bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:bg-[var(--foreground)]/10"
                     )}
                 >
                     <div className="flex justify-between items-center">
@@ -315,7 +319,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                     setSortOrder(order as 'asc' | 'desc')
                     setIsSortPickerOpen(false)
                 }}
-                title="Sort Purchase Bills"
+                title="Arrange List"
                 showSearch={false}
                 options={[
                     { id: 'date-desc', label: 'DATE (NEWEST FIRST)' },
@@ -333,7 +337,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                     setStatusFilter(val)
                     setIsFilterPickerOpen(false)
                 }}
-                title="Filter by Status"
+                title="Group by Status"
                 showSearch={false}
                 options={[
                     { id: 'ALL', label: 'ALL STATUS' },
@@ -355,7 +359,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                         onMouseLeave={handleTouchEnd}
                         onTouchStart={() => handleTouchStart(inv)}
                         onTouchEnd={handleTouchEnd}
-                        className="group relative flex items-center glass-optimized rounded-[10px] border border-[var(--foreground)]/10 p-1.5 hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer overflow-hidden h-[54px] gap-2 select-none active:scale-[0.98]"
+                        className="group relative flex items-center glass-optimized rounded-[10px] border border-[var(--foreground)]/10 p-1.5 hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer overflow-hidden h-[44px] gap-2 select-none active:scale-[0.98]"
                     >
                         {/* Status Indicator Stripe */}
                         <div className={clsx(
@@ -365,7 +369,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
 
                         {/* Avatar */}
                         <div className={clsx(
-                            "h-7 w-7 rounded-lg flex items-center justify-center font-black text-[9px] transition-all duration-300 shadow-inner shrink-0 border uppercase",
+                            "h-6 w-6 rounded-lg flex items-center justify-center font-black text-[9px] transition-all duration-300 shadow-inner shrink-0 border uppercase",
                             inv.status === 'UNPAID'
                                 ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
                                 : "bg-[var(--foreground)]/5 text-[var(--deep-contrast)]/60 border-[var(--foreground)]/10"
@@ -376,7 +380,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                         {/* Identity & Status Header - Compact */}
                         <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between gap-1">
-                                <h3 className="text-[9.5px] font-black text-[var(--deep-contrast)] truncate leading-none uppercase tracking-tight">{inv.party?.name || 'Supplier'}</h3>
+                                <h3 className="text-[9px] font-black text-[var(--deep-contrast)] truncate leading-none uppercase tracking-tight">{inv.party?.name || 'Supplier'}</h3>
                                 <span className={clsx(
                                     "text-[5.5px] font-black uppercase tracking-widest px-1 py-0.5 rounded-md border shrink-0",
                                     inv.status === 'PAID' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/10" :
@@ -387,9 +391,9 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                                 </span>
                             </div>
                             <div className="flex items-center gap-1.5 mt-1.5">
-                                <span className="text-[6.5px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">{inv.invoice_number}</span>
+                                <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">{inv.invoice_number}</span>
                                 <div className="h-0.5 w-0.5 rounded-full bg-[var(--foreground)]/20" />
-                                <span className="text-[6.5px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">
+                                <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">
                                     {new Date(inv.date).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}
                                 </span>
                             </div>
@@ -398,7 +402,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                         {/* Value & Actions Row */}
                         <div className="flex flex-col items-end gap-1 shrink-0">
                             <p className={clsx(
-                                "text-[12px] font-black tracking-tighter tabular-nums leading-none",
+                                "text-[11px] font-black tracking-tighter tabular-nums leading-none",
                                 inv.balance_amount > 0 ? "text-rose-500" : "text-emerald-500"
                             )}>
                                 {formatCurrency(inv.total_amount)}
@@ -408,7 +412,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                                     onClick={(e) => handlePrintInvoice(e, inv)}
                                     className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
                                 >
-                                    <Printer size={8} />
+                                    <Printer size={7} />
                                 </button>
                                 <button
                                     onClick={(e) => {
@@ -417,7 +421,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                                     }}
                                     className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
                                 >
-                                    <Edit2 size={8} />
+                                    <Edit2 size={7} />
                                 </button>
                                 <button
                                     onClick={(e) => {
@@ -427,7 +431,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                                     }}
                                     className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-rose-500 hover:text-white border border-[var(--foreground)]/10 transition-all"
                                 >
-                                    <Trash2 size={8} />
+                                    <Trash2 size={7} />
                                 </button>
                             </div>
                         </div>
@@ -450,8 +454,8 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                 isOpen={isDeleteConfirmOpen}
                 onClose={() => setIsDeleteConfirmOpen(false)}
                 onConfirm={confirmDelete}
-                title="Delete Purchase Bill?"
-                message="This will delete the bill and reduce the added stock. This action cannot be undone."
+                title="Remove Record?"
+                message="This will delete the entry and update stock. This action cannot be undone."
                 confirmText={isDeleting ? "Deleting..." : "Delete Permanently"}
             />
 

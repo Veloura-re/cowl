@@ -6,7 +6,7 @@ import clsx from 'clsx'
 import { useBusiness } from '@/context/business-context'
 import { createClient } from '@/utils/supabase/client'
 import { ReportGenerator, ReportType } from '@/utils/report-generator'
-import { fetchReportDataService } from '@/utils/report-service'
+import { fetchReportDataService, ReportServiceType } from '@/utils/report-service'
 import { format, parseISO } from 'date-fns'
 import SignaturePad, { SignaturePadHandle } from '@/components/ui/signature-pad'
 import Dropdown from '@/components/ui/dropdown'
@@ -47,53 +47,132 @@ export default function ReportsPage() {
         async function fetchReportsData() {
             setLoading(true)
             try {
-                // 1. P&L
+                // 1. P&L and Sales Trend
                 const { data: invoices } = await supabase
                     .from('invoices')
-                    .select('total_amount, type, date')
+                    .select('total_amount, type, date, invoice_number, id')
                     .eq('business_id', activeBusinessId)
+                    .gte('date', dateRange.start)
+                    .lte('date', dateRange.end)
 
                 const revenue = (invoices || []).filter(i => i.type === 'SALE').reduce((sum, i) => sum + Number(i.total_amount), 0)
                 const expenses = (invoices || []).filter(i => i.type === 'PURCHASE').reduce((sum, i) => sum + Number(i.total_amount), 0)
 
-                // 2. Sales Trend (Last 7 Days)
-                const last7Days = Array.from({ length: 7 }, (_, i) => {
-                    const d = new Date()
-                    d.setDate(d.getDate() - (6 - i))
-                    return d.toISOString().split('T')[0]
-                })
+                // 2. Sales Trend (Based on selected range)
+                // If the range is > 30 days, we might want to aggregate by month/week, but for now we'll stick to daily if range is reasonable
+                const daysDiff = (new Date(dateRange.end).getTime() - new Date(dateRange.start).getTime()) / (1000 * 3600 * 24)
+                let trendDates: string[] = []
 
-                const trend = last7Days.map(date => {
+                if (daysDiff <= 31) {
+                    trendDates = Array.from({ length: Math.floor(daysDiff) + 1 }, (_, i) => {
+                        const d = new Date(dateRange.start)
+                        d.setDate(d.getDate() + i)
+                        return d.toISOString().split('T')[0]
+                    })
+                } else {
+                    // Fallback to last 7 days if range is too large for a simple daily bar chart
+                    trendDates = Array.from({ length: 7 }, (_, i) => {
+                        const d = new Date()
+                        d.setDate(d.getDate() - (6 - i))
+                        return d.toISOString().split('T')[0]
+                    })
+                }
+
+                const trend = trendDates.map(date => {
                     return (invoices || [])
                         .filter(i => i.type === 'SALE' && i.date === date)
                         .reduce((sum, i) => sum + Number(i.total_amount), 0)
                 })
 
-                // 3. Quick Insights
-                const { data: lowStock } = await supabase
-                    .from('items')
-                    .select('id')
-                    .eq('business_id', activeBusinessId)
-                    .lte('stock_quantity', 10) // Approx check, should use min_stock logic if possible but simple lte 10 is fine for dashboard summary
+                // 3. Best Selling Product (Real Data)
+                const { data: topItemsData } = await supabase
+                    .from('invoice_items')
+                    .select('item_id, quantity, total, items(name)')
+                    .in('invoice_id', (invoices || []).filter(i => i.type === 'SALE').map(i => i.id))
 
-                const { data: pCount } = await supabase
-                    .from('parties')
-                    .select('name')
+                const itemStats: Record<string, { name: string, total: number }> = {}
+                topItemsData?.forEach((row: any) => {
+                    const id = row.item_id
+                    const name = row.items?.name || 'Unknown'
+                    if (!itemStats[id]) itemStats[id] = { name, total: 0 }
+                    itemStats[id].total += Number(row.total)
+                })
+
+                const sortedItems = Object.values(itemStats).sort((a, b) => b.total - a.total)
+                const topItem = sortedItems[0]?.name || 'N/A'
+
+                // 4. Low Stock count
+                const { data: lowStock } = await supabase
+                    .rpc('get_low_stock_count', { b_id: activeBusinessId })
+
+                // If RPC doesn't exist, fallback to simple query (common in these builds)
+                let lowStockCount = 0
+                if (lowStock !== undefined && lowStock !== null) {
+                    lowStockCount = lowStock
+                } else {
+                    const { data: items } = await supabase
+                        .from('items')
+                        .select('id, stock_quantity, min_stock')
+                        .eq('business_id', activeBusinessId)
+
+                    lowStockCount = items?.filter(item => Number(item.stock_quantity) <= Number(item.min_stock)).length || 0
+                }
+
+                // 5. Best Party (Customer/Supplier)
+                const partyStats: Record<string, { name: string, total: number }> = {}
+                // We need names for parties
+                const { data: partiesWithNames } = await supabase
+                    .from('invoices')
+                    .select('party_id, total_amount, parties(name)')
                     .eq('business_id', activeBusinessId)
-                    .limit(1)
+                    .in('id', (invoices || []).map(i => i.id))
+
+                partiesWithNames?.forEach((row: any) => {
+                    const id = row.party_id || 'walking'
+                    const name = row.parties?.name || 'Walking Customer'
+                    if (!partyStats[id]) partyStats[id] = { name, total: 0 }
+                    partyStats[id].total += Number(row.total_amount)
+                })
+
+                const sortedParties = Object.values(partyStats).sort((a, b) => b.total - a.total)
+                const topParty = sortedParties[0]?.name || 'N/A'
+
+                // 6. Expense Breakdown (Real Data)
+                const { data: expenseData } = await supabase
+                    .from('invoices')
+                    .select('total_amount, category, sku')
+                    .eq('business_id', activeBusinessId)
+                    .eq('type', 'PURCHASE')
+                    .gte('date', dateRange.start)
+                    .lte('date', dateRange.end)
+
+                const expenseStats: Record<string, number> = {}
+                let totalExp = 0
+                expenseData?.forEach(exp => {
+                    const cat = exp.category || 'Other'
+                    expenseStats[cat] = (expenseStats[cat] || 0) + Number(exp.total_amount)
+                    totalExp += Number(exp.total_amount)
+                })
+
+                const breakdown = Object.entries(expenseStats)
+                    .map(([label, value], i) => ({
+                        label,
+                        value: totalExp > 0 ? Math.round((value / totalExp) * 100) : 0,
+                        color: ['bg-indigo-500', 'bg-emerald-500', 'bg-sky-500', 'bg-amber-500', 'bg-rose-500'][i % 5]
+                    }))
+                    .sort((a, b) => b.value - a.value)
+                    .slice(0, 3) // Keep it to top 3 for the compact UI
 
                 setData({
                     revenue,
                     expenses,
                     salesTrend: trend,
-                    expenseBreakdown: [
-                        { label: 'Inventory', value: 70, color: 'bg-purple-500' },
-                        { label: 'Operations', value: 20, color: 'bg-emerald-500' },
-                        { label: 'Others', value: 10, color: 'bg-blue-500' }
+                    expenseBreakdown: breakdown.length > 0 ? breakdown : [
+                        { label: 'Inventory', value: 100, color: 'bg-purple-500' }
                     ],
-                    topItem: 'Main Stock',
-                    lowStockCount: lowStock?.length || 0,
-                    topParty: pCount?.[0]?.name || 'N/A',
+                    topItem,
+                    lowStockCount,
+                    topParty,
                     growth: '+12%'
                 })
             } catch (err) {
@@ -104,7 +183,7 @@ export default function ReportsPage() {
         }
 
         fetchReportsData()
-    }, [activeBusinessId])
+    }, [activeBusinessId, dateRange.start, dateRange.end])
 
     const handleExport = async (format: 'PDF' | 'EXCEL') => {
         if (!activeBusinessId) return
@@ -134,21 +213,43 @@ export default function ReportsPage() {
                 headers = ['Item Name', 'SKU', 'Stock', 'Unit Cost', 'Total Value']
                 rows = reportData.map((d: any) => [d.item, d.sku, d.stock, formatCurrency(d.cost), formatCurrency(d.value)])
                 const totalVal = reportData.reduce((acc: number, curr: any) => acc + curr.value, 0)
-                summary = [{ label: 'Total Inventory Value', value: formatCurrency(totalVal) }]
+                summary = [{ label: 'Total Stock Value', value: formatCurrency(totalVal) }]
+            } else if (selectedReport === 'CUSTOMER_REPORT' || selectedReport === 'SUPPLIER_REPORT') {
+                // Party Summary Reports
+                headers = ['Name', 'Total Amount', 'Amount Paid', 'Balance Due', 'Transactions']
+                rows = reportData.map((d: any) => [d.party, formatCurrency(d.total), formatCurrency(d.paid), formatCurrency(d.balance), d.count])
+                const totalAmount = reportData.reduce((acc: number, curr: any) => acc + curr.total, 0)
+                const totalBalance = reportData.reduce((acc: number, curr: any) => acc + curr.balance, 0)
+                summary = [
+                    { label: 'Total Business Volume', value: formatCurrency(totalAmount) },
+                    { label: 'Total Outstanding', value: formatCurrency(totalBalance) },
+                    { label: 'Number of Parties', value: reportData.length }
+                ]
             } else {
-                // Sales or Purchases
+                // Sales, Purchases, Party Sales, Party Purchases
                 headers = ['Date', 'Invoice #', 'Party', 'Status', 'Amount', 'Balance']
                 rows = reportData.map((d: any) => [d.date, d.number, d.party, d.status, formatCurrency(d.amount), formatCurrency(d.balance)])
                 const totalAmount = reportData.reduce((acc: number, curr: any) => acc + curr.amount, 0)
                 const totalBalance = reportData.reduce((acc: number, curr: any) => acc + curr.balance, 0)
                 summary = [
-                    { label: 'Total Amount', value: formatCurrency(totalAmount) },
+                    { label: `Total Money ${selectedReport === 'SALES' || selectedReport === 'PARTY_SALES' ? 'In' : 'Out'}`, value: formatCurrency(totalAmount) },
                     { label: 'Total Unpaid/Due', value: formatCurrency(totalBalance) }
                 ]
             }
 
+            const reportTitles: Record<ReportType, string> = {
+                'SALES': 'SALES REPORT (MONEY IN)',
+                'PURCHASES': 'PURCHASES REPORT (MONEY OUT)',
+                'INVENTORY': 'VALUE OF STOCK REPORT',
+                'PROFIT_LOSS': 'PROFIT & LOSS REPORT',
+                'CUSTOMER_REPORT': 'CUSTOMER REPORT',
+                'SUPPLIER_REPORT': 'SUPPLIER REPORT',
+                'PARTY_SALES': 'SALES BY CUSTOMER',
+                'PARTY_PURCHASES': 'PURCHASES BY SUPPLIER'
+            }
+
             const generatorData = {
-                title: `${selectedReport} REPORT`,
+                title: reportTitles[selectedReport] || 'BUSINESS REPORT',
                 headers,
                 rows,
                 summary
@@ -180,8 +281,9 @@ export default function ReportsPage() {
                 }
             }
 
+            let file: File | void
             if (format === 'PDF') {
-                ReportGenerator.generatePDF(
+                file = await ReportGenerator.generatePDF(
                     selectedReport,
                     generatorData,
                     businessInfo,
@@ -189,7 +291,19 @@ export default function ReportsPage() {
                     signatureDataUrl
                 )
             } else {
-                ReportGenerator.generateExcel(selectedReport, generatorData, { start: new Date(dateRange.start), end: new Date(dateRange.end) })
+                file = await ReportGenerator.generateExcel(
+                    selectedReport,
+                    generatorData,
+                    { start: new Date(dateRange.start), end: new Date(dateRange.end) }
+                )
+            }
+
+            // 4. Handle Mobile Sharing
+            if (file && (navigator as any).share) {
+                const shared = await ReportGenerator.shareReport(file, generatorData.title)
+                if (shared) {
+                    console.log('Report shared successfully')
+                }
             }
 
         } catch (error) {
@@ -203,66 +317,74 @@ export default function ReportsPage() {
     const maxTrend = Math.max(...data.salesTrend, 1000)
 
     return (
-        <div className="space-y-6 pb-20">
+        <div className="space-y-4 pb-10">
             {/* Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-[var(--primary-green)]/10">
+            <div className="flex items-center justify-between pb-2 border-b border-neutral-200 dark:border-white/5">
                 <div>
-                    <h1 className="text-xl font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)] tracking-tight">Reports</h1>
-                    <p className="text-[10px] font-bold text-[var(--foreground)]/60 dark:text-neutral-500 uppercase tracking-wider leading-none">Business Performance</p>
+                    <h1 className="text-xl font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)] tracking-tight">Business Reports</h1>
+                    <p className="text-[10px] font-bold text-[var(--foreground)]/60 dark:text-neutral-500 uppercase tracking-wider leading-none">How your business is doing</p>
                 </div>
                 {loading && <Activity className="h-4 w-4 text-[var(--primary-green)] animate-spin" />}
             </div>
 
-            {/* Export Section - NEW */}
-            <div className="glass p-5 rounded-2xl border border-gray-200 dark:border-white/10 space-y-4">
-                <div className="flex items-center gap-2 mb-2">
-                    <div className="h-7 w-7 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center">
-                        <FileText className="h-4 w-4" />
+            {/* Export Section - Redesigned & Compact */}
+            <div className="relative group overflow-hidden glass p-4 rounded-3xl border border-neutral-200 dark:border-white/5 shadow-lg shadow-neutral-100 dark:shadow-none bg-white/40 dark:bg-white/5 backdrop-blur-md">
+                <div className="flex items-center gap-2 mb-4">
+                    <div className="h-8 w-8 rounded-xl bg-indigo-500 text-white flex items-center justify-center shadow-md shadow-indigo-500/10">
+                        <Download className="h-4 w-4" />
                     </div>
-                    <h3 className="text-xs font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)]">Export Detailed Reports</h3>
+                    <div>
+                        <h3 className="text-xs font-black text-neutral-900 dark:text-white tracking-tight">Export Intelligence</h3>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                     {/* Report Type */}
-                    <div className="space-y-1">
-                        <label className="text-[9px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider">Report Type</label>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Focus Area</label>
                         <Dropdown
                             value={selectedReport}
                             onChange={(val) => setSelectedReport(val as ReportType)}
                             options={[
-                                { value: 'SALES', label: 'Sales Report' },
-                                { value: 'PURCHASES', label: 'Purchases Report' },
-                                { value: 'INVENTORY', label: 'Inventory Valuation' }
+                                { value: 'SALES', label: 'Sales Performance' },
+                                { value: 'PURCHASES', label: 'Purchase Analysis' },
+                                { value: 'INVENTORY', label: 'Inventory Valuation' },
+                                { value: 'CUSTOMER_REPORT', label: 'Client Landscape' },
+                                { value: 'SUPPLIER_REPORT', label: 'Vendor Portfolio' },
+                                { value: 'PARTY_SALES', label: 'Revenue by Client' },
+                                { value: 'PARTY_PURCHASES', label: 'Spend by Vendor' }
                             ]}
                             className="w-full"
                         />
                     </div>
 
                     {/* Start Date */}
-                    <div className="space-y-1">
-                        <label className="text-[9px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider">From</label>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">From</label>
                         <button
                             type="button"
                             onClick={() => setIsStartOpen(true)}
                             disabled={selectedReport === 'INVENTORY'}
-                            className="w-full h-10 flex items-center gap-2.5 px-3 bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg text-xs font-bold text-[var(--deep-contrast)] hover:border-[var(--primary-green)]/40 transition-all disabled:opacity-50"
+                            className="w-full h-10 flex items-center justify-between px-3 bg-neutral-100 dark:bg-white/5 border border-transparent dark:border-white/10 rounded-xl text-xs font-bold text-neutral-900 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-white/10 transition-all disabled:opacity-50 shadow-inner"
                         >
-                            <Calendar className="h-3.5 w-3.5 opacity-40" />
-                            {format(parseISO(dateRange.start), 'MMM dd, yyyy')}
+                            <Calendar className="h-4 w-4 opacity-40 shrink-0" />
+                            <span>{format(parseISO(dateRange.start), 'MMM dd, yyyy')}</span>
+                            <div className="w-4" />
                         </button>
                     </div>
 
                     {/* End Date */}
-                    <div className="space-y-1">
-                        <label className="text-[9px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider">To</label>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">To</label>
                         <button
                             type="button"
                             onClick={() => setIsEndOpen(true)}
                             disabled={selectedReport === 'INVENTORY'}
-                            className="w-full h-10 flex items-center gap-2.5 px-3 bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg text-xs font-bold text-[var(--deep-contrast)] hover:border-[var(--primary-green)]/40 transition-all disabled:opacity-50"
+                            className="w-full h-10 flex items-center justify-between px-3 bg-neutral-100 dark:bg-white/5 border border-transparent dark:border-white/10 rounded-xl text-xs font-bold text-neutral-900 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-white/10 transition-all disabled:opacity-50 shadow-inner"
                         >
-                            <Calendar className="h-3.5 w-3.5 opacity-40" />
-                            {format(parseISO(dateRange.end), 'MMM dd, yyyy')}
+                            <Calendar className="h-4 w-4 opacity-40 shrink-0" />
+                            <span>{format(parseISO(dateRange.end), 'MMM dd, yyyy')}</span>
+                            <div className="w-4" />
                         </button>
                     </div>
 
@@ -282,107 +404,118 @@ export default function ReportsPage() {
                         title="End Date"
                     />
 
-                    {/* Signature Pad */}
-                    <div className="space-y-1">
-                        <label className="text-[9px] font-bold text-[var(--foreground)]/60 uppercase tracking-wider">Authorization</label>
-                        <div className="relative group rounded-xl overflow-hidden border border-gray-200 dark:border-white/10 bg-white/50 dark:bg-white/5">
-                            <SignaturePad ref={sigPadRef} className="h-48" />
-                        </div>
-                    </div>
-
                     {/* Actions */}
-                    <div className="flex gap-2">
+                    <div className="flex gap-3">
                         <button
                             onClick={() => handleExport('PDF')}
                             disabled={exporting}
-                            className="flex-1 flex items-center justify-center gap-2 bg-emerald-600 dark:bg-emerald-600 text-[var(--primary-foreground)] p-2.5 rounded-lg text-xs font-bold hover:bg-emerald-700 dark:hover:bg-emerald-700 transition-colors disabled:opacity-70"
+                            className="flex-1 flex items-center justify-center gap-2 bg-neutral-900 dark:bg-white text-white dark:text-black h-10 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-70 shadow-lg shadow-black/10"
                         >
-                            {exporting ? <Activity className="h-3 w-3 animate-spin" /> : <FileText className="h-3 w-3" />}
+                            {exporting ? <Activity className="h-3.5 w-3.5 animate-spin" /> : <FileText className="h-3.5 w-3.5" />}
                             PDF
                         </button>
                         <button
                             onClick={() => handleExport('EXCEL')}
                             disabled={exporting}
-                            className="flex-1 flex items-center justify-center gap-2 bg-emerald-600 text-[var(--primary-foreground)] p-2.5 rounded-lg text-xs font-bold hover:bg-emerald-700 transition-colors disabled:opacity-70"
+                            className="flex-1 flex items-center justify-center gap-2 bg-emerald-500 text-white h-10 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-70 shadow-lg shadow-emerald-500/20"
                         >
-                            {exporting ? <Activity className="h-3 w-3 animate-spin" /> : <FileSpreadsheet className="h-3 w-3" />}
+                            {exporting ? <Activity className="h-3.5 w-3.5 animate-spin" /> : <FileSpreadsheet className="h-3.5 w-3.5" />}
                             XLSX
                         </button>
+                    </div>
+                </div>
+
+                <div className="mt-6 pt-6 border-t border-neutral-100 dark:border-white/5 space-y-3">
+                    <label className="text-[11px] font-black text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.2em] ml-1">OFFICIAL AUTHORIZATION SIGNATURE</label>
+                    <div className="relative group rounded-2xl overflow-hidden border border-neutral-200 dark:border-white/10 bg-white dark:bg-black/20 shadow-inner group-hover:border-indigo-500/30 transition-colors">
+                        <SignaturePad ref={sigPadRef} className="h-44" />
+                        <div className="absolute top-2 right-2 px-2 py-1 rounded-md bg-neutral-100 dark:bg-white/5 text-[8px] font-black text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-widest">SIGN HERE</div>
                     </div>
                 </div>
             </div>
 
             {/* Dashboard Grid */}
             <div className="grid gap-2 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                {/* Profit & Loss - Compact */}
-                <div className="glass p-4 rounded-2xl border border-gray-200 dark:border-white/10 space-y-4">
-                    <div className="flex items-center gap-2">
-                        <div className="h-7 w-7 rounded-lg bg-[var(--primary-green)]/10 text-[var(--primary-green)] flex items-center justify-center">
-                            <BarChart3 className="h-4 w-4" />
-                        </div>
-                        <h3 className="text-xs font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)]">Profit & Loss</h3>
+                {/* Profit & Loss - Redesigned & Compact */}
+                <div className="relative overflow-hidden glass p-4 rounded-3xl border border-neutral-200 dark:border-white/5 bg-white dark:bg-white/5 group transition-all hover:bg-white/60 dark:hover:bg-white/10">
+                    <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-all group-hover:scale-110">
+                        <BarChart3 className="h-10 w-10 text-emerald-500" />
                     </div>
 
-                    <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                            <span className="text-[10px] font-bold text-[var(--foreground)]/50 uppercase tracking-wider">Revenue</span>
-                            <span className="text-xs font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)]">{formatCurrency(data.revenue)}</span>
+                    <div className="flex items-center gap-2 mb-4">
+                        <div className="h-8 w-8 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shadow-inner">
+                            <BarChart3 className="h-4 w-4" />
                         </div>
-                        <div className="flex justify-between items-center">
-                            <span className="text-[10px] font-bold text-[var(--foreground)]/50 uppercase tracking-wider">Expenses</span>
-                            <span className="text-xs font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)]">{formatCurrency(data.expenses)}</span>
+                        <h3 className="text-xs font-black text-neutral-900 dark:text-white tracking-tight">Finance</h3>
+                    </div>
+
+                    <div className="space-y-3">
+                        <div className="flex justify-between items-center group/item p-1.5 hover:bg-neutral-50 dark:hover:bg-white/5 rounded-lg transition-colors">
+                            <div className="flex flex-col">
+                                <span className="text-[9px] font-black text-neutral-400 uppercase tracking-widest">Inflow</span>
+                                <span className="text-xs font-bold text-neutral-900 dark:text-white">{formatCurrency(data.revenue)}</span>
+                            </div>
+                            <ArrowUpRight className="h-3.5 w-3.5 text-emerald-500" />
                         </div>
-                        <div className="pt-2 border-t border-[var(--primary-green)]/5 flex justify-between items-center">
-                            <span className="text-[10px] font-bold text-[var(--primary-green)] uppercase tracking-wider">Net Profit</span>
-                            <span className="text-lg font-bold text-emerald-600 tracking-tight">{formatCurrency(data.revenue - data.expenses)}</span>
+                        <div className="flex justify-between items-center group/item p-1.5 hover:bg-neutral-50 dark:hover:bg-white/5 rounded-lg transition-colors">
+                            <div className="flex flex-col">
+                                <span className="text-[9px] font-black text-neutral-400 uppercase tracking-widest">Outflow</span>
+                                <span className="text-xs font-bold text-neutral-900 dark:text-white">{formatCurrency(data.expenses)}</span>
+                            </div>
+                            <ArrowDownRight className="h-3.5 w-3.5 text-rose-500" />
+                        </div>
+                        <div className="pt-3 border-t border-neutral-100 dark:border-white/10 flex flex-col items-center justify-center py-2 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-xl">
+                            <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Net</span>
+                            <span className="text-xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">{formatCurrency(data.revenue - data.expenses)}</span>
                         </div>
                     </div>
                 </div>
 
-                {/* Sales Trend - Compact */}
-                <div className="glass p-4 rounded-2xl border border-gray-200 dark:border-white/10 space-y-4">
-                    <div className="flex items-center gap-2">
-                        <div className="h-7 w-7 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                {/* Sales Trend - Redesigned & Compact */}
+                <div className="relative overflow-hidden glass p-4 rounded-3xl border border-neutral-200 dark:border-white/5 bg-white dark:bg-white/5 group">
+                    <div className="flex items-center gap-2 mb-4">
+                        <div className="h-8 w-8 rounded-xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center shadow-inner">
                             <TrendingUp className="h-4 w-4" />
                         </div>
-                        <h3 className="text-xs font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)]">Sales Trend</h3>
+                        <h3 className="text-xs font-black text-neutral-900 dark:text-white tracking-tight">Timeline</h3>
                     </div>
-                    <div className="h-24 flex items-end justify-between px-1 gap-1.5 pb-2 border-b border-[var(--primary-green)]/5">
+
+                    <div className="h-24 flex items-end justify-between px-1 gap-1.5 pb-3">
                         {data.salesTrend.map((val, i) => (
                             <div
                                 key={i}
-                                className="flex-1 bg-blue-500/20 rounded-t-lg relative group transition-all hover:bg-blue-500/40"
-                                style={{ height: `${Math.max(10, (val / maxTrend) * 100)}%` }}
+                                className="flex-1 bg-indigo-500/10 dark:bg-indigo-500/5 rounded-t-lg relative group transition-all hover:bg-indigo-500/20"
+                                style={{ height: `${Math.max(15, (val / maxTrend) * 100)}%` }}
                             >
-                                <div className="absolute inset-x-0 bottom-0 h-1 bg-blue-500 rounded-full" />
-                                <div className="hidden group-hover:block absolute -top-6 left-1/2 -translate-x-1/2 px-1.5 py-0.5 bg-[var(--deep-contrast)] text-white text-[8px] font-bold rounded shadow-lg whitespace-nowrap z-10">
+                                <div className="absolute inset-x-0 bottom-0 h-1 bg-indigo-500 rounded-full" />
+                                <div className="hidden group-hover:flex absolute -top-8 left-1/2 -translate-x-1/2 px-1.5 py-0.5 bg-neutral-900 text-white text-[8px] font-black rounded shadow-xl whitespace-nowrap z-10 items-center justify-center border border-white/10">
                                     {formatCurrency(val)}
                                 </div>
                             </div>
                         ))}
                     </div>
-                    <div className="flex justify-between text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/20 px-1">
+                    <div className="flex justify-between text-[8px] font-black uppercase tracking-widest text-neutral-400 px-1 pt-1.5 border-t border-neutral-50 dark:border-white/5">
                         <span>L7D</span>
-                        <span>Today</span>
+                        <span>Now</span>
                     </div>
                 </div>
 
-                {/* Expense Breakdown - Compact */}
-                <div className="glass p-4 rounded-2xl border border-gray-200 dark:border-white/10 space-y-4">
-                    <div className="flex items-center gap-2">
-                        <div className="h-7 w-7 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center">
+                {/* Expense Breakdown - Redesigned & Compact */}
+                <div className="relative overflow-hidden glass p-4 rounded-3xl border border-neutral-200 dark:border-white/5 bg-white dark:bg-white/5 group">
+                    <div className="flex items-center gap-2 mb-4">
+                        <div className="h-8 w-8 rounded-xl bg-sky-500/10 text-sky-600 flex items-center justify-center shadow-inner">
                             <Wallet className="h-4 w-4" />
                         </div>
-                        <h3 className="text-xs font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)]">Expense Breakdown</h3>
+                        <h3 className="text-xs font-black text-neutral-900 dark:text-white tracking-tight">Spending</h3>
                     </div>
                     <div className="space-y-3">
                         {data.expenseBreakdown.map((item, i) => (
-                            <div key={i} className="space-y-1">
-                                <div className="flex justify-between text-[9px] font-bold uppercase tracking-wider leading-none">
-                                    <span className="text-[var(--foreground)]/40">{item.label}</span>
-                                    <span className="text-[var(--deep-contrast)] dark:text-[var(--foreground)]">{item.value}%</span>
+                            <div key={i} className="space-y-1.5">
+                                <div className="flex justify-between text-[9px] font-black uppercase tracking-widest leading-none">
+                                    <span className="text-neutral-400">{item.label}</span>
+                                    <span className="text-neutral-900 dark:text-neutral-200">{item.value}%</span>
                                 </div>
-                                <div className="h-1.5 w-full bg-white/30 dark:bg-white/10 rounded-full overflow-hidden border border-white/20 dark:border-white/5">
+                                <div className="h-1.5 w-full bg-neutral-100 dark:bg-white/5 rounded-full overflow-hidden shadow-inner">
                                     <div
                                         className={clsx("h-full rounded-full transition-all duration-1000", item.color)}
                                         style={{ width: `${item.value}%` }}
@@ -394,25 +527,30 @@ export default function ReportsPage() {
                 </div>
             </div>
 
-            {/* Quick Insights - Compact */}
-            <div className="glass p-4 rounded-3xl border border-gray-200 dark:border-white/10">
-                <h3 className="text-xs font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)] mb-3">Quick Insights</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="p-2 rounded-xl bg-white/30 dark:bg-white/5 border border-white/20 dark:border-white/10">
-                        <p className="text-[9px] font-bold text-[var(--foreground)]/50 uppercase tracking-wider mb-1">Top Item</p>
-                        <p className="text-xs font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)] truncate">{data.topItem}</p>
+            {/* Quick Insights - Unified Theme */}
+            <div className="relative overflow-hidden glass p-6 rounded-[32px] border border-[var(--foreground)]/10 bg-[var(--foreground)]/[0.03] dark:bg-white/5 shadow-xl">
+                <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none">
+                    <div className="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] bg-gradient-to-br from-indigo-500 via-emerald-500 to-sky-500 blur-[100px] animate-pulse" />
+                </div>
+
+                <h3 className="text-[9px] font-black text-[var(--foreground)]/40 tracking-[0.3em] uppercase mb-4 text-center">Insights Intelligence</h3>
+
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
+                    <div className="p-3.5 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 backdrop-blur-sm transition-all hover:scale-[1.03] hover:bg-[var(--foreground)]/10">
+                        <p className="text-[8px] font-black text-indigo-500 dark:text-indigo-400 uppercase tracking-widest mb-1">Top Item</p>
+                        <p className="text-[11px] font-black text-[var(--deep-contrast)] truncate">{data.topItem}</p>
                     </div>
-                    <div className="p-2 rounded-xl bg-white/30 dark:bg-white/5 border border-white/20 dark:border-white/10">
-                        <p className="text-[9px] font-bold text-[var(--foreground)]/50 uppercase tracking-wider mb-1">Low Stock</p>
-                        <p className="text-xs font-bold text-rose-600">{data.lowStockCount} Items</p>
+                    <div className="p-3.5 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 backdrop-blur-sm transition-all hover:scale-[1.03] hover:bg-[var(--foreground)]/10">
+                        <p className="text-[8px] font-black text-rose-500 dark:text-rose-400 uppercase tracking-widest mb-1">Restock</p>
+                        <p className="text-[11px] font-black text-[var(--deep-contrast)]">{data.lowStockCount} Items Low</p>
                     </div>
-                    <div className="p-2 rounded-xl bg-white/30 dark:bg-white/5 border border-white/20 dark:border-white/10">
-                        <p className="text-[9px] font-bold text-[var(--foreground)]/50 uppercase tracking-wider mb-1">Top Party</p>
-                        <p className="text-xs font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)] truncate">{data.topParty}</p>
+                    <div className="p-3.5 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 backdrop-blur-sm transition-all hover:scale-[1.03] hover:bg-[var(--foreground)]/10">
+                        <p className="text-[8px] font-black text-sky-500 dark:text-sky-400 uppercase tracking-widest mb-1">Top Customer</p>
+                        <p className="text-[11px] font-black text-[var(--deep-contrast)] truncate">{data.topParty}</p>
                     </div>
-                    <div className="p-2 rounded-xl bg-white/30 dark:bg-white/5 border border-white/20 dark:border-white/10">
-                        <p className="text-[9px] font-bold text-[var(--foreground)]/50 uppercase tracking-wider mb-1">L7D Growth</p>
-                        <p className="text-xs font-bold text-emerald-600">{data.growth}</p>
+                    <div className="p-3.5 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 backdrop-blur-sm transition-all hover:scale-[1.03] hover:bg-[var(--foreground)]/10">
+                        <p className="text-[8px] font-black text-emerald-500 dark:text-emerald-400 uppercase tracking-widest mb-1">7D Velocity</p>
+                        <p className="text-[11px] font-black text-[var(--deep-contrast)]">{data.growth}</p>
                     </div>
                 </div>
             </div>

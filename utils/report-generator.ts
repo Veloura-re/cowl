@@ -1,7 +1,7 @@
 // Types only imports (optional, or just remove static imports)
 import { format } from 'date-fns';
 
-export type ReportType = 'SALES' | 'PURCHASES' | 'INVENTORY' | 'PROFIT_LOSS';
+export type ReportType = 'SALES' | 'PURCHASES' | 'INVENTORY' | 'PROFIT_LOSS' | 'CUSTOMER_REPORT' | 'SUPPLIER_REPORT' | 'PARTY_SALES' | 'PARTY_PURCHASES';
 
 interface ReportData {
     title: string;
@@ -34,81 +34,95 @@ export const ReportGenerator = {
         const doc = new jsPDF();
         const pageWidth = doc.internal.pageSize.width;
 
-        // --- Header Section ---
-        let yPos = 20;
+        // --- Premium Header Section ---
+        let yPos = 25;
 
-        // Business Name
-        doc.setFontSize(18);
-        doc.setFont('helvetica', 'bold');
-        doc.text(businessInfo.name, pageWidth / 2, yPos, { align: 'center' });
-        yPos += 8;
-
-        // Add Logo if available
+        // Add Logo if available (Left Aligned)
         if (businessInfo.logoUrl) {
             try {
                 // Determine if it's base64 or URL
-                // If it's a URL, jsPDF might have trouble fetching it synchronously in some environments without a proxy,
-                // but for web-based Supabase URLs, it's generally fine if CORS allows.
-                doc.addImage(businessInfo.logoUrl, 'PNG', 15, 10, 15, 15);
+                doc.addImage(businessInfo.logoUrl, 'PNG', 15, 15, 20, 20);
             } catch (e) {
                 console.error('Failed to add logo to report', e);
             }
         }
 
-        // Business Details
+        // Business Details (Right Aligned)
+        doc.setFontSize(22);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(17, 24, 39); // neutral-900
+        doc.text(businessInfo.name.toUpperCase(), pageWidth - 15, yPos, { align: 'right' });
+        yPos += 8;
+
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
+        doc.setTextColor(107, 114, 128); // neutral-400
         if (businessInfo.address) {
-            doc.text(businessInfo.address, pageWidth / 2, yPos, { align: 'center' });
+            doc.text(businessInfo.address, pageWidth - 15, yPos, { align: 'right' });
             yPos += 5;
         }
         if (businessInfo.phone || businessInfo.email) {
             const contact = [businessInfo.phone, businessInfo.email].filter(Boolean).join(' | ');
-            doc.text(contact, pageWidth / 2, yPos, { align: 'center' });
-            yPos += 10;
+            doc.text(contact, pageWidth - 15, yPos, { align: 'right' });
+            yPos += 12;
         }
 
-        // Divider Line
-        doc.setLineWidth(0.5);
+        // Accent Divider
+        doc.setDrawColor(99, 102, 241); // indigo-500
+        doc.setLineWidth(2);
         doc.line(15, yPos, pageWidth - 15, yPos);
-        yPos += 10;
+        yPos += 15;
 
-        // Report Title
+        // Report Title & Date
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
+        doc.setTextColor(17, 24, 39);
         doc.text(data.title.toUpperCase(), 15, yPos);
 
-        // Generated Info (Right aligned)
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
-        doc.text(`Generated on: ${format(new Date(), 'PP p')}`, pageWidth - 15, yPos, { align: 'right' });
-        yPos += 5;
+        doc.setTextColor(156, 163, 175);
+        doc.text(`ISSUED: ${format(new Date(), 'PP p')}`, pageWidth - 15, yPos, { align: 'right' });
+        yPos += 6;
 
-        // Date Range
         if (dateRange) {
+            doc.setFontSize(10);
+            doc.setTextColor(107, 114, 128);
             doc.text(
-                `Period: ${format(dateRange.start, 'MMM dd, yyyy')} - ${format(dateRange.end, 'MMM dd, yyyy')}`,
+                `ANALYSIS PERIOD: ${format(dateRange.start, 'MMM dd, yyyy')} - ${format(dateRange.end, 'MMM dd, yyyy')}`,
                 15,
                 yPos
             );
         }
-        yPos += 10;
+        yPos += 12;
 
         // --- Table Section ---
         autoTable(doc, {
             startY: yPos,
             head: [data.headers],
             body: data.rows,
-            theme: 'striped',
-            headStyles: { fillColor: [41, 128, 185], textColor: 255, fontStyle: 'bold' },
-            styles: { fontSize: 9, cellPadding: 3 },
-            alternateRowStyles: { fillColor: [245, 245, 245] },
-            margin: { top: 20 },
+            theme: 'grid',
+            headStyles: {
+                fillColor: [17, 24, 39], // neutral-900 
+                textColor: 255,
+                fontStyle: 'bold',
+                fontSize: 10,
+                cellPadding: 5
+            },
+            styles: {
+                fontSize: 9,
+                cellPadding: 4,
+                lineColor: [243, 244, 246]
+            },
+            alternateRowStyles: {
+                fillColor: [249, 250, 251]
+            },
+            margin: { left: 15, right: 15 },
             didDrawPage: (data) => {
-                // Page Footer
                 const pageCount = (doc as any).internal.getNumberOfPages();
                 doc.setFontSize(8);
-                doc.text(`Page ${pageCount}`, pageWidth - 20, doc.internal.pageSize.height - 10);
+                doc.setTextColor(156, 163, 175);
+                doc.text(`COWL BUSINESS INTELLIGENCE - PAGE ${pageCount}`, pageWidth / 2, doc.internal.pageSize.height - 10, { align: 'center' });
             }
         });
 
@@ -116,58 +130,69 @@ export const ReportGenerator = {
         if (data.summary) {
             let summaryY = (doc as any).lastAutoTable.finalY + 15;
 
-            // Check if we need a new page for summary
-            if (summaryY > doc.internal.pageSize.height - 40) {
+            if (summaryY > doc.internal.pageSize.height - 50) {
                 doc.addPage();
-                summaryY = 20;
+                summaryY = 25;
             }
+
+            // Summary Card Background
+            doc.setFillColor(249, 250, 251);
+            doc.roundedRect(15, summaryY, pageWidth - 30, (data.summary.length * 8) + 15, 5, 5, 'F');
+            summaryY += 10;
 
             doc.setFontSize(11);
             doc.setFont('helvetica', 'bold');
-            doc.text('Summary', 14, summaryY);
-            summaryY += 7;
+            doc.setTextColor(17, 24, 39);
+            doc.text('Key Performance Indicators', 20, summaryY);
+            summaryY += 8;
 
             doc.setFontSize(10);
-            doc.setFont('helvetica', 'normal');
             data.summary.forEach((item) => {
-                doc.text(`${item.label}:`, 14, summaryY);
-                doc.setFont('helvetica', 'bold');
-                doc.text(`${item.value}`, 70, summaryY); // Align values
                 doc.setFont('helvetica', 'normal');
-                summaryY += 6;
+                doc.setTextColor(107, 114, 128);
+                doc.text(`${item.label}:`, 20, summaryY);
+
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(17, 24, 39);
+                doc.text(`${item.value}`, pageWidth - 20, summaryY, { align: 'right' });
+                summaryY += 8;
             });
         }
 
         // --- Signature Section ---
         if (signatureDataUrl) {
-            let signatureY = (doc as any).lastAutoTable.finalY + 30;
-            // Check page bounds
-            if (signatureY > doc.internal.pageSize.height - 40) {
+            let signatureY = (doc as any).lastAutoTable.finalY + 40;
+            if (signatureY > doc.internal.pageSize.height - 60) {
                 doc.addPage();
                 signatureY = 40;
             }
 
-            // Add Image
-            doc.addImage(signatureDataUrl, 'PNG', 15, signatureY, 40, 20);
+            // Signature Wrapper
+            doc.setDrawColor(229, 231, 235);
+            doc.setLineWidth(0.1);
+            doc.line(15, signatureY, 85, signatureY);
 
-            // Add Line and Text
-            doc.setLineWidth(0.5);
-            doc.line(15, signatureY + 22, 55, signatureY + 22);
+            doc.addImage(signatureDataUrl, 'PNG', 20, signatureY + 5, 45, 18);
 
             doc.setFontSize(8);
             doc.setFont('helvetica', 'bold');
-            doc.text('AUTHORIZED SIGNATURE', 15, signatureY + 27);
+            doc.setTextColor(17, 24, 39);
+            doc.text('AUTHENTICATED SIGNATURE', 15, signatureY + 30);
 
-            doc.setFontSize(6);
+            doc.setFontSize(7);
             doc.setFont('helvetica', 'normal');
-            doc.setTextColor(150, 150, 150);
-            doc.text('Digitally Validated', 15, signatureY + 30);
-            doc.setTextColor(0, 0, 0); // Reset color
+            doc.setTextColor(156, 163, 175);
+            doc.text('This document is digitally verified for business records.', 15, signatureY + 34);
         }
 
-        // Save File
+        // Generate Blob for mobile compatibility
+        const blob = doc.output('blob');
         const fileName = `${data.title.replace(/\s+/g, '_')}_${format(new Date(), 'yyyyMMdd')}.pdf`;
+
+        // Auto-save for desktop
         doc.save(fileName);
+
+        return new File([blob], fileName, { type: 'application/pdf' });
     },
 
     /**
@@ -195,13 +220,40 @@ export const ReportGenerator = {
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.aoa_to_sheet(sheetData);
 
-        // Basic column width spacing (approximate)
         const colWidths = data.headers.map(h => ({ wch: Math.max(h.length, 15) }));
         ws['!cols'] = colWidths;
 
         XLSX.utils.book_append_sheet(wb, ws, 'Report');
 
         const fileName = `${data.title.replace(/\s+/g, '_')}_${format(new Date(), 'yyyyMMdd')}.xlsx`;
+
+        // Generate Blob for mobile compatibility
+        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+        // Auto-save for desktop
         XLSX.writeFile(wb, fileName);
+
+        return new File([blob], fileName, { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    },
+
+    /**
+     * Share a report file using native share API
+     */
+    shareReport: async (file: File, title: string) => {
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+            try {
+                await navigator.share({
+                    files: [file],
+                    title: title,
+                    text: `Business Report: ${title}`
+                });
+                return true;
+            } catch (error) {
+                console.error('Error sharing report:', error);
+                return false;
+            }
+        }
+        return false;
     }
 };

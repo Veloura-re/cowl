@@ -51,6 +51,14 @@ export function generateInvoiceHTML(data: InvoiceData): string {
     const isSale = data.type === 'SALE'
     const title = isSale ? 'INVOICE' : 'PURCHASE ORDER'
 
+    const statusColors: Record<string, string> = {
+        'PAID': '#10b981', // emerald-500
+        'UNPAID': '#f59e0b', // amber-500
+        'PARTIAL': '#3b82f6', // blue-500
+        'CANCELLED': '#ef4444' // red-500
+    }
+    const statusColor = statusColors[data.status] || '#6b7280'
+
     return `
 <!DOCTYPE html>
 <html>
@@ -58,21 +66,21 @@ export function generateInvoiceHTML(data: InvoiceData): string {
     <meta charset="UTF-8">
     <title>${title} - ${data.invoiceNumber}</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&family=JetBrains+Mono:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
         
         :root {
             --bg-color: #ffffff;
-            --text-main: #000000;
-            --text-muted: #666666;
-            --border-heavy: 2px solid #000000;
-            --border-light: 1px solid #e5e5e5;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --accent-bg: #f9fafb;
+            --primary: #111827;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: 'Inter', sans-serif;
-            background: #f3f3f3;
+            background: #f3f4f6;
             color: var(--text-main);
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
@@ -83,7 +91,7 @@ export function generateInvoiceHTML(data: InvoiceData): string {
             min-height: 297mm;
             margin: 0 auto;
             background: var(--bg-color);
-            padding: 24px;
+            padding: 24mm;
             position: relative;
             display: flex;
             flex-direction: column;
@@ -91,97 +99,99 @@ export function generateInvoiceHTML(data: InvoiceData): string {
 
         @media print {
             body { background: white; }
-            .page { width: 100%; margin: 0; padding: 20px; box-shadow: none; border: none; }
+            .page { width: 100%; margin: 0; padding: 15mm; box-shadow: none; border: none; }
         }
 
-        /* Typography Utilities */
-        .mono { font-family: 'JetBrains Mono', monospace; }
-        .uppercase { text-transform: uppercase; }
-        .bold { font-weight: 700; }
-        .heavy { font-weight: 900; }
-        .text-xs { font-size: 8px; letter-spacing: 0.05em; }
-        .text-sm { font-size: 10px; }
-        .text-base { font-size: 12px; }
-        .text-xl { font-size: 18px; letter-spacing: -0.02em; }
-        .tracking-wide { letter-spacing: 0.1em; }
-
-        /* Graphic Elements */
-        .divider { height: 2px; background: #000; margin: 10px 0; }
-        .divider-light { height: 1px; background: #e5e5e5; margin: 8px 0; }
-        .box { border: 1px solid #000; padding: 10px; }
-
         /* Header */
-        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12mm; }
         .brand-section { flex: 1; }
         .meta-section { text-align: right; }
         
-        .logo { height: 35px; width: auto; object-fit: contain; margin-bottom: 10px; display: block; filter: grayscale(100%); }
+        .logo { height: 45px; width: auto; object-fit: contain; margin-bottom: 15px; display: block; }
         
-        /* Grid Layout for Info */
+        .company-name { font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: -0.02em; margin-bottom: 8px; }
+        .company-details { font-size: 10px; color: var(--text-muted); line-height: 1.5; text-transform: uppercase; }
+
+        .status-badge {
+            display: inline-block;
+            background: ${statusColor};
+            color: white;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .document-title { font-size: 32px; font-weight: 900; margin-bottom: 8px; letter-spacing: 0.1em; }
+        .document-meta { font-size: 12px; color: var(--text-muted); }
+        .document-meta b { color: var(--text-main); }
+
+        /* Info Grid */
         .info-grid { 
             display: grid; 
             grid-template-columns: 1fr 1fr; 
             gap: 20px; 
-            margin-bottom: 24px; 
-            border-top: 2px solid #000; 
-            border-bottom: 2px solid #000; 
-            padding: 12px 0;
+            margin-bottom: 12mm; 
+            background: var(--accent-bg);
+            padding: 20px;
+            border-radius: 12px;
         }
         
+        .info-title { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+        .info-content { font-size: 13px; font-weight: 400; line-height: 1.5; }
+        .info-content b { font-weight: 900; text-transform: uppercase; }
+
         /* Table */
-        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 10mm; }
         th { 
             text-align: left; 
-            font-family: 'JetBrains Mono', monospace; 
-            font-size: 9px; 
+            font-size: 11px; 
+            font-weight: 700;
             text-transform: uppercase; 
-            border-bottom: 2px solid #000; 
-            padding: 10px 5px; 
+            background: var(--primary);
+            color: white;
+            padding: 12px 15px; 
         }
+        th:first-child { border-radius: 8px 0 0 8px; }
+        th:last-child { border-radius: 0 8px 8px 0; }
+        
         td { 
-            padding: 6px 4px; 
-            border-bottom: 1px solid #eee; 
-            font-size: 10px; 
+            padding: 15px; 
+            font-size: 12px; 
+            border-bottom: 1px solid #f3f4f6;
         }
-        tr:last-child td { border-bottom: 2px solid #000; }
+        tr:nth-child(even) td { background-color: #f9fafb; }
+        .bold { font-weight: 700; }
         .text-right { text-align: right; }
         .text-center { text-align: center; }
 
         /* Totals */
-        .totals-container { display: flex; justify-content: flex-end; }
-        .totals-table { width: 300px; }
-        .total-row { display: flex; justify-content: space-between; padding: 5px 0; }
+        .totals-container { display: flex; justify-content: flex-end; margin-bottom: 15mm; }
+        .totals-table { width: 280px; }
+        .total-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px; }
         .final-total { 
-            border-top: 2px solid #000; 
-            border-bottom: 2px solid #000; 
-            margin-top: 8px; 
-            padding: 8px 0; 
+            background: var(--primary);
+            color: white;
+            border-radius: 12px;
+            margin-top: 15px; 
+            padding: 15px 20px; 
             font-weight: 900; 
-            font-size: 14px;
+            font-size: 18px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
 
         /* Footer */
         .footer { 
             margin-top: auto; 
-            border-top: 1px solid #000; 
-            padding-top: 15px; 
+            border-top: 1px solid #eee; 
+            padding-top: 20px; 
             display: flex; 
             justify-content: space-between; 
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 9px;
-            color: #666;
-        }
-
-        /* Status Badge */
-        .status-badge {
-            display: inline-block;
-            border: 1px solid #000;
-            padding: 4px 12px;
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 700;
             font-size: 10px;
-            text-transform: uppercase;
-            margin-bottom: 10px;
+            color: var(--text-muted);
         }
     </style>
 </head>
@@ -191,18 +201,18 @@ export function generateInvoiceHTML(data: InvoiceData): string {
         <div class="header">
             <div class="brand-section">
                 ${data.businessLogoUrl ? `<img src="${data.businessLogoUrl}" class="logo" />` : ''}
-                <h1 class="text-xl heavy uppercase">${data.businessName}</h1>
-                <div class="text-xs uppercase mono mt-2" style="line-height: 1.6;">
+                <h1 class="company-name">${data.businessName}</h1>
+                <div class="company-details">
                     ${data.businessAddress || ''}<br>
                     ${data.businessPhone || ''}
                 </div>
             </div>
             <div class="meta-section">
                 <div class="status-badge">${data.status}</div>
-                <h2 class="text-xl heavy uppercase" style="letter-spacing: 0.1em; color: #000;">${title}</h2>
-                <div class="text-sm mono mt-2">
-                    <span class="text-muted">NO.</span> <span class="bold">${data.invoiceNumber}</span><br>
-                    <span class="text-muted">DATE</span> <span class="bold">${data.date}</span>
+                <h2 class="document-title">${isSale ? 'INVOICE' : 'PURCHASE'}</h2>
+                <div class="document-meta">
+                    NO. <b>${data.invoiceNumber}</b><br>
+                    DATE <b>${data.date}</b>
                 </div>
             </div>
         </div>
@@ -210,15 +220,19 @@ export function generateInvoiceHTML(data: InvoiceData): string {
         <!-- Info Grid -->
         <div class="info-grid">
             <div>
-                <p class="text-xs mono uppercase text-muted mb-2 tracking-wide">ISSUED TO</p>
-                <p class="text-base heavy uppercase">${data.partyName}</p>
-                <p class="text-sm mono mt-1">${data.partyAddress || 'Address Not Provided'}</p>
-                <p class="text-sm mono mt-1">${data.partyPhone || ''}</p>
+                <p class="info-title">Issued To</p>
+                <div class="info-content">
+                    <b>${data.partyName}</b><br>
+                    ${data.partyAddress || 'No Address Provided'}<br>
+                    ${data.partyPhone || ''}
+                </div>
             </div>
             <div class="text-right">
-                <p class="text-xs mono uppercase text-muted mb-2 tracking-wide">PAYMENT DETAILS</p>
-                <p class="text-sm mono">DUE DATE: <span class="bold">${data.dueDate || 'ON RECEIPT'}</span></p>
-                <p class="text-sm mono">CURRENCY: <span class="bold">${data.currency.toUpperCase()}</span></p>
+                <p class="info-title">Payment Details</p>
+                <div class="info-content">
+                    DUE DATE: <b>${data.dueDate || 'ON RECEIPT'}</b><br>
+                    CURRENCY: <b>${data.currency.toUpperCase()}</b>
+                </div>
             </div>
         </div>
 
@@ -226,21 +240,21 @@ export function generateInvoiceHTML(data: InvoiceData): string {
         <table>
             <thead>
                 <tr>
-                    <th style="width: 40%">DESCRIPTION</th>
-                    <th class="text-center" style="width: 15%">QTY</th>
-                    <th class="text-right" style="width: 15%">RATE</th>
-                    <th class="text-right" style="width: 10%">TAX</th>
-                    <th class="text-right" style="width: 20%">AMOUNT</th>
+                    <th style="width: 45%">Description</th>
+                    <th class="text-center" style="width: 10%">Qty</th>
+                    <th class="text-right" style="width: 15%">Rate</th>
+                    <th class="text-right" style="width: 10%">Tax</th>
+                    <th class="text-right" style="width: 20%">Amount</th>
                 </tr>
             </thead>
             <tbody>
                 ${data.items.map(item => `
                 <tr>
                     <td class="bold">${item.description}</td>
-                    <td class="text-center mono">${item.quantity}</td>
-                    <td class="text-right mono">${formatNumber(item.rate)}</td>
-                    <td class="text-right mono">${item.tax}%</td>
-                    <td class="text-right mono bold">${data.currencySymbol}${formatNumber(item.total)}</td>
+                    <td class="text-center">${item.quantity}</td>
+                    <td class="text-right">${formatNumber(item.rate)}</td>
+                    <td class="text-right text-muted">${item.tax}%</td>
+                    <td class="text-right bold">${data.currencySymbol}${formatNumber(item.total)}</td>
                 </tr>
                 `).join('')}
             </tbody>
@@ -249,35 +263,35 @@ export function generateInvoiceHTML(data: InvoiceData): string {
         <!-- Totals -->
         <div class="totals-container">
             <div class="totals-table">
-                <div class="total-row text-sm mono">
-                    <span class="text-muted">SUBTOTAL</span>
+                <div class="total-row">
+                    <span class="text-muted text-uppercase">Subtotal</span>
                     <span>${data.currencySymbol}${formatNumber(data.subtotal)}</span>
                 </div>
-                <div class="total-row text-sm mono">
-                    <span class="text-muted">TAX</span>
+                <div class="total-row">
+                    <span class="text-muted text-uppercase">Tax</span>
                     <span>${data.currencySymbol}${formatNumber(data.taxAmount)}</span>
                 </div>
                 ${data.discountAmount ? `
-                <div class="total-row text-sm mono">
-                    <span class="text-muted">DISCOUNT</span>
+                <div class="total-row">
+                    <span class="text-muted text-uppercase">Discount</span>
                     <span>-${data.currencySymbol}${formatNumber(data.discountAmount)}</span>
                 </div>` : ''}
                 
                 <div class="final-total total-row">
-                    <span class="tracking-wide">TOTAL</span>
+                    <span>GRAND TOTAL</span>
                     <span>${data.currencySymbol}${formatNumber(data.totalAmount)}</span>
                 </div>
 
                 ${data.paidAmount ? `
-                <div class="total-row text-sm mono mt-2">
-                    <span class="text-muted uppercase">Amount Paid</span>
-                    <span>${data.currencySymbol}${formatNumber(data.paidAmount)}</span>
+                <div class="total-row mt-2">
+                    <span class="text-muted text-uppercase">Amount Paid</span>
+                    <span class="bold">${data.currencySymbol}${formatNumber(data.paidAmount)}</span>
                 </div>` : ''}
 
                 ${data.balanceAmount ? `
-                <div class="total-row text-sm mono">
-                    <span class="text-muted uppercase">Balance Due</span>
-                    <span>${data.currencySymbol}${formatNumber(data.balanceAmount)}</span>
+                <div class="total-row">
+                    <span class="text-muted text-uppercase">Balance Due</span>
+                    <span class="bold">${data.currencySymbol}${formatNumber(data.balanceAmount)}</span>
                 </div>` : ''}
             </div>
         </div>
@@ -286,14 +300,14 @@ export function generateInvoiceHTML(data: InvoiceData): string {
         <div class="footer">
             <div style="flex: 1;">
                 ${data.notes ? `
-                    <p class="text-xs uppercase bold mb-1">NOTES</p>
-                    <p class="text-xs text-muted" style="max-width: 300px;">${data.notes}</p>
+                    <p class="info-title">Notes</p>
+                    <p class="info-content" style="max-width: 350px;">${data.notes.toUpperCase()}</p>
                 ` : ''}
             </div>
             <div style="text-align: right;">
-                ${data.signature ? `<img src="${data.signature}" style="height: 30px; margin-bottom: 5px;" />` : '<div style="height: 30px;"></div>'}
-                <p class="text-xs uppercase bold">AUTHORIZED SIGNATURE</p>
-                <div class="text-xs text-muted mt-2">GENERATED BY COWL SYSTEM</div>
+                ${data.signature ? `<img src="${data.signature}" style="height: 35px; margin-bottom: 5px;" />` : '<div style="height: 35px;"></div>'}
+                <p class="info-title">Authorized Signature</p>
+                <div class="text-uppercase mt-2">Generated by COWL System</div>
             </div>
         </div>
     </div>

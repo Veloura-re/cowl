@@ -27,6 +27,8 @@ type BusinessContextType = {
     setFeedback: (f: { isOpen: boolean, message: string, variant: 'success' | 'error', title?: string }) => void
     showSuccess: (message: string, title?: string) => void
     showError: (message: string, title?: string) => void
+    isDockHidden: boolean
+    setIsDockHidden: (hidden: boolean) => void
 }
 
 export const BusinessContext = createContext<BusinessContextType | undefined>(undefined)
@@ -41,6 +43,8 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
         message: '',
         variant: 'success'
     })
+    const [isDockHidden, setIsDockHidden] = useState(false)
+    const [user, setUser] = useState<any>(null)
     const supabase = createClient()
     const router = useRouter()
 
@@ -63,16 +67,16 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
             return
         }
 
+        setUser(session.user)
+
         // If session exists but on login/register -> dashboard
         const path = window.location.pathname
         if (path === '/login' || path === '/register') {
-            console.log('BusinessContext: Logged in user on auth page, redirecting to dashboard')
             router.replace('/dashboard')
             if (!silent) setIsLoading(false)
             return
         }
 
-        console.log('BusinessContext: Session confirmed for', session.user.email)
         const { data, error } = await supabase
             .from('businesses')
             .select('id, name, currency, owner_id, logo_url')
@@ -88,50 +92,55 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
                 isOwner: b.owner_id === session.user.id
             }))
 
-            // Only update state if data actually changed to avoid re-renders
             setBusinesses(prev => {
                 const isSame = JSON.stringify(prev) === JSON.stringify(formattedBusinesses)
                 return isSame ? prev : formattedBusinesses
             })
 
-            // If user has no businesses, redirect to onboarding
+            // Ghost business protection: if active business no longer exists, reset it
+            const currentActiveId = activeBusinessId || localStorage.getItem('activeBusinessId')
+            const stillExists = data.some(b => b.id === currentActiveId)
+
+            if (currentActiveId && !stillExists) {
+                console.log('BusinessContext: Active business no longer exists, resetting...')
+                const nextId = data.length > 0 ? data[0].id : null
+                setActiveBusinessIdState(nextId)
+                if (nextId) localStorage.setItem('activeBusinessId', nextId)
+                else localStorage.removeItem('activeBusinessId')
+            } else if (data.length > 0 && !activeBusinessId) {
+                // Set initial default
+                const defaultId = currentActiveId && stillExists ? currentActiveId : data[0].id
+                setActiveBusinessIdState(defaultId)
+                localStorage.setItem('activeBusinessId', defaultId)
+            }
+
             if (data.length === 0 && window.location.pathname !== '/onboarding') {
-                console.log('BusinessContext: No businesses found, redirecting to onboarding')
                 router.replace('/onboarding')
                 if (!silent) setIsLoading(false)
                 return
-            }
-
-            // Restore from localStorage if possible
-            const savedId = localStorage.getItem('activeBusinessId')
-            if (savedId && data.find(b => b.id === savedId)) {
-                setActiveBusinessIdState(savedId)
-            } else if (data.length > 0 && !activeBusinessId) { // Only set default if none selected
-                setActiveBusinessIdState(data[0].id)
             }
         }
         if (!silent) setIsLoading(false)
     }
 
     useEffect(() => {
-        // Init businesses - forceful first load
         fetchBusinesses()
 
-        // Sync on focus - silent load
-        const handleFocus = () => {
-            console.log('BusinessContext: App focused, refreshing silently...')
-            fetchBusinesses(true) // Silent is true
-        }
+        const handleFocus = () => fetchBusinesses(true)
         window.addEventListener('focus', handleFocus)
 
-        // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             console.log('BusinessContext: Auth Event:', event)
-            if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-                fetchBusinesses()
+            if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+                if (session?.user) {
+                    setUser(session.user)
+                    fetchBusinesses(true)
+                }
             } else if (event === 'SIGNED_OUT') {
+                setUser(null)
                 setBusinesses([])
                 setActiveBusinessIdState(null)
+                localStorage.removeItem('activeBusinessId')
                 if (window.location.pathname.startsWith('/dashboard')) {
                     router.replace('/login')
                 }
@@ -143,6 +152,47 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
             window.removeEventListener('focus', handleFocus)
         }
     }, [])
+
+    useEffect(() => {
+        if (!user) return
+
+        console.log('BusinessContext: Setting up real-time channels for user:', user.email)
+
+        // Channel for all businesses (global changes)
+        const businessesChannel = supabase
+            .channel('public:businesses')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'businesses' }, (payload) => {
+                console.log('BusinessContext: Business table pulse:', payload.eventType)
+                // Small delay to let DB triggers settle
+                setTimeout(() => fetchBusinesses(true), 500)
+            })
+            .subscribe((status) => {
+                if (status !== 'SUBSCRIBED') console.warn('BusinessContext: Businesses sync state:', status)
+            })
+
+        // Channel for this specific user's memberships
+        const membersChannel = supabase
+            .channel(`public:business_members:${user.id}`)
+            .on('postgres_changes', {
+                event: '*',
+                schema: 'public',
+                table: 'business_members',
+                filter: `user_id=eq.${user.id}`
+            }, (payload) => {
+                console.log('BusinessContext: Membership pulse:', payload.eventType)
+                // Small delay to let RLS & Triggers settle
+                setTimeout(() => fetchBusinesses(true), 500)
+            })
+            .subscribe((status) => {
+                if (status !== 'SUBSCRIBED') console.warn('BusinessContext: Membership sync state:', status)
+            })
+
+        return () => {
+            console.log('BusinessContext: Cleaning up real-time channels for user:', user.email)
+            supabase.removeChannel(businessesChannel)
+            supabase.removeChannel(membersChannel)
+        }
+    }, [user?.id])
 
     const setActiveBusinessId = React.useCallback((id: string) => {
         setActiveBusinessIdState(id)
@@ -172,7 +222,9 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
         feedback,
         setFeedback,
         showSuccess,
-        showError
+        showError,
+        isDockHidden,
+        setIsDockHidden
     }), [
         businesses,
         activeBusinessId,
@@ -183,7 +235,9 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
         isGlobalLoading,
         feedback,
         showSuccess,
-        showError
+        showError,
+        isDockHidden,
+        setIsDockHidden
     ])
 
     return (

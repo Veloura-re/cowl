@@ -122,8 +122,8 @@ export default function CreatePartyModal({ isOpen, onClose, onSuccess, onDelete,
             >
                 <div className="flex items-center justify-between border-b border-[var(--foreground)]/10 px-5 py-4 bg-[var(--foreground)]/5">
                     <div>
-                        <h2 className="text-[12px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">Contact Detail</h2>
-                        <p className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Secure Customer/Supplier Entry</p>
+                        <h2 className="text-[12px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">Person Details</h2>
+                        <p className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Add Contact</p>
                     </div>
                     <button
                         onClick={onClose}
@@ -135,7 +135,7 @@ export default function CreatePartyModal({ isOpen, onClose, onSuccess, onDelete,
 
                 <form onSubmit={handleSubmit} className="p-5 space-y-4">
                     <div>
-                        <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Party Identity *</label>
+                        <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Full Name *</label>
                         <input
                             required
                             type="text"
@@ -158,7 +158,7 @@ export default function CreatePartyModal({ isOpen, onClose, onSuccess, onDelete,
                             />
                         </div>
                         <div>
-                            <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Business Type</label>
+                            <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Type</label>
                             <button
                                 type="button"
                                 onClick={() => setIsTypePickerOpen(true)}
@@ -183,7 +183,7 @@ export default function CreatePartyModal({ isOpen, onClose, onSuccess, onDelete,
 
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Inaugural Bal</label>
+                            <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Starting Bal</label>
                             <input
                                 type="number"
                                 value={formData.opening_balance}
@@ -222,7 +222,7 @@ export default function CreatePartyModal({ isOpen, onClose, onSuccess, onDelete,
                                 onClick={onClose}
                                 className="px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/40 hover:bg-[var(--foreground)]/5 transition-all"
                             >
-                                Abort
+                                Cancel
                             </button>
                             <motion.button
                                 whileHover={{ scale: 1.02, translateY: -1 }}
@@ -232,7 +232,7 @@ export default function CreatePartyModal({ isOpen, onClose, onSuccess, onDelete,
                                 className="flex items-center px-6 py-2 rounded-xl bg-[var(--primary-green)] text-[var(--primary-foreground)] text-[10px] font-black uppercase tracking-widest hover:bg-[var(--primary-hover)] transition-all disabled:opacity-50 shadow-lg shadow-[var(--primary-green)]/20 active:scale-95"
                             >
                                 {loading && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
-                                Commit
+                                Save
                             </motion.button>
                         </div>
                     </div>

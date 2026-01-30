@@ -32,12 +32,13 @@ export default function PartiesClientView() {
         setLoading(true)
         const { data } = await supabase
             .from('parties')
-            .select('id, name, type, opening_balance, phone, business_id')
+            .select('id, name, type, opening_balance, phone, email, address, business_id')
             .eq('business_id', activeBusinessId)
             .order('name')
         if (data) setParties(data)
         setLoading(false)
     }
+
 
     useEffect(() => {
         fetchParties()
@@ -82,8 +83,8 @@ export default function PartiesClientView() {
             <div className="flex flex-col gap-3 pb-3 border-b border-[var(--primary-green)]/10">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight">Parties</h1>
-                        <p className="text-[10px] font-black text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Customers & Suppliers</p>
+                        <h1 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight">People</h1>
+                        <p className="text-[10px] font-black text-[var(--foreground)]/60 uppercase tracking-wider leading-none">People You Deal With</p>
                     </div>
                     <motion.button
                         initial={{ opacity: 0, scale: 0.9, y: 10 }}
@@ -94,7 +95,7 @@ export default function PartiesClientView() {
                         className="flex items-center justify-center rounded-xl bg-[var(--primary-green)] px-4 py-2 text-[11px] font-black uppercase tracking-wider text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] transition-all shadow-xl shadow-[var(--primary-green)]/20 active:scale-95 border border-[var(--primary-foreground)]/10 group"
                     >
                         <Plus className="mr-1.5 h-3.5 w-3.5 transition-transform group-hover:rotate-90 duration-300" />
-                        Add Party
+                        Add Person
                     </motion.button>
                 </div>
 
@@ -102,7 +103,7 @@ export default function PartiesClientView() {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--foreground)]/40" />
                     <input
                         type="text"
-                        placeholder="Search parties..."
+                        placeholder="Search..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full h-9 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 pl-9 pr-4 text-[10px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:ring-1 focus:ring-[var(--primary-green)]/20 focus:outline-none transition-all shadow-inner placeholder:text-[var(--foreground)]/40"
@@ -118,7 +119,9 @@ export default function PartiesClientView() {
                     onClick={() => setTypeFilter(typeFilter === 'CUSTOMER' ? 'ALL' : 'CUSTOMER')}
                     className={clsx(
                         "flex-1 glass p-2 rounded-xl border transition-all cursor-pointer group",
-                        typeFilter === 'CUSTOMER' ? "bg-[var(--status-info)] border-[var(--status-info-border)]" : "bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:bg-[var(--foreground)]/10"
+                        typeFilter === 'CUSTOMER'
+                            ? "bg-[var(--status-info)] border-blue-500 shadow-lg shadow-blue-500/20 ring-2 ring-blue-500/50 scale-[1.02]"
+                            : "bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:bg-[var(--foreground)]/10"
                     )}
                 >
                     <div className="flex justify-between items-center">
@@ -139,8 +142,10 @@ export default function PartiesClientView() {
                     onClick={() => setTypeFilter(typeFilter === 'SUPPLIER' ? 'ALL' : 'SUPPLIER')}
                     className={clsx(
                         "flex-1 glass p-2 rounded-xl border transition-all cursor-pointer group",
-                        typeFilter === 'SUPPLIER' ? "bg-[var(--status-warning)] border-[var(--status-warning-border)]" : "bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:bg-[var(--foreground)]/10",
-                        parties.filter(p => p.type === 'SUPPLIER').length > 0 && "critical-glow-amber"
+                        typeFilter === 'SUPPLIER'
+                            ? "bg-[var(--status-warning)] border-orange-500 shadow-lg shadow-orange-500/20 ring-2 ring-orange-500/50 scale-[1.02]"
+                            : "bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:bg-[var(--foreground)]/10",
+                        parties.filter(p => p.type === 'SUPPLIER').length > 0 && typeFilter !== 'SUPPLIER' && "critical-glow-amber"
                     )}
                 >
                     <div className="flex justify-between items-center">
@@ -156,13 +161,13 @@ export default function PartiesClientView() {
                 </motion.div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                 {filteredParties.slice(0, visibleCount).map((party) => (
                     <div
                         key={party.id}
                         onClick={(e: React.MouseEvent) => handleEdit(e, party)}
                         className={clsx(
-                            "glass-optimized p-1.5 rounded-[10px] group hover:bg-[var(--foreground)]/10 transition-all duration-300 border border-[var(--foreground)]/10 cursor-pointer relative overflow-hidden flex items-center h-[54px] gap-2",
+                            "glass-optimized p-1.5 rounded-[10px] border border-[var(--foreground)]/10 group hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer relative overflow-hidden h-[44px] flex flex-col justify-center",
                             party.opening_balance < -5000 && "critical-glow"
                         )}
                     >
@@ -172,65 +177,61 @@ export default function PartiesClientView() {
                             party.opening_balance >= 0 ? "bg-emerald-500" : "bg-rose-500"
                         )} />
 
-                        {/* Avatar */}
-                        <div className={clsx(
-                            "h-7 w-7 rounded-lg flex items-center justify-center font-black text-[9px] transition-all duration-300 shadow-inner shrink-0 border uppercase",
-                            party.opening_balance < -5000
-                                ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
-                                : "bg-[var(--foreground)]/5 text-[var(--deep-contrast)]/60 border-[var(--foreground)]/10"
-                        )}>
-                            {party.name.charAt(0)}
-                        </div>
-
-                        {/* Identity Info */}
-                        <div className="flex-1 min-w-0">
-                            <h3 className="text-[9.5px] font-black text-[var(--deep-contrast)] truncate leading-none uppercase tracking-tight">{party.name}</h3>
-                            <div className="flex items-center gap-1.5 mt-1.5">
-                                <span className={clsx(
-                                    "text-[6px] font-black uppercase tracking-widest shrink-0 px-1 py-0.5 rounded bg-[var(--foreground)]/5",
-                                    party.type === 'CUSTOMER' ? "text-blue-500/60" : "text-orange-500/60"
-                                )}>{party.type}</span>
-                                <div className="h-0.5 w-0.5 rounded-full bg-[var(--foreground)]/20" />
-                                <span className="text-[6.5px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">{party.phone || 'NO PHONE'}</span>
+                        {/* Header Row - Name & Balance */}
+                        <div className="flex items-center justify-between gap-1.5 mb-0.5">
+                            <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                {/* Avatar */}
+                                <div className={clsx(
+                                    "h-6 w-6 rounded-lg flex items-center justify-center font-black text-[9px] transition-all duration-300 shadow-inner shrink-0 border uppercase",
+                                    party.opening_balance < -5000
+                                        ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
+                                        : "bg-[var(--foreground)]/5 text-[var(--deep-contrast)]/60 border-[var(--foreground)]/10"
+                                )}>
+                                    {party.name.charAt(0)}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                    <h3 className="text-[9px] font-black text-[var(--deep-contrast)] leading-tight uppercase tracking-tight truncate">{party.name}</h3>
+                                    <span className={clsx(
+                                        "text-[6px] font-black uppercase tracking-widest leading-none",
+                                        party.type === 'CUSTOMER' ? "text-blue-500" : "text-orange-500"
+                                    )}>{party.type}</span>
+                                </div>
                             </div>
-                        </div>
-
-                        {/* Balance Metric */}
-                        <div className="flex flex-col items-end shrink-0">
+                            {/* Balance */}
                             <p className={clsx(
-                                "text-[12px] font-black tracking-tighter tabular-nums leading-none",
+                                "text-[9px] font-black tracking-tight tabular-nums shrink-0 leading-none",
                                 party.opening_balance > 0 ? "text-emerald-500" :
                                     party.opening_balance < 0 ? "text-rose-500" : "text-[var(--foreground)]/30"
                             )}>
                                 {party.opening_balance > 0 ? '+' : ''}{formatCurrency(party.opening_balance).replace(/^-/, '')}
                             </p>
-                            <div className="flex items-center gap-1 mt-1 transition-opacity">
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation()
-                                        window.print()
-                                    }}
-                                    className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
-                                >
-                                    <Printer size={8} />
-                                </button>
+                        </div>
+
+                        {/* Address & Actions Row */}
+                        <div className="flex items-center justify-between gap-1.5 ml-7.5">
+                            <p className="text-[6px] font-bold text-[var(--foreground)]/30 truncate flex-1 uppercase tracking-tight">
+                                {party.address || 'No location'}
+                            </p>
+                            <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                 <button
                                     onClick={(e) => handleEdit(e, party)}
-                                    className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
+                                    className="h-3.5 w-3.5 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
                                 >
-                                    <Edit2 size={8} />
+                                    <Edit2 size={6} />
                                 </button>
                                 <button
                                     onClick={(e) => handleDelete(e, party.id)}
-                                    className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-rose-500 hover:text-white border border-[var(--foreground)]/10 transition-all"
+                                    className="h-3.5 w-3.5 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-rose-500 hover:text-white border border-[var(--foreground)]/10 transition-all"
                                 >
-                                    <Trash2 size={8} />
+                                    <Trash2 size={6} />
                                 </button>
                             </div>
                         </div>
                     </div>
+
                 ))}
             </div>
+
 
             {filteredParties.length > visibleCount && (
                 <div className="flex justify-center py-4">

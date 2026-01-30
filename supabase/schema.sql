@@ -403,3 +403,17 @@ create index if not exists idx_invoices_business_id on public.invoices(business_
 create index if not exists idx_transactions_business_id on public.transactions(business_id);
 create index if not exists idx_parties_business_id on public.parties(business_id);
 create index if not exists idx_items_business_id on public.items(business_id);
+
+-- ==========================================
+-- 8. REALTIME ENABLEMENT
+-- ==========================================
+
+-- IMPORTANT: You must enable replication for these tables to support real-time syncing
+-- alter publication supabase_realtime add table businesses;
+-- alter publication supabase_realtime add table business_members;
+-- alter publication supabase_realtime add table invoices;
+-- alter publication supabase_realtime add table items;
+-- alter publication supabase_realtime add table parties;
+-- alter publication supabase_realtime add table transactions;
+-- alter publication supabase_realtime add table payment_modes;
+-- alter publication supabase_realtime add table notifications;

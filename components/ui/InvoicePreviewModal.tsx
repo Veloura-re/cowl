@@ -124,61 +124,71 @@ export default function InvoicePreviewModal({
                                     <img
                                         src={data.businessLogoUrl}
                                         alt="Logo"
-                                        className="h-[35px] w-auto object-contain mb-2 grayscale filter block"
+                                        className="h-[45px] w-auto object-contain mb-3 block"
                                     />
                                 )}
-                                <h1 className="text-lg font-black uppercase tracking-tight">{data.businessName}</h1>
-                                <div className="text-[8px] font-mono uppercase tracking-wider mt-1 leading-relaxed text-neutral-500">
-                                    <p>{data.businessAddress}</p>
-                                    <p>{data.businessPhone}</p>
+                                <h1 className="text-xl font-black uppercase tracking-tight text-neutral-900">{data.businessName}</h1>
+                                <div className="text-[9px] font-medium uppercase tracking-wider mt-1.5 leading-relaxed text-neutral-500 max-w-[250px]">
+                                    <p className="flex items-center gap-1.5">{data.businessAddress}</p>
+                                    <p className="mt-0.5">{data.businessPhone}</p>
                                 </div>
                             </div>
                             <div className="text-right">
-                                <div className="inline-block border border-black px-2 py-0.5 text-[8px] font-mono font-bold uppercase mb-2">
-                                    {data.status}
-                                </div>
-                                <h2 className="text-lg font-black uppercase tracking-widest text-black mb-1">{isSale ? 'INVOICE' : 'PURCHASE'}</h2>
-                                <div className="text-[10px] font-mono">
-                                    <div className="mb-0.5"><span className="text-neutral-500">NO.</span> <span className="font-bold">{data.invoiceNumber}</span></div>
-                                    <div><span className="text-neutral-500">DATE</span> <span className="font-bold">{data.date}</span></div>
+                                <div className="text-right">
+                                    <div className={clsx(
+                                        "inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-2 shadow-sm",
+                                        data.status === 'PAID' ? "bg-emerald-500 text-white" :
+                                            data.status === 'UNPAID' ? "bg-amber-500 text-white" :
+                                                data.status === 'PARTIAL' ? "bg-blue-500 text-white" : "bg-neutral-500 text-white"
+                                    )}>
+                                        {data.status}
+                                    </div>
+                                    <h2 className="text-2xl font-black uppercase tracking-widest text-black mb-1 leading-tight">{isSale ? 'INVOICE' : 'PURCHASE'}</h2>
+                                    <div className="text-[11px] font-mono">
+                                        <div className="mb-0.5"><span className="text-neutral-400 font-normal">NO.</span> <span className="font-bold text-black">{data.invoiceNumber}</span></div>
+                                        <div><span className="text-neutral-400 font-normal">DATE</span> <span className="font-bold text-black">{data.date}</span></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         {/* Info Grid */}
-                        <div className="grid grid-cols-2 gap-4 py-3 border-y-2 border-black mb-6">
+                        <div className="grid grid-cols-2 gap-8 py-5 border-y border-neutral-200 mb-8 bg-neutral-50/50 -mx-[24px] px-[24px]">
                             <div>
-                                <p className="text-[8px] font-mono uppercase text-neutral-500 mb-1 tracking-widest">ISSUED TO</p>
-                                <p className="text-xs font-black uppercase tracking-tight">{data.partyName}</p>
-                                <p className="text-[10px] font-mono mt-0.5 text-neutral-800">{data.partyAddress || 'Address Not Provided'}</p>
-                                <p className="text-[10px] font-mono mt-0.5 text-neutral-800">{data.partyPhone}</p>
+                                <p className="text-[9px] font-bold uppercase text-neutral-400 mb-2 tracking-widest">ISSUED TO</p>
+                                <p className="text-sm font-black uppercase tracking-tight text-neutral-900">{data.partyName}</p>
+                                <p className="text-[11px] font-medium mt-1 text-neutral-600 leading-relaxed">{data.partyAddress || 'Address Not Provided'}</p>
+                                <p className="text-[11px] font-bold mt-1 text-neutral-400">{data.partyPhone}</p>
                             </div>
                             <div className="text-right">
-                                <p className="text-[8px] font-mono uppercase text-neutral-500 mb-1 tracking-widest">PAYMENT DETAILS</p>
-                                <p className="text-[10px] font-mono mb-0.5">DUE DATE: <span className="font-bold">{data.dueDate || 'ON RECEIPT'}</span></p>
-                                <p className="text-[10px] font-mono">CURRENCY: <span className="font-bold">{data.currency.toUpperCase()}</span></p>
+                                <p className="text-[9px] font-bold uppercase text-neutral-400 mb-2 tracking-widest">PAYMENT DETAILS</p>
+                                <p className="text-[11px] font-medium text-neutral-600 mb-1">DUE DATE: <span className="font-bold text-neutral-900">{data.dueDate || 'ON RECEIPT'}</span></p>
+                                <p className="text-[11px] font-medium text-neutral-600">CURRENCY: <span className="font-bold text-neutral-900">{data.currency.toUpperCase()}</span></p>
                             </div>
                         </div>
 
                         {/* Items Table */}
-                        <table className="w-full border-collapse mb-4">
+                        <table className="w-full border-collapse mb-8 text-sm">
                             <thead>
-                                <tr className="border-b-2 border-black">
-                                    <th className="text-left font-mono text-[8px] uppercase tracking-wider text-black pb-1 pl-1 w-1/2">DESCRIPTION</th>
-                                    <th className="text-center font-mono text-[8px] uppercase tracking-wider text-black pb-1 w-[10%]">QTY</th>
-                                    <th className="text-right font-mono text-[8px] uppercase tracking-wider text-black pb-1 w-[15%]">RATE</th>
-                                    <th className="text-right font-mono text-[8px] uppercase tracking-wider text-black pb-1 w-[10%]">TAX</th>
-                                    <th className="text-right font-mono text-[8px] uppercase tracking-wider text-black pb-1 w-[15%] pr-1">AMOUNT</th>
+                                <tr className="bg-neutral-900 text-white">
+                                    <th className="text-left font-bold text-[9px] uppercase tracking-wider py-3 pl-4 w-1/2 rounded-l-xl">DESCRIPTION</th>
+                                    <th className="text-center font-bold text-[9px] uppercase tracking-wider py-3 w-[10%]">QTY</th>
+                                    <th className="text-right font-bold text-[9px] uppercase tracking-wider py-3 w-[15%]">RATE</th>
+                                    <th className="text-right font-bold text-[9px] uppercase tracking-wider py-3 w-[10%]">TAX</th>
+                                    <th className="text-right font-bold text-[9px] uppercase tracking-wider py-3 pr-4 w-[15%] rounded-r-xl">AMOUNT</th>
                                 </tr>
                             </thead>
-                            <tbody className="text-[10px]">
+                            <tbody className="text-[12px]">
                                 {data.items.map((item, idx) => (
-                                    <tr key={idx} className="border-b border-neutral-200 last:border-b-2 last:border-black">
-                                        <td className="py-2 pl-1 font-bold">{item.description}</td>
-                                        <td className="py-2 text-center font-mono">{item.quantity}</td>
-                                        <td className="py-2 text-right font-mono text-neutral-600">{formatNumber(item.rate)}</td>
-                                        <td className="py-2 text-right font-mono text-neutral-600">{item.tax}%</td>
-                                        <td className="py-2 pr-1 text-right font-mono font-bold">{data.currencySymbol}{formatNumber(item.total)}</td>
+                                    <tr key={idx} className={clsx(
+                                        "border-b border-neutral-100 transition-colors hover:bg-neutral-50",
+                                        idx % 2 === 0 ? "bg-white" : "bg-neutral-50/30"
+                                    )}>
+                                        <td className="py-4 pl-4 font-bold text-neutral-900">{item.description}</td>
+                                        <td className="py-4 text-center font-medium text-neutral-600">{item.quantity}</td>
+                                        <td className="py-4 text-right font-medium text-neutral-600">{formatNumber(item.rate)}</td>
+                                        <td className="py-4 text-right font-medium text-neutral-400">{item.tax}%</td>
+                                        <td className="py-4 pr-4 text-right font-bold text-neutral-900">{data.currencySymbol}{formatNumber(item.total)}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -202,9 +212,9 @@ export default function InvoicePreviewModal({
                                     </div>
                                 ) : null}
 
-                                <div className="flex justify-between items-center py-2 mt-1 border-y-2 border-black">
-                                    <span className="text-xs font-black uppercase tracking-widest">TOTAL</span>
-                                    <span className="text-base font-black font-mono">{data.currencySymbol}{formatNumber(data.totalAmount)}</span>
+                                <div className="flex justify-between items-center py-4 px-5 mt-2 rounded-2xl bg-neutral-900 text-white shadow-lg">
+                                    <span className="text-xs font-black uppercase tracking-[0.2em]">GRAND TOTAL</span>
+                                    <span className="text-xl font-black font-mono">{data.currencySymbol}{formatNumber(data.totalAmount)}</span>
                                 </div>
 
                                 {data.paidAmount ? (

@@ -140,6 +140,7 @@ body {
   /* Regular default */
   transition: background-color 0.15s ease, color 0.15s ease;
   /* Faster transition */
+  padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
@@ -149,6 +150,7 @@ body {
   overflow-x: hidden;
   /* Prevent horizontal scroll on mobile */
 }
+
 
 /* Glass Utility Implementation */
 @layer utilities {

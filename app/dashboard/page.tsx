@@ -202,9 +202,9 @@ export default function DashboardPage() {
             {/* 2. Primary Metrics */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
                 {[
-                    { label: 'Total Sales', val: stats.totalSales, icon: TrendingUp, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-                    { label: 'Total Purchases', val: stats.totalPurchases, icon: ShoppingCart, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-                    { label: 'Net Profit', val: stats.netProfit, icon: BarChart3, color: stats.netProfit >= 0 ? 'text-violet-500' : 'text-rose-500', bg: stats.netProfit >= 0 ? 'bg-violet-500/10' : 'bg-rose-500/10' },
+                    { label: 'Sell', val: stats.totalSales, icon: TrendingUp, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+                    { label: 'Purchase', val: stats.totalPurchases, icon: ShoppingCart, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+                    { label: 'Clear Profit', val: stats.netProfit, icon: BarChart3, color: stats.netProfit >= 0 ? 'text-violet-500' : 'text-rose-500', bg: stats.netProfit >= 0 ? 'bg-violet-500/10' : 'bg-rose-500/10' },
                     { label: 'Pending Due', val: stats.pendingPayments, icon: Wallet, color: 'text-amber-500', bg: 'bg-amber-500/10' },
                 ].map((item, i) => (
                     <motion.div
@@ -231,7 +231,7 @@ export default function DashboardPage() {
                 <div className="glass p-3 rounded-xl border border-[var(--foreground)]/5 dark:border-white/5 space-y-3">
                     <div className="flex items-center gap-2 border-b border-[var(--foreground)]/5 pb-2">
                         <Wallet className="h-3.5 w-3.5 text-[var(--foreground)]/40" />
-                        <h3 className="text-[10px] font-black text-[var(--foreground)]/70 uppercase tracking-widest">Financial Pulse</h3>
+                        <h3 className="text-[10px] font-black text-[var(--foreground)]/70 uppercase tracking-widest">Money Status</h3>
                     </div>
                     <div className="grid grid-cols-3 gap-2">
                         <div className="bg-[var(--foreground)]/5 rounded-lg p-2 text-center relative overflow-hidden group hover:bg-[var(--foreground)]/10 transition-colors">
@@ -256,19 +256,19 @@ export default function DashboardPage() {
                 <div className="glass p-3 rounded-xl border border-[var(--foreground)]/5 dark:border-white/5 space-y-3">
                     <div className="flex items-center gap-2 border-b border-[var(--foreground)]/5 pb-2">
                         <Users className="h-3.5 w-3.5 text-[var(--foreground)]/40" />
-                        <h3 className="text-[10px] font-black text-[var(--foreground)]/70 uppercase tracking-widest">Party Balances</h3>
+                        <h3 className="text-[10px] font-black text-[var(--foreground)]/70 uppercase tracking-widest">People Balances</h3>
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                         <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-2 flex items-center justify-between group hover:bg-emerald-500/10 transition-colors">
                             <div>
-                                <p className="text-[8px] font-bold text-emerald-600/60 uppercase tracking-wider">To Receive</p>
+                                <p className="text-[8px] font-bold text-emerald-600/60 uppercase tracking-wider">Get from others</p>
                                 <p className="text-[11px] font-black text-emerald-600 truncate">{formatCurrency(stats.totalReceivables)}</p>
                             </div>
                             <ArrowDownRight className="h-4 w-4 text-emerald-500/40 group-hover:text-emerald-500 transition-colors" />
                         </div>
                         <div className="bg-rose-500/5 border border-rose-500/10 rounded-lg p-2 flex items-center justify-between group hover:bg-rose-500/10 transition-colors">
                             <div>
-                                <p className="text-[8px] font-bold text-rose-600/60 uppercase tracking-wider">To Pay</p>
+                                <p className="text-[8px] font-bold text-rose-600/60 uppercase tracking-wider">Give to others</p>
                                 <p className="text-[11px] font-black text-rose-600 truncate">{formatCurrency(stats.totalPayables)}</p>
                             </div>
                             <ArrowUpRight className="h-4 w-4 text-rose-500/40 group-hover:text-rose-500 transition-colors" />
@@ -283,7 +283,7 @@ export default function DashboardPage() {
                     <div className="h-12 border-b border-[var(--foreground)]/5 px-4 flex items-center justify-between bg-[var(--foreground)]/[0.02]">
                         <div className="flex items-center gap-2">
                             <Activity className="h-3.5 w-3.5 text-[var(--foreground)]/40" />
-                            <h3 className="text-[10px] font-black text-[var(--foreground)]/70 uppercase tracking-widest">Unified Activity Feed</h3>
+                            <h3 className="text-[10px] font-black text-[var(--foreground)]/70 uppercase tracking-widest">Recent Activity</h3>
                         </div>
                     </div>
                     <div className="divide-y divide-[var(--foreground)]/5">
@@ -367,7 +367,7 @@ export default function DashboardPage() {
                             <AlertCircle className="h-24 w-24 text-rose-500" />
                         </div>
                         <div className="relative z-10">
-                            <h3 className="text-[10px] font-black text-rose-500/60 uppercase tracking-widest mb-2">Inventory Alert</h3>
+                            <h3 className="text-[10px] font-black text-rose-500/60 uppercase tracking-widest mb-2">Stock Alert</h3>
                             <div className="flex items-baseline gap-2">
                                 <span className="text-3xl font-black text-rose-500">{stats.lowStockCount}</span>
                                 <span className="text-[10px] font-bold text-rose-500/40 uppercase tracking-wider">Low Stock</span>
@@ -404,10 +404,10 @@ export default function DashboardPage() {
             {/* 6. Navigation Shortcuts */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pt-2">
                 {[
-                    { href: '/dashboard/sales', label: 'Sales', start: 'Invoices', icon: FileText, color: 'emerald' },
-                    { href: '/dashboard/purchases', label: 'Purchases', start: 'Expenses', icon: ShoppingCart, color: 'blue' },
-                    { href: '/dashboard/inventory', label: 'Inventory', start: 'Stock', icon: Package, color: 'orange' },
-                    { href: '/dashboard/parties', label: 'Parties', start: 'Contacts', icon: Users, color: 'purple' },
+                    { href: '/dashboard/sales', label: 'Sell', start: 'Invoices', icon: FileText, color: 'emerald' },
+                    { href: '/dashboard/purchases', label: 'Purchase', start: 'Expenses', icon: ShoppingCart, color: 'blue' },
+                    { href: '/dashboard/inventory', label: 'Stock', start: 'Stock Items', icon: Package, color: 'orange' },
+                    { href: '/dashboard/parties', label: 'People', start: 'Contacts', icon: Users, color: 'purple' },
                 ].map((item) => (
                     <Link key={item.label} href={item.href} className={`group p-3 rounded-xl bg-${item.color}-500/5 hover:bg-${item.color}-500/10 border border-${item.color}-500/10 transition-all flex items-center gap-3 active:scale-95`}>
                         <div className={`h-8 w-8 rounded-lg bg-${item.color}-500/10 text-${item.color}-600 flex items-center justify-center group-hover:scale-110 transition-transform`}>

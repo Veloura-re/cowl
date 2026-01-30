@@ -204,7 +204,7 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                     </Link>
                     <div>
                         <h1 className="text-sm font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)] uppercase tracking-tight">New Sale</h1>
-                        <p className="text-[9px] font-bold text-[var(--foreground)]/40 dark:text-neutral-500 uppercase tracking-wider leading-none mt-0.5">Invoice Creation</p>
+                        <p className="text-[9px] font-bold text-[var(--foreground)]/40 dark:text-neutral-500 uppercase tracking-wider leading-none mt-0.5">Create Invoice</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -222,7 +222,7 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                         className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--primary-foreground)] hover:bg-[var(--primary-green)] transition-all disabled:opacity-50 shadow-lg active:scale-95"
                     >
                         <Save className="mr-1.5 h-3 w-3" />
-                        Save Invoice
+                        Save Entry
                     </button>
                 </div>
             </div>
@@ -232,30 +232,30 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                 <div className="md:col-span-1 space-y-3">
                     <div className="glass rounded-[24px] border border-gray-200 dark:border-white/10 overflow-hidden">
                         <div className="px-4 py-2 border-b border-white/10 dark:border-white/5 bg-white/40 dark:bg-white/5">
-                            <h3 className="text-[9px] font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)] uppercase tracking-wider">Metadata</h3>
+                            <h3 className="text-[9px] font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)] uppercase tracking-wider">Information</h3>
                         </div>
                         <div className="p-4 space-y-3">
                             <div>
-                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Customer</label>
+                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Person</label>
                                 <button
                                     type="button"
                                     onClick={() => setIsPartyPickerOpen(true)}
                                     className="w-full h-8 rounded-xl bg-white/50 dark:bg-white/5 border border-white/20 dark:border-white/10 px-3 text-[10px] font-bold text-[var(--deep-contrast)] hover:border-[var(--primary-green)] transition-all shadow-inner text-left flex items-center justify-between"
                                 >
-                                    <span className="truncate">{parties.find(p => p.id === partyId)?.name || 'Select Party'}</span>
+                                    <span className="truncate">{parties.find(p => p.id === partyId)?.name || 'Choose Person'}</span>
                                     <Plus className="h-3 w-3 opacity-20" />
                                 </button>
                                 <PickerModal
                                     isOpen={isPartyPickerOpen}
                                     onClose={() => setIsPartyPickerOpen(false)}
                                     onSelect={(id) => setPartyId(id)}
-                                    title="Select Customer"
+                                    title="Choose Person"
                                     options={parties.map(p => ({ id: p.id, label: p.name, subLabel: p.phone }))}
                                     selectedValue={partyId}
                                 />
                             </div>
                             <div>
-                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Invoice ID</label>
+                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Entry Number</label>
                                 <input
                                     type="text"
                                     value={invoiceNumber}
@@ -264,7 +264,7 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                                 />
                             </div>
                             <div>
-                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Entry Date</label>
+                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Date</label>
                                 <input
                                     type="date"
                                     value={date}
@@ -273,7 +273,7 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                                 />
                             </div>
                             <div>
-                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Internal Notes</label>
+                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Entry Notes</label>
                                 <textarea
                                     value={notes}
                                     onChange={(e) => setNotes(e.target.value)}
@@ -290,7 +290,7 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                             <span>{formatCurrency(subtotal)}</span>
                         </div>
                         <div className="flex justify-between text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 px-1">
-                            <span>Taxation</span>
+                            <span>Tax</span>
                             <span>{formatCurrency(totalTax)}</span>
                         </div>
                         <div className="flex justify-between text-base font-bold text-[var(--deep-contrast)] pt-2 border-t border-[var(--primary-green)]/5 mt-1 px-1">
@@ -304,7 +304,7 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                 <div className="md:col-span-3">
                     <div className="glass rounded-[24px] border border-gray-200 dark:border-white/10 overflow-hidden">
                         <div className="px-5 py-2.5 border-b border-white/10 dark:border-white/5 bg-[var(--primary-green)]/5 flex justify-between items-center">
-                            <h3 className="text-[9px] font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)] uppercase tracking-wider">Line Items</h3>
+                            <h3 className="text-[9px] font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)] uppercase tracking-wider">Items List</h3>
                             <button onClick={addRow} className="flex items-center text-[9px] font-bold uppercase tracking-wider text-[var(--primary-green)] hover:text-[var(--deep-contrast)] transition-all bg-white/40 dark:bg-white/5 px-3 py-1 rounded-full border border-white/50 dark:border-white/10">
                                 <Plus className="h-3 w-3 mr-1" /> Add Row
                             </button>
@@ -321,7 +321,7 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                                     </button>
 
                                     <div className="flex-1 min-w-[200px]">
-                                        <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/30 mb-1">Stock Item</label>
+                                        <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/30 mb-1">Product</label>
                                         <button
                                             type="button"
                                             onClick={() => {
@@ -330,7 +330,7 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                                             }}
                                             className="w-full h-8 rounded-xl bg-white/40 dark:bg-white/5 border border-white/10 dark:border-white/5 px-3 text-[10px] font-bold text-[var(--deep-contrast)] hover:border-[var(--primary-green)] transition-all text-left flex items-center justify-between"
                                         >
-                                            <span className="truncate">{row.name || 'Select Resource'}</span>
+                                            <span className="truncate">{row.name || 'Choose Product'}</span>
                                             <Plus className="h-3 w-3 opacity-20" />
                                         </button>
                                     </div>
@@ -391,7 +391,7 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                         handleItemChange(activeRowIndex, id)
                     }
                 }}
-                title="Select Resource"
+                title="Choose Product"
                 options={items.map(i => ({ id: i.id, label: i.name, subLabel: `${i.stock_quantity ?? 0} ${i.unit ?? 'Units'} in stock` }))}
                 selectedValue={activeRowIndex !== null ? rows[activeRowIndex].itemId : null}
             />

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Menu, Building2, LogOut, LayoutDashboard, FileText, ShoppingCart, Package, Wallet, BarChart3, ChevronDown, Plus, Users, Settings } from 'lucide-react'
+import { Menu, Building2, LogOut, LayoutDashboard, FileText, ShoppingCart, Package, Wallet, BarChart3, ChevronDown, Plus, Users, Settings, CreditCard } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter, usePathname } from 'next/navigation'
@@ -18,29 +18,34 @@ import { BrandLogo } from '@/components/ui/BrandLogo'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import FeedbackModal from '@/components/ui/FeedbackModal'
 import BusinessSwitcherModal from '@/components/ui/BusinessSwitcherModal'
+import { SignOutModal } from '@/components/ui/SignOutModal'
 
 const navigation = [
-    { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Sales', href: '/dashboard/sales', icon: FileText },
-    { name: 'Purchases', href: '/dashboard/purchases', icon: ShoppingCart },
-    { name: 'Inventory', href: '/dashboard/inventory', icon: Package },
-    { name: 'Payments', href: '/dashboard/finance', icon: Wallet },
-    { name: 'Reports', href: '/dashboard/reports', icon: BarChart3 },
-    { name: 'Parties', href: '/dashboard/parties', icon: Users },
+    { name: 'Home', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'Sell', href: '/dashboard/sales', icon: FileText },
+    { name: 'Purchase', href: '/dashboard/purchases', icon: ShoppingCart },
+    { name: 'Stock', href: '/dashboard/inventory', icon: Package },
+    { name: 'Finances', href: '/dashboard/finance', icon: Wallet },
+    { name: 'Expenses', href: '/dashboard/expenses', icon: CreditCard },
+    { name: 'Business Reports', href: '/dashboard/reports', icon: BarChart3 },
+    { name: 'People', href: '/dashboard/parties', icon: Users },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ]
+
 
 function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     const router = useRouter()
     const pathname = usePathname()
     const supabase = createClient()
-    const { businesses, activeBusinessId, setActiveBusinessId, isGlobalLoading, feedback, setFeedback } = useBusiness()
+    const { businesses, activeBusinessId, setActiveBusinessId, isGlobalLoading, feedback, setFeedback, isDockHidden } = useBusiness()
 
     const [scrolled, setScrolled] = useState(false)
     const [scrollingUp, setScrollingUp] = useState(false)
     const [isSwitcherOpen, setIsSwitcherOpen] = useState(false)
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)
+    const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false)
+    const [isSigningOut, setIsSigningOut] = useState(false)
     const [shouldHideDock, setShouldHideDock] = useState(false)
 
     useEffect(() => {
@@ -139,42 +144,32 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                         })}
                     </nav>
 
-                    <div className="p-4 bg-[var(--foreground)]/5 border-t border-[var(--foreground)]/10 space-y-2">
+                    <div className="p-4 bg-[var(--foreground)]/5 border-t border-[var(--foreground)]/10">
+                        <div className="flex gap-2">
+                            <Link
+                                href="/dashboard/settings"
+                                className={clsx(
+                                    'flex-1 flex items-center justify-center px-3 py-2.5 text-[10px] font-black rounded-xl transition-all uppercase tracking-widest',
+                                    pathname === '/dashboard/settings'
+                                        ? 'bg-[var(--primary-green)] text-[var(--primary-foreground)] shadow-lg'
+                                        : 'text-[var(--foreground)]/40 hover:bg-[var(--foreground)]/5 hover:text-[var(--deep-contrast)] border border-[var(--foreground)]/5'
+                                )}
+                            >
+                                <Settings className="h-4 w-4" />
+                            </Link>
+                            <button
+                                onClick={() => setIsSignOutModalOpen(true)}
+                                className="flex-1 h-10 flex items-center justify-center px-3 py-2.5 text-[10px] font-black text-rose-500/60 hover:bg-rose-500 hover:text-white rounded-xl transition-all uppercase tracking-widest active:scale-95 group shadow-sm border border-rose-500/10"
+                            >
+                                <LogOut className="h-4 w-4 opacity-40 group-hover:opacity-100 transition-opacity" />
+                            </button>
+                        </div>
                         <button
                             onClick={() => setIsInviteModalOpen(true)}
-                            className="w-full flex items-center px-4 py-2.5 text-[10px] font-black text-[var(--primary-green)] bg-[var(--primary-green)]/5 hover:bg-[var(--primary-green)] hover:text-[var(--primary-foreground)] active:bg-[var(--primary-active)] rounded-xl transition-all border border-[var(--primary-green)]/10 uppercase tracking-widest shadow-sm active:scale-95"
+                            className="w-full mt-2 flex items-center justify-center px-4 py-2 text-[9px] font-black text-[var(--primary-green)] bg-[var(--primary-green)]/5 hover:bg-[var(--primary-green)] hover:text-[var(--primary-foreground)] active:bg-[var(--primary-active)] rounded-xl transition-all border border-[var(--primary-green)]/10 uppercase tracking-widest shadow-sm active:scale-95"
                         >
-                            <UserPlus className="mr-3 h-4 w-4" />
-                            Invite Members
-                        </button>
-                        <Link
-                            href="/dashboard/settings"
-                            className={clsx(
-                                'flex items-center px-4 py-2.5 text-[10px] font-black rounded-xl transition-all uppercase tracking-widest',
-                                pathname === '/dashboard/settings'
-                                    ? 'bg-[var(--primary-green)] text-[var(--primary-foreground)] shadow-lg'
-                                    : 'text-[var(--foreground)]/40 hover:bg-[var(--foreground)]/5 hover:text-[var(--deep-contrast)]'
-                            )}
-                        >
-                            <Settings className="mr-3 h-4 w-4" />
-                            Settings
-                        </Link>
-                        <button
-                            onClick={async () => {
-                                try {
-                                    await supabase.auth.signOut()
-                                    localStorage.clear()
-                                    sessionStorage.clear()
-                                    window.location.href = '/login'
-                                } catch (error) {
-                                    console.error('Sign out error:', error)
-                                    window.location.href = '/login'
-                                }
-                            }}
-                            className="w-full h-11 flex items-center px-4 py-2.5 text-[10px] font-black text-rose-500/60 hover:bg-rose-500 hover:text-white rounded-xl transition-all uppercase tracking-widest active:scale-95 group shadow-sm border border-rose-500/10"
-                        >
-                            <LogOut className="mr-3 h-4 w-4 opacity-40 group-hover:opacity-100 transition-opacity" />
-                            Log Out
+                            <UserPlus className="mr-2 h-3.5 w-3.5" />
+                            Invite
                         </button>
                     </div>
 
@@ -224,7 +219,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
                 <main className={clsx(
                     "flex-1 overflow-y-auto lg:overflow-visible p-3 lg:p-6 scrollbar-hide relative pt-4",
-                    shouldHideDock ? "pb-6" : "pb-24 lg:pb-6"
+                    (shouldHideDock || isDockHidden) ? "pb-6" : "pb-24 lg:pb-6"
                 )}>
                     <AnimatePresence mode="wait">
                         <motion.div
@@ -244,7 +239,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                 </main>
 
                 {/* Mobile Bottom Dock */}
-                {!shouldHideDock && (
+                {!(shouldHideDock || isDockHidden) && (
                     <div className="lg:hidden">
                         <BottomNav />
                     </div>
@@ -277,6 +272,24 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                 activeBusinessId={activeBusinessId}
                 onSelect={(id) => setActiveBusinessId(id)}
                 onCreateNew={() => setIsCreateModalOpen(true)}
+            />
+
+            <SignOutModal
+                isOpen={isSignOutModalOpen}
+                onClose={() => !isSigningOut && setIsSignOutModalOpen(false)}
+                isLoading={isSigningOut}
+                onConfirm={async () => {
+                    setIsSigningOut(true)
+                    try {
+                        await supabase.auth.signOut()
+                        localStorage.clear()
+                        sessionStorage.clear()
+                        window.location.href = '/login'
+                    } catch (error) {
+                        console.error('Sign out error:', error)
+                        window.location.href = '/login'
+                    }
+                }}
             />
 
             {/* Global Loading Overlay */}

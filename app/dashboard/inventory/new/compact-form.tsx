@@ -94,8 +94,8 @@ export default function CompactItemForm() {
                         <ArrowLeft className="h-3 w-3" />
                     </Link>
                     <div>
-                        <h1 className="text-[11px] font-bold text-[var(--deep-contrast)] uppercase tracking-tight">New Item</h1>
-                        <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider">Inventory Entry</p>
+                        <h1 className="text-[11px] font-bold text-[var(--deep-contrast)] uppercase tracking-tight">Add Item</h1>
+                        <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider">New Stock Entry</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -104,7 +104,7 @@ export default function CompactItemForm() {
                         className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-white/50 border border-white/20 text-[var(--deep-contrast)] text-[9px] font-bold uppercase tracking-wider hover:bg-white/70 transition-all shadow-sm active:scale-95"
                     >
                         <Package className="h-3 w-3" />
-                        View Inventory
+                        View Stock
                     </Link>
                     <button
                         type="submit"
@@ -120,7 +120,7 @@ export default function CompactItemForm() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                 {/* Basic Info */}
                 <div className="glass rounded-xl border border-white/40 p-3">
-                    <h3 className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-3">Basic Information</h3>
+                    <h3 className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-3">Item Details</h3>
                     <div className="space-y-2">
                         <div>
                             <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">Name *</label>
@@ -238,7 +238,7 @@ export default function CompactItemForm() {
 
                 {/* Stock */}
                 <div className="glass rounded-xl border border-white/40 p-3">
-                    <h3 className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-3">Stock</h3>
+                    <h3 className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-3">Stock Count</h3>
                     {formData.type === 'PRODUCT' ? (
                         <div className="grid grid-cols-2 gap-2">
                             <div>

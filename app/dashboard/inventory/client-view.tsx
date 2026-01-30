@@ -116,8 +116,8 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
             <div className="flex flex-col gap-3 pb-3 border-b border-[var(--primary-green)]/10">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight">Inventory</h1>
-                        <p className="text-[10px] font-black text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Stock Management</p>
+                        <h1 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight">Stock</h1>
+                        <p className="text-[10px] font-black text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Manage Items</p>
                     </div>
                     <motion.button
                         initial={{ opacity: 0, scale: 0.9, y: 10 }}
@@ -128,7 +128,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                         className="flex items-center justify-center rounded-xl bg-[var(--primary-green)] px-4 py-2 text-[11px] font-black uppercase tracking-wider text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] transition-all shadow-xl shadow-[var(--primary-green)]/20 active:scale-95 border border-[var(--primary-foreground)]/10 group"
                     >
                         <Plus className="mr-1.5 h-3.5 w-3.5 transition-transform group-hover:rotate-90 duration-300" />
-                        <span>New Item</span>
+                        <span>Add Item</span>
                     </motion.button>
                 </div>
 
@@ -137,7 +137,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--foreground)]/40" />
                         <input
                             type="text"
-                            placeholder="Search stock..."
+                            placeholder="Search..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="w-full h-9 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 pl-9 pr-4 text-[10px] font-bold text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:ring-1 focus:ring-[var(--primary-green)]/20 focus:outline-none transition-all shadow-inner placeholder:text-[var(--foreground)]/40"
@@ -168,7 +168,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                     <div className="flex justify-between items-center">
                         <div className="flex items-center gap-1.5">
                             <div className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-                            <span className="text-[7.5px] font-black uppercase tracking-widest text-blue-600/60">Stock Value</span>
+                            <span className="text-[7.5px] font-black uppercase tracking-widest text-blue-600/60">Value of Stock</span>
                         </div>
                         <span className="text-[9px] font-black text-blue-600 bg-blue-500/10 px-2 py-0.5 rounded uppercase tracking-tighter shadow-sm border border-blue-500/10">ASSETS</span>
                     </div>
@@ -215,7 +215,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                         onTouchStart={() => handleTouchStart(item)}
                         onTouchEnd={handleTouchEnd}
                         className={clsx(
-                            "group relative flex items-center glass-optimized rounded-[10px] border border-[var(--foreground)]/10 p-1.5 hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer overflow-hidden h-[54px] gap-2",
+                            "group relative flex items-center glass-optimized rounded-[10px] border border-[var(--foreground)]/10 p-1.5 hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer overflow-hidden h-[44px] gap-2",
                             item.stock_quantity <= (item.min_stock || 0) && "critical-glow"
                         )}
                     >
@@ -229,7 +229,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
 
                         {/* Inventory Icon */}
                         <div className={clsx(
-                            "h-7 w-7 rounded-lg flex items-center justify-center font-black text-[9px] transition-all duration-300 shadow-inner shrink-0 border uppercase",
+                            "h-6 w-6 rounded-lg flex items-center justify-center font-black text-[9px] transition-all duration-300 shadow-inner shrink-0 border uppercase",
                             item.stock_quantity <= (item.min_stock || 0)
                                 ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
                                 : "bg-[var(--foreground)]/5 text-[var(--deep-contrast)]/60 border-[var(--foreground)]/10"
@@ -239,11 +239,11 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
 
                         {/* Name & ID */}
                         <div className="flex-1 min-w-0">
-                            <h3 className="text-[9.5px] font-black text-[var(--deep-contrast)] truncate leading-none uppercase tracking-tight">{item.name}</h3>
+                            <h3 className="text-[9px] font-black text-[var(--deep-contrast)] truncate leading-none uppercase tracking-tight">{item.name}</h3>
                             <div className="flex items-center gap-1.5 mt-1.5">
-                                <span className="text-[6.5px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">{item.unit || 'Units'}</span>
+                                <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">{item.unit || 'Units'}</span>
                                 <div className="h-0.5 w-0.5 rounded-full bg-[var(--foreground)]/20" />
-                                <span className="text-[6.5px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">SP: {formatCurrency(item.selling_price)}</span>
+                                <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">SP: {formatCurrency(item.selling_price)}</span>
                             </div>
                         </div>
 
@@ -252,7 +252,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                             <div className="flex items-center gap-1.5">
                                 <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-widest opacity-40">Stock</span>
                                 <p className={clsx(
-                                    "text-[12px] font-black tracking-tighter tabular-nums leading-none",
+                                    "text-[11px] font-black tracking-tighter tabular-nums leading-none",
                                     item.stock_quantity <= (item.min_stock || 0) ? "text-rose-500" : "text-emerald-500"
                                 )}>
                                     {item.stock_quantity} <span className="text-[8px] opacity-40 lowercase">{item.unit || 'units'}</span>
@@ -267,7 +267,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                                     }}
                                     className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
                                 >
-                                    <Printer size={8} />
+                                    <Printer size={7} />
                                 </button>
                                 <button
                                     onClick={(e) => {
@@ -276,7 +276,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                                     }}
                                     className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
                                 >
-                                    <Edit2 size={8} />
+                                    <Edit2 size={7} />
                                 </button>
                                 <button
                                     onClick={(e) => {
@@ -286,7 +286,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                                     }}
                                     className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-rose-500 hover:text-white border border-[var(--foreground)]/10 transition-all"
                                 >
-                                    <Trash2 size={8} />
+                                    <Trash2 size={7} />
                                 </button>
                             </div>
                         </div>
@@ -331,7 +331,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                     setSortBy(val)
                     setIsSortPickerOpen(false)
                 }}
-                title="Sort Inventory"
+                title="Arrange List"
                 showSearch={false}
                 options={[
                     { id: 'name-asc', label: 'NAME (A-Z)' },
@@ -351,7 +351,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                     setFilterCategory(val)
                     setIsFilterPickerOpen(false)
                 }}
-                title="Filter by Category"
+                title="Group by Type"
                 showSearch={false}
                 options={categories.map(cat => ({
                     id: cat,
@@ -364,7 +364,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                 isOpen={isDeleteConfirmOpen}
                 onClose={() => setIsDeleteConfirmOpen(false)}
                 onConfirm={confirmDelete}
-                title="Delete Item?"
+                title="Remove Product?"
                 message="This will permanently delete the item. This action cannot be undone."
                 confirmText={isDeleting ? "Deleting..." : "Delete Permanently"}
             />

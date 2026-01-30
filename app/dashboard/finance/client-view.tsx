@@ -126,8 +126,8 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
             <div className="flex flex-col gap-3 pb-3 border-b border-[var(--primary-green)]/10">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight">Payments</h1>
-                        <p className="text-[10px] font-black text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Financial Ledger</p>
+                        <h1 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight">Finances</h1>
+                        <p className="text-[10px] font-black text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Money Record</p>
                     </div>
                     <div className="flex gap-2">
                         <motion.button
@@ -139,7 +139,7 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                             className="flex items-center justify-center rounded-xl bg-[var(--primary-green)] px-4 py-2 text-[11px] font-black uppercase tracking-wider text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] transition-all shadow-xl shadow-[var(--primary-green)]/20 active:scale-95 border border-[var(--primary-foreground)]/10 group"
                         >
                             <Plus className="mr-1.5 h-3.5 w-3.5 transition-transform group-hover:rotate-90 duration-500" />
-                            <span>In</span>
+                            <span>Received</span>
                         </motion.button>
                         <motion.button
                             initial={{ opacity: 0, scale: 0.9, y: 10 }}
@@ -150,7 +150,7 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                             className="flex items-center justify-center rounded-xl bg-rose-600 px-4 py-2 text-[11px] font-black uppercase tracking-wider text-white hover:bg-rose-700 transition-all shadow-xl shadow-rose-600/20 active:scale-95 border border-white/10 group"
                         >
                             <Plus className="mr-1.5 h-3.5 w-3.5 transition-transform group-hover:rotate-90 duration-500" />
-                            <span>Out</span>
+                            <span>Paid</span>
                         </motion.button>
                     </div>
                 </div>
@@ -160,7 +160,7 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--foreground)]/40" />
                         <input
                             type="text"
-                            placeholder="Search ledger..."
+                            placeholder="Search..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="w-full h-9 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 pl-9 pr-4 text-[10px] font-bold text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:ring-1 focus:ring-[var(--primary-green)]/20 focus:outline-none transition-all shadow-inner placeholder:text-[var(--foreground)]/40"
@@ -185,33 +185,72 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
 
             {/* Quick Modes Bar */}
             <div className="grid grid-cols-3 gap-2">
-                <div className="glass p-2.5 rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 relative overflow-hidden group shadow-sm">
+                <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setModeFilter(modeFilter === 'CASH' ? 'ALL' : 'CASH')}
+                    className={clsx(
+                        "glass p-2.5 rounded-2xl border bg-[var(--foreground)]/5 relative overflow-hidden group shadow-sm cursor-pointer transition-all",
+                        modeFilter === 'CASH'
+                            ? "border-[var(--primary-green)] ring-2 ring-[var(--primary-green)]/30 scale-[1.02] shadow-lg shadow-[var(--primary-green)]/10"
+                            : "border-[var(--foreground)]/10"
+                    )}
+                >
                     <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
                         <Wallet className="h-8 w-8 text-[var(--primary-green)]" />
                     </div>
                     <div className="relative z-10">
-                        <span className="text-[7.5px] font-black uppercase tracking-widest text-[var(--foreground)]/30">Cash</span>
+                        <span className={clsx(
+                            "text-[7.5px] font-black uppercase tracking-widest transition-colors",
+                            modeFilter === 'CASH' ? "text-[var(--primary-green)]" : "text-[var(--foreground)]/30"
+                        )}>Cash</span>
                         <h2 className="text-[13px] font-black text-[var(--deep-contrast)] mt-0.5 tabular-nums">{formatCurrency(cashBalance)}</h2>
                     </div>
-                </div>
-                <div className="glass p-2.5 rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 relative overflow-hidden group shadow-sm">
+                </motion.div>
+                <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setModeFilter(modeFilter === 'BANK' ? 'ALL' : 'BANK')}
+                    className={clsx(
+                        "glass p-2.5 rounded-2xl border bg-[var(--foreground)]/5 relative overflow-hidden group shadow-sm cursor-pointer transition-all",
+                        modeFilter === 'BANK'
+                            ? "border-blue-500 ring-2 ring-blue-500/30 scale-[1.02] shadow-lg shadow-blue-500/10"
+                            : "border-[var(--foreground)]/10"
+                    )}
+                >
                     <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
                         <TrendingUp className="h-8 w-8 text-blue-500" />
                     </div>
                     <div className="relative z-10">
-                        <span className="text-[7.5px] font-black uppercase tracking-widest text-[var(--foreground)]/30">Bank</span>
+                        <span className={clsx(
+                            "text-[7.5px] font-black uppercase tracking-widest transition-colors",
+                            modeFilter === 'BANK' ? "text-blue-500" : "text-[var(--foreground)]/30"
+                        )}>Bank</span>
                         <h2 className="text-[13px] font-black text-[var(--deep-contrast)] mt-0.5 tabular-nums">{formatCurrency(bankBalance)}</h2>
                     </div>
-                </div>
-                <div className="glass p-2.5 rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 relative overflow-hidden group shadow-sm">
+                </motion.div>
+                <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setModeFilter(modeFilter === 'ONLINE' ? 'ALL' : 'ONLINE')}
+                    className={clsx(
+                        "glass p-2.5 rounded-2xl border bg-[var(--foreground)]/5 relative overflow-hidden group shadow-sm cursor-pointer transition-all",
+                        modeFilter === 'ONLINE'
+                            ? "border-purple-500 ring-2 ring-purple-500/30 scale-[1.02] shadow-lg shadow-purple-500/10"
+                            : "border-[var(--foreground)]/10"
+                    )}
+                >
                     <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
                         <ArrowRightLeft className="h-8 w-8 text-purple-500" />
                     </div>
                     <div className="relative z-10">
-                        <span className="text-[7.5px] font-black uppercase tracking-widest text-[var(--foreground)]/30">Online</span>
+                        <span className={clsx(
+                            "text-[7.5px] font-black uppercase tracking-widest transition-colors",
+                            modeFilter === 'ONLINE' ? "text-purple-500" : "text-[var(--foreground)]/30"
+                        )}>Online</span>
                         <h2 className="text-[13px] font-black text-[var(--deep-contrast)] mt-0.5 tabular-nums">{formatCurrency(onlineBalance)}</h2>
                     </div>
-                </div>
+                </motion.div>
             </div>
 
             {/* Analytics - Compact */}
@@ -243,7 +282,7 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
             {/* Ledger Feed */}
             <div className="glass rounded-[24px] border border-[var(--foreground)]/10 overflow-hidden shadow-2xl">
                 <div className="px-5 py-3 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5 flex justify-between items-center">
-                    <h3 className="text-[9px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">Transaction Ledger</h3>
+                    <h3 className="text-[9px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">Daily Record</h3>
                     <span className="px-2 py-0.5 rounded-full bg-[var(--primary-green)]/10 border border-[var(--primary-green)]/20 text-[7px] font-black uppercase tracking-widest text-[var(--primary-green)]">Live Data</span>
                 </div>
                 <div className="divide-y divide-[var(--foreground)]/5">
@@ -258,7 +297,7 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                                 <div
                                     key={t.id}
                                     onClick={(e) => handleEdit(e, t)}
-                                    className="group p-1.5 hover:bg-[var(--foreground)]/5 transition-all flex justify-between items-center cursor-pointer active:scale-[0.99] border-b border-[var(--foreground)]/5 last:border-0 h-[48px]"
+                                    className="group p-1.5 hover:bg-[var(--foreground)]/5 transition-all flex justify-between items-center cursor-pointer active:scale-[0.99] border-b border-[var(--foreground)]/5 last:border-0 h-[44px]"
                                 >
                                     <div className="flex items-center gap-2">
                                         <div className={clsx(
@@ -269,7 +308,7 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                                         </div>
                                         <div className="min-w-0">
                                             <div className="flex items-center gap-1.5">
-                                                <h4 className="text-[9.5px] font-black text-[var(--deep-contrast)] truncate uppercase tracking-tight leading-none">{t.party?.name || t.description || 'General Log'}</h4>
+                                                <h4 className="text-[9px] font-black text-[var(--deep-contrast)] truncate uppercase tracking-tight leading-none">{t.party?.name || t.description || 'General Log'}</h4>
                                             </div>
                                             <div className="flex items-center gap-1.5 mt-1">
                                                 <span className={clsx(
@@ -302,21 +341,21 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                                                     e.stopPropagation()
                                                     window.print()
                                                 }}
-                                                className="h-7 w-7 flex items-center justify-center rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white transition-all shadow-sm active:scale-90"
+                                                className="h-5 w-5 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white transition-all shadow-sm active:scale-90"
                                             >
-                                                <Printer className="h-3.5 w-3.5" />
+                                                <Printer size={7} />
                                             </button>
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); handleEdit(e, t); }}
-                                                className="h-7 w-7 flex items-center justify-center rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-blue-500 hover:bg-blue-500 hover:text-white transition-all shadow-sm active:scale-90"
+                                                className="h-5 w-5 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-blue-500 hover:bg-blue-500 hover:text-white transition-all shadow-sm active:scale-90"
                                             >
-                                                <Edit2 className="h-3.5 w-3.5" />
+                                                <Edit2 size={7} />
                                             </button>
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); handleDelete(e, t.id); }}
-                                                className="h-7 w-7 flex items-center justify-center rounded-lg bg-rose-500/5 border border-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-all shadow-sm active:scale-90"
+                                                className="h-5 w-5 flex items-center justify-center rounded-md bg-rose-500/5 border border-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-all shadow-sm active:scale-90"
                                             >
-                                                <Trash2 className="h-3.5 w-3.5" />
+                                                <Trash2 size={7} />
                                             </button>
                                         </div>
                                     </div>
@@ -338,9 +377,9 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                 onClose={() => setConfirmModal({ ...confirmModal, open: false })}
                 onConfirm={() => executeDelete(confirmModal.transactionId)}
                 isLoading={isDeleting}
-                title="Purge Transaction?"
-                message="Permanently remove this entry from your financial ledger? This action is irreversible."
-                confirmText="Purge"
+                title="Delete Entry?"
+                message="Permanently remove this entry from your financial record? This action is irreversible."
+                confirmText="Delete"
                 variant="danger"
             />
 
@@ -353,7 +392,7 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                     setSortOrder(order as any)
                     setIsSortPickerOpen(false)
                 }}
-                title="Sort Ledger"
+                title="Arrange List"
                 showSearch={false}
                 options={[
                     { id: 'date-desc', label: 'DATE (NEWEST FIRST)' },
@@ -372,12 +411,12 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                     setTypeFilter(val)
                     setIsTypePickerOpen(false)
                 }}
-                title="Filter by Type"
+                title="Group by Type"
                 showSearch={false}
                 options={[
-                    { id: 'ALL', label: 'ALL LOGS' },
-                    { id: 'RECEIPT', label: 'RECEIPTS (IN)' },
-                    { id: 'PAYMENT', label: 'PAYMENTS (OUT)' },
+                    { id: 'ALL', label: 'All Logs' },
+                    { id: 'RECEIPT', label: 'Received' },
+                    { id: 'PAYMENT', label: 'Paid' },
                 ]}
                 selectedValue={typeFilter}
             />
@@ -389,13 +428,13 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                     setModeFilter(val)
                     setIsModePickerOpen(false)
                 }}
-                title="Filter by Mode"
+                title="Choose Account"
                 showSearch={false}
                 options={[
-                    { id: 'ALL', label: 'ALL MODES' },
-                    { id: 'CASH', label: 'CASH ACCOUNT' },
-                    { id: 'BANK', label: 'BANK ACCOUNT' },
-                    { id: 'ONLINE', label: 'ONLINE GATEWAY' },
+                    { id: 'ALL', label: 'All Modes' },
+                    { id: 'CASH', label: 'Cash' },
+                    { id: 'BANK', label: 'Bank' },
+                    { id: 'ONLINE', label: 'Online' },
                 ]}
                 selectedValue={modeFilter}
             />
