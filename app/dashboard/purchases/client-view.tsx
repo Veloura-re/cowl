@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react'
 
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { Plus, Search, ShoppingCart, Calendar, User, Filter, ArrowUpDown, Printer, Edit2, Trash2 } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import clsx from 'clsx'
@@ -19,6 +19,7 @@ import PickerModal from '@/components/ui/PickerModal'
 import { createClient } from '@/utils/supabase/client'
 import { printInvoice, InvoiceData, downloadInvoice } from '@/utils/invoice-generator'
 import { currencies } from '@/lib/currencies'
+import UnifiedControlBar from '@/components/ui/UnifiedControlBar'
 
 const InvoicePreviewModal = dynamic(() => import('@/components/ui/InvoicePreviewModal'), {
     ssr: false,
@@ -57,6 +58,57 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
         }
         fetchInvoices()
     }, [activeBusinessId])
+
+    // Real-time Subscription
+    useEffect(() => {
+        if (!activeBusinessId) return
+
+        const channel = supabase
+            .channel(`purchases_${activeBusinessId}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'invoices',
+                    filter: `business_id=eq.${activeBusinessId}`
+                },
+                async (payload) => {
+                    const data = (payload.new || payload.old) as any
+                    if (data && data.type !== 'PURCHASE') return
+
+                    if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+                        let partyData = null
+                        if (data.party_id) {
+                            const { data: p } = await supabase
+                                .from('parties')
+                                .select('name')
+                                .eq('id', data.party_id)
+                                .single()
+                            partyData = p
+                        }
+
+                        const updatedInvoice = {
+                            ...data,
+                            party: partyData ? { name: partyData.name } : null
+                        }
+
+                        if (payload.eventType === 'INSERT') {
+                            setInvoices(prev => [updatedInvoice, ...prev])
+                        } else {
+                            setInvoices(prev => prev.map(inv => inv.id === data.id ? { ...inv, ...updatedInvoice } : inv))
+                        }
+                    } else if (payload.eventType === 'DELETE') {
+                        setInvoices(prev => prev.filter(inv => inv.id === payload.old.id))
+                    }
+                }
+            )
+            .subscribe()
+
+        return () => {
+            supabase.removeChannel(channel)
+        }
+    }, [activeBusinessId, supabase])
 
     const [statusFilter, setStatusFilter] = useState<string>('ALL')
     const [sortBy, setSortBy] = useState<'date' | 'amount'>('date')
@@ -174,7 +226,10 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                 balanceAmount: invoice.balance_amount,
                 notes: invoice.notes,
                 currency: currencyCode,
-                currencySymbol: currencySymbol
+                currencySymbol: currencySymbol,
+                accentColor: (activeBusiness as any)?.invoice_accent_color,
+                footerNote: (activeBusiness as any)?.invoice_footer_note,
+                size: (activeBusiness as any)?.invoice_size
             }
 
             setPreviewData(invoiceData)
@@ -211,8 +266,23 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
         }
     })
 
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        show: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.05
+            }
+        }
+    }
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 10 },
+        show: { opacity: 1, y: 0 }
+    }
+
     return (
-        <div className="space-y-4 animate-in fade-in duration-300 pb-20">
+        <div className="space-y-4 pb-20">
             {/* Header - Compact */}
             <div className="flex flex-col gap-3 pb-3 border-b border-[var(--primary-green)]/10">
                 <div className="flex items-center justify-between">
@@ -221,6 +291,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                         <p className="text-[10px] font-black text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Purchase Log</p>
                     </div>
                     <motion.button
+                        id="new-purchase-btn"
                         initial={{ opacity: 0, scale: 0.9, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         whileHover={{ scale: 1.05, translateY: -2 }}
@@ -233,36 +304,16 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                     </motion.button>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--foreground)]/40" />
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full h-9 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 pl-9 pr-4 text-[10px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:ring-1 focus:ring-[var(--primary-green)]/20 focus:outline-none transition-all shadow-inner placeholder:text-[var(--foreground)]/40"
-                        />
-                    </div>
-                    <button
-                        onClick={() => setIsSortPickerOpen(true)}
-                        className="h-9 px-3 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 flex items-center gap-2 text-[9px] font-black text-[var(--deep-contrast)] uppercase tracking-wider hover:bg-[var(--deep-contrast-hover)] transition-all shadow-sm"
-                    >
-                        <ArrowUpDown className="h-3 w-3 opacity-40" />
-                        <span>Sort</span>
-                    </button>
-                    <button
-                        onClick={() => setIsFilterPickerOpen(true)}
-                        className="h-9 px-3 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 flex items-center gap-2 text-[9px] font-black text-[var(--deep-contrast)] uppercase tracking-wider hover:bg-[var(--deep-contrast-hover)] transition-all shadow-sm"
-                    >
-                        <Filter className="h-3 w-3 opacity-40" />
-                        <span>Filter</span>
-                    </button>
-                </div>
+                <UnifiedControlBar
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                    onSortClick={() => setIsSortPickerOpen(true)}
+                    onFilterClick={() => setIsFilterPickerOpen(true)}
+                />
             </div>
 
             {/* Quick Stats Bar */}
-            <div className="flex gap-2">
+            <div id="purchases-stats" className="flex gap-2">
                 <motion.div
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -349,95 +400,109 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
             />
 
             {/* Grid - Ultra Compact Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                {filteredPurchases.slice(0, visibleCount).map((inv: any) => (
-                    <div
-                        key={inv.id}
-                        onClick={() => handleEdit(inv)}
-                        onMouseDown={() => handleTouchStart(inv)}
-                        onMouseUp={handleTouchEnd}
-                        onMouseLeave={handleTouchEnd}
-                        onTouchStart={() => handleTouchStart(inv)}
-                        onTouchEnd={handleTouchEnd}
-                        className="group relative flex items-center glass-optimized rounded-[10px] border border-[var(--foreground)]/10 p-1.5 hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer overflow-hidden h-[44px] gap-2 select-none active:scale-[0.98]"
-                    >
-                        {/* Status Indicator Stripe */}
-                        <div className={clsx(
-                            "absolute top-0 left-0 w-[2px] h-full transition-colors duration-300",
-                            inv.status === 'PAID' ? "bg-emerald-500" : "bg-rose-500"
-                        )} />
+            <motion.div
+                id="purchases-list"
+                variants={containerVariants}
+                initial="hidden"
+                animate="show"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2"
+            >
+                <AnimatePresence mode="popLayout">
+                    {filteredPurchases.slice(0, visibleCount).map((inv: any) => (
+                        <motion.div
+                            key={inv.id}
+                            layout
+                            variants={itemVariants}
+                            initial="hidden"
+                            animate="show"
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ duration: 0.2 }}
+                            onClick={() => handleEdit(inv)}
+                            onMouseDown={() => handleTouchStart(inv)}
+                            onMouseUp={handleTouchEnd}
+                            onMouseLeave={handleTouchEnd}
+                            onTouchStart={() => handleTouchStart(inv)}
+                            onTouchEnd={handleTouchEnd}
+                            className="group relative flex items-center glass-optimized rounded-[10px] border border-[var(--foreground)]/10 p-1.5 hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer overflow-hidden h-[44px] gap-2 select-none active:scale-[0.98]"
+                        >
+                            {/* Status Indicator Stripe */}
+                            <div className={clsx(
+                                "absolute top-0 left-0 w-[2px] h-full transition-colors duration-300",
+                                inv.status === 'PAID' ? "bg-emerald-500" : "bg-rose-500"
+                            )} />
 
-                        {/* Avatar */}
-                        <div className={clsx(
-                            "h-6 w-6 rounded-lg flex items-center justify-center font-black text-[9px] transition-all duration-300 shadow-inner shrink-0 border uppercase",
-                            inv.status === 'UNPAID'
-                                ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
-                                : "bg-[var(--foreground)]/5 text-[var(--deep-contrast)]/60 border-[var(--foreground)]/10"
-                        )}>
-                            {(inv.party?.name || 'S').charAt(0)}
-                        </div>
-
-                        {/* Identity & Status Header - Compact */}
-                        <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between gap-1">
-                                <h3 className="text-[9px] font-black text-[var(--deep-contrast)] truncate leading-none uppercase tracking-tight">{inv.party?.name || 'Supplier'}</h3>
-                                <span className={clsx(
-                                    "text-[5.5px] font-black uppercase tracking-widest px-1 py-0.5 rounded-md border shrink-0",
-                                    inv.status === 'PAID' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/10" :
-                                        inv.status === 'PENDING' ? "bg-amber-500/10 text-amber-500 border-amber-500/10" :
-                                            "bg-rose-500/10 text-rose-500 border-rose-500/10"
-                                )}>
-                                    {inv.status}
-                                </span>
-                            </div>
-                            <div className="flex items-center gap-1.5 mt-1.5">
-                                <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">{inv.invoice_number}</span>
-                                <div className="h-0.5 w-0.5 rounded-full bg-[var(--foreground)]/20" />
-                                <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">
-                                    {new Date(inv.date).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}
-                                </span>
-                            </div>
-                        </div>
-
-                        {/* Value & Actions Row */}
-                        <div className="flex flex-col items-end gap-1 shrink-0">
-                            <p className={clsx(
-                                "text-[11px] font-black tracking-tighter tabular-nums leading-none",
-                                inv.balance_amount > 0 ? "text-rose-500" : "text-emerald-500"
+                            {/* Avatar */}
+                            <div className={clsx(
+                                "h-6 w-6 rounded-lg flex items-center justify-center font-black text-[9px] transition-all duration-300 shadow-inner shrink-0 border uppercase",
+                                inv.status === 'UNPAID'
+                                    ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
+                                    : "bg-[var(--foreground)]/5 text-[var(--deep-contrast)]/60 border-[var(--foreground)]/10"
                             )}>
-                                {formatCurrency(inv.total_amount)}
-                            </p>
-                            <div className="flex items-center gap-1 transition-opacity">
-                                <button
-                                    onClick={(e) => handlePrintInvoice(e, inv)}
-                                    className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
-                                >
-                                    <Printer size={7} />
-                                </button>
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation()
-                                        handleEdit(inv)
-                                    }}
-                                    className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
-                                >
-                                    <Edit2 size={7} />
-                                </button>
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation()
-                                        setInvoiceToDelete(inv)
-                                        setIsDeleteConfirmOpen(true)
-                                    }}
-                                    className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-rose-500 hover:text-white border border-[var(--foreground)]/10 transition-all"
-                                >
-                                    <Trash2 size={7} />
-                                </button>
+                                {(inv.party?.name || 'S').charAt(0)}
                             </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
+
+                            {/* Identity & Status Header - Compact */}
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-1">
+                                    <h3 className="text-[9px] font-black text-[var(--deep-contrast)] truncate leading-none uppercase tracking-tight">{inv.party?.name || 'Supplier'}</h3>
+                                    <span className={clsx(
+                                        "text-[5.5px] font-black uppercase tracking-widest px-1 py-0.5 rounded-md border shrink-0",
+                                        inv.status === 'PAID' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/10" :
+                                            inv.status === 'PENDING' ? "bg-amber-500/10 text-amber-500 border-amber-500/10" :
+                                                "bg-rose-500/10 text-rose-500 border-rose-500/10"
+                                    )}>
+                                        {inv.status}
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-1.5 mt-1.5">
+                                    <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">{inv.invoice_number}</span>
+                                    <div className="h-0.5 w-0.5 rounded-full bg-[var(--foreground)]/20" />
+                                    <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">
+                                        {new Date(inv.date).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Value & Actions Row */}
+                            <div className="flex flex-col items-end gap-1 shrink-0">
+                                <p className={clsx(
+                                    "text-[11px] font-black tracking-tighter tabular-nums leading-none",
+                                    inv.balance_amount > 0 ? "text-rose-500" : "text-emerald-500"
+                                )}>
+                                    {formatCurrency(inv.total_amount)}
+                                </p>
+                                <div className="flex items-center gap-1 transition-opacity">
+                                    <button
+                                        onClick={(e) => handlePrintInvoice(e, inv)}
+                                        className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
+                                    >
+                                        <Printer size={7} />
+                                    </button>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            handleEdit(inv)
+                                        }}
+                                        className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
+                                    >
+                                        <Edit2 size={7} />
+                                    </button>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            setInvoiceToDelete(inv)
+                                            setIsDeleteConfirmOpen(true)
+                                        }}
+                                        className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-rose-500 hover:text-white border border-[var(--foreground)]/10 transition-all"
+                                    >
+                                        <Trash2 size={7} />
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
+            </motion.div>
 
             {filteredPurchases.length > visibleCount && (
                 <div className="flex justify-center py-4">

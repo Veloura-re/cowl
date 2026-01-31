@@ -15,6 +15,7 @@ import FeedbackModal from '@/components/ui/FeedbackModal'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { printInvoice, InvoiceData, downloadInvoice } from '@/utils/invoice-generator'
 import { currencies } from '@/lib/currencies'
+import UnifiedControlBar from '@/components/ui/UnifiedControlBar'
 
 const InvoicePreviewModal = dynamic(() => import('@/components/ui/InvoicePreviewModal'), {
     ssr: false,
@@ -40,13 +41,11 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
     useEffect(() => {
         const fetchInvoices = async () => {
             if (!activeBusinessId) {
-                console.log('SalesClientView: No active business, skipping fetch')
                 setLoading(false)
                 return
             }
 
             setLoading(true)
-            console.log('SalesClientView: Fetching fresh invoices for business:', activeBusinessId)
             const { data, error } = await supabase
                 .from('invoices')
                 .select('id, invoice_number, date, total_amount, balance_amount, status, party:parties(name)')
@@ -58,13 +57,63 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                 console.error('SalesClientView: Error fetching invoices', error)
             }
             if (data) {
-                console.log('SalesClientView: Fetched', data.length, 'invoices')
                 setInvoices(data)
             }
             setLoading(false)
         }
         fetchInvoices()
     }, [activeBusinessId])
+
+    // Real-time Subscription
+    useEffect(() => {
+        if (!activeBusinessId) return
+
+        const channel = supabase
+            .channel(`sales_${activeBusinessId}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'invoices',
+                    filter: `business_id=eq.${activeBusinessId}`
+                },
+                async (payload) => {
+                    const data = (payload.new || payload.old) as any
+                    if (data && data.type !== 'SALE') return
+
+                    if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+                        let partyData = null
+                        if (data.party_id) {
+                            const { data: p } = await supabase
+                                .from('parties')
+                                .select('name')
+                                .eq('id', data.party_id)
+                                .single()
+                            partyData = p
+                        }
+
+                        const updatedInvoice = {
+                            ...data,
+                            party: partyData ? { name: partyData.name } : null
+                        }
+
+                        if (payload.eventType === 'INSERT') {
+                            setInvoices(prev => [updatedInvoice, ...prev])
+                        } else {
+                            setInvoices(prev => prev.map(inv => inv.id === data.id ? { ...inv, ...updatedInvoice } : inv))
+                        }
+                    } else if (payload.eventType === 'DELETE') {
+                        setInvoices(prev => prev.filter(inv => inv.id === payload.old.id))
+                    }
+                }
+            )
+            .subscribe()
+
+        return () => {
+            supabase.removeChannel(channel)
+        }
+    }, [activeBusinessId, supabase])
 
     const handleEdit = (invoice: any) => {
         router.push(`/dashboard/sales/edit?id=${invoice.id}`)
@@ -113,7 +162,10 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                 balanceAmount: invoice.balance_amount,
                 notes: invoice.notes,
                 currency: currencyCode,
-                currencySymbol: currencySymbol
+                currencySymbol: currencySymbol,
+                accentColor: (activeBusiness as any)?.invoice_accent_color,
+                footerNote: (activeBusiness as any)?.invoice_footer_note,
+                size: (activeBusiness as any)?.invoice_size
             }
 
             setPreviewData(invoiceData)
@@ -213,8 +265,23 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
         }
     }
 
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        show: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.05
+            }
+        }
+    }
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 10 },
+        show: { opacity: 1, y: 0 }
+    }
+
     return (
-        <div className="space-y-4 animate-in fade-in duration-300 pb-20">
+        <div className="space-y-4 pb-20">
             {/* Header - Compact */}
             <div className="flex flex-col gap-3 pb-3 border-b border-[var(--primary-green)]/10">
                 <div className="flex items-center justify-between">
@@ -223,6 +290,7 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                         <p className="text-[10px] font-black text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Sales Log</p>
                     </div>
                     <motion.button
+                        id="new-entry-btn"
                         initial={{ opacity: 0, scale: 0.9, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         whileHover={{ scale: 1.05, translateY: -2 }}
@@ -235,36 +303,16 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                     </motion.button>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--foreground)]/40" />
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full h-9 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 pl-9 pr-4 text-[10px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:ring-1 focus:ring-[var(--primary-green)]/20 focus:outline-none transition-all shadow-inner placeholder:text-[var(--foreground)]/40"
-                        />
-                    </div>
-                    <button
-                        onClick={() => setIsSortPickerOpen(true)}
-                        className="h-9 px-3 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 flex items-center gap-2 text-[9px] font-black text-[var(--deep-contrast)] uppercase tracking-wider hover:bg-[var(--deep-contrast-hover)] transition-all shadow-sm"
-                    >
-                        <ArrowUpDown className="h-3 w-3 opacity-40" />
-                        <span>Sort</span>
-                    </button>
-                    <button
-                        onClick={() => setIsFilterPickerOpen(true)}
-                        className="h-9 px-3 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 flex items-center gap-2 text-[9px] font-black text-[var(--deep-contrast)] uppercase tracking-wider hover:bg-[var(--deep-contrast-hover)] transition-all shadow-sm"
-                    >
-                        <Filter className="h-3 w-3 opacity-40" />
-                        <span>Filter</span>
-                    </button>
-                </div>
+                <UnifiedControlBar
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                    onSortClick={() => setIsSortPickerOpen(true)}
+                    onFilterClick={() => setIsFilterPickerOpen(true)}
+                />
             </div>
 
             {/* Quick Stats Bar */}
-            <div className="flex gap-2">
+            <div id="sales-stats" className="flex gap-2">
                 <motion.div
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -374,10 +422,22 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
             />
 
             {/* Grid - Ultra Compact Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+            <motion.div
+                id="sales-list"
+                variants={containerVariants}
+                initial="hidden"
+                animate="show"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2"
+            >
                 {filteredAndSortedInvoices.slice(0, visibleCount).map((invoice) => (
-                    <div
+                    <motion.div
                         key={invoice.id}
+                        layout
+                        variants={itemVariants}
+                        initial="hidden"
+                        animate="show"
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ duration: 0.2 }}
                         onClick={() => handleEdit(invoice)}
                         onMouseDown={() => handleTouchStart(invoice)}
                         onMouseUp={handleTouchEnd}
@@ -460,9 +520,9 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                                 </button>
                             </div>
                         </div>
-                    </div>
+                    </motion.div>
                 ))}
-            </div >
+            </motion.div>
 
             {filteredAndSortedInvoices.length > visibleCount && (
                 <div className="flex justify-center py-4">

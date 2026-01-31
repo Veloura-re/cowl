@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Building, Lock, Loader2, Globe, Shield, Bell, ChevronDown, LogOut, User, Wallet, X, Users, ChevronRight, Moon, Sparkles, Building2, UserPlus, Plus, Save, Database, Upload, Download, Key, ImageIcon, Trash2 } from 'lucide-react'
+import { Building, Lock, Loader2, Globe, Shield, Bell, ChevronDown, LogOut, User, Wallet, X, Users, ChevronRight, Moon, Sparkles, Building2, UserPlus, Plus, Save, Database, Upload, Download, Key, ImageIcon, Trash2, FileText, Settings } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { currencies } from '@/lib/currencies'
 import Link from 'next/link'
@@ -16,6 +16,7 @@ import ConfirmModal from '@/components/ui/ConfirmModal'
 import ChangePasswordModal from '@/components/ui/ChangePasswordModal'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { exportBusinessData, importBusinessData } from '@/utils/backup-service'
+import InvoiceSettingsModal from '@/components/ui/InvoiceSettingsModal'
 
 export default function SettingsPage() {
     const supabase = createClient()
@@ -54,6 +55,12 @@ export default function SettingsPage() {
     const [isRestoring, setIsRestoring] = useState(false)
     const [uploadingLogo, setUploadingLogo] = useState(false)
     const [logoUrl, setLogoUrl] = useState<string | null>(null)
+    const [isInvoiceSettingsModalOpen, setIsInvoiceSettingsModalOpen] = useState(false)
+    const [invoiceSettings, setInvoiceSettings] = useState({
+        accentColor: '#000000',
+        footerNote: '',
+        size: 'A4' as 'A4' | 'THERMAL'
+    })
 
     const { activeBusinessId, businesses, setActiveBusinessId, refreshBusinesses } = useBusiness()
 
@@ -89,6 +96,11 @@ export default function SettingsPage() {
                                 username: profile?.username || ''
                             }))
                             setLogoUrl(bus.logo_url || null)
+                            setInvoiceSettings({
+                                accentColor: bus.invoice_accent_color || '#000000',
+                                footerNote: bus.invoice_footer_note || '',
+                                size: bus.invoice_size || 'A4'
+                            })
                         }
 
                         const { data: modes } = await supabase
@@ -374,6 +386,18 @@ export default function SettingsPage() {
         }
     }
 
+    const handleRefreshInvoiceSettings = async () => {
+        if (!activeBusinessId) return
+        const { data } = await supabase.from('businesses').select('invoice_accent_color, invoice_footer_note, invoice_size').eq('id', activeBusinessId).single()
+        if (data) {
+            setInvoiceSettings({
+                accentColor: data.invoice_accent_color || '#000000',
+                footerNote: data.invoice_footer_note || '',
+                size: data.invoice_size || 'A4'
+            })
+        }
+    }
+
     if (loading) {
         return (
             <div className="flex items-center justify-center p-24 text-[var(--foreground)]/20">
@@ -417,6 +441,7 @@ export default function SettingsPage() {
 
                 {/* 1. ORGANIZATION (Wide Main) */}
                 <BentoCard
+                    id="settings-registry-card"
                     title="Active Registry"
                     subtitle="Organizational Master Data"
                     icon={Building2}
@@ -503,8 +528,34 @@ export default function SettingsPage() {
                     </div>
                 </BentoCard>
 
+
+
+                {/* [NEW] INVOICE CONFIGURATION */}
+                <BentoCard
+                    id="settings-invoice-card"
+                    title="Document Design"
+                    subtitle="Invoices & Receipts"
+                    icon={FileText}
+                    className="md:col-span-1"
+                >
+                    <div className="flex flex-col gap-2 h-full justify-center">
+                        <button
+                            onClick={() => setIsInvoiceSettingsModalOpen(true)}
+                            className="w-full h-10 rounded-xl bg-[var(--deep-contrast)]/5 text-[var(--deep-contrast)] border border-[var(--deep-contrast)]/10 hover:bg-[var(--deep-contrast)] hover:text-[var(--primary-foreground)] flex items-center justify-center gap-2 transition-all active:scale-95 group"
+                        >
+                            <Settings size={14} className="group-hover:rotate-180 transition-transform duration-500" />
+                            <span className="text-[9px] font-black uppercase tracking-widest">Customize</span>
+                        </button>
+                        <div className="flex items-center justify-between px-2">
+                            <span className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest">Format</span>
+                            <span className="text-[9px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">{invoiceSettings.size}</span>
+                        </div>
+                    </div>
+                </BentoCard>
+
                 {/* 2. PERSONAL Identity */}
                 <BentoCard
+                    id="settings-identity-card"
                     title="Operator Identity"
                     subtitle="User Profile"
                     icon={User}
@@ -537,6 +588,7 @@ export default function SettingsPage() {
 
                 {/* 3. INTERFACE */}
                 <BentoCard
+                    id="settings-visuals-card"
                     title="Visuals"
                     subtitle="Theming"
                     icon={Sparkles}
@@ -553,6 +605,7 @@ export default function SettingsPage() {
 
                 {/* 4. FINANCIAL RAILS (Wide) */}
                 <BentoCard
+                    id="settings-financial-card"
                     title="Revenue Channels"
                     subtitle="Payment Modes"
                     icon={Wallet}
@@ -589,6 +642,7 @@ export default function SettingsPage() {
 
                 {/* 5. NOTIFICATIONS */}
                 <BentoCard
+                    id="settings-notifications-card"
                     title="Signal Matrix"
                     subtitle="Notification Routing"
                     icon={Bell}
@@ -620,6 +674,7 @@ export default function SettingsPage() {
 
                 {/* 6. SECURITY */}
                 <BentoCard
+                    id="settings-security-card"
                     title="Protocol Security"
                     subtitle="Access & Keys"
                     icon={Shield}
@@ -651,6 +706,7 @@ export default function SettingsPage() {
 
                 {/* 7. DATA GOVERNANCE */}
                 <BentoCard
+                    id="settings-governance-card"
                     title="Governance"
                     subtitle="Disaster Recovery"
                     icon={Database}
@@ -748,7 +804,18 @@ export default function SettingsPage() {
                 message={feedbackModal.message}
                 variant={feedbackModal.variant}
             />
-        </div>
+
+            <InvoiceSettingsModal
+                isOpen={isInvoiceSettingsModalOpen}
+                onClose={() => setIsInvoiceSettingsModalOpen(false)}
+                businessId={activeBusinessId || ''}
+                initialSettings={invoiceSettings}
+                onSuccess={() => {
+                    setFeedbackModal({ open: true, message: 'Invoice settings updated!', variant: 'success' })
+                    handleRefreshInvoiceSettings()
+                }}
+            />
+        </div >
     )
 }
 

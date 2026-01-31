@@ -29,6 +29,9 @@ type BusinessContextType = {
     showError: (message: string, title?: string) => void
     isDockHidden: boolean
     setIsDockHidden: (hidden: boolean) => void
+    showTutorial: boolean
+    setShowTutorial: (show: boolean) => void
+    startTutorial: () => void
 }
 
 export const BusinessContext = createContext<BusinessContextType | undefined>(undefined)
@@ -44,6 +47,7 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
         variant: 'success'
     })
     const [isDockHidden, setIsDockHidden] = useState(false)
+    const [showTutorial, setShowTutorial] = useState(false)
     const [user, setUser] = useState<any>(null)
     const supabase = createClient()
     const router = useRouter()
@@ -112,6 +116,12 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
                 const defaultId = currentActiveId && stillExists ? currentActiveId : data[0].id
                 setActiveBusinessIdState(defaultId)
                 localStorage.setItem('activeBusinessId', defaultId)
+            }
+
+            // Check if tutorial should be shown (first time for this user)
+            const tutorialSeen = localStorage.getItem(`tutorial_seen_${session.user.id}`)
+            if (!tutorialSeen && data.length > 0 && window.location.pathname === '/dashboard') {
+                setTimeout(() => setShowTutorial(true), 1500)
             }
 
             if (data.length === 0 && window.location.pathname !== '/onboarding') {
@@ -209,6 +219,10 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
     const showSuccess = React.useCallback((message: string, title?: string) => setFeedback({ isOpen: true, message, title, variant: 'success' }), [])
     const showError = React.useCallback((message: string, title?: string) => setFeedback({ isOpen: true, message, title, variant: 'error' }), [])
 
+    const startTutorial = React.useCallback(() => {
+        setShowTutorial(true)
+    }, [])
+
     const contextValue = React.useMemo(() => ({
         businesses,
         activeBusinessId,
@@ -224,7 +238,10 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
         showSuccess,
         showError,
         isDockHidden,
-        setIsDockHidden
+        setIsDockHidden,
+        showTutorial,
+        setShowTutorial,
+        startTutorial
     }), [
         businesses,
         activeBusinessId,
@@ -237,7 +254,9 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
         showSuccess,
         showError,
         isDockHidden,
-        setIsDockHidden
+        setIsDockHidden,
+        showTutorial,
+        startTutorial
     ])
 
     return (

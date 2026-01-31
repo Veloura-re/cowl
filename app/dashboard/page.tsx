@@ -189,7 +189,7 @@ export default function DashboardPage() {
                     <h1 className="text-lg font-black text-[var(--deep-contrast)] dark:text-white tracking-tight leading-none mb-1">DASHBOARD</h1>
                     <p className="text-[10px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest">Live Operations Center</p>
                 </div>
-                <div className="flex gap-2">
+                <div id="quick-actions" className="flex gap-2">
                     <Link href="/dashboard/sales/new" className="h-8 px-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white flex items-center gap-2 text-[10px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-lg shadow-emerald-500/20">
                         <Plus className="h-3 w-3" /> Sale
                     </Link>
@@ -200,7 +200,7 @@ export default function DashboardPage() {
             </div>
 
             {/* 2. Primary Metrics */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+            <div id="main-metrics" className="grid grid-cols-2 lg:grid-cols-4 gap-2">
                 {[
                     { label: 'Sell', val: stats.totalSales, icon: TrendingUp, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
                     { label: 'Purchase', val: stats.totalPurchases, icon: ShoppingCart, color: 'text-blue-500', bg: 'bg-blue-500/10' },
@@ -228,7 +228,7 @@ export default function DashboardPage() {
             {/* 3. Operational Pulse (Finance & Parties) */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {/* Cash Flow Pulse */}
-                <div className="glass p-3 rounded-xl border border-[var(--foreground)]/5 dark:border-white/5 space-y-3">
+                <div id="money-status" className="glass p-3 rounded-xl border border-[var(--foreground)]/5 dark:border-white/5 space-y-3">
                     <div className="flex items-center gap-2 border-b border-[var(--foreground)]/5 pb-2">
                         <Wallet className="h-3.5 w-3.5 text-[var(--foreground)]/40" />
                         <h3 className="text-[10px] font-black text-[var(--foreground)]/70 uppercase tracking-widest">Money Status</h3>
@@ -279,7 +279,7 @@ export default function DashboardPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {/* 4. Unified Activity Feed */}
-                <div className="lg:col-span-2 glass rounded-2xl border border-[var(--foreground)]/5 dark:border-white/5 overflow-hidden flex flex-col">
+                <div id="activity-feed" className="lg:col-span-2 glass rounded-2xl border border-[var(--foreground)]/5 dark:border-white/5 overflow-hidden flex flex-col">
                     <div className="h-12 border-b border-[var(--foreground)]/5 px-4 flex items-center justify-between bg-[var(--foreground)]/[0.02]">
                         <div className="flex items-center gap-2">
                             <Activity className="h-3.5 w-3.5 text-[var(--foreground)]/40" />
@@ -361,7 +361,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* 5. Inventory Highlights */}
-                <div className="space-y-2">
+                <div id="inventory-alerts" className="space-y-2">
                     <div className="glass p-4 rounded-2xl border border-[var(--foreground)]/5 dark:border-white/5 relative overflow-hidden group">
                         <div className="absolute top-0 right-0 p-3 opacity-5 group-hover:scale-110 transition-transform duration-500">
                             <AlertCircle className="h-24 w-24 text-rose-500" />
@@ -402,7 +402,7 @@ export default function DashboardPage() {
             </div>
 
             {/* 6. Navigation Shortcuts */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pt-2">
+            <div id="nav-shortcuts" className="grid grid-cols-2 md:grid-cols-4 gap-2 pt-2">
                 {[
                     { href: '/dashboard/sales', label: 'Sell', start: 'Invoices', icon: FileText, color: 'emerald' },
                     { href: '/dashboard/purchases', label: 'Purchase', start: 'Expenses', icon: ShoppingCart, color: 'blue' },

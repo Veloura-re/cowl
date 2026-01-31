@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Wallet, ArrowUpRight, ArrowDownRight, Plus, TrendingUp, TrendingDown, Receipt, ArrowRightLeft, Search, Filter, ArrowUpDown, Trash2, Edit2, Calendar, Printer } from 'lucide-react'
 import clsx from 'clsx'
 import Link from 'next/link'
@@ -11,6 +11,7 @@ import { createClient } from '@/utils/supabase/client'
 import PickerModal from '@/components/ui/PickerModal'
 import ConfirmModal from '@/components/ui/ConfirmModal'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import UnifiedControlBar from '@/components/ui/UnifiedControlBar'
 
 export default function FinanceClientView({ initialTransactions }: { initialTransactions?: any[] }) {
     const router = useRouter()
@@ -50,6 +51,56 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
         }
         fetchTransactions()
     }, [activeBusinessId])
+
+    // Real-time Subscription
+    useEffect(() => {
+        if (!activeBusinessId) return
+
+        const channel = supabase
+            .channel(`finance_${activeBusinessId}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'transactions',
+                    filter: `business_id=eq.${activeBusinessId}`
+                },
+                async (payload) => {
+                    const data = (payload.new || payload.old) as any
+
+                    if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+                        let partyData = null
+                        if (data.party_id) {
+                            const { data: p } = await supabase
+                                .from('parties')
+                                .select('name')
+                                .eq('id', data.party_id)
+                                .single()
+                            partyData = p
+                        }
+
+                        const updatedTransaction = {
+                            ...data,
+                            party: partyData ? { name: partyData.name } : null
+                        }
+
+                        if (payload.eventType === 'INSERT') {
+                            setTransactions(prev => [updatedTransaction, ...prev])
+                        } else {
+                            setTransactions(prev => prev.map(t => t.id === data.id ? { ...t, ...updatedTransaction } : t))
+                        }
+                    } else if (payload.eventType === 'DELETE') {
+                        setTransactions(prev => prev.filter(t => t.id === payload.old.id))
+                    }
+                }
+            )
+            .subscribe()
+
+        return () => {
+            supabase.removeChannel(channel)
+        }
+    }, [activeBusinessId, supabase])
 
     const handleDelete = async (e: React.MouseEvent, id: string) => {
         e.stopPropagation()
@@ -120,8 +171,23 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
 
     const incomePercent = totalIncome > 0 ? (totalIncome / (totalIncome + totalExpenses)) * 100 : 0
 
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        show: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.05
+            }
+        }
+    }
+
+    const itemVariants = {
+        hidden: { opacity: 0, x: -10 },
+        show: { opacity: 1, x: 0 }
+    }
+
     return (
-        <div className="space-y-4 animate-in fade-in duration-500 pb-20">
+        <div className="space-y-4 pb-20">
             {/* Header - Compact */}
             <div className="flex flex-col gap-3 pb-3 border-b border-[var(--primary-green)]/10">
                 <div className="flex items-center justify-between">
@@ -129,7 +195,7 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                         <h1 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight">Finances</h1>
                         <p className="text-[10px] font-black text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Money Record</p>
                     </div>
-                    <div className="flex gap-2">
+                    <div id="finance-actions" className="flex gap-2">
                         <motion.button
                             initial={{ opacity: 0, scale: 0.9, y: 10 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -155,36 +221,16 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--foreground)]/40" />
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full h-9 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 pl-9 pr-4 text-[10px] font-bold text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:ring-1 focus:ring-[var(--primary-green)]/20 focus:outline-none transition-all shadow-inner placeholder:text-[var(--foreground)]/40"
-                        />
-                    </div>
-                    <button
-                        onClick={() => setIsSortPickerOpen(true)}
-                        className="h-9 px-3 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 flex items-center gap-2 text-[9px] font-black text-[var(--deep-contrast)] uppercase tracking-wider hover:bg-[var(--deep-contrast-hover)] transition-all shadow-sm"
-                    >
-                        <ArrowUpDown className="h-3 w-3 opacity-40" />
-                        <span>Sort</span>
-                    </button>
-                    <button
-                        onClick={() => setIsTypePickerOpen(true)}
-                        className="h-9 px-3 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 flex items-center gap-2 text-[9px] font-black text-[var(--deep-contrast)] uppercase tracking-wider hover:bg-[var(--deep-contrast-hover)] transition-all shadow-sm"
-                    >
-                        <Filter className="h-3 w-3 opacity-40" />
-                        <span>Filter</span>
-                    </button>
-                </div>
+                <UnifiedControlBar
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                    onSortClick={() => setIsSortPickerOpen(true)}
+                    onFilterClick={() => setIsTypePickerOpen(true)}
+                />
             </div>
 
             {/* Quick Modes Bar */}
-            <div className="grid grid-cols-3 gap-2">
+            <div id="finance-modes" className="grid grid-cols-3 gap-2">
                 <motion.div
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -254,7 +300,7 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
             </div>
 
             {/* Analytics - Compact */}
-            <div className="glass p-3 rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 shadow-sm">
+            <div id="finance-stats" className="glass p-3 rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 shadow-sm">
                 <div className="flex justify-between items-center mb-2">
                     <h3 className="text-[8px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">Cash Flow Analysis</h3>
                     <span className="text-[10px] font-black text-[var(--primary-green)] tabular-nums">{incomePercent.toFixed(1)}% Yield</span>
@@ -285,89 +331,101 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                     <h3 className="text-[9px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">Daily Record</h3>
                     <span className="px-2 py-0.5 rounded-full bg-[var(--primary-green)]/10 border border-[var(--primary-green)]/20 text-[7px] font-black uppercase tracking-widest text-[var(--primary-green)]">Live Data</span>
                 </div>
-                <div className="divide-y divide-[var(--foreground)]/5">
+                <div id="finance-list" className="divide-y divide-[var(--foreground)]/5">
                     {(loading || isContextLoading) ? (
                         <div className="py-24 flex flex-col items-center justify-center">
                             <LoadingSpinner size="lg" label="Synchronizing Wallet..." />
                             <p className="text-[8px] font-black text-[var(--foreground)]/20 uppercase tracking-[0.3em] mt-3">Accessing Ledger Archives</p>
                         </div>
                     ) : (
-                        <>
-                            {filteredTransactions.map((t) => (
-                                <div
-                                    key={t.id}
-                                    onClick={(e) => handleEdit(e, t)}
-                                    className="group p-1.5 hover:bg-[var(--foreground)]/5 transition-all flex justify-between items-center cursor-pointer active:scale-[0.99] border-b border-[var(--foreground)]/5 last:border-0 h-[44px]"
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <div className={clsx(
-                                            "h-6 w-6 rounded-lg flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 shrink-0",
-                                            t.type === 'RECEIPT' ? "bg-emerald-500 text-white" : "bg-rose-500 text-white"
-                                        )}>
-                                            {t.type === 'RECEIPT' ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
-                                        </div>
-                                        <div className="min-w-0">
-                                            <div className="flex items-center gap-1.5">
-                                                <h4 className="text-[9px] font-black text-[var(--deep-contrast)] truncate uppercase tracking-tight leading-none">{t.party?.name || t.description || 'General Log'}</h4>
-                                            </div>
-                                            <div className="flex items-center gap-1.5 mt-1">
-                                                <span className={clsx(
-                                                    "text-[5.5px] font-black px-1 py-0.5 rounded-md uppercase tracking-widest border shrink-0",
-                                                    t.mode === 'CASH' ? "bg-amber-100/50 text-amber-700 border-amber-200" :
-                                                        t.mode === 'BANK' ? "bg-blue-100/50 text-blue-700 border-blue-200" :
-                                                            "bg-purple-100/50 text-purple-700 border-purple-200"
-                                                )}>
-                                                    {t.mode}
-                                                </span>
-                                                <div className="h-0.5 w-0.5 rounded-full bg-[var(--foreground)]/20" />
-                                                <span className="text-[6.5px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">
-                                                    {new Date(t.date).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <div className="text-right">
-                                            <p className={clsx(
-                                                "text-[11px] font-black tabular-nums tracking-tighter leading-none",
-                                                t.type === 'RECEIPT' ? "text-emerald-500" : "text-rose-500"
+                        <motion.div
+                            variants={containerVariants}
+                            initial="hidden"
+                            animate="show"
+                        >
+                            <AnimatePresence mode="popLayout">
+                                {filteredTransactions.map((t) => (
+                                    <motion.div
+                                        key={t.id}
+                                        layout
+                                        variants={itemVariants}
+                                        initial="hidden"
+                                        animate="show"
+                                        exit={{ opacity: 0, x: 20 }}
+                                        transition={{ duration: 0.2 }}
+                                        onClick={(e) => handleEdit(e, t)}
+                                        className="group p-1.5 hover:bg-[var(--foreground)]/5 transition-all flex justify-between items-center cursor-pointer active:scale-[0.99] border-b border-[var(--foreground)]/5 last:border-0 h-[44px]"
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <div className={clsx(
+                                                "h-6 w-6 rounded-lg flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 shrink-0",
+                                                t.type === 'RECEIPT' ? "bg-emerald-500 text-white" : "bg-rose-500 text-white"
                                             )}>
-                                                {t.type === 'RECEIPT' ? '+' : '-'} {formatCurrency(t.amount)}
-                                            </p>
+                                                {t.type === 'RECEIPT' ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <div className="flex items-center gap-1.5">
+                                                    <h4 className="text-[9px] font-black text-[var(--deep-contrast)] truncate uppercase tracking-tight leading-none">{t.party?.name || t.description || 'General Log'}</h4>
+                                                </div>
+                                                <div className="flex items-center gap-1.5 mt-1">
+                                                    <span className={clsx(
+                                                        "text-[5.5px] font-black px-1 py-0.5 rounded-md uppercase tracking-widest border shrink-0",
+                                                        t.mode === 'CASH' ? "bg-amber-100/50 text-amber-700 border-amber-200" :
+                                                            t.mode === 'BANK' ? "bg-blue-100/50 text-blue-700 border-blue-200" :
+                                                                "bg-purple-100/50 text-purple-700 border-purple-200"
+                                                    )}>
+                                                        {t.mode}
+                                                    </span>
+                                                    <div className="h-0.5 w-0.5 rounded-full bg-[var(--foreground)]/20" />
+                                                    <span className="text-[6.5px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">
+                                                        {new Date(t.date).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="flex items-center gap-1 transition-opacity shrink-0">
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation()
-                                                    window.print()
-                                                }}
-                                                className="h-5 w-5 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white transition-all shadow-sm active:scale-90"
-                                            >
-                                                <Printer size={7} />
-                                            </button>
-                                            <button
-                                                onClick={(e) => { e.stopPropagation(); handleEdit(e, t); }}
-                                                className="h-5 w-5 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-blue-500 hover:bg-blue-500 hover:text-white transition-all shadow-sm active:scale-90"
-                                            >
-                                                <Edit2 size={7} />
-                                            </button>
-                                            <button
-                                                onClick={(e) => { e.stopPropagation(); handleDelete(e, t.id); }}
-                                                className="h-5 w-5 flex items-center justify-center rounded-md bg-rose-500/5 border border-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-all shadow-sm active:scale-90"
-                                            >
-                                                <Trash2 size={7} />
-                                            </button>
+                                        <div className="flex items-center gap-3">
+                                            <div className="text-right">
+                                                <p className={clsx(
+                                                    "text-[11px] font-black tabular-nums tracking-tighter leading-none",
+                                                    t.type === 'RECEIPT' ? "text-emerald-500" : "text-rose-500"
+                                                )}>
+                                                    {t.type === 'RECEIPT' ? '+' : '-'} {formatCurrency(t.amount)}
+                                                </p>
+                                            </div>
+                                            <div className="flex items-center gap-1 transition-opacity shrink-0">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        window.print()
+                                                    }}
+                                                    className="h-5 w-5 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white transition-all shadow-sm active:scale-90"
+                                                >
+                                                    <Printer size={7} />
+                                                </button>
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); handleEdit(e, t); }}
+                                                    className="h-5 w-5 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-blue-500 hover:bg-blue-500 hover:text-white transition-all shadow-sm active:scale-90"
+                                                >
+                                                    <Edit2 size={7} />
+                                                </button>
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); handleDelete(e, t.id); }}
+                                                    className="h-5 w-5 flex items-center justify-center rounded-md bg-rose-500/5 border border-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-all shadow-sm active:scale-90"
+                                                >
+                                                    <Trash2 size={7} />
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                            ))}
+                                    </motion.div>
+                                ))}
+                            </AnimatePresence>
                             {filteredTransactions.length === 0 && (
                                 <div className="text-center py-20 opacity-20">
                                     <Receipt className="h-10 w-10 mx-auto mb-3 opacity-10" />
                                     <p className="text-[9px] font-black uppercase tracking-[0.3em]">Ledger is Empty</p>
                                 </div>
                             )}
-                        </>
+                        </motion.div>
                     )}
                 </div>
             </div>
@@ -438,6 +496,6 @@ export default function FinanceClientView({ initialTransactions }: { initialTran
                 ]}
                 selectedValue={modeFilter}
             />
-        </div>
+        </div >
     )
 }

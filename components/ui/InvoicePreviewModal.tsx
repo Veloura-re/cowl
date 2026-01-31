@@ -1,7 +1,7 @@
 'use client'
 
 import { X, Printer, Download, Share2, Mail, MessageCircle } from 'lucide-react'
-import { InvoiceData, shareInvoice, downloadInvoice } from '@/utils/invoice-generator'
+import { InvoiceData, shareInvoice, downloadInvoice, generateInvoiceHTML } from '@/utils/invoice-generator'
 import { format } from 'date-fns'
 import clsx from 'clsx'
 import { formatNumber } from '@/lib/format-number'
@@ -23,46 +23,22 @@ export default function InvoicePreviewModal({
 }: InvoicePreviewModalProps) {
     if (!isOpen) return null
 
-    const isSale = data.type === 'SALE'
-
-    const handleEmailShare = () => {
-        const subject = encodeURIComponent(`Invoice ${data.invoiceNumber} from ${data.businessName}`)
-        const body = encodeURIComponent(
-            `Dear ${data.partyName},\n\n` +
-            `Please find the details of Invoice ${data.invoiceNumber}:\n\n` +
-            `Total Amount: ${data.currencySymbol}${formatNumber(data.totalAmount)}\n` +
-            `Status: ${data.status}\n` +
-            `Date: ${data.date}\n\n` +
-            `Thank you for your business!\n\n` +
-            `Best regards,\n${data.businessName}`
-        )
-        window.open(`mailto:?subject=${subject}&body=${body}`, '_blank')
-    }
-
-    const handleWhatsAppShare = () => {
-        const message = encodeURIComponent(
-            `*Invoice ${data.invoiceNumber}*\n` +
-            `From: ${data.businessName}\n` +
-            `To: ${data.partyName}\n\n` +
-            `📋 *Invoice Details:*\n` +
-            `Amount: ${data.currencySymbol}${formatNumber(data.totalAmount)}\n` +
-            `Status: ${data.status}\n` +
-            `Date: ${data.date}\n\n` +
-            `Thank you for your business! 🙏`
-        )
-        window.open(`https://wa.me/?text=${message}`, '_blank')
-    }
+    const htmlContent = generateInvoiceHTML(data)
+    const isThermal = data.size === 'THERMAL'
 
     return (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-md animate-in fade-in duration-300" onClick={onClose} />
 
-            <div className="glass w-full max-w-3xl h-[95vh] flex flex-col rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 relative z-10 border border-[var(--foreground)]/10 bg-[var(--background)]/95">
+            <div className={clsx(
+                "glass w-full flex flex-col rounded-[24px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 relative z-10 border border-[var(--foreground)]/10 bg-[var(--background)]/95",
+                isThermal ? "max-w-[400px] h-[80vh]" : "max-w-4xl h-[90vh]"
+            )}>
                 {/* Header Actions */}
-                <div className="flex items-center justify-between border-b border-[var(--foreground)]/10 px-6 py-4 bg-[var(--foreground)]/5 sticky top-0 z-20">
+                <div className="flex items-center justify-between border-b border-[var(--foreground)]/10 px-6 py-4 bg-[var(--foreground)]/5 shrink-0">
                     <div>
                         <h2 className="text-sm font-bold text-[var(--deep-contrast)] tracking-tight">Invoice Preview</h2>
-                        <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-none mt-0.5">A4 Standard Format</p>
+                        <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-none mt-0.5">{isThermal ? 'Thermal Receipt' : 'A4 Standard'}</p>
                     </div>
                     <div className="flex items-center gap-2">
                         <button
@@ -73,23 +49,7 @@ export default function InvoicePreviewModal({
                             <Share2 className="h-4 w-4" />
                             <span className="text-[10px] font-bold uppercase tracking-wider hidden sm:inline">Share</span>
                         </button>
-                        <button
-                            onClick={handleEmailShare}
-                            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all shadow-lg active:scale-95 hidden md:flex"
-                            title="Share via Email"
-                        >
-                            <Mail className="h-4 w-4" />
-                            <span className="text-[10px] font-bold uppercase tracking-wider hidden sm:inline">Email</span>
-                        </button>
-                        <button
-                            onClick={handleWhatsAppShare}
-                            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-green-600 text-white hover:bg-green-700 transition-all shadow-lg active:scale-95 hidden md:flex"
-                            title="Share via WhatsApp"
-                        >
-                            <MessageCircle className="h-4 w-4" />
-                            <span className="text-[10px] font-bold uppercase tracking-wider hidden sm:inline">WhatsApp</span>
-                        </button>
-                        <div className="w-px h-6 bg-black/10 dark:bg-white/10 mx-1" />
+                        <div className="w-px h-6 bg-current/10 mx-1" />
                         <button
                             onClick={onPrint}
                             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--primary-green)] text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] transition-all shadow-lg active:scale-95"
@@ -106,154 +66,26 @@ export default function InvoicePreviewModal({
                             <Download className="h-4 w-4" />
                             <span className="text-[10px] font-bold uppercase tracking-wider hidden sm:inline">Download</span>
                         </button>
-                        <div className="w-px h-6 bg-black/10 dark:bg-white/10 mx-1" />
+                        <div className="w-px h-6 bg-current/10 mx-1" />
                         <button onClick={onClose} className="p-2 rounded-full hover:bg-[var(--foreground)]/5 transition-all text-[var(--foreground)]/40 hover:text-[var(--deep-contrast)]">
                             <X className="h-5 w-5" />
                         </button>
                     </div>
                 </div>
 
-                {/* Preview Content */}
-                <div className="flex-1 overflow-y-auto p-2 md:p-4 bg-[#f3f3f3] custom-scrollbar">
-                    <div className="w-full max-w-[210mm] mx-auto bg-white shadow-xl overflow-hidden flex flex-col min-h-[297mm] p-[24px] text-black font-['Inter'] relative">
-
-                        {/* Header */}
-                        <div className="flex justify-between items-start mb-6">
-                            <div className="flex-1">
-                                {data.businessLogoUrl && (
-                                    <img
-                                        src={data.businessLogoUrl}
-                                        alt="Logo"
-                                        className="h-[45px] w-auto object-contain mb-3 block"
-                                    />
-                                )}
-                                <h1 className="text-xl font-black uppercase tracking-tight text-neutral-900">{data.businessName}</h1>
-                                <div className="text-[9px] font-medium uppercase tracking-wider mt-1.5 leading-relaxed text-neutral-500 max-w-[250px]">
-                                    <p className="flex items-center gap-1.5">{data.businessAddress}</p>
-                                    <p className="mt-0.5">{data.businessPhone}</p>
-                                </div>
-                            </div>
-                            <div className="text-right">
-                                <div className="text-right">
-                                    <div className={clsx(
-                                        "inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-2 shadow-sm",
-                                        data.status === 'PAID' ? "bg-emerald-500 text-white" :
-                                            data.status === 'UNPAID' ? "bg-amber-500 text-white" :
-                                                data.status === 'PARTIAL' ? "bg-blue-500 text-white" : "bg-neutral-500 text-white"
-                                    )}>
-                                        {data.status}
-                                    </div>
-                                    <h2 className="text-2xl font-black uppercase tracking-widest text-black mb-1 leading-tight">{isSale ? 'INVOICE' : 'PURCHASE'}</h2>
-                                    <div className="text-[11px] font-mono">
-                                        <div className="mb-0.5"><span className="text-neutral-400 font-normal">NO.</span> <span className="font-bold text-black">{data.invoiceNumber}</span></div>
-                                        <div><span className="text-neutral-400 font-normal">DATE</span> <span className="font-bold text-black">{data.date}</span></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Info Grid */}
-                        <div className="grid grid-cols-2 gap-8 py-5 border-y border-neutral-200 mb-8 bg-neutral-50/50 -mx-[24px] px-[24px]">
-                            <div>
-                                <p className="text-[9px] font-bold uppercase text-neutral-400 mb-2 tracking-widest">ISSUED TO</p>
-                                <p className="text-sm font-black uppercase tracking-tight text-neutral-900">{data.partyName}</p>
-                                <p className="text-[11px] font-medium mt-1 text-neutral-600 leading-relaxed">{data.partyAddress || 'Address Not Provided'}</p>
-                                <p className="text-[11px] font-bold mt-1 text-neutral-400">{data.partyPhone}</p>
-                            </div>
-                            <div className="text-right">
-                                <p className="text-[9px] font-bold uppercase text-neutral-400 mb-2 tracking-widest">PAYMENT DETAILS</p>
-                                <p className="text-[11px] font-medium text-neutral-600 mb-1">DUE DATE: <span className="font-bold text-neutral-900">{data.dueDate || 'ON RECEIPT'}</span></p>
-                                <p className="text-[11px] font-medium text-neutral-600">CURRENCY: <span className="font-bold text-neutral-900">{data.currency.toUpperCase()}</span></p>
-                            </div>
-                        </div>
-
-                        {/* Items Table */}
-                        <table className="w-full border-collapse mb-8 text-sm">
-                            <thead>
-                                <tr className="bg-neutral-900 text-white">
-                                    <th className="text-left font-bold text-[9px] uppercase tracking-wider py-3 pl-4 w-1/2 rounded-l-xl">DESCRIPTION</th>
-                                    <th className="text-center font-bold text-[9px] uppercase tracking-wider py-3 w-[10%]">QTY</th>
-                                    <th className="text-right font-bold text-[9px] uppercase tracking-wider py-3 w-[15%]">RATE</th>
-                                    <th className="text-right font-bold text-[9px] uppercase tracking-wider py-3 w-[10%]">TAX</th>
-                                    <th className="text-right font-bold text-[9px] uppercase tracking-wider py-3 pr-4 w-[15%] rounded-r-xl">AMOUNT</th>
-                                </tr>
-                            </thead>
-                            <tbody className="text-[12px]">
-                                {data.items.map((item, idx) => (
-                                    <tr key={idx} className={clsx(
-                                        "border-b border-neutral-100 transition-colors hover:bg-neutral-50",
-                                        idx % 2 === 0 ? "bg-white" : "bg-neutral-50/30"
-                                    )}>
-                                        <td className="py-4 pl-4 font-bold text-neutral-900">{item.description}</td>
-                                        <td className="py-4 text-center font-medium text-neutral-600">{item.quantity}</td>
-                                        <td className="py-4 text-right font-medium text-neutral-600">{formatNumber(item.rate)}</td>
-                                        <td className="py-4 text-right font-medium text-neutral-400">{item.tax}%</td>
-                                        <td className="py-4 pr-4 text-right font-bold text-neutral-900">{data.currencySymbol}{formatNumber(item.total)}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-
-                        {/* Totals */}
-                        <div className="flex justify-end mb-auto">
-                            <div className="w-[300px] space-y-1">
-                                <div className="flex justify-between text-[11px] font-mono">
-                                    <span className="text-neutral-500">SUBTOTAL</span>
-                                    <span>{data.currencySymbol}{formatNumber(data.subtotal)}</span>
-                                </div>
-                                <div className="flex justify-between text-[11px] font-mono">
-                                    <span className="text-neutral-500">TAX</span>
-                                    <span>{data.currencySymbol}{formatNumber(data.taxAmount)}</span>
-                                </div>
-                                {data.discountAmount ? (
-                                    <div className="flex justify-between text-[11px] font-mono text-neutral-800">
-                                        <span className="text-neutral-500">DISCOUNT</span>
-                                        <span>-{data.currencySymbol}{formatNumber(data.discountAmount)}</span>
-                                    </div>
-                                ) : null}
-
-                                <div className="flex justify-between items-center py-4 px-5 mt-2 rounded-2xl bg-neutral-900 text-white shadow-lg">
-                                    <span className="text-xs font-black uppercase tracking-[0.2em]">GRAND TOTAL</span>
-                                    <span className="text-xl font-black font-mono">{data.currencySymbol}{formatNumber(data.totalAmount)}</span>
-                                </div>
-
-                                {data.paidAmount ? (
-                                    <div className="flex justify-between text-[11px] font-mono mt-2 pt-1">
-                                        <span className="text-neutral-500 uppercase">Amount Paid</span>
-                                        <span>{data.currencySymbol}{formatNumber(data.paidAmount)}</span>
-                                    </div>
-                                ) : null}
-                                {data.balanceAmount ? (
-                                    <div className="flex justify-between text-[11px] font-mono">
-                                        <span className="text-neutral-500 uppercase">Balance Due</span>
-                                        <span>{data.currencySymbol}{formatNumber(data.balanceAmount)}</span>
-                                    </div>
-                                ) : null}
-                            </div>
-                        </div>
-
-                        {/* Footer */}
-                        <div className="mt-12 pt-4 border-t border-black flex items-end justify-between">
-                            <div className="flex-1">
-                                {data.notes && (
-                                    <div className="max-w-xs">
-                                        <p className="text-[9px] font-bold uppercase mb-1">NOTES</p>
-                                        <p className="text-[10px] text-neutral-500 leading-relaxed uppercase">{data.notes}</p>
-                                    </div>
-                                )}
-                            </div>
-                            <div className="text-right">
-                                {data.signature ? (
-                                    <img src={data.signature} className="h-8 mb-2 ml-auto object-contain grayscale" alt="Signature" />
-                                ) : <div className="h-8" />}
-                                <p className="text-[9px] font-bold uppercase tracking-wider">AUTHORIZED SIGNATURE</p>
-                                <p className="text-[9px] font-mono text-neutral-400 mt-1 uppercase">GENERATED BY COWL SYSTEM</p>
-                            </div>
-                        </div>
-
-                    </div>
+                <div className="flex-1 overflow-hidden bg-[#525659] relative flex items-center justify-center p-4">
+                    <iframe
+                        srcDoc={htmlContent}
+                        className={clsx(
+                            "bg-white shadow-2xl transition-all duration-300",
+                            isThermal ? "w-[80mm] h-full rounded-sm" : "w-[210mm] h-full aspect-[210/297] rounded-sm"
+                        )}
+                        style={{ border: 'none' }}
+                        title="Invoice Preview"
+                    />
                 </div>
             </div>
         </div>
     )
 }
+

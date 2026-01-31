@@ -363,7 +363,7 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                 </div>
 
                 {/* Tab Switcher */}
-                <div className="flex p-1 gap-1 glass rounded-2xl border border-white/10 w-fit">
+                <div id="expenses-tabs" className="flex p-1 gap-1 glass rounded-2xl border border-white/10 w-fit">
                     <button
                         onClick={() => setActiveTab('expenses')}
                         className={clsx(
@@ -388,6 +388,7 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                 <div className="flex gap-2">
                     {activeTab === 'expenses' ? (
                         <motion.button
+                            id="add-expense-btn"
                             whileTap={{ scale: 0.95 }}
                             onClick={() => openAddModal('OUT')}
                             className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600 text-white text-[10px] font-black uppercase tracking-wider shadow-lg shadow-rose-600/20"
@@ -397,6 +398,7 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                         </motion.button>
                     ) : (
                         <motion.button
+                            id="new-category-btn"
                             whileTap={{ scale: 0.95 }}
                             onClick={() => { resetCatForm(); setIsAddingCategory(true) }}
                             className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--primary-green)] text-white text-[10px] font-black uppercase tracking-wider shadow-lg shadow-[var(--primary-green)]/20"
@@ -412,6 +414,7 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                 <>
                     {/* Summary Card */}
                     <motion.div
+                        id="expenses-stats"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         className="glass p-3 rounded-xl border border-rose-500/20 bg-rose-500/[0.02] hover:bg-rose-500/[0.05] transition-all cursor-pointer shadow-sm hover:shadow-rose-500/10 hover:border-rose-500/40"
@@ -456,7 +459,7 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
 
 
                     {/* Expenses List */}
-                    <div className="space-y-2">
+                    <div id="expenses-list" className="space-y-2">
                         {filteredExpenses.length === 0 ? (
                             <div className="glass rounded-2xl border border-[var(--foreground)]/10 p-8 text-center">
                                 <div className="h-12 w-12 rounded-full bg-[var(--foreground)]/5 flex items-center justify-center mx-auto mb-3">

@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
-import { QuillBackground } from "@/components/ui/QuillBackground";
+import { RouteThemeHandler } from "@/components/RouteThemeHandler";
+import { CyberGridBackground } from "@/components/ui/CyberGridBackground";
 import AppInitializer from "@/components/AppInitializer";
 
 const inter = Inter({
@@ -43,8 +44,9 @@ export default function RootLayout({
         className={`${inter.variable} antialiased bg-background text-foreground`}
       >
         <Providers>
+          <RouteThemeHandler />
           <AppInitializer />
-          <QuillBackground />
+          <CyberGridBackground />
 
           <div className="relative z-10 w-full min-h-[100dvh] pb-[env(safe-area-inset-bottom)]">
             {children}

@@ -1,9 +1,9 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Plus, Search, Package, ShoppingBag, AlertTriangle, Boxes, Filter, SortAsc, ChevronDown, Edit2, Trash2, Printer } from 'lucide-react'
+import { Plus, Search, Package, ShoppingBag, AlertTriangle, Boxes, Filter, ArrowUpDown, ChevronDown, Edit2, Trash2, Printer } from 'lucide-react'
 import ConfirmModal from '@/components/ui/ConfirmModal'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import PickerModal from '@/components/ui/PickerModal'
 import clsx from 'clsx'
 import { useBusiness } from '@/context/business-context'
@@ -11,6 +11,7 @@ import Link from 'next/link'
 import { createClient } from '@/utils/supabase/client'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { useRouter } from 'next/navigation'
+import UnifiedControlBar from '@/components/ui/UnifiedControlBar'
 
 export default function InventoryClientView({ initialItems }: { initialItems?: any[] }) {
     const router = useRouter()
@@ -75,7 +76,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
             setLoading(true)
             const { data, error } = await supabase
                 .from('items')
-                .select('id, name, stock_quantity, min_stock, unit, selling_price, category') // This line was already explicit, keeping it as is.
+                .select('id, name, stock_quantity, min_stock, unit, selling_price, category')
                 .eq('business_id', activeBusinessId)
                 .order('name')
 
@@ -89,6 +90,37 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
         }
         fetchItems()
     }, [activeBusinessId])
+
+    // Real-time Subscription
+    useEffect(() => {
+        if (!activeBusinessId) return
+
+        const channel = supabase
+            .channel(`inventory_${activeBusinessId}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'items',
+                    filter: `business_id=eq.${activeBusinessId}`
+                },
+                (payload) => {
+                    if (payload.eventType === 'INSERT') {
+                        setItems(prev => [payload.new, ...prev])
+                    } else if (payload.eventType === 'UPDATE') {
+                        setItems(prev => prev.map(item => item.id === payload.new.id ? { ...item, ...payload.new } : item))
+                    } else if (payload.eventType === 'DELETE') {
+                        setItems(prev => prev.filter(item => item.id === payload.old.id))
+                    }
+                }
+            )
+            .subscribe()
+
+        return () => {
+            supabase.removeChannel(channel)
+        }
+    }, [activeBusinessId, supabase])
 
     const categories = ['all', ...Array.from(new Set(items.map(i => i.category).filter(Boolean)))]
 
@@ -110,8 +142,23 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
             return 0
         })
 
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        show: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.05
+            }
+        }
+    }
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 10 },
+        show: { opacity: 1, y: 0 }
+    }
+
     return (
-        <div className="space-y-4 animate-in fade-in duration-300 pb-20">
+        <div className="space-y-4 pb-20">
             {/* Header - Compact */}
             <div className="flex flex-col gap-3 pb-3 border-b border-[var(--primary-green)]/10">
                 <div className="flex items-center justify-between">
@@ -120,6 +167,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                         <p className="text-[10px] font-black text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Manage Items</p>
                     </div>
                     <motion.button
+                        id="add-item-btn"
                         initial={{ opacity: 0, scale: 0.9, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         whileHover={{ scale: 1.05, translateY: -2 }}
@@ -132,36 +180,16 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                     </motion.button>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--foreground)]/40" />
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full h-9 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 pl-9 pr-4 text-[10px] font-bold text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:ring-1 focus:ring-[var(--primary-green)]/20 focus:outline-none transition-all shadow-inner placeholder:text-[var(--foreground)]/40"
-                        />
-                    </div>
-                    <button
-                        onClick={() => setIsSortPickerOpen(true)}
-                        className="h-9 px-3 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 flex items-center gap-2 text-[9px] font-black text-[var(--deep-contrast)] uppercase tracking-wider hover:bg-[var(--deep-contrast-hover)] transition-all shadow-sm"
-                    >
-                        <SortAsc className="h-3 w-3 opacity-40" />
-                        <span>Sort</span>
-                    </button>
-                    <button
-                        onClick={() => setIsFilterPickerOpen(true)}
-                        className="h-9 px-3 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 flex items-center gap-2 text-[9px] font-black text-[var(--deep-contrast)] uppercase tracking-wider hover:bg-[var(--deep-contrast-hover)] transition-all shadow-sm"
-                    >
-                        <Filter className="h-3 w-3 opacity-40" />
-                        <span>Filter</span>
-                    </button>
-                </div>
+                <UnifiedControlBar
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                    onSortClick={() => setIsSortPickerOpen(true)}
+                    onFilterClick={() => setIsFilterPickerOpen(true)}
+                />
             </div>
 
             {/* Quick Stats Bar */}
-            <div className="flex gap-2">
+            <div id="inventory-stats" className="flex gap-2">
                 <div
                     className="flex-1 glass p-2 rounded-xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 group hover:bg-[var(--foreground)]/10 transition-all cursor-default"
                 >
@@ -201,98 +229,114 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
             </div>
 
             {/* Grid - Ultra Compact Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                {!isContextLoading && filteredItems.slice(0, visibleCount).map((item) => (
-                    <div
-                        key={item.id}
-                        onClick={() => {
-                            if (item.id === 'temp-id') return
-                            router.push(`/dashboard/inventory/edit?id=${item.id}`)
-                        }}
-                        onMouseDown={() => handleTouchStart(item)}
-                        onMouseUp={handleTouchEnd}
-                        onMouseLeave={handleTouchEnd}
-                        onTouchStart={() => handleTouchStart(item)}
-                        onTouchEnd={handleTouchEnd}
-                        className={clsx(
-                            "group relative flex items-center glass-optimized rounded-[10px] border border-[var(--foreground)]/10 p-1.5 hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer overflow-hidden h-[44px] gap-2",
-                            item.stock_quantity <= (item.min_stock || 0) && "critical-glow"
-                        )}
-                    >
-                        {/* Stock Level Indicator */}
-                        <div className={clsx(
-                            "absolute top-0 left-0 w-[2px] h-full transition-colors duration-300",
-                            item.stock_quantity <= 0 ? "bg-rose-500" :
-                                item.stock_quantity <= (item.min_stock || 0) ? "bg-amber-500" :
-                                    "bg-emerald-500"
-                        )} />
+            <motion.div
+                id="inventory-list"
+                variants={containerVariants}
+                initial="hidden"
+                animate="show"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2"
+            >
+                {!isContextLoading && (
+                    <AnimatePresence mode="popLayout">
+                        {filteredItems.slice(0, visibleCount).map((item) => (
+                            <motion.div
+                                key={item.id}
+                                layout
+                                variants={itemVariants}
+                                initial="hidden"
+                                animate="show"
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                transition={{ duration: 0.2 }}
+                                onClick={() => {
+                                    if (item.id === 'temp-id') return
+                                    router.push(`/dashboard/inventory/edit?id=${item.id}`)
+                                }}
+                                onMouseDown={() => handleTouchStart(item)}
+                                onMouseUp={handleTouchEnd}
+                                onMouseLeave={handleTouchEnd}
+                                onTouchStart={() => handleTouchStart(item)}
+                                onTouchEnd={handleTouchEnd}
+                                className={clsx(
+                                    "group relative flex items-center glass-optimized rounded-[10px] border border-[var(--foreground)]/10 p-1.5 hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer overflow-hidden h-[44px] gap-2",
+                                    item.stock_quantity <= (item.min_stock || 0) && "critical-glow"
+                                )}
+                            >
+                                {/* Stock Level Indicator */}
+                                <div className={clsx(
+                                    "absolute top-0 left-0 w-[2px] h-full transition-colors duration-300",
+                                    item.stock_quantity <= 0 ? "bg-rose-500" :
+                                        item.stock_quantity <= (item.min_stock || 0) ? "bg-amber-500" :
+                                            "bg-emerald-500"
+                                )} />
 
-                        {/* Inventory Icon */}
-                        <div className={clsx(
-                            "h-6 w-6 rounded-lg flex items-center justify-center font-black text-[9px] transition-all duration-300 shadow-inner shrink-0 border uppercase",
-                            item.stock_quantity <= (item.min_stock || 0)
-                                ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
-                                : "bg-[var(--foreground)]/5 text-[var(--deep-contrast)]/60 border-[var(--foreground)]/10"
-                        )}>
-                            {item.name.charAt(0)}
-                        </div>
-
-                        {/* Name & ID */}
-                        <div className="flex-1 min-w-0">
-                            <h3 className="text-[9px] font-black text-[var(--deep-contrast)] truncate leading-none uppercase tracking-tight">{item.name}</h3>
-                            <div className="flex items-center gap-1.5 mt-1.5">
-                                <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">{item.unit || 'Units'}</span>
-                                <div className="h-0.5 w-0.5 rounded-full bg-[var(--foreground)]/20" />
-                                <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">SP: {formatCurrency(item.selling_price)}</span>
-                            </div>
-                        </div>
-
-                        {/* Stock Metric */}
-                        <div className="flex flex-col items-end shrink-0">
-                            <div className="flex items-center gap-1.5">
-                                <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-widest opacity-40">Stock</span>
-                                <p className={clsx(
-                                    "text-[11px] font-black tracking-tighter tabular-nums leading-none",
-                                    item.stock_quantity <= (item.min_stock || 0) ? "text-rose-500" : "text-emerald-500"
+                                {/* Inventory Icon */}
+                                <div className={clsx(
+                                    "h-6 w-6 rounded-lg flex items-center justify-center font-black text-[9px] transition-all duration-300 shadow-inner shrink-0 border uppercase",
+                                    item.stock_quantity <= (item.min_stock || 0)
+                                        ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
+                                        : "bg-[var(--foreground)]/5 text-[var(--deep-contrast)]/60 border-[var(--foreground)]/10"
                                 )}>
-                                    {item.stock_quantity} <span className="text-[8px] opacity-40 lowercase">{item.unit || 'units'}</span>
-                                </p>
-                            </div>
-                            <div className="flex items-center gap-1 mt-1 transition-opacity">
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation()
-                                        // Generic print for item - could be label or info card
-                                        window.print()
-                                    }}
-                                    className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
-                                >
-                                    <Printer size={7} />
-                                </button>
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation()
-                                        router.push(`/dashboard/inventory/edit?id=${item.id}`)
-                                    }}
-                                    className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
-                                >
-                                    <Edit2 size={7} />
-                                </button>
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation()
-                                        setItemToDelete(item)
-                                        setIsDeleteConfirmOpen(true)
-                                    }}
-                                    className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-rose-500 hover:text-white border border-[var(--foreground)]/10 transition-all"
-                                >
-                                    <Trash2 size={7} />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
+                                    {item.name.charAt(0)}
+                                </div>
+
+                                {/* Name & ID */}
+                                <div className="flex-1 min-w-0">
+                                    <h3 className="text-[9px] font-black text-[var(--deep-contrast)] truncate leading-none uppercase tracking-tight">{item.name}</h3>
+                                    <div className="flex items-center gap-1.5 mt-1.5">
+                                        <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">{item.unit || 'Units'}</span>
+                                        <div className="h-0.5 w-0.5 rounded-full bg-[var(--foreground)]/20" />
+                                        <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">SP: {formatCurrency(item.selling_price)}</span>
+                                    </div>
+                                </div>
+
+                                {/* Stock Metric */}
+                                <div className="flex flex-col items-end shrink-0">
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-widest opacity-40">Stock</span>
+                                        <p className={clsx(
+                                            "text-[11px] font-black tracking-tighter tabular-nums leading-none",
+                                            item.stock_quantity <= (item.min_stock || 0) ? "text-rose-500" : "text-emerald-500"
+                                        )}>
+                                            {item.stock_quantity} <span className="text-[8px] opacity-40 lowercase">{item.unit || 'units'}</span>
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center gap-1 mt-1 transition-opacity">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                // Generic print for item - could be label or info card
+                                                window.print()
+                                            }}
+                                            className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
+                                        >
+                                            <Printer size={7} />
+                                        </button>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                router.push(`/dashboard/inventory/edit?id=${item.id}`)
+                                            }}
+                                            className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
+                                        >
+                                            <Edit2 size={7} />
+                                        </button>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                setItemToDelete(item)
+                                                setIsDeleteConfirmOpen(true)
+                                            }}
+                                            className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-rose-500 hover:text-white border border-[var(--foreground)]/10 transition-all"
+                                        >
+                                            <Trash2 size={7} />
+                                        </button>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
+                )}
+            </motion.div>
 
             {filteredItems.length > visibleCount && (
                 <div className="flex justify-center py-4">

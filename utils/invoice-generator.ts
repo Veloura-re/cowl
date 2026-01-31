@@ -45,11 +45,18 @@ export type InvoiceData = {
     currencySymbol: string
     signature?: string
     attachments?: string[]
+
+    // Customization
+    accentColor?: string
+    footerNote?: string
+    size?: 'A4' | 'THERMAL'
 }
 
 export function generateInvoiceHTML(data: InvoiceData): string {
     const isSale = data.type === 'SALE'
     const title = isSale ? 'INVOICE' : 'PURCHASE ORDER'
+    const accentColor = data.accentColor || '#111827'
+    const isThermal = data.size === 'THERMAL'
 
     const statusColors: Record<string, string> = {
         'PAID': '#10b981', // emerald-500
@@ -66,14 +73,14 @@ export function generateInvoiceHTML(data: InvoiceData): string {
     <meta charset="UTF-8">
     <title>${title} - ${data.invoiceNumber}</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Share+Tech+Mono&display=swap');
         
         :root {
             --bg-color: #ffffff;
             --text-main: #111827;
             --text-muted: #6b7280;
             --accent-bg: #f9fafb;
-            --primary: #111827;
+            --primary: ${accentColor};
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -87,80 +94,92 @@ export function generateInvoiceHTML(data: InvoiceData): string {
         }
 
         .page {
-            width: 210mm;
-            min-height: 297mm;
+            width: ${isThermal ? '80mm' : '210mm'};
+            min-height: ${isThermal ? 'auto' : '297mm'};
             margin: 0 auto;
             background: var(--bg-color);
-            padding: 24mm;
+            padding: ${isThermal ? '4mm' : '12mm'};
             position: relative;
             display: flex;
             flex-direction: column;
+            ${isThermal ? 'font-size: 10px; padding-bottom: 20mm;' : ''}
         }
 
         @media print {
             body { background: white; }
-            .page { width: 100%; margin: 0; padding: 15mm; box-shadow: none; border: none; }
+            .page { width: 100%; margin: 0; padding: ${isThermal ? '0' : '10mm'}; box-shadow: none; border: none; }
         }
 
         /* Header */
-        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12mm; }
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-start; 
+            margin-bottom: ${isThermal ? '4mm' : '6mm'}; 
+            ${isThermal ? 'flex-direction: column; align-items: center; text-align: center;' : ''}
+        }
         .brand-section { flex: 1; }
-        .meta-section { text-align: right; }
+        .meta-section { text-align: ${isThermal ? 'center' : 'right'}; ${isThermal ? 'margin-top: 10px; width: 100%;' : ''} }
         
-        .logo { height: 45px; width: auto; object-fit: contain; margin-bottom: 15px; display: block; }
+        .logo { 
+            height: ${isThermal ? '25px' : '35px'}; 
+            width: auto; 
+            object-fit: contain; 
+            margin-bottom: 6px; 
+            display: ${isThermal ? 'inline-block' : 'block'}; 
+        }
         
-        .company-name { font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: -0.02em; margin-bottom: 8px; }
-        .company-details { font-size: 10px; color: var(--text-muted); line-height: 1.5; text-transform: uppercase; }
+        .company-name { font-size: ${isThermal ? '14px' : '20px'}; font-weight: 900; text-transform: uppercase; letter-spacing: -0.02em; margin-bottom: 2px; }
+        .company-details { font-size: ${isThermal ? '8px' : '9px'}; color: var(--text-muted); line-height: 1.3; text-transform: uppercase; }
 
         .status-badge {
             display: inline-block;
             background: ${statusColor};
             color: white;
-            padding: 4px 12px;
+            padding: 2px 8px;
             border-radius: 99px;
             font-weight: 700;
-            font-size: 11px;
+            font-size: ${isThermal ? '8px' : '10px'};
             text-transform: uppercase;
-            margin-bottom: 15px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            margin-bottom: ${isThermal ? '4px' : '10px'};
         }
 
-        .document-title { font-size: 32px; font-weight: 900; margin-bottom: 8px; letter-spacing: 0.1em; }
-        .document-meta { font-size: 12px; color: var(--text-muted); }
+        .document-title { font-size: ${isThermal ? '16px' : '24px'}; font-weight: 900; margin-bottom: 2px; letter-spacing: 0.1em; }
+        .document-meta { font-size: ${isThermal ? '10px' : '11px'}; color: var(--text-muted); }
         .document-meta b { color: var(--text-main); }
 
         /* Info Grid */
         .info-grid { 
             display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 20px; 
-            margin-bottom: 12mm; 
+            grid-template-columns: ${isThermal ? '1fr' : '1fr 1fr'}; 
+            gap: ${isThermal ? '8px' : '16px'}; 
+            margin-bottom: ${isThermal ? '4mm' : '6mm'}; 
             background: var(--accent-bg);
-            padding: 20px;
-            border-radius: 12px;
+            padding: ${isThermal ? '8px' : '12px'};
+            border-radius: ${isThermal ? '8px' : '12px'};
         }
         
-        .info-title { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
-        .info-content { font-size: 13px; font-weight: 400; line-height: 1.5; }
+        .info-title { font-size: ${isThermal ? '7px' : '8px'}; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: ${isThermal ? '2px' : '6px'}; }
+        .info-content { font-size: ${isThermal ? '10px' : '11px'}; font-weight: 400; line-height: 1.3; }
         .info-content b { font-weight: 900; text-transform: uppercase; }
 
         /* Table */
-        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 10mm; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: ${isThermal ? '6mm' : '10mm'}; }
         th { 
             text-align: left; 
-            font-size: 11px; 
+            font-size: ${isThermal ? '9px' : '11px'}; 
             font-weight: 700;
             text-transform: uppercase; 
             background: var(--primary);
             color: white;
-            padding: 12px 15px; 
+            padding: ${isThermal ? '6px 8px' : '12px 15px'}; 
         }
         th:first-child { border-radius: 8px 0 0 8px; }
         th:last-child { border-radius: 0 8px 8px 0; }
         
         td { 
-            padding: 15px; 
-            font-size: 12px; 
+            padding: ${isThermal ? '6px 8px' : '10px 15px'}; 
+            font-size: ${isThermal ? '10px' : '11px'}; 
             border-bottom: 1px solid #f3f4f6;
         }
         tr:nth-child(even) td { background-color: #f9fafb; }
@@ -169,29 +188,36 @@ export function generateInvoiceHTML(data: InvoiceData): string {
         .text-center { text-align: center; }
 
         /* Totals */
-        .totals-container { display: flex; justify-content: flex-end; margin-bottom: 15mm; }
-        .totals-table { width: 280px; }
-        .total-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px; }
+        .totals-container { display: flex; justify-content: flex-end; margin-bottom: ${isThermal ? '6mm' : '8mm'}; }
+        .totals-table { width: ${isThermal ? '100%' : '240px'}; }
+        .total-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: ${isThermal ? '11px' : '12px'}; }
         .final-total { 
             background: var(--primary);
             color: white;
-            border-radius: 12px;
-            margin-top: 15px; 
-            padding: 15px 20px; 
+            border-radius: ${isThermal ? '8px' : '12px'};
+            margin-top: 8px; 
+            padding: ${isThermal ? '8px 12px' : '12px 16px'}; 
             font-weight: 900; 
-            font-size: 18px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            font-size: ${isThermal ? '14px' : '16px'};
         }
 
         /* Footer */
         .footer { 
             margin-top: auto; 
             border-top: 1px solid #eee; 
-            padding-top: 20px; 
+            padding-top: ${isThermal ? '12px' : '20px'}; 
             display: flex; 
-            justify-content: space-between; 
+            ${isThermal ? 'flex-direction: column; gap: 12px; text-align: center;' : 'justify-content: space-between;'}
             font-size: 10px;
             color: var(--text-muted);
+        }
+        .footer-note { 
+            font-family: 'Share Tech Mono', monospace; 
+            background: #fdfdfd; 
+            border: 1px dashed #e5e7eb; 
+            padding: 8px; 
+            border-radius: 8px; 
+            font-size: ${isThermal ? '9px' : '10px'};
         }
     </style>
 </head>
@@ -227,7 +253,7 @@ export function generateInvoiceHTML(data: InvoiceData): string {
                     ${data.partyPhone || ''}
                 </div>
             </div>
-            <div class="text-right">
+            <div class="${isThermal ? '' : 'text-right'}">
                 <p class="info-title">Payment Details</p>
                 <div class="info-content">
                     DUE DATE: <b>${data.dueDate || 'ON RECEIPT'}</b><br>
@@ -240,20 +266,23 @@ export function generateInvoiceHTML(data: InvoiceData): string {
         <table>
             <thead>
                 <tr>
-                    <th style="width: 45%">Description</th>
-                    <th class="text-center" style="width: 10%">Qty</th>
-                    <th class="text-right" style="width: 15%">Rate</th>
-                    <th class="text-right" style="width: 10%">Tax</th>
-                    <th class="text-right" style="width: 20%">Amount</th>
+                    <th style="width: ${isThermal ? '40%' : '45%'}">Desc</th>
+                    ${isThermal ? '' : '<th class="text-center" style="width: 10%">Qty</th>'}
+                    <th class="text-right" style="width: ${isThermal ? '25%' : '15%'}">${isThermal ? 'Price' : 'Rate'}</th>
+                    ${isThermal ? '' : '<th class="text-right" style="width: 10%">Tax</th>'}
+                    <th class="text-right" style="width: ${isThermal ? '35%' : '20%'}">Amt</th>
                 </tr>
             </thead>
             <tbody>
                 ${data.items.map(item => `
                 <tr>
-                    <td class="bold">${item.description}</td>
-                    <td class="text-center">${item.quantity}</td>
-                    <td class="text-right">${formatNumber(item.rate)}</td>
-                    <td class="text-right text-muted">${item.tax}%</td>
+                    <td>
+                        <div class="bold">${item.description}</div>
+                        ${isThermal ? `<div style="font-size: 8px; color: #9ca3af;">${item.quantity} x ${formatNumber(item.rate)}</div>` : ''}
+                    </td>
+                    ${isThermal ? '' : `<td class="text-center">${item.quantity}</td>`}
+                    ${isThermal ? `<td class="text-right">${formatNumber(item.rate)}</td>` : `<td class="text-right">${formatNumber(item.rate)}</td>`}
+                    ${isThermal ? '' : `<td class="text-right text-muted">${item.tax}%</td>`}
                     <td class="text-right bold">${data.currencySymbol}${formatNumber(item.total)}</td>
                 </tr>
                 `).join('')}
@@ -299,15 +328,17 @@ export function generateInvoiceHTML(data: InvoiceData): string {
         <!-- Footer / Signature -->
         <div class="footer">
             <div style="flex: 1;">
-                ${data.notes ? `
-                    <p class="info-title">Notes</p>
-                    <p class="info-content" style="max-width: 350px;">${data.notes.toUpperCase()}</p>
+                ${(data.notes || data.footerNote) ? `
+                    <div class="footer-note">
+                        ${data.notes ? `<p class="info-content" style="margin-bottom: 4px;"><strong>NOTES:</strong> ${data.notes.toUpperCase()}</p>` : ''}
+                        ${data.footerNote ? `<p class="info-content" style="opacity: 0.8;">${data.footerNote}</p>` : ''}
+                    </div>
                 ` : ''}
             </div>
-            <div style="text-align: right;">
-                ${data.signature ? `<img src="${data.signature}" style="height: 35px; margin-bottom: 5px;" />` : '<div style="height: 35px;"></div>'}
+            <div style="text-align: ${isThermal ? 'center' : 'right'};">
+                ${data.signature ? `<img src="${data.signature}" style="height: 28px; margin-bottom: 4px;" />` : '<div style="height: 28px;"></div>'}
                 <p class="info-title">Authorized Signature</p>
-                <div class="text-uppercase mt-2">Generated by COWL System</div>
+                <div class="text-uppercase mt-2" style="font-size: 8px; opacity: 0.5;">Generated by COWL System</div>
             </div>
         </div>
     </div>
