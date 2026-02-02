@@ -163,6 +163,7 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                     partyName: selectedParty?.name || 'Walk-in Customer',
                     partyAddress: selectedParty?.address,
                     partyPhone: selectedParty?.phone,
+                    partyGoogleLocation: selectedParty?.google_location,
                     items: rows.map(row => ({
                         description: row.name,
                         quantity: row.quantity,

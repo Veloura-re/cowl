@@ -31,7 +31,8 @@ export default function CreatePartyModal({ isOpen, onClose, onSuccess, onDelete,
         type: 'CUSTOMER',
         opening_balance: 0,
         address: '',
-        gstin: ''
+        gstin: '',
+        google_location: ''
     })
 
     const { activeBusinessId } = useBusiness()
@@ -46,7 +47,8 @@ export default function CreatePartyModal({ isOpen, onClose, onSuccess, onDelete,
                 type: initialData.type || 'CUSTOMER',
                 opening_balance: initialData.opening_balance || 0,
                 address: initialData.address || '',
-                gstin: initialData.gstin || ''
+                gstin: initialData.gstin || '',
+                google_location: initialData.google_location || ''
             })
         } else {
             setFormData({
@@ -56,7 +58,8 @@ export default function CreatePartyModal({ isOpen, onClose, onSuccess, onDelete,
                 type: 'CUSTOMER',
                 opening_balance: 0,
                 address: '',
-                gstin: ''
+                gstin: '',
+                google_location: ''
             })
         }
     }, [initialData, isOpen])
@@ -100,7 +103,8 @@ export default function CreatePartyModal({ isOpen, onClose, onSuccess, onDelete,
                     type: 'CUSTOMER',
                     opening_balance: 0,
                     address: '',
-                    gstin: ''
+                    gstin: '',
+                    google_location: ''
                 })
             }
         } catch (err: any) {
@@ -201,6 +205,27 @@ export default function CreatePartyModal({ isOpen, onClose, onSuccess, onDelete,
                                 placeholder="..."
                             />
                         </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Address</label>
+                        <textarea
+                            value={formData.address}
+                            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                            className="w-full h-20 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 p-3 text-[11px] font-black text-[var(--deep-contrast)] placeholder:text-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none shadow-inner resize-none"
+                            placeholder="Full Address..."
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Google Location (URL)</label>
+                        <input
+                            type="text"
+                            value={formData.google_location}
+                            onChange={(e) => setFormData({ ...formData, google_location: e.target.value })}
+                            className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-black text-[var(--deep-contrast)] placeholder:text-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none shadow-inner"
+                            placeholder="https://maps.google.com/..."
+                        />
                     </div>
 
                     <div className="flex justify-between pt-4 border-t border-[var(--primary-green)]/10">

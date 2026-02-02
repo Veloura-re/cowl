@@ -325,6 +325,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
             partyName: selectedParty?.name || 'Walk-in Customer',
             partyAddress: selectedParty?.address,
             partyPhone: selectedParty?.phone,
+            partyGoogleLocation: selectedParty?.google_location,
             items: rows.map(row => ({
                 description: row.name,
                 quantity: Number(row.quantity) || 0,
@@ -428,6 +429,13 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
         try {
             if (isEdit) {
                 // UPDATE FLOW
+                console.log('Update Flow Triggered for ID:', cleanUUID(initialData.id));
+
+                // 0. Validation
+                if (!cleanUUID(initialData.id)) {
+                    throw new Error('Invalid Invoice ID for update')
+                }
+
                 for (const item of initialLineItems || []) {
                     if (item.item_id) {
                         const { data: dbItem } = await supabase.from('items').select('stock_quantity').eq('id', cleanUUID(item.item_id)).single()
@@ -582,7 +590,8 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                 router.push(isSale ? '/dashboard/sales' : '/dashboard/purchases')
             }, 1000)
         } catch (err: any) {
-            alert(err.message)
+            console.error('Submission Error:', err)
+            alert(`Error: ${err.message || 'Unknown error occurred'}`)
         } finally {
             setLoading(false)
         }

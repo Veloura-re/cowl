@@ -78,23 +78,28 @@ export default function InvoiceSettingsModal({ isOpen, onClose, businessId, init
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="glass w-full max-w-md rounded-[24px] overflow-hidden shadow-2xl relative z-10 border border-[var(--foreground)]/10 bg-[var(--background)]"
+                className="relative w-full max-w-md rounded-[32px] overflow-hidden shadow-2xl border border-white/10 bg-[#0a0a0a] text-white"
             >
+                {/* Decorative Background Mesh */}
+                <div className="absolute inset-0 opacity-20 pointer-events-none">
+                    <div className="absolute -top-[50%] -left-[50%] w-[200%] h-[200%] bg-[radial-gradient(circle_at_50%_50%,rgb(var(--primary-green))_0%,transparent_50%)] blur-[80px]" />
+                </div>
+
                 {/* Header */}
-                <div className="px-6 py-4 border-b border-[var(--foreground)]/10 flex items-center justify-between bg-[var(--foreground)]/5">
+                <div className="relative px-6 py-5 border-b border-white/10 flex items-center justify-between">
                     <div>
-                        <h2 className="text-sm font-black text-[var(--deep-contrast)] uppercase tracking-tight">Invoice Customization</h2>
-                        <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mt-0.5">Styling & Configuration</p>
+                        <h2 className="text-xl font-black uppercase tracking-tight text-white/90">Invoice Design</h2>
+                        <p className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em] mt-1">Customize Appearance</p>
                     </div>
-                    <button onClick={onClose} className="p-2 rounded-full hover:bg-[var(--foreground)]/10 transition-colors">
-                        <X className="h-4 w-4 text-[var(--foreground)]/60" />
+                    <button onClick={onClose} className="h-8 w-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-all">
+                        <X className="h-4 w-4 text-white/60" />
                     </button>
                 </div>
 
-                <div className="p-6 space-y-6">
+                <div className="relative p-6 space-y-6">
                     {/* Size Selector */}
                     <div className="space-y-3">
-                        <label className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/60">
+                        <label className="flex items-center gap-2 text-[8px] font-black uppercase tracking-[0.2em] text-white/40 ml-1">
                             <LayoutTemplate className="h-3 w-3" />
                             Paper Format
                         </label>
@@ -102,23 +107,30 @@ export default function InvoiceSettingsModal({ isOpen, onClose, businessId, init
                             <button
                                 onClick={() => setSize('A4')}
                                 className={clsx(
-                                    "relative h-20 rounded-xl border-2 flex flex-col items-center justify-center gap-2 transition-all active:scale-95",
+                                    "relative h-24 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all active:scale-95 group",
                                     size === 'A4'
-                                        ? "border-[var(--primary-green)] bg-[var(--primary-green)]/5 text-[var(--primary-green)]"
-                                        : "border-[var(--foreground)]/10 hover:bg-[var(--foreground)]/5 text-[var(--foreground)]/40"
+                                        ? "border-[var(--primary-green)] bg-[var(--primary-green)]/10 text-white"
+                                        : "border-white/10 bg-white/5 text-white/40 hover:bg-white/10 hover:text-white"
                                 )}
                             >
                                 <div className="w-8 h-10 border border-current rounded-sm bg-current/10" />
                                 <span className="text-[9px] font-black uppercase tracking-widest">A4 Standard</span>
-                                {size === 'A4' && <div className="absolute top-2 right-2 bg-[var(--primary-green)] text-white rounded-full p-0.5"><Check size={8} /></div>}
+                                {size === 'A4' && (
+                                    <motion.div
+                                        layoutId="check"
+                                        className="absolute top-2 right-2 h-5 w-5 bg-[var(--primary-green)] rounded-full flex items-center justify-center shadow-lg shadow-[var(--primary-green)]/40"
+                                    >
+                                        <Check className="h-3 w-3 text-white" />
+                                    </motion.div>
+                                )}
                             </button>
                             <button
                                 onClick={() => setSize('THERMAL')}
                                 className={clsx(
-                                    "relative h-20 rounded-xl border-2 flex flex-col items-center justify-center gap-2 transition-all active:scale-95",
+                                    "relative h-24 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all active:scale-95 group",
                                     size === 'THERMAL'
-                                        ? "border-[var(--primary-green)] bg-[var(--primary-green)]/5 text-[var(--primary-green)]"
-                                        : "border-[var(--foreground)]/10 hover:bg-[var(--foreground)]/5 text-[var(--foreground)]/40"
+                                        ? "border-[var(--primary-green)] bg-[var(--primary-green)]/10 text-white"
+                                        : "border-white/10 bg-white/5 text-white/40 hover:bg-white/10 hover:text-white"
                                 )}
                             >
                                 <div className="w-6 h-10 border border-current rounded-sm bg-current/10 flex flex-col gap-0.5 p-0.5 overflow-hidden">
@@ -127,14 +139,21 @@ export default function InvoiceSettingsModal({ isOpen, onClose, businessId, init
                                     <div className="h-0.5 w-3/4 bg-current/40" />
                                 </div>
                                 <span className="text-[9px] font-black uppercase tracking-widest">Thermal (Receipt)</span>
-                                {size === 'THERMAL' && <div className="absolute top-2 right-2 bg-[var(--primary-green)] text-white rounded-full p-0.5"><Check size={8} /></div>}
+                                {size === 'THERMAL' && (
+                                    <motion.div
+                                        layoutId="check"
+                                        className="absolute top-2 right-2 h-5 w-5 bg-[var(--primary-green)] rounded-full flex items-center justify-center shadow-lg shadow-[var(--primary-green)]/40"
+                                    >
+                                        <Check className="h-3 w-3 text-white" />
+                                    </motion.div>
+                                )}
                             </button>
                         </div>
                     </div>
 
                     {/* Color Picker */}
                     <div className="space-y-3">
-                        <label className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/60">
+                        <label className="flex items-center gap-2 text-[8px] font-black uppercase tracking-[0.2em] text-white/40 ml-1">
                             <Palette className="h-3 w-3" />
                             Brand Accent
                         </label>
@@ -144,13 +163,13 @@ export default function InvoiceSettingsModal({ isOpen, onClose, businessId, init
                                     key={color.value}
                                     onClick={() => setAccentColor(color.value)}
                                     className={clsx(
-                                        "h-8 w-8 rounded-full border-2 transition-all hover:scale-110 active:scale-95 flex items-center justify-center",
-                                        accentColor === color.value ? "border-[var(--deep-contrast)]" : "border-transparent"
+                                        "h-10 w-10 rounded-xl transition-all hover:scale-110 active:scale-95 flex items-center justify-center relative",
+                                        accentColor === color.value ? "ring-2 ring-white ring-offset-2 ring-offset-black" : "opacity-80 hover:opacity-100"
                                     )}
                                     style={{ backgroundColor: color.value }}
                                     title={color.name}
                                 >
-                                    {accentColor === color.value && <Check className="h-4 w-4 text-white drop-shadow-md" />}
+                                    {accentColor === color.value && <Check className="h-5 w-5 text-white drop-shadow-md" />}
                                 </button>
                             ))}
                         </div>
@@ -158,7 +177,7 @@ export default function InvoiceSettingsModal({ isOpen, onClose, businessId, init
 
                     {/* Footer Note */}
                     <div className="space-y-3">
-                        <label className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/60">
+                        <label className="flex items-center gap-2 text-[8px] font-black uppercase tracking-[0.2em] text-white/40 ml-1">
                             <Type className="h-3 w-3" />
                             Footer / Terms
                         </label>
@@ -166,20 +185,23 @@ export default function InvoiceSettingsModal({ isOpen, onClose, businessId, init
                             value={footerNote}
                             onChange={(e) => setFooterNote(e.target.value)}
                             placeholder="e.g. Thank you for your business! Payments are due within 14 days."
-                            className="w-full h-24 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 p-3 text-[11px] font-medium text-[var(--deep-contrast)] placeholder:text-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none transition-all resize-none"
+                            className="w-full h-32 rounded-2xl bg-white/5 border border-white/10 p-4 text-[11px] font-bold text-white placeholder:text-white/20 focus:border-white/30 focus:bg-white/10 focus:outline-none transition-all resize-none"
                         />
                     </div>
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 pt-2">
+                <div className="relative p-6 pt-2">
                     <button
                         onClick={handleSave}
                         disabled={saving}
-                        className="w-full h-10 rounded-xl bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] flex items-center justify-center gap-2 font-black text-[10px] uppercase tracking-widest hover:bg-[var(--deep-contrast-hover)] transition-all active:scale-95 disabled:opacity-50"
+                        className="relative w-full h-14 rounded-2xl overflow-hidden group disabled:opacity-50 bg-[var(--primary-green)]"
                     >
-                        {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
-                        Save Changes
+                        <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-transparent" />
+                        <span className="relative z-10 flex items-center justify-center gap-2 text-xs font-black text-white uppercase tracking-widest">
+                            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                            Save Configuration
+                        </span>
                     </button>
                 </div>
             </motion.div>

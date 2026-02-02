@@ -18,6 +18,7 @@ export type InvoiceData = {
     partyName: string
     partyAddress?: string
     partyPhone?: string
+    partyGoogleLocation?: string
 
     // Items
     items: {
@@ -98,16 +99,16 @@ export function generateInvoiceHTML(data: InvoiceData): string {
             min-height: ${isThermal ? 'auto' : '297mm'};
             margin: 0 auto;
             background: var(--bg-color);
-            padding: ${isThermal ? '4mm' : '12mm'};
+            padding: ${isThermal ? '4mm' : '8mm'};
             position: relative;
             display: flex;
             flex-direction: column;
-            ${isThermal ? 'font-size: 10px; padding-bottom: 20mm;' : ''}
+            ${isThermal ? 'font-size: 10px; padding-bottom: 20mm;' : 'font-size: 9px;'}
         }
 
         @media print {
             body { background: white; }
-            .page { width: 100%; margin: 0; padding: ${isThermal ? '0' : '10mm'}; box-shadow: none; border: none; }
+            .page { width: 100%; margin: 0; padding: ${isThermal ? '0' : '5mm'}; box-shadow: none; border: none; }
         }
 
         /* Header */
@@ -115,22 +116,22 @@ export function generateInvoiceHTML(data: InvoiceData): string {
             display: flex; 
             justify-content: space-between; 
             align-items: flex-start; 
-            margin-bottom: ${isThermal ? '4mm' : '6mm'}; 
+            margin-bottom: ${isThermal ? '4mm' : '4mm'}; 
             ${isThermal ? 'flex-direction: column; align-items: center; text-align: center;' : ''}
         }
         .brand-section { flex: 1; }
         .meta-section { text-align: ${isThermal ? 'center' : 'right'}; ${isThermal ? 'margin-top: 10px; width: 100%;' : ''} }
         
         .logo { 
-            height: ${isThermal ? '25px' : '35px'}; 
+            height: ${isThermal ? '25px' : '30px'}; 
             width: auto; 
             object-fit: contain; 
             margin-bottom: 6px; 
             display: ${isThermal ? 'inline-block' : 'block'}; 
         }
         
-        .company-name { font-size: ${isThermal ? '14px' : '20px'}; font-weight: 900; text-transform: uppercase; letter-spacing: -0.02em; margin-bottom: 2px; }
-        .company-details { font-size: ${isThermal ? '8px' : '9px'}; color: var(--text-muted); line-height: 1.3; text-transform: uppercase; }
+        .company-name { font-size: ${isThermal ? '14px' : '16px'}; font-weight: 900; text-transform: uppercase; letter-spacing: -0.02em; margin-bottom: 2px; }
+        .company-details { font-size: ${isThermal ? '8px' : '8px'}; color: var(--text-muted); line-height: 1.3; text-transform: uppercase; }
 
         .status-badge {
             display: inline-block;
@@ -139,47 +140,47 @@ export function generateInvoiceHTML(data: InvoiceData): string {
             padding: 2px 8px;
             border-radius: 99px;
             font-weight: 700;
-            font-size: ${isThermal ? '8px' : '10px'};
+            font-size: ${isThermal ? '8px' : '9px'};
             text-transform: uppercase;
-            margin-bottom: ${isThermal ? '4px' : '10px'};
+            margin-bottom: ${isThermal ? '4px' : '6px'};
         }
 
-        .document-title { font-size: ${isThermal ? '16px' : '24px'}; font-weight: 900; margin-bottom: 2px; letter-spacing: 0.1em; }
-        .document-meta { font-size: ${isThermal ? '10px' : '11px'}; color: var(--text-muted); }
+        .document-title { font-size: ${isThermal ? '16px' : '20px'}; font-weight: 900; margin-bottom: 2px; letter-spacing: 0.1em; }
+        .document-meta { font-size: ${isThermal ? '10px' : '9px'}; color: var(--text-muted); }
         .document-meta b { color: var(--text-main); }
 
         /* Info Grid */
         .info-grid { 
             display: grid; 
             grid-template-columns: ${isThermal ? '1fr' : '1fr 1fr'}; 
-            gap: ${isThermal ? '8px' : '16px'}; 
+            gap: ${isThermal ? '8px' : '12px'}; 
             margin-bottom: ${isThermal ? '4mm' : '6mm'}; 
             background: var(--accent-bg);
-            padding: ${isThermal ? '8px' : '12px'};
-            border-radius: ${isThermal ? '8px' : '12px'};
+            padding: ${isThermal ? '8px' : '10px'};
+            border-radius: ${isThermal ? '8px' : '10px'};
         }
         
-        .info-title { font-size: ${isThermal ? '7px' : '8px'}; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: ${isThermal ? '2px' : '6px'}; }
-        .info-content { font-size: ${isThermal ? '10px' : '11px'}; font-weight: 400; line-height: 1.3; }
+        .info-title { font-size: ${isThermal ? '7px' : '7px'}; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: ${isThermal ? '2px' : '4px'}; }
+        .info-content { font-size: ${isThermal ? '10px' : '9px'}; font-weight: 400; line-height: 1.3; }
         .info-content b { font-weight: 900; text-transform: uppercase; }
 
         /* Table */
-        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: ${isThermal ? '6mm' : '10mm'}; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: ${isThermal ? '6mm' : '6mm'}; }
         th { 
             text-align: left; 
-            font-size: ${isThermal ? '9px' : '11px'}; 
+            font-size: ${isThermal ? '9px' : '9px'}; 
             font-weight: 700;
             text-transform: uppercase; 
             background: var(--primary);
             color: white;
-            padding: ${isThermal ? '6px 8px' : '12px 15px'}; 
+            padding: ${isThermal ? '6px 8px' : '6px 10px'}; 
         }
-        th:first-child { border-radius: 8px 0 0 8px; }
-        th:last-child { border-radius: 0 8px 8px 0; }
+        th:first-child { border-radius: 6px 0 0 6px; }
+        th:last-child { border-radius: 0 6px 6px 0; }
         
         td { 
-            padding: ${isThermal ? '6px 8px' : '10px 15px'}; 
-            font-size: ${isThermal ? '10px' : '11px'}; 
+            padding: ${isThermal ? '6px 8px' : '6px 10px'}; 
+            font-size: ${isThermal ? '10px' : '9px'}; 
             border-bottom: 1px solid #f3f4f6;
         }
         tr:nth-child(even) td { background-color: #f9fafb; }
@@ -250,7 +251,8 @@ export function generateInvoiceHTML(data: InvoiceData): string {
                 <div class="info-content">
                     <b>${data.partyName}</b><br>
                     ${data.partyAddress || 'No Address Provided'}<br>
-                    ${data.partyPhone || ''}
+                    ${data.partyPhone || ''}<br>
+                    ${data.partyGoogleLocation ? `<a href="${data.partyGoogleLocation}" style="color: var(--primary); text-decoration: none; font-size: 8px;">📍 View Location</a>` : ''}
                 </div>
             </div>
             <div class="${isThermal ? '' : 'text-right'}">
