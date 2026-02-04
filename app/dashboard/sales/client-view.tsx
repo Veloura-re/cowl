@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { Search, Plus, Calendar, FileText, User, Filter, ArrowUpDown, Trash2, Edit2, AlertTriangle, Printer, Loader2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/context/business-context'
@@ -25,6 +26,8 @@ const InvoicePreviewModal = dynamic(() => import('@/components/ui/InvoicePreview
 export default function SalesClientView({ initialInvoices }: { initialInvoices?: any[] }) {
     const router = useRouter()
     const { activeBusinessId, formatCurrency, isLoading: isContextLoading, businesses } = useBusiness()
+    const { resolvedTheme } = useTheme()
+    const theme = (resolvedTheme === 'dark' ? 'dark' : 'light') as 'light' | 'dark'
     const [invoices, setInvoices] = useState(initialInvoices || [])
     const [searchQuery, setSearchQuery] = useState('')
     const [statusFilter, setStatusFilter] = useState<string>('ALL')
@@ -175,13 +178,13 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
 
     const handlePrint = () => {
         if (previewData) {
-            printInvoice(previewData)
+            printInvoice(previewData, theme)
         }
     }
 
     const handleDownload = () => {
         if (previewData) {
-            downloadInvoice(previewData)
+            downloadInvoice(previewData, true, theme)
         }
     }
 

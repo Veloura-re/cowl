@@ -9,6 +9,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { Plus, Search, ShoppingCart, Calendar, User, Filter, ArrowUpDown, Printer, Edit2, Trash2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
+import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import clsx from 'clsx'
 import dynamic from 'next/dynamic'
@@ -29,6 +30,8 @@ const InvoicePreviewModal = dynamic(() => import('@/components/ui/InvoicePreview
 export default function PurchasesClientView({ initialInvoices }: { initialInvoices?: any[] }) {
     const router = useRouter()
     const { activeBusinessId, formatCurrency, businesses } = useBusiness()
+    const { resolvedTheme } = useTheme()
+    const theme = (resolvedTheme === 'dark' ? 'dark' : 'light') as 'light' | 'dark'
     const [invoices, setInvoices] = useState(initialInvoices || [])
     const [searchQuery, setSearchQuery] = useState('')
     const supabase = createClient()
@@ -239,13 +242,13 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
 
     const handlePrint = () => {
         if (previewData) {
-            printInvoice(previewData)
+            printInvoice(previewData, theme)
         }
     }
 
     const handleDownload = () => {
         if (previewData) {
-            downloadInvoice(previewData)
+            downloadInvoice(previewData, true, theme)
         }
     }
 

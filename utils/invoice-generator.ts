@@ -384,7 +384,7 @@ export function generateInvoiceHTML(data: InvoiceData, theme: 'light' | 'dark' =
 /**
  * Print invoice using a hidden iframe to prevent navigation
  */
-export function printInvoice(data: InvoiceData) {
+export function printInvoice(data: InvoiceData, theme: 'light' | 'dark' = 'light') {
     // strict reset for printing
     const existingFrame = document.getElementById('invoice-print-frame')
     if (existingFrame) existingFrame.remove()
@@ -402,7 +402,7 @@ export function printInvoice(data: InvoiceData) {
     const doc = iframe.contentWindow?.document
     if (doc) {
         doc.open()
-        doc.write(generateInvoiceHTML(data))
+        doc.write(generateInvoiceHTML(data, theme))
         doc.close()
 
         // Wait for images
@@ -420,7 +420,7 @@ export function printInvoice(data: InvoiceData) {
  * Download invoice as PDF file using html2canvas + jsPDF for accurate rendering.
  * Returns the File object for potential sharing.
  */
-export async function downloadInvoice(data: InvoiceData, autoDownload = true): Promise<File | void> {
+export async function downloadInvoice(data: InvoiceData, autoDownload = true, theme: 'light' | 'dark' = 'light'): Promise<File | void> {
     // 1. Create a hidden container to render the invoice specifically for capture
     const container = document.createElement('div')
     container.style.position = 'absolute'
@@ -434,7 +434,7 @@ export async function downloadInvoice(data: InvoiceData, autoDownload = true): P
     if (!isNano && !isThermal) container.style.minHeight = '297mm'
 
     // Inject the HTML
-    container.innerHTML = generateInvoiceHTML(data)
+    container.innerHTML = generateInvoiceHTML(data, theme)
 
     // Append to body to ensure fonts and styles load
     document.body.appendChild(container)
@@ -498,7 +498,7 @@ export async function downloadInvoice(data: InvoiceData, autoDownload = true): P
 /**
  * Capture invoice as high-quality image (Snapshot)
  */
-export async function saveInvoiceAsImage(data: InvoiceData, autoDownload = true): Promise<File | void> {
+export async function saveInvoiceAsImage(data: InvoiceData, autoDownload = true, theme: 'light' | 'dark' = 'light'): Promise<File | void> {
     const container = document.createElement('div')
     container.style.position = 'absolute'
     container.style.top = '-10000px'
@@ -508,7 +508,7 @@ export async function saveInvoiceAsImage(data: InvoiceData, autoDownload = true)
     const isThermal = data.size === 'THERMAL'
     container.style.width = isNano ? '58mm' : (isThermal ? '80mm' : '210mm')
 
-    container.innerHTML = generateInvoiceHTML(data)
+    container.innerHTML = generateInvoiceHTML(data, theme)
     document.body.appendChild(container)
 
     try {
@@ -551,10 +551,10 @@ export async function saveInvoiceAsImage(data: InvoiceData, autoDownload = true)
 /**
  * Handle robust sharing of the Invoice (PDF or Image)
  */
-export async function shareInvoice(data: InvoiceData) {
+export async function shareInvoice(data: InvoiceData, theme: 'light' | 'dark' = 'light') {
     try {
         // We prefer PDF for sharing
-        const file = await downloadInvoice(data, false)
+        const file = await downloadInvoice(data, false, theme)
 
         if (file && typeof navigator !== 'undefined' && navigator.canShare && navigator.canShare({ files: [file as File] })) {
             await navigator.share({

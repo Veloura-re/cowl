@@ -30,21 +30,27 @@ export default function InvoicePreviewModal({
 
     return (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-0 sm:p-4">
-            <div className="absolute inset-0 bg-black/95 animate-in fade-in duration-300" onClick={onClose} />
+            <div className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose} />
 
             <div className={clsx(
-                "relative flex flex-col w-full h-full sm:rounded-none overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 border border-white/10 bg-black",
+                "relative flex flex-col w-full h-full sm:rounded-none overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 border border-[var(--foreground)]/10 bg-[var(--background)]",
                 "max-w-6xl sm:h-[95vh]"
             )}>
                 {/* Formal Header Actions */}
-                <div className="relative z-20 flex items-center justify-between border-b border-white/20 px-6 py-4 bg-black shrink-0">
+                <div
+                    className="relative z-20 flex items-center justify-between border-b border-[var(--foreground)]/10 px-6 bg-[var(--background)] shrink-0"
+                    style={{
+                        paddingTop: 'calc(env(safe-area-inset-top) + 16px)',
+                        paddingBottom: '16px'
+                    }}
+                >
                     <div className="flex items-center gap-4">
                         <button onClick={onClose} className="h-10 w-10 flex items-center justify-center transition-all sm:hidden">
-                            <X className="h-5 w-5 text-white" />
+                            <X className="h-5 w-5 text-[var(--deep-contrast)]" />
                         </button>
                         <div>
-                            <h2 className="text-sm font-bold text-white uppercase tracking-widest">Document Registry</h2>
-                            <p className="text-[9px] font-bold text-white/40 uppercase tracking-[0.3em] mt-1">
+                            <h2 className="text-sm font-bold text-[var(--deep-contrast)] uppercase tracking-widest">Document Registry</h2>
+                            <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-[0.3em] mt-1">
                                 Format: A4 ISO Standard
                             </p>
                         </div>
@@ -52,12 +58,12 @@ export default function InvoicePreviewModal({
 
                     <div className="flex items-center gap-2">
                         {/* View Switcher */}
-                        <div className="flex items-center bg-white/10 p-1 mr-2 border border-white/10">
+                        <div className="flex items-center bg-[var(--foreground)]/5 p-1 mr-2 border border-[var(--foreground)]/10">
                             <button
                                 onClick={() => setViewMode('fit')}
                                 className={clsx(
                                     "px-3 py-1.5 transition-all text-[9px] font-bold uppercase",
-                                    viewMode === 'fit' ? "bg-white text-black" : "text-white/60 hover:text-white"
+                                    viewMode === 'fit' ? "bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)]" : "text-[var(--foreground)]/60 hover:text-[var(--foreground)]"
                                 )}
                             >
                                 Fit
@@ -66,7 +72,7 @@ export default function InvoicePreviewModal({
                                 onClick={() => setViewMode('read')}
                                 className={clsx(
                                     "px-3 py-1.5 transition-all text-[9px] font-bold uppercase",
-                                    viewMode === 'read' ? "bg-white text-black" : "text-white/60 hover:text-white"
+                                    viewMode === 'read' ? "bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)]" : "text-[var(--foreground)]/60 hover:text-[var(--foreground)]"
                                 )}
                             >
                                 100%
@@ -75,7 +81,7 @@ export default function InvoicePreviewModal({
 
                         <button
                             onClick={onPrint}
-                            className="flex items-center gap-2 px-5 py-2 bg-white text-black hover:bg-gray-200 transition-all font-bold"
+                            className="flex items-center gap-2 px-5 py-2 bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] hover:bg-[var(--deep-contrast-hover)] transition-all font-bold"
                         >
                             <Printer className="h-4 w-4" />
                             <span className="text-[10px] uppercase tracking-widest hidden xs:inline">Print</span>
@@ -86,27 +92,27 @@ export default function InvoicePreviewModal({
                                 // On mobile/phone, we prefer Share as it's more reliable than a straight download
                                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
                                 if (isMobile) {
-                                    await shareInvoice(data)
+                                    await shareInvoice(data, theme)
                                 } else {
-                                    downloadInvoice(data)
+                                    downloadInvoice(data, true, theme)
                                 }
                             }}
-                            className="flex items-center gap-2 px-5 py-2 border border-white text-white hover:bg-white/10 transition-all font-bold"
+                            className="flex items-center gap-2 px-5 py-2 border border-[var(--deep-contrast)] text-[var(--deep-contrast)] hover:bg-[var(--deep-contrast)]/10 transition-all font-bold"
                         >
                             <Download className="h-4 w-4" />
                             <span className="text-[10px] uppercase tracking-widest hidden xs:inline">PDF</span>
                         </button>
 
-                        <button onClick={onClose} className="h-10 w-10 flex items-center justify-center transition-all hidden sm:flex ml-2 border-l border-white/10 pl-2">
-                            <X className="h-5 w-5 text-white hover:text-gray-400" />
+                        <button onClick={onClose} className="h-10 w-10 flex items-center justify-center transition-all hidden sm:flex ml-2 border-l border-[var(--foreground)]/10 pl-2">
+                            <X className="h-5 w-5 text-[var(--deep-contrast)] hover:text-[var(--foreground)]/40" />
                         </button>
                     </div>
                 </div>
 
                 {/* Preview Area - High Contrast */}
-                <div className="relative z-10 flex-1 bg-black overflow-auto scrollbar-hide flex items-start justify-center p-4 sm:p-12">
+                <div className="relative z-10 flex-1 bg-[var(--foreground)]/5 overflow-auto scrollbar-hide flex items-start justify-center p-4 sm:p-12">
                     <div className={clsx(
-                        "relative bg-white shadow-[0_0_100px_rgba(0,0,0,1)] transition-all duration-300 origin-top",
+                        "relative bg-white shadow-[0_0_100px_rgba(0,0,0,0.1)] transition-all duration-300 origin-top",
                         viewMode === 'fit' ? "scale-fit" : "scale-100",
                         "w-[210mm]"
                     )} style={{
@@ -128,10 +134,10 @@ export default function InvoicePreviewModal({
                 </div>
 
                 {/* Bottom Bar (Mobile) - Simple */}
-                <div className="sm:hidden relative z-20 flex items-center justify-around border-t border-white/20 px-6 py-5 bg-black">
+                <div className="sm:hidden relative z-20 flex items-center justify-around border-t border-[var(--foreground)]/10 px-6 py-5 bg-[var(--background)]">
                     <button
                         onClick={async () => {
-                            const file = await saveInvoiceAsImage(data, false)
+                            const file = await saveInvoiceAsImage(data, false, theme)
                             if (file && navigator.share && navigator.canShare && navigator.canShare({ files: [file as File] })) {
                                 await navigator.share({
                                     title: `Invoice Screenshot`,
@@ -139,18 +145,18 @@ export default function InvoicePreviewModal({
                                 })
                             } else {
                                 // Fallback
-                                saveInvoiceAsImage(data, true)
+                                saveInvoiceAsImage(data, true, theme)
                             }
                         }}
-                        className="flex items-center gap-2 text-white font-bold uppercase text-[10px] tracking-widest"
+                        className="flex items-center gap-2 text-[var(--deep-contrast)] font-bold uppercase text-[10px] tracking-widest"
                     >
                         <Camera className="h-5 w-5" />
                         Snap
                     </button>
 
                     <button
-                        onClick={() => shareInvoice(data)}
-                        className="flex items-center gap-2 text-white font-bold uppercase text-[10px] tracking-widest"
+                        onClick={() => shareInvoice(data, theme)}
+                        className="flex items-center gap-2 text-[var(--deep-contrast)] font-bold uppercase text-[10px] tracking-widest"
                     >
                         <Share2 className="h-5 w-5" />
                         Share

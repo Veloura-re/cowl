@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/context/business-context'
 import Link from 'next/link'
 import { createClient } from '@/utils/supabase/client'
+import { useTheme } from 'next-themes'
 import clsx from 'clsx'
 import PickerModal from '@/components/ui/PickerModal'
 import AddSalesItemModal from '@/components/ui/AddSalesItemModal'
@@ -39,6 +40,8 @@ type InvoiceItem = {
 export default function CompactInvoiceForm({ parties = [], items = [], paymentModes = [], initialData, initialLineItems }: InvoiceFormProps) {
     const router = useRouter()
     const { activeBusinessId, formatCurrency, businesses } = useBusiness()
+    const { resolvedTheme } = useTheme()
+    const theme = (resolvedTheme === 'dark' ? 'dark' : 'light') as 'light' | 'dark'
     const supabase = useMemo(() => createClient(), [])
     const isEdit = false // Hardcoded to false - No more editing
     const isSale = useMemo(() => initialData ? initialData.type === 'SALE' : true, [initialData?.type])
@@ -352,13 +355,13 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
 
     const handlePrint = () => {
         if (previewData) {
-            printInvoice(previewData)
+            printInvoice(previewData, theme)
         }
     }
 
     const handleDownload = () => {
         if (previewData) {
-            downloadInvoice(previewData)
+            downloadInvoice(previewData, true, theme)
         }
     }
 
