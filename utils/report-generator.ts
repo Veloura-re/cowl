@@ -1,5 +1,8 @@
 // Types only imports (optional, or just remove static imports)
 import { format } from 'date-fns';
+import { Capacitor } from '@capacitor/core'
+import { Filesystem, Directory } from '@capacitor/filesystem'
+import { Share } from '@capacitor/share'
 
 export type ReportType = 'SALES' | 'PURCHASES' | 'INVENTORY' | 'PROFIT_LOSS' | 'CUSTOMER_REPORT' | 'SUPPLIER_REPORT' | 'PARTY_SALES' | 'PARTY_PURCHASES';
 
@@ -189,8 +192,10 @@ export const ReportGenerator = {
         const blob = doc.output('blob');
         const fileName = `${data.title.replace(/\s+/g, '_')}_${format(new Date(), 'yyyyMMdd')}.pdf`;
 
-        // Auto-save for desktop
-        doc.save(fileName);
+        // Only auto-save on desktop
+        if (!Capacitor.isNativePlatform()) {
+            doc.save(fileName);
+        }
 
         return new File([blob], fileName, { type: 'application/pdf' });
     },
@@ -238,7 +243,38 @@ export const ReportGenerator = {
      * Share a report file using native share API
      */
     shareReport: async (file: File, title: string) => {
-        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        if (Capacitor.isNativePlatform()) {
+            try {
+                const reader = new FileReader()
+                const base64Promise = new Promise<string>((resolve) => {
+                    reader.onloadend = () => {
+                        const base64data = reader.result as string
+                        resolve(base64data.split(',')[1])
+                    }
+                })
+                reader.readAsDataURL(file)
+                const base64Data = await base64Promise
+
+                const writeResult = await Filesystem.writeFile({
+                    path: file.name,
+                    data: base64Data,
+                    directory: Directory.Cache
+                })
+
+                await Share.share({
+                    title: title,
+                    text: `Business Report: ${title}`,
+                    url: writeResult.uri,
+                    dialogTitle: 'Save or Share Report'
+                })
+                return true
+            } catch (error) {
+                console.error('Native report share failed:', error)
+                return false
+            }
+        }
+
+        if (typeof navigator !== 'undefined' && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
             try {
                 await navigator.share({
                     files: [file],
@@ -247,7 +283,7 @@ export const ReportGenerator = {
                 });
                 return true;
             } catch (error) {
-                console.error('Error sharing report:', error);
+                console.error('Navigator share failed:', error);
                 return false;
             }
         }

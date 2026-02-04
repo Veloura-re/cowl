@@ -8,6 +8,7 @@ import { createClient } from '@/utils/supabase/client'
 import { ReportGenerator, ReportType } from '@/utils/report-generator'
 import { fetchReportDataService, ReportServiceType } from '@/utils/report-service'
 import { format, parseISO } from 'date-fns'
+import { Capacitor } from '@capacitor/core'
 import SignaturePad, { SignaturePadHandle } from '@/components/ui/signature-pad'
 import Dropdown from '@/components/ui/dropdown'
 import DatePickerModal from '@/components/ui/DatePickerModal'
@@ -384,35 +385,10 @@ export default function ReportsPage() {
                 )
             }
 
-            if (!file) {
-                throw new Error('Failed to generate report file')
-            }
+            // 4. Handle Export / Sharing
+            const shareSuccess = await ReportGenerator.shareReport(file, generatorData.title)
 
-            // 4. Try to share on mobile first
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-            let shareAttempted = false
-
-            if (isMobile && navigator.share) {
-                try {
-                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                        await navigator.share({
-                            files: [file],
-                            title: generatorData.title,
-                            text: `Business Report: ${generatorData.title}`
-                        })
-                        shareAttempted = true
-                        console.log('Report shared successfully via native share')
-                    }
-                } catch (error: any) {
-                    // User cancelled or share failed, fall through to download
-                    if (error.name !== 'AbortError') {
-                        console.log('Share failed, falling back to download:', error.message)
-                    }
-                }
-            }
-
-            // 5. Fallback to download if share wasn't used or failed
-            if (!shareAttempted) {
+            if (!shareSuccess && !Capacitor.isNativePlatform()) {
                 const url = URL.createObjectURL(file)
                 const link = document.createElement('a')
                 link.href = url

@@ -88,15 +88,7 @@ export default function InvoicePreviewModal({
                         </button>
 
                         <button
-                            onClick={async () => {
-                                // On mobile/phone, we prefer Share as it's more reliable than a straight download
-                                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-                                if (isMobile) {
-                                    await shareInvoice(data, theme)
-                                } else {
-                                    downloadInvoice(data, true, theme)
-                                }
-                            }}
+                            onClick={() => downloadInvoice(data, true, theme)}
                             className="flex items-center gap-2 px-5 py-2 border border-[var(--deep-contrast)] text-[var(--deep-contrast)] hover:bg-[var(--deep-contrast)]/10 transition-all font-bold"
                         >
                             <Download className="h-4 w-4" />
@@ -136,18 +128,7 @@ export default function InvoicePreviewModal({
                 {/* Bottom Bar (Mobile) - Simple */}
                 <div className="sm:hidden relative z-20 flex items-center justify-around border-t border-[var(--foreground)]/10 px-6 py-5 bg-[var(--background)]">
                     <button
-                        onClick={async () => {
-                            const file = await saveInvoiceAsImage(data, false, theme)
-                            if (file && navigator.share && navigator.canShare && navigator.canShare({ files: [file as File] })) {
-                                await navigator.share({
-                                    title: `Invoice Screenshot`,
-                                    files: [file as File]
-                                })
-                            } else {
-                                // Fallback
-                                saveInvoiceAsImage(data, true, theme)
-                            }
-                        }}
+                        onClick={() => saveInvoiceAsImage(data, true, theme)}
                         className="flex items-center gap-2 text-[var(--deep-contrast)] font-bold uppercase text-[10px] tracking-widest"
                     >
                         <Camera className="h-5 w-5" />

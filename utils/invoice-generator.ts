@@ -1,4 +1,6 @@
-// Types only imports
+import { Capacitor } from '@capacitor/core'
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem'
+import { Share } from '@capacitor/share'
 import type { jsPDF } from 'jspdf'
 import { formatNumber } from '@/lib/format-number'
 
@@ -385,9 +387,15 @@ export function generateInvoiceHTML(data: InvoiceData, theme: 'light' | 'dark' =
  * Print invoice using a hidden iframe to prevent navigation
  */
 export function printInvoice(data: InvoiceData, theme: 'light' | 'dark' = 'light') {
+    if (Capacitor.isNativePlatform()) {
+        shareInvoice(data, theme)
+        return
+    }
+
     // strict reset for printing
     const existingFrame = document.getElementById('invoice-print-frame')
     if (existingFrame) existingFrame.remove()
+    // ...
 
     const iframe = document.createElement('iframe')
     iframe.id = 'invoice-print-frame'
@@ -477,12 +485,38 @@ export async function downloadInvoice(data: InvoiceData, autoDownload = true, th
         const fileName = `${data.invoiceNumber}.pdf`
 
         if (autoDownload) {
-            const url = URL.createObjectURL(blob)
-            const a = document.createElement('a')
-            a.href = url
-            a.download = fileName
-            a.click()
-            URL.revokeObjectURL(url)
+            if (Capacitor.isNativePlatform()) {
+                // Save to cache and share
+                const reader = new FileReader()
+                const base64Promise = new Promise<string>((resolve) => {
+                    reader.onloadend = () => {
+                        const base64data = reader.result as string
+                        resolve(base64data.split(',')[1]) // Get just the base64 part
+                    }
+                })
+                reader.readAsDataURL(blob)
+                const base64Data = await base64Promise
+
+                const writeResult = await Filesystem.writeFile({
+                    path: fileName,
+                    data: base64Data,
+                    directory: Directory.Cache
+                })
+
+                await Share.share({
+                    title: `Invoice ${data.invoiceNumber}`,
+                    text: `Exported Invoice from ${data.businessName}`,
+                    url: writeResult.uri,
+                    dialogTitle: 'Save or Share Invoice'
+                })
+            } else {
+                const url = URL.createObjectURL(blob)
+                const a = document.createElement('a')
+                a.href = url
+                a.download = fileName
+                a.click()
+                URL.revokeObjectURL(url)
+            }
         }
 
         return new File([blob], fileName, { type: 'application/pdf' })
@@ -530,10 +564,26 @@ export async function saveInvoiceAsImage(data: InvoiceData, autoDownload = true,
         const fileName = `${data.invoiceNumber}_snapshot.png`
 
         if (autoDownload) {
-            const a = document.createElement('a')
-            a.href = imgData
-            a.download = fileName
-            a.click()
+            if (Capacitor.isNativePlatform()) {
+                const base64Data = imgData.split(',')[1]
+                const writeResult = await Filesystem.writeFile({
+                    path: fileName,
+                    data: base64Data,
+                    directory: Directory.Cache
+                })
+
+                await Share.share({
+                    title: 'Invoice Snapshot',
+                    text: `Snapshot for Invoice ${data.invoiceNumber}`,
+                    url: writeResult.uri,
+                    dialogTitle: 'Save or Share Snapshot'
+                })
+            } else {
+                const a = document.createElement('a')
+                a.href = imgData
+                a.download = fileName
+                a.click()
+            }
         }
 
         // Convert base64 to blob/file for sharing
@@ -553,28 +603,51 @@ export async function saveInvoiceAsImage(data: InvoiceData, autoDownload = true,
  */
 export async function shareInvoice(data: InvoiceData, theme: 'light' | 'dark' = 'light') {
     try {
-        // We prefer PDF for sharing
+        // We prefer PDF for sharing - Pass false to autoDownload to handle UI manually here
         const file = await downloadInvoice(data, false, theme)
 
-        if (file && typeof navigator !== 'undefined' && navigator.canShare && navigator.canShare({ files: [file as File] })) {
-            await navigator.share({
-                title: `Invoice ${data.invoiceNumber}`,
-                text: `Invoice ${data.invoiceNumber} from ${data.businessName}`,
-                files: [file as File]
-            })
-            return true
-        } else {
-            // Fallback for devices that don't support file sharing but might support text sharing
-            // or just trigger the download if all else fails
-            if (file) {
+        if (file) {
+            if (Capacitor.isNativePlatform()) {
+                const reader = new FileReader()
+                const base64Promise = new Promise<string>((resolve) => {
+                    reader.onloadend = () => {
+                        const base64data = reader.result as string
+                        resolve(base64data.split(',')[1])
+                    }
+                })
+                reader.readAsDataURL(file as File)
+                const base64Data = await base64Promise
+
+                const writeResult = await Filesystem.writeFile({
+                    path: file.name,
+                    data: base64Data,
+                    directory: Directory.Cache
+                })
+
+                await Share.share({
+                    title: `Share Invoice`,
+                    text: `Invoice ${data.invoiceNumber} from ${data.businessName}`,
+                    url: writeResult.uri,
+                    dialogTitle: 'Share'
+                })
+                return true
+            } else if (typeof navigator !== 'undefined' && navigator.canShare && navigator.canShare({ files: [file as File] })) {
+                await navigator.share({
+                    title: `Invoice ${data.invoiceNumber}`,
+                    text: `Invoice ${data.invoiceNumber} from ${data.businessName}`,
+                    files: [file as File]
+                })
+                return true
+            } else {
+                // Fallback for web
                 const url = URL.createObjectURL(file)
                 const a = document.createElement('a')
                 a.href = url
                 a.download = file.name
                 a.click()
                 URL.revokeObjectURL(url)
+                return false
             }
-            return false
         }
     } catch (error) {
         console.error('Error sharing:', error)
