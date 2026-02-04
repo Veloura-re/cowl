@@ -181,9 +181,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
         }
     }
 
-    const handleEdit = (invoice: any) => {
-        router.push(`/dashboard/purchases/edit?id=${invoice.id}`)
-    }
+    // handleEdit removed - editing disabled
 
     const handlePrintInvoice = async (e: React.MouseEvent, invoice: any) => {
         e.stopPropagation()
@@ -417,7 +415,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                             animate="show"
                             exit={{ opacity: 0, scale: 0.95 }}
                             transition={{ duration: 0.2 }}
-                            onClick={() => handleEdit(inv)}
+                            onClick={(e) => handlePrintInvoice(e, inv)}
                             onMouseDown={() => handleTouchStart(inv)}
                             onMouseUp={handleTouchEnd}
                             onMouseLeave={handleTouchEnd}
@@ -478,15 +476,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                                     >
                                         <Printer size={7} />
                                     </button>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation()
-                                            handleEdit(inv)
-                                        }}
-                                        className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
-                                    >
-                                        <Edit2 size={7} />
-                                    </button>
+                                    {/* Edit button removed */}
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation()

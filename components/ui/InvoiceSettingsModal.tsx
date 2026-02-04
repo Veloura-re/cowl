@@ -13,7 +13,7 @@ interface InvoiceSettingsModalProps {
     initialSettings?: {
         accentColor?: string
         footerNote?: string
-        size?: 'A4' | 'THERMAL'
+        size?: 'A4' | 'THERMAL' | 'NANO'
     }
     onSuccess?: () => void
 }
@@ -30,9 +30,9 @@ const COLORS = [
 ]
 
 export default function InvoiceSettingsModal({ isOpen, onClose, businessId, initialSettings, onSuccess }: InvoiceSettingsModalProps) {
-    const [accentColor, setAccentColor] = useState(initialSettings?.accentColor || '#000000')
+    const [accentColor, setAccentColor] = useState(initialSettings?.accentColor || '#111827')
     const [footerNote, setFooterNote] = useState(initialSettings?.footerNote || '')
-    const [size, setSize] = useState<'A4' | 'THERMAL'>(initialSettings?.size || 'A4')
+    const [size, setSize] = useState<'A4' | 'THERMAL' | 'NANO'>(initialSettings?.size || 'A4')
     const [saving, setSaving] = useState(false)
     const supabase = createClient()
 
@@ -138,8 +138,31 @@ export default function InvoiceSettingsModal({ isOpen, onClose, businessId, init
                                     <div className="h-0.5 w-full bg-current/40" />
                                     <div className="h-0.5 w-3/4 bg-current/40" />
                                 </div>
-                                <span className="text-[9px] font-black uppercase tracking-widest">Thermal (Receipt)</span>
+                                <span className="text-[9px] font-black uppercase tracking-widest">Thermal (80mm)</span>
                                 {size === 'THERMAL' && (
+                                    <motion.div
+                                        layoutId="check"
+                                        className="absolute top-2 right-2 h-5 w-5 bg-[var(--primary-green)] rounded-full flex items-center justify-center shadow-lg shadow-[var(--primary-green)]/40"
+                                    >
+                                        <Check className="h-3 w-3 text-white" />
+                                    </motion.div>
+                                )}
+                            </button>
+                            <button
+                                onClick={() => setSize('NANO')}
+                                className={clsx(
+                                    "relative h-24 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all active:scale-95 group",
+                                    size === 'NANO'
+                                        ? "border-[var(--primary-green)] bg-[var(--primary-green)]/10 text-white"
+                                        : "border-white/10 bg-white/5 text-white/40 hover:bg-white/10 hover:text-white"
+                                )}
+                            >
+                                <div className="w-4 h-10 border border-current rounded-sm bg-current/10 flex flex-col gap-0.5 p-0.5 overflow-hidden">
+                                    <div className="h-0.5 w-full bg-current/60" />
+                                    <div className="h-0.5 w-full bg-current/60" />
+                                </div>
+                                <span className="text-[9px] font-black uppercase tracking-widest text-center px-1">Nano (58mm)</span>
+                                {size === 'NANO' && (
                                     <motion.div
                                         layoutId="check"
                                         className="absolute top-2 right-2 h-5 w-5 bg-[var(--primary-green)] rounded-full flex items-center justify-center shadow-lg shadow-[var(--primary-green)]/40"

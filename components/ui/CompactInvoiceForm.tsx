@@ -40,7 +40,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
     const router = useRouter()
     const { activeBusinessId, formatCurrency, businesses } = useBusiness()
     const supabase = useMemo(() => createClient(), [])
-    const isEdit = !!initialData?.id
+    const isEdit = false // Hardcoded to false - No more editing
     const isSale = useMemo(() => initialData ? initialData.type === 'SALE' : true, [initialData?.type])
 
     const [loading, setLoading] = useState(false)
@@ -427,87 +427,14 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
         setLoading(true)
 
         try {
+            // Hardcode isEdit to false, so only the CREATE FLOW is executed.
+            // The original update logic is removed.
+            const isEdit = false;
+
             if (isEdit) {
-                // UPDATE FLOW
-                console.log('Update Flow Triggered for ID:', cleanUUID(initialData.id));
-
-                // 0. Validation
-                if (!cleanUUID(initialData.id)) {
-                    throw new Error('Invalid Invoice ID for update')
-                }
-
-                for (const item of initialLineItems || []) {
-                    if (item.item_id) {
-                        const { data: dbItem } = await supabase.from('items').select('stock_quantity').eq('id', cleanUUID(item.item_id)).single()
-                        if (dbItem) {
-                            const multiplier = isSale ? 1 : -1
-                            const newStock = (dbItem.stock_quantity || 0) + (item.quantity * multiplier)
-                            await supabase.from('items').update({ stock_quantity: newStock }).eq('id', cleanUUID(item.item_id))
-                        }
-                    }
-                }
-
-                const { error: deleteError } = await supabase.from('invoice_items').delete().eq('invoice_id', cleanUUID(initialData.id))
-                if (deleteError) throw deleteError
-
-                const { data: transactions } = await supabase.from('transactions').select('amount, type').eq('invoice_id', cleanUUID(initialData.id))
-                const netPaidOrReceived = transactions?.reduce((acc, t) => {
-                    const amount = Number(t.amount) || 0
-                    if (isSale) {
-                        return acc + (t.type === 'RECEIPT' ? amount : -amount)
-                    } else {
-                        return acc + (t.type === 'PAYMENT' ? amount : -amount)
-                    }
-                }, 0) || 0
-                const newBalance = totalAmount - netPaidOrReceived
-
-                let status = 'UNPAID'
-                if (newBalance <= 0) status = 'PAID'
-                else if (netPaidOrReceived > 0) status = 'PARTIAL'
-
-                const { error: invoiceError } = await supabase
-                    .from('invoices')
-                    .update({
-                        party_id: currentPartyId,
-                        invoice_number: invoiceNumber,
-                        date: date,
-                        due_date: dueDate || null,
-                        total_amount: totalAmount,
-                        balance_amount: newBalance,
-                        status: status,
-                        notes: notes,
-                        discount_amount: discountAmount,
-                        tax_amount: invoiceTaxAmount,
-                        attachments: attachments
-                    })
-                    .eq('id', cleanUUID(initialData.id))
-
-                if (invoiceError) throw invoiceError
-
-                const newInvoiceItems = rows.map(row => ({
-                    invoice_id: cleanUUID(initialData.id),
-                    item_id: cleanUUID(row.itemId),
-                    description: row.name,
-                    quantity: Number(row.quantity) || 0,
-                    rate: Number(row.rate) || 0,
-                    tax_amount: (Number(row.quantity) || 0) * (Number(row.rate) || 0) * (Number(row.tax || 0) / 100),
-                    total: row.amount,
-                    purchase_price: Number(row.purchasePrice) || 0
-                }))
-
-                const { error: itemsError } = await supabase.from('invoice_items').insert(newInvoiceItems)
-                if (itemsError) throw itemsError
-
-                for (const row of rows) {
-                    if (row.itemId) {
-                        const { data: item } = await supabase.from('items').select('stock_quantity').eq('id', cleanUUID(row.itemId)).single()
-                        if (item) {
-                            const multiplier = isSale ? -1 : 1
-                            const newStock = (item.stock_quantity || 0) + ((Number(row.quantity) || 0) * multiplier)
-                            await supabase.from('items').update({ stock_quantity: newStock }).eq('id', cleanUUID(row.itemId))
-                        }
-                    }
-                }
+                // UPDATE FLOW REMOVED - Redirect to creation flow
+                console.log('Update Flow Disabled');
+                return;
             } else {
                 // CREATE FLOW
                 const isPaid = paymentMode !== 'UNPAID'
@@ -641,7 +568,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                             className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[var(--primary-green)] text-[var(--primary-foreground)] text-[8px] font-black uppercase tracking-widest hover:bg-[var(--primary-hover)] transition-all disabled:opacity-50 shadow-md active:scale-95"
                         >
                             {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
-                            <span>{isEdit ? 'Update' : (isSale ? 'Commit' : 'Record')}</span>
+                            <span>{isSale ? 'Commit' : 'Record'}</span>
                         </button>
                     </div>
                 </div>
@@ -751,16 +678,16 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                     <div className="space-y-2">
                                         <div className="flex justify-between text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 px-0.5">
                                             <span>Subtotal</span>
-                                            <span className="text-[var(--deep-contrast)] tabular-nums font-mono">{formatCurrency(subtotal)}</span>
+                                            <span className="text-[var(--deep-contrast)] tabular-nums">{formatCurrency(subtotal)}</span>
                                         </div>
                                         <div className="flex justify-between text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 px-0.5">
                                             <span>Tax</span>
-                                            <span className="text-[var(--deep-contrast)] tabular-nums font-mono">{formatCurrency(totalTax)}</span>
+                                            <span className="text-[var(--deep-contrast)] tabular-nums">{formatCurrency(totalTax)}</span>
                                         </div>
                                         {discountAmount > 0 && (
                                             <div className="flex justify-between text-[8px] font-black uppercase tracking-widest text-orange-600 px-0.5">
                                                 <span>Rebate</span>
-                                                <span className="tabular-nums font-mono">-{formatCurrency(discountAmount)}</span>
+                                                <span className="tabular-nums">-{formatCurrency(discountAmount)}</span>
                                             </div>
                                         )}
                                     </div>

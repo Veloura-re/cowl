@@ -57,9 +57,9 @@ export default function SettingsPage() {
     const [logoUrl, setLogoUrl] = useState<string | null>(null)
     const [isInvoiceSettingsModalOpen, setIsInvoiceSettingsModalOpen] = useState(false)
     const [invoiceSettings, setInvoiceSettings] = useState({
-        accentColor: '#000000',
+        accentColor: '#111827',
         footerNote: '',
-        size: 'A4' as 'A4' | 'THERMAL'
+        size: 'A4' as 'A4' | 'THERMAL' | 'NANO'
     })
 
     const { activeBusinessId, businesses, setActiveBusinessId, refreshBusinesses } = useBusiness()
@@ -97,7 +97,7 @@ export default function SettingsPage() {
                             }))
                             setLogoUrl(bus.logo_url || null)
                             setInvoiceSettings({
-                                accentColor: bus.invoice_accent_color || '#000000',
+                                accentColor: bus.invoice_accent_color || '#111827',
                                 footerNote: bus.invoice_footer_note || '',
                                 size: bus.invoice_size || 'A4'
                             })
@@ -391,7 +391,7 @@ export default function SettingsPage() {
         const { data } = await supabase.from('businesses').select('invoice_accent_color, invoice_footer_note, invoice_size').eq('id', activeBusinessId).single()
         if (data) {
             setInvoiceSettings({
-                accentColor: data.invoice_accent_color || '#000000',
+                accentColor: data.invoice_accent_color || '#111827',
                 footerNote: data.invoice_footer_note || '',
                 size: data.invoice_size || 'A4'
             })
@@ -528,30 +528,6 @@ export default function SettingsPage() {
                     </div>
                 </BentoCard>
 
-
-
-                {/* [NEW] INVOICE CONFIGURATION */}
-                <BentoCard
-                    id="settings-invoice-card"
-                    title="Document Design"
-                    subtitle="Invoices & Receipts"
-                    icon={FileText}
-                    className="md:col-span-1"
-                >
-                    <div className="flex flex-col gap-2 h-full justify-center">
-                        <button
-                            onClick={() => setIsInvoiceSettingsModalOpen(true)}
-                            className="w-full h-10 rounded-xl bg-[var(--deep-contrast)]/5 text-[var(--deep-contrast)] border border-[var(--deep-contrast)]/10 hover:bg-[var(--deep-contrast)] hover:text-[var(--primary-foreground)] flex items-center justify-center gap-2 transition-all active:scale-95 group"
-                        >
-                            <Settings size={14} className="group-hover:rotate-180 transition-transform duration-500" />
-                            <span className="text-[9px] font-black uppercase tracking-widest">Customize</span>
-                        </button>
-                        <div className="flex items-center justify-between px-2">
-                            <span className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest">Format</span>
-                            <span className="text-[9px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">{invoiceSettings.size}</span>
-                        </div>
-                    </div>
-                </BentoCard>
 
                 {/* 2. PERSONAL Identity */}
                 <BentoCard

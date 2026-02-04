@@ -50,22 +50,37 @@ export type InvoiceData = {
     // Customization
     accentColor?: string
     footerNote?: string
-    size?: 'A4' | 'THERMAL'
+    size?: 'A4' | 'THERMAL' | 'NANO'
 }
 
-export function generateInvoiceHTML(data: InvoiceData): string {
+export function generateInvoiceHTML(data: InvoiceData, theme: 'light' | 'dark' = 'light'): string {
     const isSale = data.type === 'SALE'
     const title = isSale ? 'INVOICE' : 'PURCHASE ORDER'
-    const accentColor = data.accentColor || '#111827'
-    const isThermal = data.size === 'THERMAL'
+    const accentColor = data.accentColor || '#000000'
+    const isA4 = true // Forced A4 as requested
 
-    const statusColors: Record<string, string> = {
-        'PAID': '#10b981', // emerald-500
-        'UNPAID': '#f59e0b', // amber-500
-        'PARTIAL': '#3b82f6', // blue-500
-        'CANCELLED': '#ef4444' // red-500
+    // Theme-aware color schemes
+    const lightColors = {
+        bgColor: '#ffffff',
+        textMain: '#000000',
+        textMuted: '#444444',
+        borderColor: '#000000',
+        pageBackground: '#f0f0f0',
+        infoBg: '#fdfdfd',
+        tableBorder: '#eee'
     }
-    const statusColor = statusColors[data.status] || '#6b7280'
+
+    const darkColors = {
+        bgColor: '#0a0a0a',
+        textMain: '#fafafa',
+        textMuted: '#a3a3a3',
+        borderColor: '#fafafa',
+        pageBackground: '#000000',
+        infoBg: '#141414',
+        tableBorder: '#262626'
+    }
+
+    const colors = theme === 'dark' ? darkColors : lightColors
 
     return `
 <!DOCTYPE html>
@@ -74,273 +89,290 @@ export function generateInvoiceHTML(data: InvoiceData): string {
     <meta charset="UTF-8">
     <title>${title} - ${data.invoiceNumber}</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Share+Tech+Mono&display=swap');
-        
         :root {
-            --bg-color: #ffffff;
-            --text-main: #111827;
-            --text-muted: #6b7280;
-            --accent-bg: #f9fafb;
-            --primary: ${accentColor};
+            --bg-color: ${colors.bgColor};
+            --text-main: ${colors.textMain};
+            --text-muted: ${colors.textMuted};
+            --border-color: ${colors.borderColor};
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: 'Inter', sans-serif;
-            background: #f3f4f6;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: ${colors.pageBackground};
             color: var(--text-main);
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
+            line-height: 1.2;
+            letter-spacing: -0.01em;
+            font-weight: 100;
+            font-feature-settings: "tnum", "lnum", "cv01";
         }
 
         .page {
-            width: ${isThermal ? '80mm' : '210mm'};
-            min-height: ${isThermal ? 'auto' : '297mm'};
+            width: 210mm;
+            min-height: 297mm;
             margin: 0 auto;
             background: var(--bg-color);
-            padding: ${isThermal ? '4mm' : '8mm'};
+            padding: 12mm;
             position: relative;
             display: flex;
             flex-direction: column;
-            ${isThermal ? 'font-size: 10px; padding-bottom: 20mm;' : 'font-size: 9px;'}
+            font-size: 9.5pt;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
         @media print {
-            body { background: white; }
-            .page { width: 100%; margin: 0; padding: ${isThermal ? '0' : '5mm'}; box-shadow: none; border: none; }
+            body { background: ${theme === 'dark' ? '#000' : '#fff'}; }
+            .page { width: 210mm; height: 297mm; margin: 0; padding: 12mm; box-shadow: none; border: none; }
         }
 
-        /* Header */
+        /* Classic Centered Header */
         .header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: flex-start; 
-            margin-bottom: ${isThermal ? '4mm' : '4mm'}; 
-            ${isThermal ? 'flex-direction: column; align-items: center; text-align: center;' : ''}
-        }
-        .brand-section { flex: 1; }
-        .meta-section { text-align: ${isThermal ? 'center' : 'right'}; ${isThermal ? 'margin-top: 10px; width: 100%;' : ''} }
-        
-        .logo { 
-            height: ${isThermal ? '25px' : '30px'}; 
-            width: auto; 
-            object-fit: contain; 
-            margin-bottom: 6px; 
-            display: ${isThermal ? 'inline-block' : 'block'}; 
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 0.25pt solid var(--border-color);
+            padding-bottom: 8px;
         }
         
-        .company-name { font-size: ${isThermal ? '14px' : '16px'}; font-weight: 900; text-transform: uppercase; letter-spacing: -0.02em; margin-bottom: 2px; }
-        .company-details { font-size: ${isThermal ? '8px' : '8px'}; color: var(--text-muted); line-height: 1.3; text-transform: uppercase; }
-
-        .status-badge {
-            display: inline-block;
-            background: ${statusColor};
-            color: white;
-            padding: 2px 8px;
-            border-radius: 99px;
-            font-weight: 700;
-            font-size: ${isThermal ? '8px' : '9px'};
+        .document-title { 
+            font-size: 22pt; 
+            font-weight: 200; 
+            letter-spacing: 4pt;
             text-transform: uppercase;
-            margin-bottom: ${isThermal ? '4px' : '6px'};
+            margin-bottom: 4px;
         }
 
-        .document-title { font-size: ${isThermal ? '16px' : '20px'}; font-weight: 900; margin-bottom: 2px; letter-spacing: 0.1em; }
-        .document-meta { font-size: ${isThermal ? '10px' : '9px'}; color: var(--text-muted); }
-        .document-meta b { color: var(--text-main); }
+        /* Business Info & Logo */
+        .business-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            align-items: flex-end;
+        }
 
-        /* Info Grid */
-        .info-grid { 
-            display: grid; 
-            grid-template-columns: ${isThermal ? '1fr' : '1fr 1fr'}; 
-            gap: ${isThermal ? '8px' : '12px'}; 
-            margin-bottom: ${isThermal ? '4mm' : '6mm'}; 
-            background: var(--accent-bg);
-            padding: ${isThermal ? '8px' : '10px'};
-            border-radius: ${isThermal ? '8px' : '10px'};
+        .logo { 
+            max-height: 50px;
+            max-width: 180px;
+            object-fit: contain;
+        }
+
+        .company-info {
+            text-align: right;
+            font-size: 9pt;
         }
         
-        .info-title { font-size: ${isThermal ? '7px' : '7px'}; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: ${isThermal ? '2px' : '4px'}; }
-        .info-content { font-size: ${isThermal ? '10px' : '9px'}; font-weight: 400; line-height: 1.3; }
-        .info-content b { font-weight: 900; text-transform: uppercase; }
+        .company-name { font-size: 12pt; font-weight: 200; text-transform: uppercase; }
 
-        /* Table */
-        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: ${isThermal ? '6mm' : '6mm'}; }
+        /* Meta & Parties Info Grid */
+        .info-grid { 
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+        
+        .party-box {
+            flex: 1;
+            border: 0.15pt solid var(--border-color);
+            padding: 8px;
+        }
+        
+        .info-box {
+            flex: 0.6;
+            border: 0.15pt solid var(--border-color);
+            padding: 8px;
+            background: ${colors.infoBg};
+        }
+        
+        .label { font-size: 7.5pt; font-weight: 200; text-transform: uppercase; color: var(--text-muted); margin-bottom: 2px; }
+        .content { font-size: 9pt; font-weight: 100; }
+        .content b { font-weight: 100; }
+
+        /* Formal Table */
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-bottom: 20px; 
+        }
+        
         th { 
             text-align: left; 
-            font-size: ${isThermal ? '9px' : '9px'}; 
-            font-weight: 700;
+            font-size: 9pt; 
+            font-weight: 200;
             text-transform: uppercase; 
-            background: var(--primary);
-            color: white;
-            padding: ${isThermal ? '6px 8px' : '6px 10px'}; 
+            border-bottom: 0.5pt solid var(--border-color);
+            padding: 6px 4px;
         }
-        th:first-child { border-radius: 6px 0 0 6px; }
-        th:last-child { border-radius: 0 6px 6px 0; }
         
         td { 
-            padding: ${isThermal ? '6px 8px' : '6px 10px'}; 
-            font-size: ${isThermal ? '10px' : '9px'}; 
-            border-bottom: 1px solid #f3f4f6;
+            padding: 6px 4px;
+            font-size: 9pt; 
+            border-bottom: 0.15pt solid ${colors.tableBorder};
+            vertical-align: top;
         }
-        tr:nth-child(even) td { background-color: #f9fafb; }
-        .bold { font-weight: 700; }
+
         .text-right { text-align: right; }
         .text-center { text-align: center; }
 
-        /* Totals */
-        .totals-container { display: flex; justify-content: flex-end; margin-bottom: ${isThermal ? '6mm' : '8mm'}; }
-        .totals-table { width: ${isThermal ? '100%' : '240px'}; }
-        .total-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: ${isThermal ? '11px' : '12px'}; }
-        .final-total { 
-            background: var(--primary);
-            color: white;
-            border-radius: ${isThermal ? '8px' : '12px'};
-            margin-top: 8px; 
-            padding: ${isThermal ? '8px 12px' : '12px 16px'}; 
-            font-weight: 900; 
-            font-size: ${isThermal ? '14px' : '16px'};
+        /* Totals Area */
+        .totals-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: auto;
+        }
+        
+        .totals-table {
+            width: 220px;
+        }
+        
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            border-bottom: 0.15pt solid ${colors.tableBorder};
+            font-size: 9pt;
+        }
+        
+        .grand-total {
+            border-top: 0.5pt solid var(--border-color);
+            border-bottom: 0.5pt double var(--border-color);
+            font-weight: 200;
+            font-size: 11pt;
+            margin-top: 4px;
+            padding: 8px 0;
         }
 
-        /* Footer */
+        /* Footer & Signature */
         .footer { 
-            margin-top: auto; 
-            border-top: 1px solid #eee; 
-            padding-top: ${isThermal ? '12px' : '20px'}; 
-            display: flex; 
-            ${isThermal ? 'flex-direction: column; gap: 12px; text-align: center;' : 'justify-content: space-between;'}
-            font-size: 10px;
-            color: var(--text-muted);
+            margin-top: 30px;
+            border-top: 0.15pt solid ${colors.tableBorder};
+            padding-top: 12px;
+            font-size: 8.5pt;
+            display: flex;
+            justify-content: space-between;
         }
-        .footer-note { 
-            font-family: 'Share Tech Mono', monospace; 
-            background: #fdfdfd; 
-            border: 1px dashed #e5e7eb; 
-            padding: 8px; 
-            border-radius: 8px; 
-            font-size: ${isThermal ? '9px' : '10px'};
-        }
+        
+        .notes-section { flex: 1; margin-right: 30px; }
+        .signature-section { width: 180px; text-align: center; }
+        .signature-line { border-top: 0.15pt solid var(--border-color); margin-top: 35px; padding-top: 4px; font-weight: 200; text-transform: uppercase; font-size: 7.5pt; }
+        .signature-img { max-height: 45px; margin-bottom: -30px; }
+
     </style>
 </head>
 <body>
     <div class="page">
-        <!-- Header -->
+        <!-- Centered Header -->
         <div class="header">
-            <div class="brand-section">
+            <h1 class="document-title">${title}</h1>
+            <p>NO. <b>${data.invoiceNumber}</b> | DATE: <b>${data.date}</b></p>
+        </div>
+
+        <!-- Business Section -->
+        <div class="business-section">
+            <div>
                 ${data.businessLogoUrl ? `<img src="${data.businessLogoUrl}" class="logo" />` : ''}
-                <h1 class="company-name">${data.businessName}</h1>
-                <div class="company-details">
-                    ${data.businessAddress || ''}<br>
-                    ${data.businessPhone || ''}
-                </div>
             </div>
-            <div class="meta-section">
-                <div class="status-badge">${data.status}</div>
-                <h2 class="document-title">${isSale ? 'INVOICE' : 'PURCHASE'}</h2>
-                <div class="document-meta">
-                    NO. <b>${data.invoiceNumber}</b><br>
-                    DATE <b>${data.date}</b>
-                </div>
+            <div class="company-info">
+                <h2 class="company-name">${data.businessName}</h2>
+                <p>${data.businessAddress || ''}</p>
+                <p>${data.businessPhone || ''}</p>
             </div>
         </div>
 
         <!-- Info Grid -->
         <div class="info-grid">
-            <div>
-                <p class="info-title">Issued To</p>
-                <div class="info-content">
-                    <b>${data.partyName}</b><br>
-                    ${data.partyAddress || 'No Address Provided'}<br>
-                    ${data.partyPhone || ''}<br>
-                    ${data.partyGoogleLocation ? `<a href="${data.partyGoogleLocation}" style="color: var(--primary); text-decoration: none; font-size: 8px;">📍 View Location</a>` : ''}
+            <div class="party-box">
+                <p class="label">Bill To:</p>
+                <div class="content">
+                    <p><b>${data.partyName}</b></p>
+                    <p>${data.partyAddress || ''}</p>
+                    <p>${data.partyPhone || ''}</p>
                 </div>
             </div>
-            <div class="${isThermal ? '' : 'text-right'}">
-                <p class="info-title">Payment Details</p>
-                <div class="info-content">
-                    DUE DATE: <b>${data.dueDate || 'ON RECEIPT'}</b><br>
-                    CURRENCY: <b>${data.currency.toUpperCase()}</b>
+            <div class="info-box">
+                <div style="margin-bottom: 10px;">
+                    <p class="label">Due Date:</p>
+                    <p class="content"><b>${data.dueDate || 'ON RECEIPT'}</b></p>
+                </div>
+                <div>
+                    <p class="label">Currency:</p>
+                    <p class="content"><b>${data.currency.toUpperCase()} (${data.currencySymbol})</b></p>
                 </div>
             </div>
         </div>
 
-        <!-- Items -->
+        <!-- Items Table -->
         <table>
             <thead>
                 <tr>
-                    <th style="width: ${isThermal ? '40%' : '45%'}">Desc</th>
-                    ${isThermal ? '' : '<th class="text-center" style="width: 10%">Qty</th>'}
-                    <th class="text-right" style="width: ${isThermal ? '25%' : '15%'}">${isThermal ? 'Price' : 'Rate'}</th>
-                    ${isThermal ? '' : '<th class="text-right" style="width: 10%">Tax</th>'}
-                    <th class="text-right" style="width: ${isThermal ? '35%' : '20%'}">Amt</th>
+                    <th style="width: 50%">Description</th>
+                    <th class="text-center" style="width: 10%">Qty</th>
+                    <th class="text-right" style="width: 20%">Rate</th>
+                    <th class="text-right" style="width: 20%">Amount</th>
                 </tr>
             </thead>
             <tbody>
                 ${data.items.map(item => `
                 <tr>
                     <td>
-                        <div class="bold">${item.description}</div>
-                        ${isThermal ? `<div style="font-size: 8px; color: #9ca3af;">${item.quantity} x ${formatNumber(item.rate)}</div>` : ''}
+                        <b>${item.description}</b>
+                        ${item.tax ? `<br><small style="color: #666; font-size: 8pt;">Tax: ${item.tax}%</small>` : ''}
                     </td>
-                    ${isThermal ? '' : `<td class="text-center">${item.quantity}</td>`}
-                    ${isThermal ? `<td class="text-right">${formatNumber(item.rate)}</td>` : `<td class="text-right">${formatNumber(item.rate)}</td>`}
-                    ${isThermal ? '' : `<td class="text-right text-muted">${item.tax}%</td>`}
-                    <td class="text-right bold">${data.currencySymbol}${formatNumber(item.total)}</td>
+                    <td class="text-center">${item.quantity}</td>
+                    <td class="text-right">${formatNumber(item.rate)}</td>
+                    <td class="text-right"><b>${formatNumber(item.total)}</b></td>
                 </tr>
                 `).join('')}
             </tbody>
         </table>
 
         <!-- Totals -->
-        <div class="totals-container">
+        <div class="totals-section">
             <div class="totals-table">
                 <div class="total-row">
-                    <span class="text-muted text-uppercase">Subtotal</span>
+                    <span>Subtotal:</span>
                     <span>${data.currencySymbol}${formatNumber(data.subtotal)}</span>
                 </div>
                 <div class="total-row">
-                    <span class="text-muted text-uppercase">Tax</span>
+                    <span>Tax Total:</span>
                     <span>${data.currencySymbol}${formatNumber(data.taxAmount)}</span>
                 </div>
                 ${data.discountAmount ? `
                 <div class="total-row">
-                    <span class="text-muted text-uppercase">Discount</span>
+                    <span>Discount:</span>
                     <span>-${data.currencySymbol}${formatNumber(data.discountAmount)}</span>
                 </div>` : ''}
                 
-                <div class="final-total total-row">
-                    <span>GRAND TOTAL</span>
+                <div class="grand-total total-row">
+                    <span>TOTAL AMOUNT:</span>
                     <span>${data.currencySymbol}${formatNumber(data.totalAmount)}</span>
                 </div>
 
                 ${data.paidAmount ? `
-                <div class="total-row mt-2">
-                    <span class="text-muted text-uppercase">Amount Paid</span>
-                    <span class="bold">${data.currencySymbol}${formatNumber(data.paidAmount)}</span>
+                <div class="total-row" style="color: #000;">
+                    <span>Amount Paid:</span>
+                    <span>${data.currencySymbol}${formatNumber(data.paidAmount)}</span>
                 </div>` : ''}
 
-                ${data.balanceAmount ? `
-                <div class="total-row">
-                    <span class="text-muted text-uppercase">Balance Due</span>
-                    <span class="bold">${data.currencySymbol}${formatNumber(data.balanceAmount)}</span>
+                ${data.balanceAmount && data.balanceAmount > 0 ? `
+                <div class="total-row" style="color: red; font-weight: bold;">
+                    <span>Balance Due:</span>
+                    <span>${data.currencySymbol}${formatNumber(data.balanceAmount)}</span>
                 </div>` : ''}
             </div>
         </div>
 
-        <!-- Footer / Signature -->
+        <!-- Footer -->
         <div class="footer">
-            <div style="flex: 1;">
-                ${(data.notes || data.footerNote) ? `
-                    <div class="footer-note">
-                        ${data.notes ? `<p class="info-content" style="margin-bottom: 4px;"><strong>NOTES:</strong> ${data.notes.toUpperCase()}</p>` : ''}
-                        ${data.footerNote ? `<p class="info-content" style="opacity: 0.8;">${data.footerNote}</p>` : ''}
-                    </div>
-                ` : ''}
+            <div class="notes-section">
+                ${data.notes ? `<p class="label">Notes:</p><p>${data.notes}</p>` : ''}
+                ${data.footerNote ? `<p style="margin-top: 10px; font-style: italic; color: #666;">${data.footerNote}</p>` : ''}
             </div>
-            <div style="text-align: ${isThermal ? 'center' : 'right'};">
-                ${data.signature ? `<img src="${data.signature}" style="height: 28px; margin-bottom: 4px;" />` : '<div style="height: 28px;"></div>'}
-                <p class="info-title">Authorized Signature</p>
-                <div class="text-uppercase mt-2" style="font-size: 8px; opacity: 0.5;">Generated by COWL System</div>
+            <div class="signature-section">
+                ${data.signature ? `<img src="${data.signature}" class="signature-img" />` : ''}
+                <div class="signature-line">Authorized Signature</div>
             </div>
         </div>
     </div>
@@ -385,18 +417,21 @@ export function printInvoice(data: InvoiceData) {
 
 
 /**
- * Download invoice as PDF file using html2canvas + jsPDF for accurate rendering
+ * Download invoice as PDF file using html2canvas + jsPDF for accurate rendering.
+ * Returns the File object for potential sharing.
  */
-export async function downloadInvoice(data: InvoiceData): Promise<File | void> {
+export async function downloadInvoice(data: InvoiceData, autoDownload = true): Promise<File | void> {
     // 1. Create a hidden container to render the invoice specifically for capture
     const container = document.createElement('div')
     container.style.position = 'absolute'
     container.style.top = '-10000px'
     container.style.left = '-10000px'
-    // A4 width in pixels at roughly 96 DPI is ~794px, but we can go higher for quality. 
-    // 210mm = ~794px. Let's use 2x scale for sharpness.
-    container.style.width = '210mm'
-    container.style.minHeight = '297mm'
+
+    // Set appropriate width for container
+    const isNano = data.size === 'NANO'
+    const isThermal = data.size === 'THERMAL'
+    container.style.width = isNano ? '58mm' : (isThermal ? '80mm' : '210mm')
+    if (!isNano && !isThermal) container.style.minHeight = '297mm'
 
     // Inject the HTML
     container.innerHTML = generateInvoiceHTML(data)
@@ -409,23 +444,28 @@ export async function downloadInvoice(data: InvoiceData): Promise<File | void> {
         const html2canvas = (await import('html2canvas')).default
         const { jsPDF } = await import('jspdf')
 
-        // Small delay to ensure images/fonts might render (optional but safe)
-        await new Promise(resolve => setTimeout(resolve, 500))
+        // Wait for images and fonts to render
+        await new Promise(resolve => setTimeout(resolve, 800))
+        if (typeof document !== 'undefined' && (document as any).fonts) {
+            await (document as any).fonts.ready;
+        }
 
-        const canvas = await html2canvas(container.querySelector('.page') as HTMLElement, {
-            scale: 2, // Higher quality
-            useCORS: true, // For external images
+        const target = container.querySelector('.page') as HTMLElement
+        const canvas = await html2canvas(target, {
+            scale: 2.5, // Even higher quality for tiny fonts
+            useCORS: true,
             logging: false,
             backgroundColor: '#ffffff'
         })
 
         const imgData = canvas.toDataURL('image/jpeg', 1.0)
 
-        // A4 Dimensions: 210 x 297 mm
+        // PDF Generation
+        const format = isNano ? [58, canvas.height * (58 / canvas.width)] : (isThermal ? [80, canvas.height * (80 / canvas.width)] : 'a4')
         const pdf = new jsPDF({
             orientation: 'p',
             unit: 'mm',
-            format: 'a4'
+            format: format
         })
 
         const pdfWidth = pdf.internal.pageSize.getWidth()
@@ -433,18 +473,19 @@ export async function downloadInvoice(data: InvoiceData): Promise<File | void> {
 
         pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight)
 
-        // Check if we need to return a file (for sharing) or save it
         const blob = pdf.output('blob')
-        // We'll create a link to download it here since this is the primary purpose
-        // but we return the file object for shareInvoice below
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `${data.invoiceNumber}.pdf`
-        a.click()
-        URL.revokeObjectURL(url)
+        const fileName = `${data.invoiceNumber}.pdf`
 
-        return new File([blob], `${data.invoiceNumber}.pdf`, { type: 'application/pdf' })
+        if (autoDownload) {
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = fileName
+            a.click()
+            URL.revokeObjectURL(url)
+        }
+
+        return new File([blob], fileName, { type: 'application/pdf' })
 
     } catch (error) {
         console.error('PDF Generation Failed:', error)
@@ -455,27 +496,88 @@ export async function downloadInvoice(data: InvoiceData): Promise<File | void> {
 }
 
 /**
- * Handle native sharing of the Invoice PDF
+ * Capture invoice as high-quality image (Snapshot)
+ */
+export async function saveInvoiceAsImage(data: InvoiceData, autoDownload = true): Promise<File | void> {
+    const container = document.createElement('div')
+    container.style.position = 'absolute'
+    container.style.top = '-10000px'
+    container.style.left = '-10000px'
+
+    const isNano = data.size === 'NANO'
+    const isThermal = data.size === 'THERMAL'
+    container.style.width = isNano ? '58mm' : (isThermal ? '80mm' : '210mm')
+
+    container.innerHTML = generateInvoiceHTML(data)
+    document.body.appendChild(container)
+
+    try {
+        const html2canvas = (await import('html2canvas')).default
+        await new Promise(resolve => setTimeout(resolve, 800))
+        if (typeof document !== 'undefined' && (document as any).fonts) {
+            await (document as any).fonts.ready;
+        }
+
+        const target = container.querySelector('.page') as HTMLElement
+        const canvas = await html2canvas(target, {
+            scale: 3, // Ultra-high quality for image mode
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff'
+        })
+
+        const imgData = canvas.toDataURL('image/png', 1.0)
+        const fileName = `${data.invoiceNumber}_snapshot.png`
+
+        if (autoDownload) {
+            const a = document.createElement('a')
+            a.href = imgData
+            a.download = fileName
+            a.click()
+        }
+
+        // Convert base64 to blob/file for sharing
+        const res = await fetch(imgData)
+        const blob = await res.blob()
+        return new File([blob], fileName, { type: 'image/png' })
+
+    } catch (error) {
+        console.error('Snapshot Failed:', error)
+    } finally {
+        document.body.removeChild(container)
+    }
+}
+
+/**
+ * Handle robust sharing of the Invoice (PDF or Image)
  */
 export async function shareInvoice(data: InvoiceData) {
     try {
-        // downloadInvoice() will trigger a download, which might be annoying if sharing.
-        // Ideally we should separate "generateBlob" and "download". 
-        // But for time, let's just let it download and then share. 
-        // Actually, let's modify downloadInvoice logic above slightly to NOT auto-download if a flag is passed?
-        // Or just let it happen. The user might want both.
+        // We prefer PDF for sharing
+        const file = await downloadInvoice(data, false)
 
-        const file = await downloadInvoice(data)
-
-        if (file && navigator.canShare && navigator.canShare({ files: [file as File] })) {
+        if (file && typeof navigator !== 'undefined' && navigator.canShare && navigator.canShare({ files: [file as File] })) {
             await navigator.share({
                 title: `Invoice ${data.invoiceNumber}`,
                 text: `Invoice ${data.invoiceNumber} from ${data.businessName}`,
                 files: [file as File]
             })
+            return true
+        } else {
+            // Fallback for devices that don't support file sharing but might support text sharing
+            // or just trigger the download if all else fails
+            if (file) {
+                const url = URL.createObjectURL(file)
+                const a = document.createElement('a')
+                a.href = url
+                a.download = file.name
+                a.click()
+                URL.revokeObjectURL(url)
+            }
+            return false
         }
     } catch (error) {
         console.error('Error sharing:', error)
-        // If sharing fails, at least the downloadInvoice call already saved it.
+        return false
     }
 }

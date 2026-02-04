@@ -1,15 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 import { RouteThemeHandler } from "@/components/RouteThemeHandler";
 import { CyberGridBackground } from "@/components/ui/CyberGridBackground";
 import AppInitializer from "@/components/AppInitializer";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-});
 
 export const metadata: Metadata = {
   title: "Claire",
@@ -32,6 +25,13 @@ export const viewport: Viewport = {
 };
 
 import { Providers } from "@/components/Providers";
+import { Inter } from "next/font/google";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+});
 
 export default function RootLayout({
   children,
@@ -41,7 +41,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} antialiased bg-background text-foreground`}
+        className={`${inter.variable} ${inter.className} antialiased bg-background text-foreground`}
       >
         <Providers>
           <RouteThemeHandler />

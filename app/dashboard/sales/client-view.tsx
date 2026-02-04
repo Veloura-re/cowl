@@ -115,9 +115,7 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
         }
     }, [activeBusinessId, supabase])
 
-    const handleEdit = (invoice: any) => {
-        router.push(`/dashboard/sales/edit?id=${invoice.id}`)
-    }
+    // handleEdit removed - editing disabled
 
     const handlePrintInvoice = async (e: React.MouseEvent, invoice: any) => {
         e.stopPropagation() // Prevent card click
@@ -438,7 +436,7 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                         animate="show"
                         exit={{ opacity: 0, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
-                        onClick={() => handleEdit(invoice)}
+                        onClick={(e) => handlePrintInvoice(e, invoice)}
                         onMouseDown={() => handleTouchStart(invoice)}
                         onMouseUp={handleTouchEnd}
                         onMouseLeave={handleTouchEnd}
@@ -499,15 +497,7 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                                 >
                                     <Printer size={7} />
                                 </button>
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation()
-                                        handleEdit(invoice)
-                                    }}
-                                    className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
-                                >
-                                    <Edit2 size={7} />
-                                </button>
+                                {/* Edit button removed */}
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation()

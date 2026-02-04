@@ -41,6 +41,81 @@ export default function ReportsPage() {
         growth: '+0%'
     })
 
+    // Preview report data
+    const [previewLoading, setPreviewLoading] = useState(false)
+    const [previewData, setPreviewData] = useState<any[]>([])
+    const [previewHeaders, setPreviewHeaders] = useState<string[]>([])
+    const [previewSummary, setPreviewSummary] = useState<any[]>([])
+
+    // Fetch preview data when report type or date range changes
+    useEffect(() => {
+        if (!activeBusinessId) return
+
+        async function fetchPreviewData() {
+            setPreviewLoading(true)
+            try {
+                const reportData = await fetchReportDataService(
+                    activeBusinessId,
+                    selectedReport as any,
+                    selectedReport === 'INVENTORY' ? undefined : dateRange.start,
+                    selectedReport === 'INVENTORY' ? undefined : dateRange.end
+                )
+
+                // Format data based on report type
+                let headers: string[] = []
+                let rows: any[][] = []
+                let summary: any[] = []
+
+                if (selectedReport === 'PROFIT_LOSS') {
+                    const plData = reportData[0] as any
+                    headers = ['Category', 'Amount', '% of Expenses']
+                    rows = plData.breakdown.map((d: any) => [d.category, formatCurrency(d.amount), `${d.percentage}%`])
+                    summary = [
+                        { label: 'Total Revenue', value: formatCurrency(plData.revenue) },
+                        { label: 'Total Expenses', value: formatCurrency(plData.expenses) },
+                        { label: 'Net Profit/Loss', value: formatCurrency(plData.netProfit) },
+                        { label: 'Profit Margin', value: `${plData.profitMargin}%` }
+                    ]
+                } else if (selectedReport === 'INVENTORY') {
+                    headers = ['Item Name', 'SKU', 'Stock', 'Unit Cost', 'Total Value']
+                    rows = reportData.map((d: any) => [d.item, d.sku, d.stock, formatCurrency(d.cost), formatCurrency(d.value)])
+                    const totalVal = reportData.reduce((acc: number, curr: any) => acc + curr.value, 0)
+                    summary = [{ label: 'Total Stock Value', value: formatCurrency(totalVal) }]
+                } else if (selectedReport === 'CUSTOMER_REPORT' || selectedReport === 'SUPPLIER_REPORT') {
+                    headers = ['Name', 'Total Amount', 'Amount Paid', 'Balance Due', 'Transactions']
+                    rows = reportData.map((d: any) => [d.party, formatCurrency(d.total), formatCurrency(d.paid), formatCurrency(d.balance), d.count])
+                    const totalAmount = reportData.reduce((acc: number, curr: any) => acc + curr.total, 0)
+                    const totalBalance = reportData.reduce((acc: number, curr: any) => acc + curr.balance, 0)
+                    summary = [
+                        { label: 'Total Business Volume', value: formatCurrency(totalAmount) },
+                        { label: 'Total Outstanding', value: formatCurrency(totalBalance) },
+                        { label: 'Number of Parties', value: reportData.length }
+                    ]
+                } else {
+                    headers = ['Date', 'Invoice #', 'Party', 'Status', 'Amount', 'Balance']
+                    rows = reportData.map((d: any) => [d.date, d.number, d.party, d.status, formatCurrency(d.amount), formatCurrency(d.balance)])
+                    const totalAmount = reportData.reduce((acc: number, curr: any) => acc + curr.amount, 0)
+                    const totalBalance = reportData.reduce((acc: number, curr: any) => acc + curr.balance, 0)
+                    summary = [
+                        { label: `Total Money ${selectedReport === 'SALES' || selectedReport === 'PARTY_SALES' ? 'In' : 'Out'}`, value: formatCurrency(totalAmount) },
+                        { label: 'Total Unpaid/Due', value: formatCurrency(totalBalance) }
+                    ]
+                }
+
+                setPreviewHeaders(headers)
+                setPreviewData(rows)
+                setPreviewSummary(summary)
+            } catch (error) {
+                console.error('Failed to fetch preview data:', error)
+                setPreviewData([])
+            } finally {
+                setPreviewLoading(false)
+            }
+        }
+
+        fetchPreviewData()
+    }, [selectedReport, dateRange.start, dateRange.end, activeBusinessId])
+
     useEffect(() => {
         if (!activeBusinessId) return
 
@@ -200,8 +275,8 @@ export default function ReportsPage() {
             const reportData = await fetchReportDataService(
                 activeBusinessId,
                 selectedReport as any,
-                dateRange.start,
-                dateRange.end
+                selectedReport === 'INVENTORY' ? undefined : dateRange.start,
+                selectedReport === 'INVENTORY' ? undefined : dateRange.end
             )
 
             // 2. Prepare Data Structure for Generator
@@ -209,7 +284,18 @@ export default function ReportsPage() {
             let rows: any[][] = []
             let summary: any[] = []
 
-            if (selectedReport === 'INVENTORY') {
+            if (selectedReport === 'PROFIT_LOSS') {
+                // Profit & Loss Report - Special formatting
+                const plData = reportData[0] as any // P&L returns a single summary object
+                headers = ['Category', 'Amount', '% of Expenses']
+                rows = plData.breakdown.map((d: any) => [d.category, formatCurrency(d.amount), `${d.percentage}%`])
+                summary = [
+                    { label: 'Total Revenue', value: formatCurrency(plData.revenue) },
+                    { label: 'Total Expenses', value: formatCurrency(plData.expenses) },
+                    { label: 'Net Profit/Loss', value: formatCurrency(plData.netProfit) },
+                    { label: 'Profit Margin', value: `${plData.profitMargin}%` }
+                ]
+            } else if (selectedReport === 'INVENTORY') {
                 headers = ['Item Name', 'SKU', 'Stock', 'Unit Cost', 'Total Value']
                 rows = reportData.map((d: any) => [d.item, d.sku, d.stock, formatCurrency(d.cost), formatCurrency(d.value)])
                 const totalVal = reportData.reduce((acc: number, curr: any) => acc + curr.value, 0)
@@ -298,12 +384,44 @@ export default function ReportsPage() {
                 )
             }
 
-            // 4. Handle Mobile Sharing
-            if (file && (navigator as any).share) {
-                const shared = await ReportGenerator.shareReport(file, generatorData.title)
-                if (shared) {
-                    console.log('Report shared successfully')
+            if (!file) {
+                throw new Error('Failed to generate report file')
+            }
+
+            // 4. Try to share on mobile first
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+            let shareAttempted = false
+
+            if (isMobile && navigator.share) {
+                try {
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            files: [file],
+                            title: generatorData.title,
+                            text: `Business Report: ${generatorData.title}`
+                        })
+                        shareAttempted = true
+                        console.log('Report shared successfully via native share')
+                    }
+                } catch (error: any) {
+                    // User cancelled or share failed, fall through to download
+                    if (error.name !== 'AbortError') {
+                        console.log('Share failed, falling back to download:', error.message)
+                    }
                 }
+            }
+
+            // 5. Fallback to download if share wasn't used or failed
+            if (!shareAttempted) {
+                const url = URL.createObjectURL(file)
+                const link = document.createElement('a')
+                link.href = url
+                link.download = file.name
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
+                URL.revokeObjectURL(url)
+                console.log('Report downloaded successfully')
             }
 
         } catch (error) {
@@ -346,6 +464,7 @@ export default function ReportsPage() {
                             value={selectedReport}
                             onChange={(val) => setSelectedReport(val as ReportType)}
                             options={[
+                                { value: 'PROFIT_LOSS', label: '💰 Profit & Loss Statement' },
                                 { value: 'SALES', label: 'Sales Performance' },
                                 { value: 'PURCHASES', label: 'Purchase Analysis' },
                                 { value: 'INVENTORY', label: 'Inventory Valuation' },
@@ -553,6 +672,86 @@ export default function ReportsPage() {
                         <p className="text-[11px] font-black text-[var(--deep-contrast)]">{data.growth}</p>
                     </div>
                 </div>
+            </div>
+
+            {/* Report Preview Table */}
+            <div className="relative overflow-hidden glass p-6 rounded-[32px] border border-[var(--foreground)]/10 bg-white dark:bg-white/5 shadow-xl">
+                <div className="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 className="text-sm font-black text-[var(--deep-contrast)] tracking-tight">Report Preview</h3>
+                        <p className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Live Data View</p>
+                    </div>
+                    {previewLoading && <Activity className="h-4 w-4 text-[var(--primary-green)] animate-spin" />}
+                </div>
+
+                {previewLoading ? (
+                    <div className="flex items-center justify-center py-20 text-[var(--foreground)]/30">
+                        <div className="text-center">
+                            <Activity className="h-8 w-8 animate-spin mx-auto mb-2" />
+                            <p className="text-xs font-black uppercase tracking-widest">Loading report data...</p>
+                        </div>
+                    </div>
+                ) : previewData.length === 0 ? (
+                    <div className="flex items-center justify-center py-20 text-[var(--foreground)]/30">
+                        <div className="text-center">
+                            <FileText className="h-12 w-12 mx-auto mb-3 opacity-20" />
+                            <p className="text-xs font-black uppercase tracking-widest">No data available for this report</p>
+                            <p className="text-[9px] text-[var(--foreground)]/20 mt-1">Try adjusting your date range</p>
+                        </div>
+                    </div>
+                ) : (
+                    <>
+                        {/* Table */}
+                        <div className="overflow-x-auto rounded-xl border border-[var(--foreground)]/10">
+                            <table className="w-full text-left">
+                                <thead>
+                                    <tr className="bg-[var(--foreground)]/5 border-b border-[var(--foreground)]/10">
+                                        {previewHeaders.map((header, i) => (
+                                            <th key={i} className="px-4 py-3 text-[9px] font-black text-[var(--foreground)]/60 uppercase tracking-widest">
+                                                {header}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {previewData.slice(0, 50).map((row, i) => (
+                                        <tr
+                                            key={i}
+                                            className="border-b border-[var(--foreground)]/5 hover:bg-[var(--foreground)]/[0.02] transition-colors"
+                                        >
+                                            {row.map((cell: any, j: number) => (
+                                                <td key={j} className="px-4 py-2.5 text-[10px] font-bold text-[var(--deep-contrast)]">
+                                                    {cell}
+                                                </td>
+                                            ))}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {previewData.length > 50 && (
+                            <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-3 text-center">
+                                Showing first 50 of {previewData.length} records • Export to see all
+                            </p>
+                        )}
+
+                        {/* Summary KPIs */}
+                        {previewSummary.length > 0 && (
+                            <div className="mt-6 pt-6 border-t border-[var(--foreground)]/10">
+                                <h4 className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.3em] mb-4">Key Performance Indicators</h4>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                    {previewSummary.map((item, i) => (
+                                        <div key={i} className="p-3 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10">
+                                            <p className="text-[8px] font-black text-[var(--foreground)]/50 uppercase tracking-widest mb-1">{item.label}</p>
+                                            <p className="text-sm font-black text-[var(--deep-contrast)]">{item.value}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </>
+                )}
             </div>
         </div>
     )

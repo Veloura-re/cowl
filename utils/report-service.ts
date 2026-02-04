@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/client'
 import { format } from 'date-fns'
 
-export type ReportServiceType = 'SALES' | 'PURCHASES' | 'INVENTORY' | 'CUSTOMER_REPORT' | 'SUPPLIER_REPORT' | 'PARTY_SALES' | 'PARTY_PURCHASES'
+export type ReportServiceType = 'SALES' | 'PURCHASES' | 'INVENTORY' | 'PROFIT_LOSS' | 'CUSTOMER_REPORT' | 'SUPPLIER_REPORT' | 'PARTY_SALES' | 'PARTY_PURCHASES'
 
 export async function fetchReportDataService(
     businessId: string,
@@ -11,6 +11,56 @@ export async function fetchReportDataService(
     partyId?: string
 ) {
     const supabase = createClient()
+
+    if (type === 'PROFIT_LOSS') {
+        // Comprehensive Profit & Loss Report
+        let q = supabase
+            .from('invoices')
+            .select('type, total_amount, date, category')
+            .eq('business_id', businessId)
+
+        if (startDate) q = q.gte('date', startDate)
+        if (endDate) q = q.lte('date', endDate)
+
+        const { data, error } = await q
+        if (error) throw error
+
+        // Aggregate by type and category
+        let totalRevenue = 0
+        let totalExpenses = 0
+        const expensesByCategory: Record<string, number> = {}
+
+        data?.forEach((inv: any) => {
+            const amount = Number(inv.total_amount)
+            if (inv.type === 'SALE') {
+                totalRevenue += amount
+            } else if (inv.type === 'PURCHASE') {
+                totalExpenses += amount
+                const cat = inv.category || 'Uncategorized'
+                expensesByCategory[cat] = (expensesByCategory[cat] || 0) + amount
+            }
+        })
+
+        const netProfit = totalRevenue - totalExpenses
+        const profitMargin = totalRevenue > 0 ? ((netProfit / totalRevenue) * 100).toFixed(2) : '0.00'
+
+        // Build detailed breakdown
+        const breakdown = Object.entries(expensesByCategory)
+            .map(([category, amount]) => ({
+                category,
+                amount,
+                percentage: totalExpenses > 0 ? ((amount / totalExpenses) * 100).toFixed(2) : '0.00'
+            }))
+            .sort((a, b) => b.amount - a.amount)
+
+        return [{
+            revenue: totalRevenue,
+            expenses: totalExpenses,
+            netProfit,
+            profitMargin,
+            breakdown
+        }]
+    }
 
     if (type === 'INVENTORY') {
         // Inventory Report (Snapshot of current state)

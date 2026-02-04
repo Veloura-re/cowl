@@ -231,9 +231,6 @@ export const ReportGenerator = {
         const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
         const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
-        // Auto-save for desktop
-        XLSX.writeFile(wb, fileName);
-
         return new File([blob], fileName, { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     },
 

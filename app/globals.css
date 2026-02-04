@@ -8,9 +8,10 @@
   --color-deep-contrast: var(--deep-contrast);
   --color-glass-bg: var(--glass-bg);
 
-  --font-sans: var(--font-inter);
-  --font-serif: var(--font-inter);
-  --font-display: var(--font-inter);
+  --font-sans: var(--font-inter), "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-serif: var(--font-inter), Georgia, "Times New Roman", Times, serif;
+  --font-display: var(--font-inter), "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 :root {
@@ -139,19 +140,83 @@ html {
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter);
-  font-weight: 400;
-  /* Regular default */
+  font-family: var(--font-sans), sans-serif;
+  font-weight: 100;
+  letter-spacing: -0.011em;
+  line-height: 1.25;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv02", "cv05", "cv08", "cv09", "cv11", "lnum";
+
   transition: background-color 0.15s ease, color 0.15s ease;
-  /* Faster transition */
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
   min-height: 100vh;
   min-height: 100dvh;
-  /* Dynamic viewport height for modern browsers */
   overflow-x: hidden;
-  /* Prevent horizontal scroll on mobile */
+}
+
+/* Standardize Weights - Force all bolds thinner than default but heavier for buttons */
+.font-bold,
+[class*="font-bold"] {
+  font-weight: 300 !important;
+}
+
+.font-black,
+[class*="font-black"] {
+  font-weight: 400 !important;
+}
+
+.font-semibold,
+[class*="font-semibold"],
+.font-medium,
+[class*="font-medium"] {
+  font-weight: 300 !important;
+}
+
+b,
+strong {
+  font-weight: 300 !important;
+}
+
+/* Force lining numbers and medium weight on all digits */
+.tabular-nums,
+[class*="tabular-nums"],
+span:has(> [class*="tabular-nums"]),
+input[type="number"] {
+  font-weight: 500 !important;
+  letter-spacing: 0.02em;
+}
+
+/* Increase weight for buttons specifically */
+button,
+.button,
+[role="button"] {
+  font-weight: 500 !important;
+  letter-spacing: 0.02em;
+}
+
+button .font-black,
+button [class*="font-black"] {
+  font-weight: 600 !important;
+}
+
+/* Force lining numbers and thin weight on all digits */
+[class*="text-"],
+body,
+* {
+  font-feature-settings: "cv02", "cv05", "cv08", "cv09", "cv11", "lnum", "tnum" !important;
+}
+
+/* Specific resets for form elements that ignore inheritance in some browsers */
+input,
+button,
+select,
+textarea,
+optgroup {
+  font-family: var(--font-sans), sans-serif;
+  font-weight: inherit;
 }
 
 
@@ -192,19 +257,13 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-inter);
+  font-family: var(--font-sans), sans-serif;
   color: var(--deep-contrast);
-  font-weight: 400 !important;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
 }
 
-/* Typography Overrides as requested */
-.font-bold,
-.font-semibold,
-.font-medium,
-.font-black,
-.font-extrabold {
-  font-weight: 400 !important;
-}
 
 /* Animations - Optimized for Mobile */
 @keyframes pulse-slow {
@@ -262,23 +321,23 @@ h6 {
 }
 
 .critical-glow-red {
-  animation: glow-red 1.5s infinite ease-in-out;
+  animation: glow-red 0.4s infinite ease-in-out;
   border-color: rgba(239, 68, 68, 0.4) !important;
 }
 
 .critical-glow-amber {
-  animation: glow-amber 1.5s infinite ease-in-out;
+  animation: glow-amber 0.4s infinite ease-in-out;
   border-color: rgba(245, 158, 11, 0.4) !important;
 }
 
-/* Apply slower animations on mobile to save CPU/GPU */
+/* Ultra-fast animations for instant, snappy feel */
 @media (max-width: 768px) {
   .animate-pulse-slow {
-    animation-duration: 4s;
+    animation-duration: 1s;
   }
 
   .animate-pulse-slower {
-    animation-duration: 6s;
+    animation-duration: 1.5s;
   }
 
 

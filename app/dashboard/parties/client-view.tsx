@@ -264,7 +264,7 @@ export default function PartiesClientView() {
 
                             {/* Address & Actions Row */}
                             <div className="flex items-center justify-between gap-1.5 ml-7.5">
-                                <p className="text-[6px] font-bold text-[var(--foreground)]/30 truncate flex-1 uppercase tracking-tight">
+                                <p className="text-[7.5px] font-bold text-[var(--foreground)]/40 truncate flex-1 uppercase tracking-tight">
                                     {party.address || 'No location'}
                                 </p>
                                 <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
