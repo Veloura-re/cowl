@@ -43,7 +43,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
     const { resolvedTheme } = useTheme()
     const theme = (resolvedTheme === 'dark' ? 'dark' : 'light') as 'light' | 'dark'
     const supabase = useMemo(() => createClient(), [])
-    const isEdit = false // Hardcoded to false - No more editing
+    const isEdit = !!initialData?.id
     const isSale = useMemo(() => initialData ? initialData.type === 'SALE' : true, [initialData?.type])
 
     const [loading, setLoading] = useState(false)
@@ -430,14 +430,95 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
         setLoading(true)
 
         try {
-            // Hardcode isEdit to false, so only the CREATE FLOW is executed.
-            // The original update logic is removed.
-            const isEdit = false;
 
             if (isEdit) {
-                // UPDATE FLOW REMOVED - Redirect to creation flow
-                console.log('Update Flow Disabled');
-                return;
+                // 1. Revert Stock for initial items
+                for (const item of initialLineItems || []) {
+                    if (item.item_id) {
+                        const { data: dbItem } = await supabase.from('items').select('stock_quantity').eq('id', cleanUUID(item.item_id)).maybeSingle()
+                        if (dbItem) {
+                            const multiplier = isSale ? 1 : -1
+                            const newStock = (dbItem.stock_quantity || 0) + (item.quantity * multiplier)
+                            await supabase.from('items').update({ stock_quantity: newStock }).eq('id', cleanUUID(item.item_id))
+                        }
+                    }
+                }
+
+                // 2. Update Invoice
+                const isPaid = paymentMode !== 'UNPAID'
+                const actualReceived = isPaid ? numReceived : 0
+                const currentBalance = isPaid ? balanceDue : totalAmount
+
+                let status = 'UNPAID'
+                if (isPaid) {
+                    if (numReceived >= totalAmount) status = 'PAID'
+                    else if (numReceived > 0) status = 'PARTIAL'
+                }
+
+                const { error: invoiceError } = await supabase
+                    .from('invoices')
+                    .update({
+                        party_id: currentPartyId,
+                        invoice_number: invoiceNumber,
+                        date: date,
+                        due_date: dueDate || null,
+                        total_amount: totalAmount,
+                        balance_amount: currentBalance,
+                        status: status,
+                        notes: notes,
+                        discount_amount: discountAmount,
+                        tax_amount: invoiceTaxAmount,
+                        attachments: attachments
+                    })
+                    .eq('id', initialData.id)
+
+                if (invoiceError) throw invoiceError
+
+                // 3. Delete & Re-insert Items
+                await supabase.from('invoice_items').delete().eq('invoice_id', initialData.id)
+
+                const invoiceItems = rows.map(row => ({
+                    invoice_id: initialData.id,
+                    item_id: cleanUUID(row.itemId),
+                    description: row.name,
+                    quantity: Number(row.quantity) || 0,
+                    rate: Number(row.rate) || 0,
+                    tax_amount: (Number(row.quantity) || 0) * (Number(row.rate) || 0) * (Number(row.tax || 0) / 100),
+                    total: row.amount,
+                    purchase_price: Number(row.purchasePrice) || 0
+                }))
+
+                const { error: itemsError } = await supabase.from('invoice_items').insert(invoiceItems)
+                if (itemsError) throw itemsError
+
+                // 4. Update Transaction
+                await supabase.from('transactions').delete().eq('invoice_id', initialData.id)
+
+                if (isPaid && actualReceived > 0) {
+                    const { error: txError } = await supabase.from('transactions').insert({
+                        business_id,
+                        party_id: currentPartyId,
+                        invoice_id: initialData.id,
+                        amount: Math.min(actualReceived, totalAmount),
+                        type: isSale ? 'RECEIPT' : 'PAYMENT',
+                        mode: paymentMode,
+                        date: date,
+                        description: `${isSale ? 'Sale' : 'Purchase'} ${invoiceNumber}${status === 'PARTIAL' ? ' (Partial Payment)' : ''}`
+                    })
+                    if (txError) throw txError
+                }
+
+                // 5. Update Stock for new items
+                for (const row of rows) {
+                    if (row.itemId) {
+                        const { data: item } = await supabase.from('items').select('stock_quantity').eq('id', cleanUUID(row.itemId)).single()
+                        if (item) {
+                            const multiplier = isSale ? -1 : 1
+                            const newStock = (item.stock_quantity || 0) + ((Number(row.quantity) || 0) * multiplier)
+                            await supabase.from('items').update({ stock_quantity: newStock }).eq('id', cleanUUID(row.itemId))
+                        }
+                    }
+                }
             } else {
                 // CREATE FLOW
                 const isPaid = paymentMode !== 'UNPAID'

@@ -9,17 +9,21 @@ import Link from 'next/link'
 import clsx from 'clsx'
 import { BottomNav } from '@/components/ui/BottomNav'
 import { BusinessProvider, useBusiness } from '@/context/business-context'
-import CreateBusinessModal from '@/components/ui/CreateBusinessModal'
 import PickerModal from '@/components/ui/PickerModal'
-import AddTeamMemberModal from '@/components/ui/AddTeamMemberModal'
 import { UserPlus } from 'lucide-react'
 import NotificationCenter from '@/components/ui/NotificationCenter'
+import { SignOutModal } from '@/components/ui/SignOutModal'
+import VisualTutorial, { TutorialStep } from '@/components/ui/VisualTutorial'
 import { BrandLogo } from '@/components/ui/BrandLogo'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import FeedbackModal from '@/components/ui/FeedbackModal'
-import BusinessSwitcherModal from '@/components/ui/BusinessSwitcherModal'
-import { SignOutModal } from '@/components/ui/SignOutModal'
-import VisualTutorial, { TutorialStep } from '@/components/ui/VisualTutorial'
+import dynamic from 'next/dynamic'
+import { memo } from 'react'
+
+// Dynamic imports for heavy modals to improve initial load
+const CreateBusinessModal = dynamic(() => import('@/components/ui/CreateBusinessModal'), { ssr: false })
+const BusinessSwitcherModal = dynamic(() => import('@/components/ui/BusinessSwitcherModal'), { ssr: false })
+const AddTeamMemberModal = dynamic(() => import('@/components/ui/AddTeamMemberModal'), { ssr: false })
 
 const navigation = [
     { name: 'Home', href: '/dashboard', icon: LayoutDashboard },
@@ -274,6 +278,34 @@ const getTutorialTheme = (pathname: string): string => {
     return '#10b981' // Emerald (Default)
 }
 
+const NavItem = memo(({ item, pathname }: { item: any, pathname: string }) => {
+    const isActive = pathname === item.href
+    return (
+        <Link
+            href={item.href}
+            className={clsx(
+                'group flex items-center px-3 py-2.5 text-[11px] font-black rounded-xl transition-all duration-300 relative overflow-hidden uppercase tracking-tighter',
+                isActive
+                    ? 'text-[var(--primary-foreground)] shadow-md shadow-[var(--primary-green)]/20 translate-x-1'
+                    : 'text-[var(--foreground)]/40 hover:bg-[var(--foreground)]/5 hover:text-[var(--deep-contrast)] hover:translate-x-1'
+            )}
+        >
+            {isActive && (
+                <div className="absolute inset-0 bg-[var(--primary-green)]" />
+            )}
+            <item.icon
+                className={clsx(
+                    'mr-3 h-4 w-4 flex-shrink-0 relative z-10 transition-colors',
+                    isActive ? 'text-[var(--primary-foreground)]' : 'text-[var(--foreground)]/20 group-hover:text-[var(--primary-green)]'
+                )}
+            />
+            <span className="relative z-10">{item.name}</span>
+        </Link>
+    )
+})
+
+NavItem.displayName = 'NavItem'
+
 
 function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     const router = useRouter()
@@ -304,13 +336,21 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         let lastScrollY = window.scrollY
+        let ticking = false
+
         const handleScroll = () => {
-            const currentScrollY = window.scrollY
-            setScrolled(currentScrollY > 10)
-            setScrollingUp(currentScrollY < lastScrollY && currentScrollY > 10)
-            lastScrollY = currentScrollY
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const currentScrollY = window.scrollY
+                    setScrolled(currentScrollY > 10)
+                    setScrollingUp(currentScrollY < lastScrollY && currentScrollY > 10)
+                    lastScrollY = currentScrollY
+                    ticking = false
+                })
+                ticking = true
+            }
         }
-        window.addEventListener('scroll', handleScroll)
+        window.addEventListener('scroll', handleScroll, { passive: true })
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
 
@@ -361,32 +401,9 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
 
                     <nav id="nav-menu" className="flex-1 px-2 py-4 space-y-1 overflow-y-auto scrollbar-hide">
-                        {navigation.map((item) => {
-                            const isActive = pathname === item.href
-                            return (
-                                <Link
-                                    key={item.name}
-                                    href={item.href}
-                                    className={clsx(
-                                        'group flex items-center px-3 py-2.5 text-[11px] font-black rounded-xl transition-all duration-300 relative overflow-hidden uppercase tracking-tighter',
-                                        isActive
-                                            ? 'text-[var(--primary-foreground)] shadow-md shadow-[var(--primary-green)]/20 translate-x-1'
-                                            : 'text-[var(--foreground)]/40 hover:bg-[var(--foreground)]/5 hover:text-[var(--deep-contrast)] hover:translate-x-1'
-                                    )}
-                                >
-                                    {isActive && (
-                                        <div className="absolute inset-0 bg-[var(--primary-green)]" />
-                                    )}
-                                    <item.icon
-                                        className={clsx(
-                                            'mr-3 h-4 w-4 flex-shrink-0 relative z-10 transition-colors',
-                                            isActive ? 'text-[var(--primary-foreground)]' : 'text-[var(--foreground)]/20 group-hover:text-[var(--primary-green)]'
-                                        )}
-                                    />
-                                    <span className="relative z-10">{item.name}</span>
-                                </Link>
-                            )
-                        })}
+                        {navigation.map((item) => (
+                            <NavItem key={item.name} item={item} pathname={pathname} />
+                        ))}
                     </nav>
 
                     <div className="p-4 bg-[var(--foreground)]/5 border-t border-[var(--foreground)]/10 space-y-2">
@@ -480,15 +497,15 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     "flex-1 overflow-y-auto lg:overflow-visible p-3 lg:p-6 scrollbar-hide relative pt-0",
                     (shouldHideDock || isDockHidden) ? "pb-6" : "pb-24 lg:pb-6"
                 )}>
-                    <AnimatePresence mode="wait">
+                    <AnimatePresence mode="popLayout" initial={false}>
                         <motion.div
                             key={pathname}
-                            initial={{ opacity: 0, scale: 0.98, y: 4 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 1.02, y: -4 }}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
                             transition={{
-                                duration: 0.15,
-                                ease: [0.23, 1, 0.32, 1]
+                                duration: 0.2,
+                                ease: "easeOut"
                             }}
                             className="mx-auto max-w-7xl"
                         >

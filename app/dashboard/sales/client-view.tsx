@@ -266,6 +266,10 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
         }
     }
 
+    const handleEdit = (id: string) => {
+        router.push(`/dashboard/sales/edit?id=${id}`)
+    }
+
     const containerVariants = {
         hidden: { opacity: 0 },
         show: {
@@ -439,7 +443,7 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                         animate="show"
                         exit={{ opacity: 0, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
-                        onClick={(e) => handlePrintInvoice(e, invoice)}
+                        onClick={() => handleEdit(invoice.id)}
                         onMouseDown={() => handleTouchStart(invoice)}
                         onMouseUp={handleTouchEnd}
                         onMouseLeave={handleTouchEnd}

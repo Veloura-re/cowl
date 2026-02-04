@@ -267,6 +267,10 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
         }
     })
 
+    const handleEdit = (id: string) => {
+        router.push(`/dashboard/purchases/edit?id=${id}`)
+    }
+
     const containerVariants = {
         hidden: { opacity: 0 },
         show: {
@@ -418,7 +422,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                             animate="show"
                             exit={{ opacity: 0, scale: 0.95 }}
                             transition={{ duration: 0.2 }}
-                            onClick={(e) => handlePrintInvoice(e, inv)}
+                            onClick={() => handleEdit(inv.id)}
                             onMouseDown={() => handleTouchStart(inv)}
                             onMouseUp={handleTouchEnd}
                             onMouseLeave={handleTouchEnd}

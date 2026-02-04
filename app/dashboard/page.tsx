@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, memo, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/context/business-context'
 import { createClient } from '@/utils/supabase/client'
-import { BarChart3, TrendingUp, Wallet, Package, ArrowRight, Plus, AlertCircle, Clock, FileText, ShoppingCart, Users, Activity, CreditCard, Globe, ArrowUpRight, ArrowDownRight, BadgeCheck } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { BarChart3, TrendingUp, Wallet, Package, ArrowRight, Plus, AlertCircle, Clock, FileText, ShoppingCart, Users, Activity, CreditCard, Globe, ArrowUpRight, ArrowDownRight, BadgeCheck, ChevronRight } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { format } from 'date-fns'
@@ -154,22 +155,41 @@ export default function DashboardPage() {
         }
     }
 
+    const router = useRouter()
+
+    const handleActivityClick = (activity: any) => {
+        if (activity.category === 'INVOICE') {
+            const route = activity.type === 'SALE' ? 'sales' : 'purchases'
+            router.push(`/dashboard/${route}/edit?id=${activity.id}`)
+        }
+    }
+
     useEffect(() => {
         fetchDashboardData()
 
         if (!activeBusinessId) return
 
+        let debounceTimer: NodeJS.Timeout
+
+        const debouncedFetch = () => {
+            clearTimeout(debounceTimer)
+            debounceTimer = setTimeout(() => {
+                fetchDashboardData()
+            }, 1000) // Buffer changes for 1 second
+        }
+
         // Realtime Subscription
         const channel = supabase
             .channel('dashboard-comprehensive-sync')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'invoices', filter: `business_id=eq.${activeBusinessId}` }, fetchDashboardData)
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'items', filter: `business_id=eq.${activeBusinessId}` }, fetchDashboardData)
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions', filter: `business_id=eq.${activeBusinessId}` }, fetchDashboardData)
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'parties', filter: `business_id=eq.${activeBusinessId}` }, fetchDashboardData)
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'invoices', filter: `business_id=eq.${activeBusinessId}` }, debouncedFetch)
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'items', filter: `business_id=eq.${activeBusinessId}` }, debouncedFetch)
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions', filter: `business_id=eq.${activeBusinessId}` }, debouncedFetch)
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'parties', filter: `business_id=eq.${activeBusinessId}` }, debouncedFetch)
             .subscribe()
 
         return () => {
             supabase.removeChannel(channel)
+            clearTimeout(debounceTimer)
         }
     }, [activeBusinessId])
 
@@ -207,21 +227,7 @@ export default function DashboardPage() {
                     { label: 'Clear Profit', val: stats.netProfit, icon: BarChart3, color: stats.netProfit >= 0 ? 'text-violet-500' : 'text-rose-500', bg: stats.netProfit >= 0 ? 'bg-violet-500/10' : 'bg-rose-500/10' },
                     { label: 'Pending Due', val: stats.pendingPayments, icon: Wallet, color: 'text-amber-500', bg: 'bg-amber-500/10' },
                 ].map((item, i) => (
-                    <motion.div
-                        key={item.label}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: i * 0.05 }}
-                        className="glass p-3 rounded-xl border border-[var(--foreground)]/5 dark:border-white/5 flex items-center justify-between group hover:border-[var(--foreground)]/10 transition-colors"
-                    >
-                        <div>
-                            <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mb-0.5">{item.label}</p>
-                            <h3 className="text-sm font-black text-[var(--deep-contrast)] tracking-tight">{formatCurrency(item.val)}</h3>
-                        </div>
-                        <div className={clsx("h-8 w-8 rounded-lg flex items-center justify-center transition-colors", item.bg, item.color)}>
-                            <item.icon className="h-4 w-4" />
-                        </div>
-                    </motion.div>
+                    <MetricCard key={item.label} item={item} index={i} formatCurrency={formatCurrency} />
                 ))}
             </div>
 
@@ -292,69 +298,13 @@ export default function DashboardPage() {
                                 <p className="text-[9px] font-bold text-[var(--foreground)]/30 uppercase tracking-widest">No recent activity</p>
                             </div>
                         ) : (
-                            stats.recentActivity.map((activity, i) => (
-                                <div key={activity.id} className="p-3 flex items-center justify-between hover:bg-[var(--foreground)]/5 transition-colors group cursor-default">
-                                    <div className="flex items-center gap-3">
-                                        {/* Icon Box */}
-                                        <div className={clsx(
-                                            "h-8 w-8 rounded-lg flex items-center justify-center text-[10px] font-black shrink-0",
-                                            activity.category === 'INVOICE'
-                                                ? (activity.type === 'SALE' ? "bg-emerald-500/10 text-emerald-600" : "bg-blue-500/10 text-blue-600")
-                                                : (activity.type === 'RECEIPT' ? "bg-teal-500/10 text-teal-600" : "bg-rose-500/10 text-rose-600")
-                                        )}>
-                                            {activity.category === 'INVOICE'
-                                                ? (activity.type === 'SALE' ? <FileText className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4" />)
-                                                : (activity.type === 'RECEIPT' ? <ArrowDownRight className="h-4 w-4" /> : <ArrowUpRight className="h-4 w-4" />)
-                                            }
-                                        </div>
-
-                                        {/* Description */}
-                                        <div>
-                                            <div className="flex items-center gap-1.5 mb-1">
-                                                <p className="text-[11px] font-bold text-[var(--deep-contrast)] leading-none">
-                                                    {activity.party_name}
-                                                </p>
-                                                {/* Mini Tag */}
-                                                <span className={clsx(
-                                                    "text-[6px] px-1 py-0.5 rounded-[3px] font-black uppercase tracking-widest border",
-                                                    activity.category === 'INVOICE'
-                                                        ? "border-[var(--foreground)]/10 text-[var(--foreground)]/50"
-                                                        : "border-purple-500/20 text-purple-600 bg-purple-500/5"
-                                                )}>
-                                                    {activity.category === 'INVOICE' ? activity.type : activity.mode}
-                                                </span>
-                                            </div>
-
-                                            <p className="text-[9px] font-medium text-[var(--foreground)]/40 flex items-center gap-1.5">
-                                                <span>{format(new Date(activity.date), 'h:mm a')}</span>
-                                                <span className="w-0.5 h-0.5 rounded-full bg-[var(--foreground)]/20" />
-                                                <span>{activity.number ? `#${activity.number}` : 'Transaction'}</span>
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    {/* Amount & Status */}
-                                    <div className="text-right">
-                                        <p className={clsx(
-                                            "text-[11px] font-black mb-0.5",
-                                            (activity.type === 'SALE' || activity.type === 'RECEIPT') ? "text-emerald-600" : "text-[var(--deep-contrast)]"
-                                        )}>
-                                            {(activity.type === 'SALE' || activity.type === 'RECEIPT') ? '+' : '-'} {formatCurrency(activity.amount)}
-                                        </p>
-                                        {activity.category === 'INVOICE' ? (
-                                            <span className={clsx(
-                                                "inline-flex px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider",
-                                                activity.status === 'PAID' ? "bg-emerald-500/10 text-emerald-600" : "bg-amber-500/10 text-amber-600"
-                                            )}>
-                                                {activity.status}
-                                            </span>
-                                        ) : (
-                                            <span className="inline-flex items-center gap-0.5 text-[8px] font-bold uppercase tracking-wider text-emerald-600/60">
-                                                <BadgeCheck className="h-2.5 w-2.5" /> Done
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
+                            stats.recentActivity.map((activity) => (
+                                <ActivityItem
+                                    key={activity.id}
+                                    activity={activity}
+                                    formatCurrency={formatCurrency}
+                                    onClick={() => handleActivityClick(activity)}
+                                />
                             ))
                         )}
                     </div>
@@ -423,3 +373,86 @@ export default function DashboardPage() {
         </div>
     )
 }
+
+const MetricCard = memo(({ item, index, formatCurrency }: any) => (
+    <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: index * 0.05 }}
+        className="glass p-3 rounded-xl border border-[var(--foreground)]/5 dark:border-white/5 flex items-center justify-between group hover:border-[var(--foreground)]/10 transition-colors"
+    >
+        <div>
+            <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mb-0.5">{item.label}</p>
+            <h3 className="text-sm font-black text-[var(--deep-contrast)] tracking-tight">{formatCurrency(item.val)}</h3>
+        </div>
+        <div className={clsx("h-8 w-8 rounded-lg flex items-center justify-center transition-colors", item.bg, item.color)}>
+            <item.icon className="h-4 w-4" />
+        </div>
+    </motion.div>
+))
+MetricCard.displayName = 'MetricCard'
+
+const ActivityItem = memo(({ activity, formatCurrency, onClick }: any) => (
+    <div
+        onClick={onClick}
+        className="p-3 flex items-center justify-between hover:bg-[var(--foreground)]/5 transition-colors group cursor-pointer active:scale-[0.98]"
+    >
+        <div className="flex items-center gap-3">
+            <div className={clsx(
+                "h-8 w-8 rounded-lg flex items-center justify-center text-[10px] font-black shrink-0",
+                activity.category === 'INVOICE'
+                    ? (activity.type === 'SALE' ? "bg-emerald-500/10 text-emerald-600" : "bg-blue-500/10 text-blue-600")
+                    : (activity.type === 'RECEIPT' ? "bg-teal-500/10 text-teal-600" : "bg-rose-500/10 text-rose-600")
+            )}>
+                {activity.category === 'INVOICE'
+                    ? (activity.type === 'SALE' ? <FileText className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4" />)
+                    : (activity.type === 'RECEIPT' ? <ArrowDownRight className="h-4 w-4" /> : <ArrowUpRight className="h-4 w-4" />)
+                }
+            </div>
+
+            <div>
+                <div className="flex items-center gap-1.5 mb-1">
+                    <p className="text-[11px] font-bold text-[var(--deep-contrast)] leading-none">
+                        {activity.party_name}
+                    </p>
+                    <span className={clsx(
+                        "text-[6px] px-1 py-0.5 rounded-[3px] font-black uppercase tracking-widest border",
+                        activity.category === 'INVOICE'
+                            ? "border-[var(--foreground)]/10 text-[var(--foreground)]/50"
+                            : "border-purple-500/20 text-purple-600 bg-purple-500/5"
+                    )}>
+                        {activity.category === 'INVOICE' ? activity.type : activity.mode}
+                    </span>
+                </div>
+
+                <p className="text-[9px] font-medium text-[var(--foreground)]/40 flex items-center gap-1.5">
+                    <span>{format(new Date(activity.date), 'h:mm a')}</span>
+                    <span className="w-0.5 h-0.5 rounded-full bg-[var(--foreground)]/20" />
+                    <span>{activity.number ? `#${activity.number}` : 'Transaction'}</span>
+                </p>
+            </div>
+        </div>
+
+        <div className="text-right">
+            <p className={clsx(
+                "text-[11px] font-black mb-0.5",
+                (activity.type === 'SALE' || activity.type === 'RECEIPT') ? "text-emerald-600" : "text-[var(--deep-contrast)]"
+            )}>
+                {(activity.type === 'SALE' || activity.type === 'RECEIPT') ? '+' : '-'} {formatCurrency(activity.amount)}
+            </p>
+            {activity.category === 'INVOICE' ? (
+                <span className={clsx(
+                    "inline-flex px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider",
+                    activity.status === 'PAID' ? "bg-emerald-500/10 text-emerald-600" : "bg-amber-500/10 text-amber-600"
+                )}>
+                    {activity.status}
+                </span>
+            ) : (
+                <span className="inline-flex items-center gap-0.5 text-[8px] font-bold uppercase tracking-wider text-teal-600/60">
+                    <BadgeCheck className="h-2.5 w-2.5" /> Done
+                </span>
+            )}
+        </div>
+    </div>
+))
+ActivityItem.displayName = 'ActivityItem'

@@ -155,6 +155,8 @@ body {
   min-height: 100vh;
   min-height: 100dvh;
   overflow-x: hidden;
+  /* Performance: Force hardware acceleration for the main body */
+  transform: translateZ(0);
 }
 
 /* Standardize Weights - Force all bolds thinner than default but heavier for buttons */
@@ -224,10 +226,12 @@ optgroup {
 @layer utilities {
   .glass {
     background: var(--glass-bg);
-    backdrop-filter: blur(16px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    backdrop-filter: blur(8px) saturate(150%);
+    -webkit-backdrop-filter: blur(8px) saturate(150%);
     border: 1px solid rgba(0, 0, 0, 0.1);
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+    /* Performance: Hint at changes */
+    will-change: transform, opacity;
   }
 
   /* Optimized glass for lists/frequent items - Removes heavy blur */
@@ -248,6 +252,14 @@ optgroup {
     /* Slightly more opaque for readability without blur */
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+
+  /* Performance: Optimize blur for mobile */
+  @media (max-width: 768px) {
+    .glass {
+      backdrop-filter: blur(4px) saturate(120%);
+      -webkit-backdrop-filter: blur(4px) saturate(120%);
+    }
   }
 }
 
