@@ -55,7 +55,7 @@ export default function ReportsPage() {
             setPreviewLoading(true)
             try {
                 const reportData = await fetchReportDataService(
-                    activeBusinessId,
+                    activeBusinessId!,
                     selectedReport as any,
                     selectedReport === 'INVENTORY' ? undefined : dateRange.start,
                     selectedReport === 'INVENTORY' ? undefined : dateRange.end
@@ -273,7 +273,7 @@ export default function ReportsPage() {
 
             // 1. Fetch Detailed Data
             const reportData = await fetchReportDataService(
-                activeBusinessId,
+                activeBusinessId!,
                 selectedReport as any,
                 selectedReport === 'INVENTORY' ? undefined : dateRange.start,
                 selectedReport === 'INVENTORY' ? undefined : dateRange.end
