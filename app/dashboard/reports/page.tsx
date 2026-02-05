@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { BarChart3, TrendingUp, Wallet, ArrowUpRight, ArrowDownRight, Activity, Download, FileText, Calendar, FileSpreadsheet } from 'lucide-react'
+import { BarChart3, TrendingUp, Wallet, ArrowUpRight, ArrowDownRight, Activity, Download, FileText, Calendar, FileSpreadsheet, AlertTriangle } from 'lucide-react'
 import clsx from 'clsx'
 import { useBusiness } from '@/context/business-context'
 import { createClient } from '@/utils/supabase/client'
@@ -48,12 +48,15 @@ export default function ReportsPage() {
     const [previewHeaders, setPreviewHeaders] = useState<string[]>([])
     const [previewSummary, setPreviewSummary] = useState<any[]>([])
 
+    const [reportError, setReportError] = useState<string | null>(null)
+
     // Fetch preview data when report type or date range changes
     useEffect(() => {
         if (!activeBusinessId) return
 
         async function fetchPreviewData() {
             setPreviewLoading(true)
+            setReportError(null)
             try {
                 const reportData = await fetchReportDataService(
                     activeBusinessId!,
@@ -106,8 +109,9 @@ export default function ReportsPage() {
                 setPreviewHeaders(headers)
                 setPreviewData(rows)
                 setPreviewSummary(summary)
-            } catch (error) {
+            } catch (error: any) {
                 console.error('Failed to fetch preview data:', error)
+                setReportError(error.message || 'An unknown error occurred while fetching report data.')
                 setPreviewData([])
             } finally {
                 setPreviewLoading(false)
@@ -665,6 +669,20 @@ export default function ReportsPage() {
                         <div className="text-center">
                             <Activity className="h-8 w-8 animate-spin mx-auto mb-2" />
                             <p className="text-xs font-black uppercase tracking-widest">Loading report data...</p>
+                        </div>
+                    </div>
+                ) : reportError ? (
+                    <div className="flex items-center justify-center py-20 text-rose-500/60">
+                        <div className="text-center">
+                            <AlertTriangle className="h-12 w-12 mx-auto mb-3 opacity-20" />
+                            <p className="text-xs font-black uppercase tracking-widest text-rose-500">Retrieval Failed</p>
+                            <p className="text-[9px] mt-1 opacity-50 max-w-xs mx-auto leading-relaxed">{reportError}</p>
+                            <button
+                                onClick={() => window.location.reload()}
+                                className="mt-4 px-4 py-2 rounded-xl bg-rose-500/5 border border-rose-500/10 text-[8px] font-black uppercase tracking-widest hover:bg-rose-500/10 transition-all"
+                            >
+                                Force Reset System
+                            </button>
                         </div>
                     </div>
                 ) : previewData.length === 0 ? (

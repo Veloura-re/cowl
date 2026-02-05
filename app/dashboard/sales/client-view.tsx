@@ -4,15 +4,12 @@ import React, { useState, useEffect } from 'react'
 import { Search, Plus, Calendar, FileText, User, Filter, ArrowUpDown, Trash2, Edit2, AlertTriangle, Printer, Loader2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTheme } from 'next-themes'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/context/business-context'
 import { createClient } from '@/utils/supabase/client'
 import clsx from 'clsx'
 import dynamic from 'next/dynamic'
-import PickerModal from '@/components/ui/PickerModal'
 import ConfirmModal from '@/components/ui/ConfirmModal'
-import FeedbackModal from '@/components/ui/FeedbackModal'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { printInvoice, InvoiceData, downloadInvoice } from '@/utils/invoice-generator'
 import { currencies } from '@/lib/currencies'
@@ -23,6 +20,117 @@ const InvoicePreviewModal = dynamic(() => import('@/components/ui/InvoicePreview
     ssr: false,
     loading: () => <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm"><Loader2 className="h-8 w-8 animate-spin text-[var(--primary-green)]" /></div>
 })
+
+const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    show: { opacity: 1, y: 0 }
+}
+
+// Memoized Invoice Card for performance
+const InvoiceCard = React.memo(({
+    invoice,
+    formatCurrency,
+    handleEdit,
+    handleTouchStart,
+    handleTouchEnd,
+    handlePrintInvoice,
+    setInvoiceToDelete,
+    setIsDeleteConfirmOpen
+}: {
+    invoice: any,
+    formatCurrency: any,
+    handleEdit: any,
+    handleTouchStart: any,
+    handleTouchEnd: any,
+    handlePrintInvoice: any,
+    setInvoiceToDelete: any,
+    setIsDeleteConfirmOpen: any
+}) => {
+    return (
+        <motion.div
+            variants={itemVariants}
+            initial="hidden"
+            animate="show"
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => handleEdit(invoice.id)}
+            onMouseDown={() => handleTouchStart(invoice)}
+            onMouseUp={handleTouchEnd}
+            onMouseLeave={handleTouchEnd}
+            onTouchStart={() => handleTouchStart(invoice)}
+            onTouchEnd={handleTouchEnd}
+            className="group relative flex items-center glass-optimized rounded-[10px] border border-[var(--foreground)]/10 p-1.5 hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer overflow-hidden h-[44px] gap-2 select-none active:scale-[0.98] will-change-transform"
+        >
+            {/* Status Indicator Stripe */}
+            <div className={clsx(
+                "absolute top-0 left-0 w-[2px] h-full transition-colors duration-300",
+                invoice.status === 'PAID' ? "bg-emerald-500" : "bg-rose-500"
+            )} />
+
+            {/* Avatar */}
+            <div className={clsx(
+                "h-6 w-6 rounded-lg flex items-center justify-center font-black text-[9px] transition-all duration-300 shadow-inner shrink-0 border uppercase",
+                invoice.status === 'UNPAID'
+                    ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
+                    : "bg-[var(--foreground)]/5 text-[var(--deep-contrast)]/60 border-[var(--foreground)]/10"
+            )}>
+                {(invoice.party?.name || 'W').charAt(0)}
+            </div>
+
+            {/* Identity & Status Header - Compact */}
+            <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-1">
+                    <h3 className="text-[9px] font-black text-[var(--deep-contrast)] truncate leading-none uppercase tracking-tight">{invoice.party?.name || 'Walk-in'}</h3>
+                    <span className={clsx(
+                        "text-[5.5px] font-black uppercase tracking-widest px-1 py-0.5 rounded-md border shrink-0",
+                        invoice.status === 'PAID' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/10" :
+                            invoice.status === 'PENDING' ? "bg-amber-500/10 text-amber-500 border-amber-500/10" :
+                                "bg-rose-500/10 text-rose-500 border-rose-500/10"
+                    )}>
+                        {invoice.status}
+                    </span>
+                </div>
+                <div className="flex items-center gap-1.5 mt-1.5">
+                    <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">{invoice.invoice_number}</span>
+                    <div className="h-0.5 w-0.5 rounded-full bg-[var(--foreground)]/20" />
+                    <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">
+                        {new Date(invoice.date).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}
+                    </span>
+                </div>
+            </div>
+
+            {/* Value & Actions Row */}
+            <div className="flex flex-col items-end gap-1 shrink-0">
+                <p className={clsx(
+                    "text-[11px] font-black tracking-tighter tabular-nums leading-none",
+                    invoice.balance_amount > 0 ? "text-rose-500" : "text-emerald-500"
+                )}>
+                    {formatCurrency(invoice.total_amount)}
+                </p>
+                <div className="flex items-center gap-1 transition-opacity">
+                    <button
+                        onClick={(e) => handlePrintInvoice(e, invoice)}
+                        className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
+                    >
+                        <Printer size={7} />
+                    </button>
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            setInvoiceToDelete(invoice)
+                            setIsDeleteConfirmOpen(true)
+                        }}
+                        className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-rose-500 hover:text-white border border-[var(--foreground)]/10 transition-all"
+                    >
+                        <Trash2 size={7} />
+                    </button>
+                </div>
+            </div>
+        </motion.div>
+    )
+})
+
+InvoiceCard.displayName = 'InvoiceCard'
 
 export default function SalesClientView({ initialInvoices }: { initialInvoices?: any[] }) {
     const router = useRouter()
@@ -67,7 +175,6 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
         fetchInvoices()
     }, [activeBusinessId])
 
-    // Real-time Subscription
     useEffect(() => {
         if (!activeBusinessId) return
 
@@ -107,7 +214,7 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                             setInvoices(prev => prev.map(inv => inv.id === data.id ? { ...inv, ...updatedInvoice } : inv))
                         }
                     } else if (payload.eventType === 'DELETE') {
-                        setInvoices(prev => prev.filter(inv => inv.id === payload.old.id))
+                        setInvoices(prev => prev.filter(inv => inv.id !== payload.old.id))
                     }
                 }
             )
@@ -118,19 +225,15 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
         }
     }, [activeBusinessId, supabase])
 
-    // handleEdit removed - editing disabled
-
     const handlePrintInvoice = async (e: React.MouseEvent, invoice: any) => {
-        e.stopPropagation() // Prevent card click
+        e.stopPropagation()
 
         try {
-            // Fetch invoice items
             const { data: items } = await supabase
                 .from('invoice_items')
                 .select('*')
                 .eq('invoice_id', invoice.id)
 
-            // Get business info
             const activeBusiness = businesses.find(b => b.id === activeBusinessId)
             const currencyCode = (activeBusiness as any)?.currency || 'USD'
             const currencySymbol = currencies.find(c => c.code === currencyCode)?.symbol || '$'
@@ -188,7 +291,6 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
         }
     }
 
-    // Invoices are already filtered by business_id at the database level
     const filteredAndSortedInvoices = React.useMemo(() => {
         let result = invoices.filter((inv) =>
             (inv.invoice_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -215,7 +317,7 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
         longPressTimer.current = setTimeout(() => {
             setInvoiceToDelete(invoice)
             setIsDeleteConfirmOpen(true)
-        }, 800) // 800ms long press
+        }, 800)
     }
 
     const handleTouchEnd = () => {
@@ -230,31 +332,22 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
         const id = invoiceToDelete.id
 
         try {
-            // 1. Fetch Items for Stock Reversion
             const { data: invoiceItems } = await supabase.from('invoice_items').select('*').eq('invoice_id', id)
-
-            // 2. Revert Stock
             if (invoiceItems) {
                 for (const item of invoiceItems) {
                     if (item.item_id) {
                         const { data: dbItem } = await supabase.from('items').select('stock_quantity').eq('id', item.item_id).maybeSingle()
                         if (dbItem) {
-                            // For SALE: We decreased stock, so adding back means + quantity
                             const newStock = (dbItem.stock_quantity || 0) + item.quantity
                             await supabase.from('items').update({ stock_quantity: newStock }).eq('id', item.item_id)
                         }
                     }
                 }
             }
-
-            // 3. Cascade Delete
             await supabase.from('transactions').delete().eq('invoice_id', id)
             await supabase.from('invoice_items').delete().eq('invoice_id', id)
             const { error } = await supabase.from('invoices').delete().eq('id', id)
-
             if (error) throw error
-
-            // Update UI
             setInvoices(prev => prev.filter(i => i.id !== id))
             setIsDeleteConfirmOpen(false)
             setInvoiceToDelete(null)
@@ -280,14 +373,8 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
         }
     }
 
-    const itemVariants = {
-        hidden: { opacity: 0, y: 10 },
-        show: { opacity: 1, y: 0 }
-    }
-
     return (
         <div className="space-y-4 pb-20">
-            {/* Header - Compact */}
             <div className="flex flex-col gap-3 pb-3 border-b border-[var(--primary-green)]/10">
                 <div className="flex items-center justify-between">
                     <div>
@@ -301,7 +388,7 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                         whileHover={{ scale: 1.05, translateY: -2 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => router.push('/dashboard/sales/new')}
-                        className="flex items-center justify-center rounded-xl bg-[var(--primary-green)] px-4 py-2 text-[11px] font-black uppercase tracking-wider text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] transition-all shadow-xl shadow-[var(--primary-green)]/20 active:scale-95 border border-[var(--primary-foreground)]/10 group"
+                        className="flex items-center justify-center rounded-xl bg-[var(--primary-green)] px-4 py-2 text-[11px] font-black uppercase tracking-wider text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] transition-all shadow-xl shadow-[var(--primary-green)]/20 border border-[var(--primary-foreground)]/10 group"
                     >
                         <Plus className="mr-1.5 h-3.5 w-3.5 transition-transform group-hover:rotate-90 duration-300" />
                         <span>New Entry</span>
@@ -315,7 +402,6 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                 />
             </div>
 
-            {/* Quick Stats Bar */}
             <div id="sales-stats" className="flex gap-2">
                 <motion.div
                     whileHover={{ scale: 1.02 }}
@@ -412,7 +498,6 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                 ]}
             />
 
-            {/* Grid - Ultra Compact Cards */}
             <motion.div
                 id="sales-list"
                 variants={containerVariants}
@@ -421,89 +506,17 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2"
             >
                 {filteredAndSortedInvoices.slice(0, visibleCount).map((invoice) => (
-                    <motion.div
+                    <InvoiceCard
                         key={invoice.id}
-                        layout
-                        variants={itemVariants}
-                        initial="hidden"
-                        animate="show"
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        transition={{ duration: 0.2 }}
-                        onClick={() => handleEdit(invoice.id)}
-                        onMouseDown={() => handleTouchStart(invoice)}
-                        onMouseUp={handleTouchEnd}
-                        onMouseLeave={handleTouchEnd}
-                        onTouchStart={() => handleTouchStart(invoice)}
-                        onTouchEnd={handleTouchEnd}
-                        className="group relative flex items-center glass-optimized rounded-[10px] border border-[var(--foreground)]/10 p-1.5 hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer overflow-hidden h-[44px] gap-2 select-none active:scale-[0.98]"
-                    >
-                        {/* Status Indicator Stripe */}
-                        <div className={clsx(
-                            "absolute top-0 left-0 w-[2px] h-full transition-colors duration-300",
-                            invoice.status === 'PAID' ? "bg-emerald-500" : "bg-rose-500"
-                        )} />
-
-                        {/* Avatar */}
-                        <div className={clsx(
-                            "h-6 w-6 rounded-lg flex items-center justify-center font-black text-[9px] transition-all duration-300 shadow-inner shrink-0 border uppercase",
-                            invoice.status === 'UNPAID'
-                                ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
-                                : "bg-[var(--foreground)]/5 text-[var(--deep-contrast)]/60 border-[var(--foreground)]/10"
-                        )}>
-                            {(invoice.party?.name || 'W').charAt(0)}
-                        </div>
-
-                        {/* Identity & Status Header - Compact */}
-                        <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between gap-1">
-                                <h3 className="text-[9px] font-black text-[var(--deep-contrast)] truncate leading-none uppercase tracking-tight">{invoice.party?.name || 'Walk-in'}</h3>
-                                <span className={clsx(
-                                    "text-[5.5px] font-black uppercase tracking-widest px-1 py-0.5 rounded-md border shrink-0",
-                                    invoice.status === 'PAID' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/10" :
-                                        invoice.status === 'PENDING' ? "bg-amber-500/10 text-amber-500 border-amber-500/10" :
-                                            "bg-rose-500/10 text-rose-500 border-rose-500/10"
-                                )}>
-                                    {invoice.status}
-                                </span>
-                            </div>
-                            <div className="flex items-center gap-1.5 mt-1.5">
-                                <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">{invoice.invoice_number}</span>
-                                <div className="h-0.5 w-0.5 rounded-full bg-[var(--foreground)]/20" />
-                                <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">
-                                    {new Date(invoice.date).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}
-                                </span>
-                            </div>
-                        </div>
-
-                        {/* Value & Actions Row */}
-                        <div className="flex flex-col items-end gap-1 shrink-0">
-                            <p className={clsx(
-                                "text-[11px] font-black tracking-tighter tabular-nums leading-none",
-                                invoice.balance_amount > 0 ? "text-rose-500" : "text-emerald-500"
-                            )}>
-                                {formatCurrency(invoice.total_amount)}
-                            </p>
-                            <div className="flex items-center gap-1 transition-opacity">
-                                <button
-                                    onClick={(e) => handlePrintInvoice(e, invoice)}
-                                    className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-[var(--primary-green)] hover:text-white border border-[var(--foreground)]/10 transition-all"
-                                >
-                                    <Printer size={7} />
-                                </button>
-                                {/* Edit button removed */}
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation()
-                                        setInvoiceToDelete(invoice)
-                                        setIsDeleteConfirmOpen(true)
-                                    }}
-                                    className="h-4 w-4 flex items-center justify-center rounded-md bg-[var(--foreground)]/5 text-[var(--foreground)]/40 hover:bg-rose-500 hover:text-white border border-[var(--foreground)]/10 transition-all"
-                                >
-                                    <Trash2 size={7} />
-                                </button>
-                            </div>
-                        </div>
-                    </motion.div>
+                        invoice={invoice}
+                        formatCurrency={formatCurrency}
+                        handleEdit={handleEdit}
+                        handleTouchStart={handleTouchStart}
+                        handleTouchEnd={handleTouchEnd}
+                        handlePrintInvoice={handlePrintInvoice}
+                        setInvoiceToDelete={setInvoiceToDelete}
+                        setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
+                    />
                 ))}
             </motion.div>
 
@@ -545,17 +558,16 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                     <p className="text-[8px] font-bold uppercase tracking-widest mt-1 opacity-50">Generate an invoice to start tracking</p>
                 </div>
             ) : null}
-            {
-                isPreviewOpen && previewData && (
-                    <InvoicePreviewModal
-                        isOpen={isPreviewOpen}
-                        onClose={() => setIsPreviewOpen(false)}
-                        data={previewData}
-                        onPrint={handlePrint}
-                        onDownload={handleDownload}
-                    />
-                )
-            }
-        </div >
+
+            {isPreviewOpen && previewData && (
+                <InvoicePreviewModal
+                    isOpen={isPreviewOpen}
+                    onClose={() => setIsPreviewOpen(false)}
+                    data={previewData}
+                    onPrint={handlePrint}
+                    onDownload={handleDownload}
+                />
+            )}
+        </div>
     )
 }

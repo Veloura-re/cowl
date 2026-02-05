@@ -184,7 +184,7 @@ export async function fetchReportDataService(
             total_amount,
             status,
             balance_amount,
-            parties (name)
+            parties(name)
         `)
         .eq('business_id', businessId)
         .eq('type', type === 'SALES' ? 'SALE' : 'PURCHASE')

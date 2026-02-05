@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Minus, Settings2, Trash2, Search, Filter, Calendar, ArrowUpRight, ArrowDownRight, TrendingUp, Loader2, X, Edit2, Wallet, ShoppingCart, Home, Car, Zap, Utensils, Coffee, ShoppingBag, Briefcase, GraduationCap, Heart, Smartphone, Plane, Gift, Dumbbell } from 'lucide-react'
 import { useBusiness } from '@/context/business-context'
@@ -62,6 +62,71 @@ type Props = {
     initialCategories: ExpenseCategory[]
     initialExpenses: Expense[]
 }
+
+// Memoized Expense Card
+const ExpenseCard = React.memo(({
+    expense,
+    formatCurrency,
+    openEditModal,
+    setDeleteTarget
+}: {
+    expense: any,
+    formatCurrency: any,
+    openEditModal: any,
+    setDeleteTarget: any
+}) => {
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            onClick={() => openEditModal(expense)}
+            className="glass-optimized rounded-[24px] border border-[var(--foreground)]/5 p-4 flex items-center justify-between group hover:border-[var(--primary-green)]/20 transition-all cursor-pointer bg-white/[0.02] will-change-transform"
+        >
+            <div className="flex items-center gap-4">
+                <div className={clsx(
+                    "h-12 w-12 rounded-[18px] flex items-center justify-center shadow-lg",
+                    expense.type === 'IN' ? "bg-emerald-500/10 text-emerald-500" : "bg-rose-500/10 text-rose-500"
+                )}>
+                    {expense.type === 'IN' ?
+                        <ArrowUpRight className="h-5 w-5" /> :
+                        <ArrowDownRight className="h-5 w-5" />
+                    }
+                </div>
+                <div>
+                    <h4 className="text-[11px] font-black text-[var(--deep-contrast)] uppercase tracking-tight leading-none mb-1.5">
+                        {expense.description || expense.expense_categories?.name || 'Unlabeled Transaction'}
+                    </h4>
+                    <div className="flex items-center gap-2">
+                        <span className="text-[8px] font-black text-[var(--foreground)]/30 uppercase tracking-widest">
+                            {new Date(expense.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </span>
+                        {expense.expense_categories && (
+                            <span className="px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest border border-current" style={{ color: expense.expense_categories.color, opacity: 0.7 }}>
+                                {expense.expense_categories.name}
+                            </span>
+                        )}
+                    </div>
+                </div>
+            </div>
+            <div className="flex items-center gap-4">
+                <p className={clsx(
+                    "text-sm font-black tabular-nums tracking-tighter",
+                    expense.type === 'IN' ? "text-emerald-500" : "text-rose-500"
+                )}>
+                    {expense.type === 'IN' ? '+' : '-'}{formatCurrency(expense.amount)}
+                </p>
+                <button
+                    onClick={(e) => { e.stopPropagation(); setDeleteTarget(expense); }}
+                    className="h-8 w-8 rounded-xl bg-rose-500/5 text-rose-500 hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center border border-rose-500/10"
+                >
+                    <Trash2 className="h-4 w-4" />
+                </button>
+            </div>
+        </motion.div>
+    )
+})
+
+ExpenseCard.displayName = 'ExpenseCard'
 
 export default function ExpensesClientView({ initialCategories, initialExpenses }: Props) {
     const { activeBusinessId, formatCurrency, showSuccess, showError, setIsGlobalLoading, setIsDockHidden } = useBusiness()
@@ -134,11 +199,9 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
         fetchData()
     }, [activeBusinessId])
 
-    // Filter expenses by business
     const businessExpenses = expenses.filter(e => e.business_id === activeBusinessId)
     const businessCategories = categories.filter(c => c.business_id === activeBusinessId)
 
-    // Toggle Dock Visibility
     useEffect(() => {
         if (isAddModalOpen) {
             setIsDockHidden(true)
@@ -146,9 +209,6 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
         return () => setIsDockHidden(false)
     }, [isAddModalOpen, setIsDockHidden])
 
-
-
-    // Optimize filtering with useMemo
     const filteredExpenses = useMemo(() => {
         return businessExpenses.filter(expense => {
             const matchesSearch = expense.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -159,15 +219,12 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
         })
     }, [businessExpenses, searchQuery, typeFilter, categoryFilter])
 
-    // Optimize totals with useMemo
     const { totalIn, totalOut } = useMemo(() => {
         const _totalIn = businessExpenses.filter(e => e.type === 'IN').reduce((sum, e) => sum + Number(e.amount), 0)
         const _totalOut = businessExpenses.filter(e => e.type === 'OUT').reduce((sum, e) => sum + Number(e.amount), 0)
         return { totalIn: _totalIn, totalOut: _totalOut }
     }, [businessExpenses])
 
-
-    // Open add modal
     const openAddModal = (type: 'IN' | 'OUT') => {
         setAddType(type)
         setFormAmount('')
@@ -178,7 +235,6 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
         setIsAddModalOpen(true)
     }
 
-    // Open edit modal
     const openEditModal = (expense: Expense) => {
         setEditTarget(expense)
         setAddType(expense.type)
@@ -190,7 +246,6 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
         setIsAddModalOpen(true)
     }
 
-    // Handle add expense
     const handleAddExpense = async () => {
         if (!formAmount || !activeBusinessId) return
         setLoading(true)
@@ -225,7 +280,6 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
         }
     }
 
-    // Handle update expense
     const handleUpdateExpense = async () => {
         if (!editTarget || !formAmount || !activeBusinessId) return
         setLoading(true)
@@ -260,7 +314,6 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
         }
     }
 
-    // Handle delete expense
     const handleDeleteExpense = async () => {
         if (!deleteTarget) return
         setLoading(true)
@@ -285,7 +338,6 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
         }
     }
 
-    // Category CRUD logic
     const handleSaveCategory = async () => {
         if (!catFormName.trim() || !activeBusinessId) return
         setCategoryLoading(true)
@@ -293,7 +345,6 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
 
         try {
             if (editingCategoryId) {
-                // Update existing
                 const { error } = await supabase
                     .from('expense_categories')
                     .update({ name: catFormName, color: catFormColor, icon: catFormIcon })
@@ -301,7 +352,6 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                 if (error) throw error
                 showSuccess('Category updated!')
             } else {
-                // Create new
                 const { error } = await supabase
                     .from('expense_categories')
                     .insert({
@@ -315,7 +365,6 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                 showSuccess('Category created!')
             }
             resetCatForm()
-            // Refresh data
             const { data } = await supabase
                 .from('expense_categories')
                 .select('*')
@@ -339,7 +388,6 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                 .eq('id', id)
             if (error) throw error
             showSuccess('Category deleted!')
-            // Refresh data
             const { data } = await supabase
                 .from('expense_categories')
                 .select('*')
@@ -353,10 +401,8 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
         }
     }
 
-
     return (
         <div className="space-y-4 pb-20">
-            {/* Header Redesigned */}
             <div className="flex flex-col items-center justify-center pt-4 pb-2">
                 <h1 className="text-sm font-black text-[var(--deep-contrast)] uppercase tracking-[0.4em] text-center">
                     Financial Ledger
@@ -366,7 +412,6 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
 
             {activeTab === 'expenses' ? (
                 <>
-                    {/* Centerpiece Summary - Cyber-Neon Redesign */}
                     <div className="relative px-3 py-6">
                         <motion.div
                             id="expenses-stats"
@@ -375,20 +420,15 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                             transition={{ type: "spring", stiffness: 300, damping: 25 }}
                             className="relative"
                         >
-                            {/* Multi-Layer Glass Container */}
                             <div className="relative rounded-[28px] overflow-hidden">
-                                {/* Animated Glow Border */}
                                 <div className="absolute inset-0 rounded-[28px] p-[1px] bg-gradient-to-br from-rose-500/40 via-transparent to-rose-500/20">
                                     <div className="h-full w-full rounded-[27px] bg-[var(--background)]" />
                                 </div>
 
-                                {/* Inner Content */}
                                 <div className="relative glass backdrop-blur-3xl bg-[var(--background)]/60 border border-white/5 rounded-[28px] p-6">
-                                    {/* Ambient Background Mesh */}
                                     <div className="absolute top-0 right-0 w-48 h-48 bg-rose-500/5 rounded-full blur-[80px] pointer-events-none" />
                                     <div className="absolute bottom-0 left-0 w-32 h-32 bg-[var(--primary-green)]/5 rounded-full blur-[60px] pointer-events-none" />
 
-                                    {/* Header Row */}
                                     <div className="relative flex items-start justify-between mb-5">
                                         <div className="flex-1">
                                             <div className="flex items-center gap-2 mb-2">
@@ -411,10 +451,8 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                                         </div>
                                     </div>
 
-                                    {/* Divider Line */}
                                     <div className="relative h-[1px] bg-gradient-to-r from-transparent via-[var(--foreground)]/10 to-transparent my-5" />
 
-                                    {/* Action Buttons */}
                                     <div className="grid grid-cols-2 gap-3">
                                         <button
                                             onClick={() => openAddModal('OUT')}
@@ -441,8 +479,6 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                         </motion.div>
                     </div>
 
-
-                    {/* Search & Filters Redesigned */}
                     <div className="flex gap-3 px-1 mt-4">
                         <div className="flex-1 relative group">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--foreground)]/20 group-focus-within:text-[var(--primary-green)] transition-colors" />
@@ -465,8 +501,6 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                         </button>
                     </div>
 
-
-                    {/* Expenses List Redesigned */}
                     <div id="expenses-list" className="space-y-3 mt-6">
                         <div className="flex items-center justify-between px-2 mb-2">
                             <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40">Chronicle</h4>
@@ -483,61 +517,19 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                             </div>
                         ) : (
                             filteredExpenses.map((expense) => (
-                                <motion.div
+                                <ExpenseCard
                                     key={expense.id}
-                                    initial={{ opacity: 0, x: -10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    onClick={() => openEditModal(expense)}
-                                    className="glass rounded-[24px] border border-[var(--foreground)]/5 p-4 flex items-center justify-between group hover:border-[var(--primary-green)]/20 transition-all cursor-pointer bg-white/[0.02]"
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <div className={clsx(
-                                            "h-12 w-12 rounded-[18px] flex items-center justify-center shadow-lg",
-                                            expense.type === 'IN' ? "bg-emerald-500/10 text-emerald-500" : "bg-rose-500/10 text-rose-500"
-                                        )}>
-                                            {expense.type === 'IN' ?
-                                                <ArrowUpRight className="h-5 w-5" /> :
-                                                <ArrowDownRight className="h-5 w-5" />
-                                            }
-                                        </div>
-                                        <div>
-                                            <h4 className="text-[11px] font-black text-[var(--deep-contrast)] uppercase tracking-tight leading-none mb-1.5">
-                                                {expense.description || expense.expense_categories?.name || 'Unlabeled Transaction'}
-                                            </h4>
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-[8px] font-black text-[var(--foreground)]/30 uppercase tracking-widest">
-                                                    {new Date(expense.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                                                </span>
-                                                {expense.expense_categories && (
-                                                    <span className="px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest border border-current" style={{ color: expense.expense_categories.color, opacity: 0.7 }}>
-                                                        {expense.expense_categories.name}
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-4">
-                                        <p className={clsx(
-                                            "text-sm font-black tabular-nums tracking-tighter",
-                                            expense.type === 'IN' ? "text-emerald-500" : "text-rose-500"
-                                        )}>
-                                            {expense.type === 'IN' ? '+' : '-'}{formatCurrency(expense.amount)}
-                                        </p>
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); setDeleteTarget(expense); }}
-                                            className="h-8 w-8 rounded-xl bg-rose-500/5 text-rose-500 hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center opacity-0 group-hover:opacity-100"
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </button>
-                                    </div>
-                                </motion.div>
+                                    expense={expense}
+                                    formatCurrency={formatCurrency}
+                                    openEditModal={openEditModal}
+                                    setDeleteTarget={setDeleteTarget}
+                                />
                             ))
                         )}
                     </div>
                 </>
             ) : (
                 <div className="space-y-6">
-                    {/* Categories Header */}
                     <div className="flex items-center justify-between px-2">
                         <div>
                             <h2 className="text-xl font-black text-[var(--deep-contrast)] uppercase tracking-tight">
@@ -564,7 +556,7 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                             Back to Ledger
                         </button>
                     </div>
-                    {/* Add Category Modal - Redesigned & Theme Aware */}
+
                     <AnimatePresence>
                         {(isAddingCategory || editingCategoryId) && (
                             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -584,7 +576,6 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                                     className="relative w-full max-w-sm rounded-[32px] overflow-hidden shadow-2xl border border-[var(--foreground)]/10 bg-[var(--background)]/90 backdrop-blur-2xl text-[var(--foreground)]"
                                     onClick={(e) => e.stopPropagation()}
                                 >
-                                    {/* Decorative Background Mesh - Theme Sensitive */}
                                     <div className="absolute inset-0 opacity-10 dark:opacity-20 pointer-events-none">
                                         <div className="absolute -top-[50%] -left-[50%] w-[200%] h-[200%] bg-[radial-gradient(circle_at_50%_50%,rgb(var(--primary-green))_0%,transparent_50%)] blur-[80px]" />
                                     </div>
@@ -599,7 +590,6 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                                             </button>
                                         </div>
 
-                                        {/* Name Input */}
                                         <div className="space-y-1.5">
                                             <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 ml-1">Name</label>
                                             <input
@@ -611,7 +601,6 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                                             />
                                         </div>
 
-                                        {/* Color & Icon */}
                                         <div className="space-y-4">
                                             <div>
                                                 <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 mb-2 ml-1">Color Palette</label>
@@ -651,7 +640,6 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                                             </div>
                                         </div>
 
-                                        {/* Actions */}
                                         <div className="pt-2">
                                             <button
                                                 onClick={handleSaveCategory}
@@ -717,7 +705,6 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                                             </p>
                                         </div>
 
-                                        {/* Background Decoration */}
                                         <div className="absolute -bottom-8 -right-8 w-24 h-24 blur-[40px] opacity-10 rounded-full" style={{ backgroundColor: category.color }} />
                                     </motion.div>
                                 )
@@ -727,11 +714,9 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                 </div>
             )}
 
-            {/* Add Expense Modal - Redesigned */}
             <AnimatePresence>
                 {isAddModalOpen && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                        {/* Backdrop with cosmic effect */}
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -742,7 +727,6 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(50,50,50,0.2),transparent_70%)] opacity-50" />
                         </motion.div>
 
-                        {/* Modal Content - Cyber Style & Theme Aware */}
                         <motion.div
                             initial={{ scale: 0.9, opacity: 0, y: 20 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -751,12 +735,10 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                             className="relative w-full max-w-sm rounded-[32px] overflow-hidden shadow-2xl border border-[var(--foreground)]/10 bg-[var(--background)]/90 backdrop-blur-2xl text-[var(--foreground)]"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            {/* Decorative Background Mesh - Theme Sensitive */}
                             <div className="absolute inset-0 opacity-10 dark:opacity-20 pointer-events-none">
                                 <div className="absolute -top-[50%] -left-[50%] w-[200%] h-[200%] bg-[radial-gradient(circle_at_50%_50%,rgb(var(--primary-green))_0%,transparent_50%)] blur-[80px]" />
                             </div>
 
-                            {/* Header */}
                             <div className="relative p-6 pb-2">
                                 <div className="flex items-center justify-between">
                                     <div>
@@ -777,7 +759,6 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                             </div>
 
                             <div className="relative p-6 space-y-5">
-                                {/* Amount Input - Large & Central */}
                                 <div className="relative group">
                                     <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 mb-2 ml-1">Amount</label>
                                     <div className="relative">
@@ -792,7 +773,6 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                                     </div>
                                 </div>
 
-                                {/* Date & Category Grid */}
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="space-y-1.5">
                                         <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 ml-1">Date</label>
@@ -822,7 +802,6 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                                     </div>
                                 </div>
 
-                                {/* Description */}
                                 <div className="space-y-1.5">
                                     <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 ml-1">Description</label>
                                     <input
@@ -834,13 +813,20 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                                     />
                                 </div>
 
-                                {/* Action Button - Magnetic Style */}
-                                <div className="pt-2">
+                                <div className="flex gap-3">
+                                    {editTarget && (
+                                        <button
+                                            onClick={() => setDeleteTarget(editTarget)}
+                                            className="w-14 h-14 rounded-2xl bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500 hover:text-white transition-all active:scale-[0.98] flex items-center justify-center shadow-lg shadow-rose-500/5"
+                                        >
+                                            <Trash2 className="h-5 w-5" />
+                                        </button>
+                                    )}
                                     <button
                                         onClick={editTarget ? handleUpdateExpense : handleAddExpense}
                                         disabled={loading || !formAmount}
                                         className={clsx(
-                                            "relative w-full h-14 rounded-2xl overflow-hidden group disabled:opacity-50 shadow-lg transition-all active:scale-[0.98]",
+                                            "relative flex-1 h-14 rounded-2xl overflow-hidden group disabled:opacity-50 shadow-lg transition-all active:scale-[0.98]",
                                             addType === 'IN' ? "bg-emerald-500 shadow-emerald-500/20" : "bg-rose-500 shadow-rose-500/20"
                                         )}
                                     >
@@ -857,7 +843,6 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                 )}
             </AnimatePresence>
 
-            {/* Modals */}
             <PickerModal
                 isOpen={isTypeFilterOpen}
                 onClose={() => setIsTypeFilterOpen(false)}
@@ -882,7 +867,6 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                 ]}
                 selectedValue={categoryFilter}
             />
-
 
             <PickerModal
                 isOpen={isCategoryPickerOpen}
@@ -909,8 +893,10 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                 onClose={() => setDeleteTarget(null)}
                 onConfirm={handleDeleteExpense}
                 title="Delete Expense?"
-                description="This will permanently remove this expense record."
+                description="This will permanently remove this expense record from your ledger. This action cannot be undone."
                 confirmLabel="Delete"
+                icon={Trash2}
+                variant="danger"
             />
         </div>
     )

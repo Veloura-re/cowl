@@ -29,9 +29,6 @@ export const CyberGridBackground = () => {
         <div className="fixed inset-0 w-full h-full -z-10 overflow-hidden bg-[var(--background)] transition-colors duration-100 will-change-[background-color]">
             {/* 
               LAYER 1: BASE GRID 
-              Visible always, but subtle. 
-              Dark Mode: Vibrantly green but dim.
-              Light Mode: Dark emerald tint (instead of black). 
             */}
             <div className="absolute inset-0 opacity-[0.1] dark:opacity-[0.2]">
                 <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -52,11 +49,9 @@ export const CyberGridBackground = () => {
 
             {/* 
               LAYER 2: ACTIVE GRID (MOUSE REVEAL)
-              Revealed by mouse movement. Brighter and more intense.
-              Uses --glass-highlight to ensure it looks like "light" in both modes.
             */}
             <motion.div
-                className="absolute inset-0 opacity-0 dark:opacity-100 mix-blend-screen pointer-events-none"
+                className="absolute inset-0 opacity-0 dark:opacity-100 mix-blend-screen pointer-events-none will-change-transform"
                 style={{
                     maskImage: gridMask,
                     WebkitMaskImage: gridMask
@@ -71,7 +66,7 @@ export const CyberGridBackground = () => {
                                     fill="none"
                                     stroke="currentColor"
                                     strokeWidth="1"
-                                    className="text-[var(--glass-highlight)] shadow-[0_0_10px_var(--glass-highlight)]"
+                                    className="text-[var(--glass-highlight)]"
                                 />
                             </pattern>
                         </defs>
@@ -87,16 +82,14 @@ export const CyberGridBackground = () => {
             </motion.div>
 
             {/* 
-              LAYER 3: SCANNERS (The "Matrix" feel)
-              Random beams of light traveling along the grid lines.
-              Increased opacity for better visibility.
+              LAYER 3: SCANNERS
             */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
                 {/* Horizontal Scanners */}
                 {[...Array(3)].map((_, i) => (
                     <motion.div
                         key={`h-${i}`}
-                        className="absolute h-[1px] w-[20%] bg-gradient-to-r from-transparent via-[var(--glass-highlight)] to-transparent opacity-50 dark:opacity-80"
+                        className="absolute h-[1px] w-[20%] bg-gradient-to-r from-transparent via-[var(--glass-highlight)] to-transparent opacity-50 dark:opacity-80 will-change-transform"
                         initial={{ left: '-20%', top: `${15 + i * 30}%` }}
                         animate={{ left: '120%' }}
                         transition={{
@@ -105,10 +98,6 @@ export const CyberGridBackground = () => {
                             ease: "linear",
                             delay: i * 1.5
                         }}
-                        style={{
-                            boxShadow: '0 0 8px var(--glass-highlight)',
-                            filter: 'blur(1px)'
-                        }}
                     />
                 ))}
 
@@ -116,7 +105,7 @@ export const CyberGridBackground = () => {
                 {[...Array(4)].map((_, i) => (
                     <motion.div
                         key={`v-${i}`}
-                        className="absolute w-[1px] h-[20%] bg-gradient-to-b from-transparent via-[var(--glass-highlight)] to-transparent opacity-30 dark:opacity-70"
+                        className="absolute w-[1px] h-[20%] bg-gradient-to-b from-transparent via-[var(--glass-highlight)] to-transparent opacity-30 dark:opacity-70 will-change-transform"
                         initial={{ top: '-20%', left: `${20 + i * 25}%` }}
                         animate={{ top: '120%' }}
                         transition={{
@@ -125,35 +114,28 @@ export const CyberGridBackground = () => {
                             ease: "linear",
                             delay: i * 2
                         }}
-                        style={{
-                            boxShadow: '0 0 8px var(--glass-highlight)',
-                            filter: 'blur(1px)'
-                        }}
                     />
                 ))}
             </div>
 
             {/* 
-               LAYER 4: AMBIENT PULSE (Corners)
-               Soft green glow in corners to add depth.
-               Color adjusted to be visible in light mode too (glass-highlight).
+               LAYER 4: AMBIENT PULSE
             */}
             <div className="absolute inset-0 pointer-events-none">
                 <motion.div
                     animate={{ opacity: [0.2, 0.4, 0.2] }}
                     transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute top-0 left-0 w-[500px] h-[500px] bg-[radial-gradient(circle_at_0_0,_var(--glass-highlight)_0%,transparent_70%)] blur-[100px] opacity-15 dark:opacity-25 mix-blend-screen"
+                    className="absolute top-0 left-0 w-[400px] h-[400px] bg-[radial-gradient(circle_at_0_0,_var(--glass-highlight)_0%,transparent_70%)] blur-[40px] opacity-15 dark:opacity-25 mix-blend-screen"
                 />
                 <motion.div
                     animate={{ opacity: [0.1, 0.3, 0.1] }}
                     transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                    className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-[radial-gradient(circle_at_100%_100%,_var(--glass-highlight)_0%,transparent_70%)] blur-[120px] opacity-15 dark:opacity-25 mix-blend-screen"
+                    className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[radial-gradient(circle_at_100%_100%,_var(--glass-highlight)_0%,transparent_70%)] blur-[60px] opacity-15 dark:opacity-25 mix-blend-screen"
                 />
             </div>
 
             {/* 
                LAYER 5: VIGNETTE
-               Focuses attention on the center.
             */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,var(--background)_100%)] opacity-80 pointer-events-none" />
         </div>
