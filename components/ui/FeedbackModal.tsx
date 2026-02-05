@@ -3,7 +3,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { AlertCircle, CheckCircle2, X, ShieldCheck, ShieldAlert } from 'lucide-react'
 import clsx from 'clsx'
-import { useLockBodyScroll } from '@/hooks/use-lock-body-scroll'
 
 interface FeedbackModalProps {
     isOpen: boolean
@@ -20,13 +19,12 @@ export default function FeedbackModal({
     message,
     variant = 'error'
 }: FeedbackModalProps) {
-    useLockBodyScroll(isOpen)
     const isError = variant === 'error'
 
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[200] flex items-start md:items-center justify-center px-4 h-[100dvh] pt-[10vh] md:pt-0">
+                <div className="fixed inset-0 z-[200] flex items-center justify-center px-4">
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}

@@ -379,16 +379,14 @@ const MetricCard = memo(({ item, index, formatCurrency }: any) => (
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: index * 0.05 }}
-        whileHover={{ scale: 1.02, y: -2 }}
-        whileTap={{ scale: 0.98 }}
-        className="glass p-3.5 rounded-[22px] border border-[var(--foreground)]/5 dark:border-white/5 flex items-center justify-between group hover:border-[var(--foreground)]/20 dark:hover:border-white/20 transition-all duration-300 shadow-sm hover:shadow-xl"
+        className="glass p-3 rounded-xl border border-[var(--foreground)]/5 dark:border-white/5 flex items-center justify-between group hover:border-[var(--foreground)]/10 transition-colors"
     >
-        <div className="min-w-0">
-            <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.2em] mb-1.5 leading-none">{item.label}</p>
-            <h3 className="text-sm font-black text-[var(--deep-contrast)] tracking-tighter tabular-nums truncate leading-none">{formatCurrency(item.val)}</h3>
+        <div>
+            <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mb-0.5">{item.label}</p>
+            <h3 className="text-sm font-black text-[var(--deep-contrast)] tracking-tight">{formatCurrency(item.val)}</h3>
         </div>
-        <div className={clsx("h-10 w-10 rounded-xl flex items-center justify-center transition-all duration-500 group-hover:rotate-6 shadow-lg", item.bg, item.color)}>
-            <item.icon className="h-4.5 w-4.5" />
+        <div className={clsx("h-8 w-8 rounded-lg flex items-center justify-center transition-colors", item.bg, item.color)}>
+            <item.icon className="h-4 w-4" />
         </div>
     </motion.div>
 ))

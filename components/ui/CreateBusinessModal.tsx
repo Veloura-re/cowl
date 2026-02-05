@@ -6,7 +6,6 @@ import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
 import { useBusiness } from '@/context/business-context'
 import ErrorModal from '@/components/ui/ErrorModal'
-import { useLockBodyScroll } from '@/hooks/use-lock-body-scroll'
 
 type CreateBusinessModalProps = {
     isOpen: boolean
@@ -14,7 +13,6 @@ type CreateBusinessModalProps = {
 }
 
 export default function CreateBusinessModal({ isOpen, onClose }: CreateBusinessModalProps) {
-    useLockBodyScroll(isOpen)
     const [loading, setLoading] = useState(false)
     const supabase = createClient()
     const { refreshBusinesses, setActiveBusinessId } = useBusiness()
@@ -51,8 +49,8 @@ export default function CreateBusinessModal({ isOpen, onClose }: CreateBusinessM
     if (!isOpen) return null
 
     return (
-        <div className="fixed inset-0 z-[200] flex items-start md:items-center justify-center px-4 h-[100dvh] pt-[10vh] md:pt-0">
-            <div className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-md animate-in fade-in duration-300" onClick={onClose} />
+        <div className="fixed inset-0 z-[200] flex items-center justify-center px-4">
+            <div className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose} />
             <div className="glass w-full max-w-sm rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 relative z-10 border border-[var(--foreground)]/10 bg-[var(--background)]/80">
                 <div className="flex items-center justify-between border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5 px-6 py-4">
                     <div className="flex items-center gap-2.5">

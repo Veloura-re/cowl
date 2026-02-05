@@ -3,7 +3,6 @@ import { useState, useMemo } from 'react'
 import { useTheme } from 'next-themes'
 import { InvoiceData, shareInvoice, downloadInvoice, generateInvoiceHTML, saveInvoiceAsImage } from '@/utils/invoice-generator'
 import clsx from 'clsx'
-import { useLockBodyScroll } from '@/hooks/use-lock-body-scroll'
 
 type InvoicePreviewModalProps = {
     isOpen: boolean
@@ -20,7 +19,6 @@ export default function InvoicePreviewModal({
     onPrint,
     onDownload
 }: InvoicePreviewModalProps) {
-    useLockBodyScroll(isOpen)
     const [viewMode, setViewMode] = useState<'fit' | 'read'>('fit')
     const { resolvedTheme } = useTheme()
 
@@ -32,7 +30,7 @@ export default function InvoicePreviewModal({
 
     return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-0 sm:p-4">
-            <div className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-md animate-in fade-in duration-300" onClick={onClose} />
+            <div className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose} />
 
             <div className={clsx(
                 "relative flex flex-col w-full h-full sm:rounded-none overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 border border-[var(--foreground)]/10 bg-[var(--background)]",

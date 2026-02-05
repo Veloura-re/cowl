@@ -4,7 +4,6 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertCircle, X, ShieldAlert } from "lucide-react";
 import clsx from 'clsx';
-import { useLockBodyScroll } from "@/hooks/use-lock-body-scroll";
 
 interface ErrorModalProps {
     isOpen: boolean;
@@ -19,18 +18,16 @@ export default function ErrorModal({
     title = "SYSTEM FAULT",
     message,
 }: ErrorModalProps) {
-    useLockBodyScroll(isOpen);
-
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[200] flex items-start md:items-center justify-center p-4 h-[100dvh] pt-[10vh] md:pt-4">
+                <div className="fixed inset-0 z-[250] flex items-center justify-center px-4">
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-md"
+                        className="fixed inset-0 bg-[var(--modal-backdrop)] backdrop-blur-md"
                     />
 
                     <motion.div

@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { Search, X, Check, ArrowUpDown, Filter, ChevronRight, Calendar, DollarSign, Tag } from 'lucide-react'
 import clsx from 'clsx'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useLockBodyScroll } from '@/hooks/use-lock-body-scroll'
 
 export type SortOption = {
     id: string
@@ -39,7 +38,6 @@ export default function FilterSortModal({
     onFilterSelect,
     title = "Organize List"
 }: FilterSortModalProps) {
-    useLockBodyScroll(isOpen)
     const [activeTab, setActiveTab] = useState<'sort' | 'filter'>('sort')
 
     if (!isOpen) return null
@@ -50,7 +48,7 @@ export default function FilterSortModal({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-black/60 backdrop-blur-md"
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
                 onClick={onClose}
             />
             <motion.div

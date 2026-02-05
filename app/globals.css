@@ -156,20 +156,19 @@ body {
   min-height: 100vh;
   min-height: 100dvh;
   overflow-x: hidden;
-  overscroll-behavior: none;
-  /* Performance: Force hardware acceleration for the main body */
-  transform: translateZ(0);
+  min-height: 100dvh;
+  overflow-x: hidden;
 }
 
 /* Standardize Weights - Force all bolds thinner than default but heavier for buttons */
 .font-bold,
 [class*="font-bold"] {
-  font-weight: 400 !important;
+  font-weight: 300 !important;
 }
 
 .font-black,
 [class*="font-black"] {
-  font-weight: 500 !important;
+  font-weight: 400 !important;
 }
 
 .font-semibold,
@@ -181,7 +180,7 @@ body {
 
 b,
 strong {
-  font-weight: 400 !important;
+  font-weight: 300 !important;
 }
 
 /* Force lining numbers and medium weight on all digits */
@@ -189,7 +188,7 @@ strong {
 [class*="tabular-nums"],
 span:has(> [class*="tabular-nums"]),
 input[type="number"] {
-  font-weight: 600 !important;
+  font-weight: 500 !important;
   letter-spacing: 0.02em;
 }
 
@@ -197,14 +196,14 @@ input[type="number"] {
 button,
 .button,
 [role="button"] {
-  font-weight: 600 !important;
-  letter-spacing: 0.04em;
+  font-weight: 500 !important;
+  letter-spacing: 0.02em;
   transition: all 0.1s ease-in-out;
 }
 
 button .font-black,
 button [class*="font-black"] {
-  font-weight: 700 !important;
+  font-weight: 600 !important;
 }
 
 /* Force lining numbers and thin weight on all digits */

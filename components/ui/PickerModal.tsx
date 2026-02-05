@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { Search, X, Check, ArrowRight } from 'lucide-react'
 import clsx from 'clsx'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useLockBodyScroll } from '@/hooks/use-lock-body-scroll'
 
 export type Option = {
     id: string | number
@@ -41,8 +40,6 @@ export default function PickerModal({
     autoFocus = false,
     action
 }: PickerModalProps) {
-    useLockBodyScroll(isOpen)
-
     const [searchQuery, setSearchQuery] = useState('')
 
     const filteredOptions = options.filter(opt =>
@@ -53,7 +50,7 @@ export default function PickerModal({
     if (!isOpen) return null
 
     return (
-        <div className="fixed inset-0 z-[200] flex items-center md:items-center justify-center px-4 h-[100dvh] pt-[10vh] md:pt-0">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center px-4">
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}

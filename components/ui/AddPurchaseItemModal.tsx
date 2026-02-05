@@ -8,7 +8,6 @@ import PickerModal from '@/components/ui/PickerModal'
 import ErrorModal from '@/components/ui/ErrorModal'
 import { motion } from 'framer-motion'
 import clsx from 'clsx'
-import { useLockBodyScroll } from '@/hooks/use-lock-body-scroll'
 
 type AddPurchaseItemModalProps = {
     isOpen: boolean
@@ -20,7 +19,6 @@ type AddPurchaseItemModalProps = {
 }
 
 export default function AddPurchaseItemModal({ isOpen, onClose, onAdd, items, initialData, onDelete }: AddPurchaseItemModalProps) {
-    useLockBodyScroll(isOpen)
     const router = useRouter()
     const { formatCurrency } = useBusiness()
     const [isItemPickerOpen, setIsItemPickerOpen] = useState(false)

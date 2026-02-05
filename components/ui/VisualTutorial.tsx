@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion'
 import { ChevronRight, ChevronLeft, X, Sparkles, Command } from 'lucide-react'
 import clsx from 'clsx'
-import { useLockBodyScroll } from '@/hooks/use-lock-body-scroll'
 
 export type TutorialStep = {
     title: string
@@ -154,8 +153,6 @@ export default function VisualTutorial({ steps, isOpen, onClose, accentColor = '
     const [spotlightRect, setSpotlightRect] = useState<DOMRect | null>(null)
     const [isTransitioning, setIsTransitioning] = useState(false)
     const containerRef = useRef<HTMLDivElement>(null)
-
-    useLockBodyScroll(isOpen)
 
     // Calculate RGB for CSS variables
     const primaryRgb = hexToRgb(accentColor)

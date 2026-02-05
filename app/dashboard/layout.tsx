@@ -369,7 +369,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     const activeBusiness = businesses.find(b => b.id === activeBusinessId)
 
     return (
-        <div className="flex min-h-screen bg-transparent">
+        <div className="flex h-[100dvh] bg-transparent overflow-hidden">
             {/* Desktop Sidebar (Glassmorphic) - Compact */}
             <div className="hidden lg:flex w-60 flex-col fixed inset-y-0 z-50 p-2">
                 <div className="flex flex-col flex-grow glass rounded-[24px] overflow-hidden shadow-2xl border border-[var(--foreground)]/10 dark:border-white/10 ring-1 ring-[var(--foreground)]/5 dark:ring-white/20">
@@ -497,8 +497,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                 </header>
 
                 <main className={clsx(
-                    "flex-1 overflow-y-auto lg:overflow-visible p-3 lg:p-6 scrollbar-hide relative pt-0",
-                    (shouldHideDock || isDockHidden) ? "pb-6" : "pb-24 lg:pb-6"
+                    "flex-1 overflow-y-auto p-3 lg:p-6 scrollbar-hide relative pt-0",
+                    (shouldHideDock || isDockHidden) ? "pb-6" : "pb-20 lg:pb-6"
                 )}>
                     <AnimatePresence mode="popLayout" initial={false}>
                         <motion.div

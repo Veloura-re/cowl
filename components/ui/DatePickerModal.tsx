@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { X, ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react'
 import clsx from 'clsx'
-import { useLockBodyScroll } from '@/hooks/use-lock-body-scroll'
 import {
     format,
     addMonths,
@@ -36,7 +35,6 @@ export default function DatePickerModal({
     selectedValue,
     title
 }: DatePickerModalProps) {
-    useLockBodyScroll(isOpen)
     const initialDate = selectedValue ? parseISO(selectedValue) : new Date()
     const [viewDate, setViewDate] = useState(initialDate)
 
@@ -59,8 +57,8 @@ export default function DatePickerModal({
     const selectedDateObj = selectedValue ? startOfDay(parseISO(selectedValue)) : null
 
     return (
-        <div className="fixed inset-0 z-[200] flex items-start md:items-center justify-center px-4 h-[100dvh] pt-[10vh] md:pt-0">
-            <div className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-md animate-in fade-in duration-300" onClick={onClose} />
+        <div className="fixed inset-0 z-[200] flex items-center justify-center px-4">
+            <div className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose} />
             <div className="glass w-full max-w-md rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 relative z-10 border border-white/40 dark:border-white/10">
                 {/* Header */}
                 <div className="flex items-center justify-between border-b border-white/10 dark:border-white/5 px-6 py-4 bg-white/40 dark:bg-white/5">

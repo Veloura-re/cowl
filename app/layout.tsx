@@ -48,7 +48,7 @@ export default function RootLayout({
           <AppInitializer />
           <CyberGridBackground />
 
-          <div className="relative z-10 w-full min-h-[100dvh] pb-[env(safe-area-inset-bottom)]">
+          <div className="relative z-10 w-full h-[100dvh] overflow-hidden flex flex-col pb-[env(safe-area-inset-bottom)]">
             {children}
           </div>
         </Providers>

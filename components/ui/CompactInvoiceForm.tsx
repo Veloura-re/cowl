@@ -626,8 +626,8 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                 {/* Header */}
                 <div className="flex items-center justify-between pb-2 border-b border-[var(--primary-green)]/10">
                     <div className="flex items-center gap-2">
-                        <Link href={isSale ? "/dashboard/sales" : "/dashboard/purchases"} className="h-10 w-10 flex items-center justify-center rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:bg-rose-500 hover:text-white transition-all active:scale-95 shadow-sm">
-                            <ArrowLeft className="h-4 w-4" />
+                        <Link href={isSale ? "/dashboard/sales" : "/dashboard/purchases"} className="p-1.5 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:bg-[var(--primary-green)] hover:text-[var(--primary-foreground)] transition-all active:scale-95 shadow-sm">
+                            <ArrowLeft className="h-3.5 w-3.5" />
                         </Link>
                         <div className="flex flex-col">
                             <h1 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight">
@@ -649,9 +649,9 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                         <button
                             type="submit"
                             disabled={loading || !partyId || rows.length === 0}
-                            className="flex items-center gap-2 px-6 h-10 rounded-xl bg-[var(--primary-green)] text-[var(--primary-foreground)] text-[10px] font-black uppercase tracking-[0.15em] hover:bg-[var(--primary-hover)] transition-all disabled:opacity-50 shadow-lg shadow-[var(--primary-green)]/20 active:scale-95 ring-offset-2 focus:ring-2 ring-[var(--primary-green)]"
+                            className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[var(--primary-green)] text-[var(--primary-foreground)] text-[8px] font-black uppercase tracking-widest hover:bg-[var(--primary-hover)] transition-all disabled:opacity-50 shadow-md active:scale-95"
                         >
-                            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                            {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
                             <span>{isSale ? 'Commit' : 'Record'}</span>
                         </button>
                     </div>

@@ -2,7 +2,6 @@
 
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useLockBodyScroll } from "@/hooks/use-lock-body-scroll";
 
 interface ConfirmationModalProps {
     isOpen: boolean;
@@ -23,19 +22,17 @@ export const ConfirmationModal = ({
     confirmLabel = "CONFIRM",
     cancelLabel = "CANCEL",
 }: ConfirmationModalProps) => {
-    useLockBodyScroll(isOpen);
-
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[200] flex items-start md:items-center justify-center px-4 h-[100dvh] pt-[10vh] md:pt-0">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
                     {/* Overlay */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-md"
+                        className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-sm"
                     />
 
                     {/* Modal Container */}

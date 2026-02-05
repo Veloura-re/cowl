@@ -8,7 +8,6 @@ import { SignOutModal } from "./SignOutModal";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import { useLockBodyScroll } from "@/hooks/use-lock-body-scroll";
 
 // Items always on the dock
 const dockItems = [
@@ -35,21 +34,8 @@ export const BottomNav = () => {
     const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
     const [isSigningOut, setIsSigningOut] = useState(false);
     const [mounted, setMounted] = useState(false);
-    const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
-    useLockBodyScroll(isMenuOpen);
-
-    useEffect(() => {
-        setMounted(true);
-        const handleResize = () => {
-            // Simple heuristic: if height drops significantly, keyboard is likely up
-            if (window.visualViewport) {
-                setIsKeyboardVisible(window.visualViewport.height < window.innerHeight * 0.85);
-            }
-        };
-        window.visualViewport?.addEventListener('resize', handleResize);
-        return () => window.visualViewport?.removeEventListener('resize', handleResize);
-    }, []);
+    useEffect(() => setMounted(true), []);
 
     if (!mounted) return null;
 
@@ -71,7 +57,7 @@ export const BottomNav = () => {
                             animate={{ y: 0, opacity: 1, scale: 1 }}
                             exit={{ y: "100%", opacity: 0, scale: 0.95 }}
                             transition={{ type: "spring", damping: 30, stiffness: 500 }}
-                            className="relative z-10 glass rounded-[40px] p-8 border border-[var(--foreground)]/10 shadow-[0_-20px_50px_-12px_rgba(0,0,0,0.3)] bg-[var(--background)]/95 backdrop-blur-3xl max-h-[85vh] overflow-y-auto scrollbar-hide"
+                            className="relative z-10 glass rounded-[40px] p-8 border border-[var(--foreground)]/10 shadow-[0_-20px_50px_-12px_rgba(0,0,0,0.3)] bg-[var(--background)]/95 backdrop-blur-3xl"
                         >
                             <div className="flex justify-between items-center mb-8">
                                 <div>
@@ -135,11 +121,8 @@ export const BottomNav = () => {
 
             {/* Bottom Dock - Jewel-like Glassmorphism */}
             <div
-                className={clsx(
-                    "fixed left-1/2 -translate-x-1/2 z-[100] transition-all duration-300",
-                    isKeyboardVisible ? "opacity-0 pointer-events-none translate-y-10" : "opacity-100"
-                )}
-                style={{ bottom: `calc(2rem + env(safe-area-inset-bottom, 0px))` }}
+                className="fixed left-1/2 -translate-x-1/2 z-50"
+                style={{ bottom: `calc(1.5rem + env(safe-area-inset-bottom, 0px))` }}
             >
                 <div className="flex items-center gap-1 px-1.5 py-1.5 rounded-full border border-[var(--foreground)]/10 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] bg-[var(--background)]/95 backdrop-blur-2xl relative transition-all duration-200">
 
@@ -216,10 +199,7 @@ export const BottomNav = () => {
                     setIsSigningOut(true)
                     try {
                         await supabase.auth.signOut()
-                        // Preserve theme during logout
-                        const theme = localStorage.getItem('theme')
                         localStorage.clear()
-                        if (theme) localStorage.setItem('theme', theme)
                         sessionStorage.clear()
                         window.location.href = '/login'
                     } catch (error) {
