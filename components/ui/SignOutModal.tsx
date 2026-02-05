@@ -20,7 +20,7 @@ export const SignOutModal = ({
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+                <div className="fixed inset-0 z-[200] flex items-center justify-center px-4">
                     {/* Premium Backdrop */}
                     <motion.div
                         initial={{ opacity: 0 }}

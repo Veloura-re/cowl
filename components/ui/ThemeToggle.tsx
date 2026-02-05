@@ -35,7 +35,7 @@ export function ThemeToggle() {
                     initial={{ y: -20, opacity: 0, rotate: -180 }}
                     animate={{ y: 0, opacity: 1, rotate: 0 }}
                     exit={{ y: 20, opacity: 0, rotate: 180 }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    transition={{ duration: 0.15, ease: "easeInOut" }}
                 >
                     {isDark ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
                 </motion.div>

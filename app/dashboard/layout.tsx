@@ -284,7 +284,7 @@ const NavItem = memo(({ item, pathname }: { item: any, pathname: string }) => {
         <Link
             href={item.href}
             className={clsx(
-                'group flex items-center px-3 py-2.5 text-[11px] font-black rounded-xl transition-all duration-300 relative overflow-hidden uppercase tracking-tighter',
+                'group flex items-center px-3 py-2.5 text-[11px] font-black rounded-xl transition-all duration-200 relative overflow-hidden uppercase tracking-tighter',
                 isActive
                     ? 'text-[var(--primary-foreground)] shadow-md shadow-[var(--primary-green)]/20 translate-x-1'
                     : 'text-[var(--foreground)]/40 hover:bg-[var(--foreground)]/5 hover:text-[var(--deep-contrast)] hover:translate-x-1'
@@ -448,10 +448,10 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
             </div>
 
             {/* Main Content Area - Compact */}
-            <div className="flex-1 flex flex-col lg:pl-60 w-full transition-all duration-300">
+            <div className="flex-1 flex flex-col lg:pl-60 w-full transition-all duration-200">
                 {/* Mobile Header (Minimalist) - Dynamic Transparency */}
                 <header className={clsx(
-                    "lg:hidden sticky top-0 z-[60] transition-all duration-300 border-b",
+                    "lg:hidden sticky top-0 z-[60] transition-all duration-200 border-b",
                     scrolled
                         ? "bg-[var(--background)]/80 backdrop-blur-md border-[var(--foreground)]/5 shadow-sm"
                         : "bg-transparent border-transparent"
@@ -459,6 +459,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     {/* Safe Area Spacer + Header Content */}
                     <div className="flex h-10 items-center justify-between px-4 box-content" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 4px)' }}>
                         <button
+                            id="business-switcher-mobile"
                             onClick={() => setIsSwitcherOpen(true)}
                             className="flex items-center gap-3 active:scale-95 transition-all group max-w-[60%]"
                         >
@@ -477,6 +478,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                         </button>
                         <div className="flex items-center gap-1">
                             <button
+                                id="help-mobile"
                                 onClick={startTutorial}
                                 className="w-10 h-10 flex items-center justify-center text-[var(--foreground)]/40 active:scale-95 transition-all"
                             >
@@ -484,6 +486,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                             </button>
                             <NotificationCenter />
                             <button
+                                id="invite-btn-mobile-header"
                                 onClick={() => setIsInviteModalOpen(true)}
                                 className="w-10 h-10 flex items-center justify-center text-[var(--primary-green)] active:scale-95 transition-all"
                             >
@@ -514,13 +517,14 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     </AnimatePresence>
                 </main>
 
-                {/* Mobile Bottom Dock */}
-                {!(shouldHideDock || isDockHidden) && (
-                    <div className="lg:hidden">
-                        <BottomNav />
-                    </div>
-                )}
             </div>
+
+            {/* Mobile Bottom Dock - Moved outside main content to prevent scrolling */}
+            {!(shouldHideDock || isDockHidden) && (
+                <div id="nav-menu-mobile" className="lg:hidden">
+                    <BottomNav />
+                </div>
+            )}
 
             <CreateBusinessModal
                 isOpen={isCreateModalOpen}
@@ -559,8 +563,10 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                 onConfirm={async () => {
                     setIsSigningOut(true)
                     try {
+                        const theme = localStorage.getItem('theme')
                         await supabase.auth.signOut()
                         localStorage.clear()
+                        if (theme) localStorage.setItem('theme', theme)
                         sessionStorage.clear()
                         window.location.href = '/login'
                     } catch (error) {
@@ -577,7 +583,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[100] flex items-center justify-center bg-[var(--background)]/60 backdrop-blur-sm shadow-2xl"
+                        className="fixed inset-0 z-[400] flex items-center justify-center bg-[var(--background)]/60 backdrop-blur-sm shadow-2xl"
                     >
                         <div className="glass p-8 rounded-3xl border border-[var(--foreground)]/10 dark:border-white/50 flex flex-col items-center gap-4">
                             <LoadingSpinner size="lg" label="Processing..." />

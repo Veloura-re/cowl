@@ -818,8 +818,11 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                             </div>
                                         ) : (
                                             rows.map((row, index) => (
-                                                <div
+                                                <motion.div
                                                     key={index}
+                                                    initial={{ opacity: 0, y: 5 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ duration: 0.15, delay: index * 0.02 }}
                                                     onClick={() => openEditModal(index)}
                                                     className="group relative p-2.5 rounded-xl bg-[var(--foreground)]/3 border border-[var(--foreground)]/5 hover:bg-[var(--foreground)]/7 transition-all cursor-pointer active:scale-[0.99] shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3"
                                                 >
@@ -850,7 +853,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                                             <Trash2 size={12} />
                                                         </button>
                                                     </div>
-                                                </div>
+                                                </motion.div>
                                             ))
                                         )}
                                     </div>

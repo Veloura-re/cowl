@@ -168,11 +168,11 @@ export default function NotificationCenter() {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={() => setIsOpen(false)}
-                            className="fixed inset-0 bg-[var(--modal-backdrop)] backdrop-blur-sm z-[100]"
+                            className="fixed inset-0 bg-[var(--modal-backdrop)] backdrop-blur-sm z-[300]"
                         />
 
                         {/* Modal Container */}
-                        <div className="fixed inset-0 flex items-center justify-center p-4 z-[110] pointer-events-none">
+                        <div className="fixed inset-0 flex items-center justify-center p-4 z-[310] pointer-events-none">
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                                 animate={{ opacity: 1, scale: 1, y: 0 }}

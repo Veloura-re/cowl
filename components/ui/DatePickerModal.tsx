@@ -57,7 +57,7 @@ export default function DatePickerModal({
     const selectedDateObj = selectedValue ? startOfDay(parseISO(selectedValue)) : null
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center px-4">
             <div className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose} />
             <div className="glass w-full max-w-md rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 relative z-10 border border-white/40 dark:border-white/10">
                 {/* Header */}

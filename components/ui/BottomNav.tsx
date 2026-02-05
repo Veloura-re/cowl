@@ -44,19 +44,19 @@ export const BottomNav = () => {
             {/* Hamburger Menu Overlay - Redesigned Card Grid */}
             <AnimatePresence>
                 {isMenuOpen && (
-                    <div className="fixed inset-0 z-[60] flex flex-col justify-end p-4">
+                    <div className="fixed inset-0 z-[200] flex flex-col justify-end p-4">
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-md transition-all duration-500"
+                            className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-md transition-all duration-200"
                             onClick={() => setIsMenuOpen(false)}
                         />
                         <motion.div
                             initial={{ y: "100%", opacity: 0, scale: 0.95 }}
                             animate={{ y: 0, opacity: 1, scale: 1 }}
                             exit={{ y: "100%", opacity: 0, scale: 0.95 }}
-                            transition={{ type: "spring", damping: 25, stiffness: 400 }}
+                            transition={{ type: "spring", damping: 30, stiffness: 500 }}
                             className="relative z-10 glass rounded-[40px] p-8 border border-[var(--foreground)]/10 shadow-[0_-20px_50px_-12px_rgba(0,0,0,0.3)] bg-[var(--background)]/95 backdrop-blur-3xl"
                         >
                             <div className="flex justify-between items-center mb-8">
@@ -124,7 +124,7 @@ export const BottomNav = () => {
                 className="fixed left-1/2 -translate-x-1/2 z-50"
                 style={{ bottom: `calc(1.5rem + env(safe-area-inset-bottom, 0px))` }}
             >
-                <div className="flex items-center gap-1 px-1.5 py-1.5 rounded-full border border-[var(--foreground)]/10 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] bg-[var(--background)]/95 backdrop-blur-2xl relative transition-all duration-500">
+                <div className="flex items-center gap-1 px-1.5 py-1.5 rounded-full border border-[var(--foreground)]/10 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] bg-[var(--background)]/95 backdrop-blur-2xl relative transition-all duration-200">
 
                     {/* Standard Dock Items */}
                     {dockItems.map((item) => {
@@ -134,13 +134,13 @@ export const BottomNav = () => {
                                 key={item.label}
                                 href={item.path}
                                 className={clsx(
-                                    "relative flex items-center justify-center w-12 h-12 rounded-full transition-all duration-500 overflow-visible group active:scale-90",
+                                    "relative flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200 overflow-visible group active:scale-95",
                                     isActive ? "text-[var(--primary-foreground)]" : "text-[var(--foreground)]/60 hover:text-[var(--foreground)]"
                                 )}
                             >
                                 {isActive && (
                                     <div
-                                        className="absolute inset-0 bg-[var(--primary-green)] rounded-full shadow-[0_5px_15px_-3px_rgba(6,78,59,0.4)] border border-[var(--primary-foreground)]/10 transition-all duration-300"
+                                        className="absolute inset-0 bg-[var(--primary-green)] rounded-full shadow-[0_5px_15px_-3px_rgba(6,78,59,0.4)] border border-[var(--primary-foreground)]/10 transition-all duration-200"
                                     />
                                 )}
                                 <div className="relative z-10">
@@ -171,7 +171,7 @@ export const BottomNav = () => {
                     <button
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                         className={clsx(
-                            "group relative flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 active:scale-90",
+                            "group relative flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200 active:scale-95",
                             isMenuOpen
                                 ? "bg-[var(--primary-green)] text-[var(--primary-foreground)] shadow-lg"
                                 : "text-[var(--foreground)]/40 hover:text-[var(--deep-contrast)] hover:bg-[var(--foreground)]/10"

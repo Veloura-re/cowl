@@ -26,7 +26,7 @@ export const CyberGridBackground = () => {
     const burstGradient = useMotionTemplate`radial-gradient(circle at ${springX}px ${springY}px, rgba(16,185,129,0.2), transparent 40%)`
 
     return (
-        <div className="fixed inset-0 w-full h-full -z-10 overflow-hidden bg-[var(--background)] transition-colors duration-500">
+        <div className="fixed inset-0 w-full h-full -z-10 overflow-hidden bg-[var(--background)] transition-colors duration-100 will-change-[background-color]">
             {/* 
               LAYER 1: BASE GRID 
               Visible always, but subtle. 
@@ -42,7 +42,7 @@ export const CyberGridBackground = () => {
                                 fill="none"
                                 stroke="currentColor"
                                 strokeWidth="0.5"
-                                className="text-emerald-900 dark:text-[var(--primary-green)] transition-colors duration-500"
+                                className="text-emerald-900 dark:text-[var(--primary-green)] transition-colors duration-100"
                             />
                         </pattern>
                     </defs>

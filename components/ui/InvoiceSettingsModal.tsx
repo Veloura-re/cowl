@@ -71,7 +71,7 @@ export default function InvoiceSettingsModal({ isOpen, onClose, businessId, init
     if (!isOpen) return null
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center px-4 p-4 md:p-8">
             <div className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-md animate-in fade-in duration-300" onClick={onClose} />
 
             <motion.div

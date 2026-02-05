@@ -255,8 +255,10 @@ export default function SettingsPage() {
     const handleSignOut = async () => {
         setLoading(true)
         try {
+            const theme = localStorage.getItem('theme')
             await supabase.auth.signOut()
             localStorage.clear()
+            if (theme) localStorage.setItem('theme', theme)
             sessionStorage.clear()
             window.location.href = '/login'
         } catch (error: any) {

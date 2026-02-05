@@ -126,7 +126,7 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
     const isLoss = totalProfit < 0
 
     return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center px-4 bg-[var(--modal-backdrop)] backdrop-blur-md animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center px-4 bg-[var(--modal-backdrop)] backdrop-blur-md animate-in fade-in duration-300">
             <motion.div
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}

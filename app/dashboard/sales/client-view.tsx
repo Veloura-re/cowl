@@ -17,6 +17,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { printInvoice, InvoiceData, downloadInvoice } from '@/utils/invoice-generator'
 import { currencies } from '@/lib/currencies'
 import UnifiedControlBar from '@/components/ui/UnifiedControlBar'
+import FilterSortModal from '@/components/ui/FilterSortModal'
 
 const InvoicePreviewModal = dynamic(() => import('@/components/ui/InvoicePreviewModal'), {
     ssr: false,
@@ -33,8 +34,7 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
     const [statusFilter, setStatusFilter] = useState<string>('ALL')
     const [sortBy, setSortBy] = useState<'date' | 'amount'>('date')
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
-    const [isSortPickerOpen, setIsSortPickerOpen] = useState(false)
-    const [isFilterPickerOpen, setIsFilterPickerOpen] = useState(false)
+    const [isOrganizeOpen, setIsOrganizeOpen] = useState(false)
     const [loading, setLoading] = useState(!initialInvoices)
     const [visibleCount, setVisibleCount] = useState(50)
     const [isPreviewOpen, setIsPreviewOpen] = useState(false)
@@ -311,8 +311,7 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                 <UnifiedControlBar
                     searchQuery={searchQuery}
                     setSearchQuery={setSearchQuery}
-                    onSortClick={() => setIsSortPickerOpen(true)}
-                    onFilterClick={() => setIsFilterPickerOpen(true)}
+                    onOrganizeClick={() => setIsOrganizeOpen(true)}
                 />
             </div>
 
@@ -388,42 +387,29 @@ export default function SalesClientView({ initialInvoices }: { initialInvoices?:
                 </motion.div>
             </div>
 
-            <PickerModal
-                isOpen={isSortPickerOpen}
-                onClose={() => setIsSortPickerOpen(false)}
-                onSelect={(val) => {
+            <FilterSortModal
+                isOpen={isOrganizeOpen}
+                onClose={() => setIsOrganizeOpen(false)}
+                selectedSort={`${sortBy}-${sortOrder}`}
+                selectedFilter={statusFilter}
+                onSortSelect={(val) => {
                     const [by, order] = val.split('-')
                     setSortBy(by as 'date' | 'amount')
                     setSortOrder(order as 'asc' | 'desc')
-                    setIsSortPickerOpen(false)
                 }}
-                title="Arrange List"
-                showSearch={false}
-                options={[
-                    { id: 'date-desc', label: 'DATE (NEWEST FIRST)' },
-                    { id: 'date-asc', label: 'DATE (OLDEST FIRST)' },
-                    { id: 'amount-high', label: 'AMOUNT (HIGH TO LOW)' },
-                    { id: 'amount-low', label: 'AMOUNT (LOW TO HIGH)' },
+                onFilterSelect={(val) => setStatusFilter(val)}
+                sortOptions={[
+                    { id: 'date-desc', label: 'NEWEST FIRST' },
+                    { id: 'date-asc', label: 'OLDEST FIRST' },
+                    { id: 'amount-desc', label: 'AMOUNT: HIGH TO LOW' },
+                    { id: 'amount-asc', label: 'AMOUNT: LOW TO HIGH' },
                 ]}
-                selectedValue={`${sortBy}-${sortOrder === 'desc' && sortBy === 'amount' ? 'high' : sortOrder === 'asc' && sortBy === 'amount' ? 'low' : sortOrder}`}
-            />
-
-            <PickerModal
-                isOpen={isFilterPickerOpen}
-                onClose={() => setIsFilterPickerOpen(false)}
-                onSelect={(val) => {
-                    setStatusFilter(val)
-                    setIsFilterPickerOpen(false)
-                }}
-                title="Group by Status"
-                showSearch={false}
-                options={[
-                    { id: 'ALL', label: 'ALL STATUS' },
-                    { id: 'PAID', label: 'PAID' },
-                    { id: 'PENDING', label: 'PENDING' },
-                    { id: 'UNPAID', label: 'UNPAID' }
+                filterOptions={[
+                    { id: 'ALL', label: 'ALL SALES' },
+                    { id: 'PAID', label: 'PAID ONLY' },
+                    { id: 'PENDING', label: 'PENDING ONLY' },
+                    { id: 'UNPAID', label: 'UNPAID ONLY' }
                 ]}
-                selectedValue={statusFilter}
             />
 
             {/* Grid - Ultra Compact Cards */}

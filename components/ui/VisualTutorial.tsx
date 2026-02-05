@@ -136,7 +136,7 @@ const VelocityText = ({ text }: { text: string }) => {
                     key={i}
                     initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
                     animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                    transition={{ delay: 0.1 + i * 0.03, duration: 0.4, ease: "circOut" }}
+                    transition={{ delay: 0.05 + i * 0.02, duration: 0.2, ease: "circOut" }}
                     className="inline-block"
                 >
                     {word}
@@ -158,36 +158,64 @@ export default function VisualTutorial({ steps, isOpen, onClose, accentColor = '
     const primaryRgb = hexToRgb(accentColor)
 
     useEffect(() => {
-        if (isOpen) {
-            updateSpotlight()
-            const handleUpdate = () => updateSpotlight()
-            window.addEventListener('resize', handleUpdate)
-            window.addEventListener('scroll', handleUpdate, true)
-            return () => {
-                window.removeEventListener('resize', handleUpdate)
-                window.removeEventListener('scroll', handleUpdate, true)
-            }
-        }
-    }, [isOpen, currentStep])
+        if (!isOpen) return
 
-    const updateSpotlight = () => {
-        const step = steps[currentStep]
-        if (step?.targetId) {
-            const element = document.getElementById(step.targetId)
-            if (element) {
+        let observer: ResizeObserver | null = null
+
+        const updatePosition = () => {
+            const step = steps[currentStep]
+            if (!step?.targetId) {
+                setSpotlightRect(null)
+                return
+            }
+
+            // Try primary ID, then fallback to mobile variant
+            let element = document.getElementById(step.targetId)
+
+            // If primary is not visible or doesn't exist, try mobile variants
+            if (!element || element.offsetWidth === 0) {
+                // Special case for nav-menu
+                if (step.targetId === 'nav-menu') {
+                    element = document.getElementById('nav-menu-mobile') || element
+                } else {
+                    element = document.getElementById(`${step.targetId}-mobile`) ||
+                        document.getElementById(`${step.targetId}-mobile-header`) ||
+                        element
+                }
+            }
+
+            if (element && element.offsetWidth > 0) {
                 const rect = element.getBoundingClientRect()
                 setSpotlightRect(rect)
+
+                // Debounced scroll into view to avoid layout thrashing during resize
                 const vh = window.innerHeight
                 if (rect.top < 100 || rect.bottom > vh - 100) {
                     element.scrollIntoView({ behavior: 'smooth', block: 'center' })
                 }
+
+                // Attach ResizeObserver to the specific target for frame-perfect tracking
+                if (observer) observer.disconnect()
+                observer = new ResizeObserver(() => {
+                    if (element) setSpotlightRect(element.getBoundingClientRect())
+                })
+                observer.observe(element)
             } else {
                 setSpotlightRect(null)
             }
-        } else {
-            setSpotlightRect(null)
         }
-    }
+
+        updatePosition()
+
+        window.addEventListener('resize', updatePosition)
+        window.addEventListener('scroll', updatePosition, true)
+
+        return () => {
+            window.removeEventListener('resize', updatePosition)
+            window.removeEventListener('scroll', updatePosition, true)
+            if (observer) observer.disconnect()
+        }
+    }, [isOpen, currentStep, steps])
 
     const nextStep = () => {
         if (currentStep < steps.length - 1) {
@@ -195,7 +223,7 @@ export default function VisualTutorial({ steps, isOpen, onClose, accentColor = '
             setTimeout(() => {
                 setCurrentStep(prev => prev + 1)
                 setIsTransitioning(false)
-            }, 300)
+            }, 100) // Faster for extreme snappiness
         } else {
             onClose()
         }
@@ -207,7 +235,7 @@ export default function VisualTutorial({ steps, isOpen, onClose, accentColor = '
             setTimeout(() => {
                 setCurrentStep(prev => prev - 1)
                 setIsTransitioning(false)
-            }, 300)
+            }, 100)
         }
     }
 
@@ -254,12 +282,10 @@ export default function VisualTutorial({ steps, isOpen, onClose, accentColor = '
                                     rx: 24,
                                 }}
                                 transition={{
-                                    type: 'spring',
-                                    damping: 30,
-                                    stiffness: 200,
-                                    mass: 1.2
+                                    mass: 1.0
                                 }}
                                 fill="black"
+                                className="will-change-[x,y,width,height]"
                             />
                         )}
                     </mask>
@@ -318,7 +344,7 @@ export default function VisualTutorial({ steps, isOpen, onClose, accentColor = '
                             type: 'spring',
                             damping: 20,
                             stiffness: 300,
-                            layout: { type: 'spring', damping: 25, stiffness: 200 }
+                            layout: { type: 'spring', damping: 20, stiffness: 350 }
                         }}
                         className="pointer-events-auto relative w-[90%] max-w-lg overflow-hidden glass-optimized rounded-[40px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.7)] border border-white/20"
                     >
@@ -373,7 +399,7 @@ export default function VisualTutorial({ steps, isOpen, onClose, accentColor = '
                                         initial={{ opacity: 0, x: 20 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         exit={{ opacity: 0, x: -20 }}
-                                        transition={{ duration: 0.3 }}
+                                        transition={{ duration: 0.2 }}
                                         className="absolute inset-0"
                                     >
                                         <VelocityText text={step.content} />
@@ -394,7 +420,7 @@ export default function VisualTutorial({ steps, isOpen, onClose, accentColor = '
                                                 backgroundColor: i === currentStep ? `rgb(${primaryRgb})` : 'rgba(255, 255, 255, 0.15)',
                                                 boxShadow: i === currentStep ? `0 0 15px rgba(${primaryRgb}, 0.5)` : 'none'
                                             }}
-                                            className="h-1.5 rounded-full transition-all duration-500"
+                                            className="h-1.5 rounded-full transition-all duration-200"
                                         />
                                     ))}
                                 </div>

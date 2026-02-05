@@ -49,7 +49,7 @@ export default function CreateBusinessModal({ isOpen, onClose }: CreateBusinessM
     if (!isOpen) return null
 
     return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center px-4">
             <div className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose} />
             <div className="glass w-full max-w-sm rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 relative z-10 border border-[var(--foreground)]/10 bg-[var(--background)]/80">
                 <div className="flex items-center justify-between border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5 px-6 py-4">

@@ -15,6 +15,7 @@
 }
 
 :root {
+  color-scheme: light dark;
   /* Light Mode Palette */
   --background: #ffffff;
   --foreground: #052e16;
@@ -148,7 +149,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: "cv02", "cv05", "cv08", "cv09", "cv11", "lnum";
 
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: background-color 0.1s ease, color 0.1s ease;
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
@@ -197,6 +198,7 @@ button,
 [role="button"] {
   font-weight: 500 !important;
   letter-spacing: 0.02em;
+  transition: all 0.1s ease-in-out;
 }
 
 button .font-black,
@@ -205,10 +207,16 @@ button [class*="font-black"] {
 }
 
 /* Force lining numbers and thin weight on all digits */
-[class*="text-"],
 body,
-* {
+input,
+button,
+select,
+textarea {
   font-feature-settings: "cv02", "cv05", "cv08", "cv09", "cv11", "lnum", "tnum" !important;
+}
+
+[class*="text-"] {
+  font-feature-settings: "cv02", "cv11", "lnum", "tnum" !important;
 }
 
 /* Specific resets for form elements that ignore inheritance in some browsers */
@@ -231,7 +239,8 @@ optgroup {
     border: 1px solid rgba(0, 0, 0, 0.1);
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
     /* Performance: Hint at changes */
-    will-change: transform, opacity;
+    will-change: transform, opacity, backdrop-filter;
+    transition: backdrop-filter 0.1s ease;
   }
 
   /* Optimized glass for lists/frequent items - Removes heavy blur */
@@ -283,12 +292,12 @@ h6 {
   0%,
   100% {
     opacity: 0.08;
-    transform: scale(1);
+    transform: scale(1) translateZ(0);
   }
 
   50% {
     opacity: 0.12;
-    transform: scale(1.05);
+    transform: scale(1.05) translateZ(0);
     /* Reduced scale for performance */
   }
 }
@@ -298,12 +307,12 @@ h6 {
   0%,
   100% {
     opacity: 0.05;
-    transform: scale(1);
+    transform: scale(1) translateZ(0);
   }
 
   50% {
     opacity: 0.08;
-    transform: scale(1.1);
+    transform: scale(1.1) translateZ(0);
     /* Reduced scale for performance */
   }
 }
