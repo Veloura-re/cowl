@@ -5,6 +5,7 @@ import { X, Save, Check, Loader2, LayoutTemplate, Palette, Type } from 'lucide-r
 import { motion, AnimatePresence } from 'framer-motion'
 import { createClient } from '@/utils/supabase/client'
 import clsx from 'clsx'
+import { useLockBodyScroll } from '@/hooks/use-lock-body-scroll'
 
 interface InvoiceSettingsModalProps {
     isOpen: boolean
@@ -35,6 +36,8 @@ export default function InvoiceSettingsModal({ isOpen, onClose, businessId, init
     const [size, setSize] = useState<'A4' | 'THERMAL' | 'NANO'>(initialSettings?.size || 'A4')
     const [saving, setSaving] = useState(false)
     const supabase = createClient()
+
+    useLockBodyScroll(isOpen)
 
     useEffect(() => {
         if (isOpen && initialSettings) {
@@ -71,14 +74,14 @@ export default function InvoiceSettingsModal({ isOpen, onClose, businessId, init
     if (!isOpen) return null
 
     return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center px-4 p-4 md:p-8">
+        <div className="fixed inset-0 z-[200] flex items-start md:items-center justify-center px-4 h-[100dvh] pt-[10vh] md:pt-0">
             <div className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-md animate-in fade-in duration-300" onClick={onClose} />
 
             <motion.div
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="relative w-full max-w-md rounded-[32px] overflow-hidden shadow-2xl border border-white/10 bg-[#0a0a0a] text-white"
+                className="relative w-full max-w-md rounded-[32px] overflow-hidden shadow-2xl border border-white/10 bg-[#0a0a0a] text-white flex flex-col max-h-[90vh]"
             >
                 {/* Decorative Background Mesh */}
                 <div className="absolute inset-0 opacity-20 pointer-events-none">
@@ -96,7 +99,7 @@ export default function InvoiceSettingsModal({ isOpen, onClose, businessId, init
                     </button>
                 </div>
 
-                <div className="relative p-6 space-y-6">
+                <div className="relative p-6 space-y-6 overflow-y-auto scrollbar-hide">
                     {/* Size Selector */}
                     <div className="space-y-3">
                         <label className="flex items-center gap-2 text-[8px] font-black uppercase tracking-[0.2em] text-white/40 ml-1">

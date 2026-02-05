@@ -6,6 +6,7 @@ import { createClient } from '@/utils/supabase/client'
 import { useBusiness } from '@/context/business-context'
 import { motion, AnimatePresence } from 'framer-motion'
 import clsx from 'clsx'
+import { useLockBodyScroll } from '@/hooks/use-lock-body-scroll'
 import { formatDistanceToNow } from 'date-fns'
 import { showNotification } from '@/utils/notifications'
 
@@ -24,6 +25,7 @@ export default function NotificationCenter() {
     const supabase = createClient()
     const { activeBusinessId } = useBusiness()
     const [isOpen, setIsOpen] = useState(false)
+    useLockBodyScroll(isOpen)
     const [notifications, setNotifications] = useState<Notification[]>([])
     const [loading, setLoading] = useState(true)
     const [unreadCount, setUnreadCount] = useState(0)
@@ -168,16 +170,17 @@ export default function NotificationCenter() {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={() => setIsOpen(false)}
-                            className="fixed inset-0 bg-[var(--modal-backdrop)] backdrop-blur-sm z-[300]"
+                            className="fixed inset-0 bg-[var(--modal-backdrop)] backdrop-blur-md z-[500]"
                         />
 
                         {/* Modal Container */}
-                        <div className="fixed inset-0 flex items-center justify-center p-4 z-[310] pointer-events-none">
+                        <div className="fixed inset-0 flex items-start md:items-center justify-center p-4 z-[510] pointer-events-none h-[100dvh] pt-[10vh] md:pt-4">
                             <motion.div
-                                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                                initial={{ opacity: 0, scale: 0.95, y: 20 }}
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                                className="w-full max-w-sm bg-[var(--background)] rounded-[32px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] overflow-hidden pointer-events-auto border border-[var(--foreground)]/5"
+                                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                                className="w-full max-w-sm glass rounded-[32px] shadow-2xl overflow-hidden pointer-events-auto border border-[var(--foreground)]/10"
                             >
                                 {/* Header */}
                                 <div className="px-6 py-5 border-b border-[var(--foreground)]/5 flex items-center justify-between">

@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Plus, Building2, Check, ChevronRight } from 'lucide-react'
+import { useLockBodyScroll } from '@/hooks/use-lock-body-scroll'
 import { BrandLogo } from './BrandLogo'
 import clsx from 'clsx'
 
@@ -28,10 +29,11 @@ export default function BusinessSwitcherModal({
     onSelect,
     onCreateNew
 }: BusinessSwitcherModalProps) {
+    useLockBodyScroll(isOpen)
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6 overflow-hidden">
+                <div className="fixed inset-0 z-[200] flex items-start md:items-center justify-center p-4 sm:p-6 overflow-hidden h-[100dvh] pt-[10vh] md:pt-6">
                     {/* Backdrop */}
                     <motion.div
                         initial={{ opacity: 0 }}

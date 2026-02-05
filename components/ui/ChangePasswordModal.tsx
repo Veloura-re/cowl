@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Loader2, Lock, CheckCircle2, ShieldCheck, KeyRound } from 'lucide-react'
+import { useLockBodyScroll } from '@/hooks/use-lock-body-scroll'
 import { createClient } from '@/utils/supabase/client'
 import clsx from 'clsx'
 
@@ -12,6 +13,7 @@ interface ChangePasswordModalProps {
 }
 
 export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordModalProps) {
+    useLockBodyScroll(isOpen)
     const supabase = createClient()
     const [currentPassword, setCurrentPassword] = useState('')
     const [password, setPassword] = useState('')
@@ -76,7 +78,7 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}

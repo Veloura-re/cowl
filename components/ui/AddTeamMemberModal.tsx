@@ -5,6 +5,7 @@ import clsx from 'clsx'
 import PickerModal from '@/components/ui/PickerModal'
 import ErrorModal from '@/components/ui/ErrorModal'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useLockBodyScroll } from '@/hooks/use-lock-body-scroll'
 
 const ROLES = [
     { id: 'ADMIN', label: 'ADMIN', subLabel: 'Full access to manage business & team' },
@@ -21,6 +22,7 @@ interface AddTeamMemberModalProps {
 }
 
 export default function AddTeamMemberModal({ isOpen, onClose, businessId, onSuccess }: AddTeamMemberModalProps) {
+    useLockBodyScroll(isOpen)
     const supabase = createClient()
 
     const [searchQuery, setSearchQuery] = useState('')
@@ -130,7 +132,7 @@ export default function AddTeamMemberModal({ isOpen, onClose, businessId, onSucc
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={onClose}
-                className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-sm"
+                className="absolute inset-0 bg-[var(--modal-backdrop)] backdrop-blur-md"
             />
 
             <motion.div

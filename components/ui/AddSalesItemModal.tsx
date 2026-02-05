@@ -8,6 +8,7 @@ import PickerModal from '@/components/ui/PickerModal'
 import ErrorModal from '@/components/ui/ErrorModal'
 import clsx from 'clsx'
 import { motion } from 'framer-motion'
+import { useLockBodyScroll } from '@/hooks/use-lock-body-scroll'
 
 type AddSalesItemModalProps = {
     isOpen: boolean
@@ -20,6 +21,7 @@ type AddSalesItemModalProps = {
 }
 
 export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initialData, onDelete, isSale = true }: AddSalesItemModalProps) {
+    useLockBodyScroll(isOpen)
     const router = useRouter()
     const { formatCurrency } = useBusiness()
     const [isItemPickerOpen, setIsItemPickerOpen] = useState(false)
@@ -126,7 +128,7 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
     const isLoss = totalProfit < 0
 
     return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center px-4 bg-[var(--modal-backdrop)] backdrop-blur-md animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[200] flex items-start md:items-center justify-center px-4 bg-[var(--modal-backdrop)] backdrop-blur-md animate-in fade-in duration-300 h-[100dvh] pt-[10vh] md:pt-0">
             <motion.div
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
