@@ -50,7 +50,7 @@ export default function InvoicePreviewModal({
                         </button>
                         <div>
                             <h2 className="text-sm font-bold text-[var(--deep-contrast)] uppercase tracking-widest">Document Registry</h2>
-                            <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-[0.3em] mt-1">
+                            <p className="text-[13px] font-bold text-[var(--foreground)]/40 uppercase tracking-[0.3em] mt-1">
                                 Format: A4 ISO Standard
                             </p>
                         </div>
@@ -62,7 +62,7 @@ export default function InvoicePreviewModal({
                             <button
                                 onClick={() => setViewMode('fit')}
                                 className={clsx(
-                                    "px-3 py-1.5 transition-all text-[9px] font-bold uppercase",
+                                    "px-3 py-1.5 transition-all text-[13px] font-bold uppercase",
                                     viewMode === 'fit' ? "bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)]" : "text-[var(--foreground)]/60 hover:text-[var(--foreground)]"
                                 )}
                             >
@@ -71,7 +71,7 @@ export default function InvoicePreviewModal({
                             <button
                                 onClick={() => setViewMode('read')}
                                 className={clsx(
-                                    "px-3 py-1.5 transition-all text-[9px] font-bold uppercase",
+                                    "px-3 py-1.5 transition-all text-[13px] font-bold uppercase",
                                     viewMode === 'read' ? "bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)]" : "text-[var(--foreground)]/60 hover:text-[var(--foreground)]"
                                 )}
                             >
@@ -84,7 +84,7 @@ export default function InvoicePreviewModal({
                             className="flex items-center gap-2 px-5 py-2 bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] hover:bg-[var(--deep-contrast-hover)] transition-all font-bold"
                         >
                             <Printer className="h-4 w-4" />
-                            <span className="text-[10px] uppercase tracking-widest hidden xs:inline">Print</span>
+                            <span className="text-[14px] uppercase tracking-widest hidden xs:inline">Print</span>
                         </button>
 
                         <button
@@ -92,7 +92,7 @@ export default function InvoicePreviewModal({
                             className="flex items-center gap-2 px-5 py-2 border border-[var(--deep-contrast)] text-[var(--deep-contrast)] hover:bg-[var(--deep-contrast)]/10 transition-all font-bold"
                         >
                             <Download className="h-4 w-4" />
-                            <span className="text-[10px] uppercase tracking-widest hidden xs:inline">PDF</span>
+                            <span className="text-[14px] uppercase tracking-widest hidden xs:inline">PDF</span>
                         </button>
 
                         <button onClick={onClose} className="h-10 w-10 flex items-center justify-center transition-all hidden sm:flex ml-2 border-l border-[var(--foreground)]/10 pl-2">
@@ -129,7 +129,7 @@ export default function InvoicePreviewModal({
                 <div className="sm:hidden relative z-20 flex items-center justify-around border-t border-[var(--foreground)]/10 px-6 py-5 bg-[var(--background)]">
                     <button
                         onClick={() => saveInvoiceAsImage(data, true, theme)}
-                        className="flex items-center gap-2 text-[var(--deep-contrast)] font-bold uppercase text-[10px] tracking-widest"
+                        className="flex items-center gap-2 text-[var(--deep-contrast)] font-bold uppercase text-[14px] tracking-widest"
                     >
                         <Camera className="h-5 w-5" />
                         Snap
@@ -137,7 +137,7 @@ export default function InvoicePreviewModal({
 
                     <button
                         onClick={() => shareInvoice(data, theme)}
-                        className="flex items-center gap-2 text-[var(--deep-contrast)] font-bold uppercase text-[10px] tracking-widest"
+                        className="flex items-center gap-2 text-[var(--deep-contrast)] font-bold uppercase text-[14px] tracking-widest"
                     >
                         <Share2 className="h-5 w-5" />
                         Share

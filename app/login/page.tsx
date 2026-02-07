@@ -62,7 +62,7 @@ export default function LoginPage() {
                     <h2 className="text-2xl font-black tracking-tight text-[var(--deep-contrast)] uppercase">
                         Welcome Back
                     </h2>
-                    <p className="mt-1 text-[11px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.3em]">
+                    <p className="mt-1 text-[15px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.3em]">
                         Access your Claire Network
                     </p>
                 </div>
@@ -72,7 +72,7 @@ export default function LoginPage() {
                         <div>
                             <label
                                 htmlFor="email"
-                                className="block text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 mb-2 ml-1"
+                                className="block text-[14px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 mb-2 ml-1"
                             >
                                 System Identity
                             </label>
@@ -91,7 +91,7 @@ export default function LoginPage() {
                         <div>
                             <label
                                 htmlFor="password"
-                                className="block text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 mb-2 ml-1"
+                                className="block text-[14px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 mb-2 ml-1"
                             >
                                 Secure Key
                             </label>
@@ -112,14 +112,14 @@ export default function LoginPage() {
                     <div className="flex items-center justify-end px-1">
                         <Link
                             href="/login/forgot-password"
-                            className="text-[10px] font-black text-[var(--primary-green)] hover:text-[var(--deep-contrast)] transition-colors uppercase tracking-[0.1em]"
+                            className="text-[14px] font-black text-[var(--primary-green)] hover:text-[var(--deep-contrast)] transition-colors uppercase tracking-[0.1em]"
                         >
                             Recovery Node?
                         </Link>
                     </div>
 
                     {error && (
-                        <div className="rounded-xl bg-rose-500/10 p-3 text-[10px] font-black text-rose-500 border border-rose-500/20 uppercase tracking-widest text-center animate-in shake duration-300">
+                        <div className="rounded-xl bg-rose-500/10 p-3 text-[14px] font-black text-rose-500 border border-rose-500/20 uppercase tracking-widest text-center animate-in shake duration-300">
                             {error}
                         </div>
                     )}
@@ -127,7 +127,7 @@ export default function LoginPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="group relative flex w-full justify-center rounded-xl bg-[var(--primary-green)] px-4 py-4 text-[11px] font-black text-[var(--primary-foreground)] uppercase tracking-[0.3em] hover:bg-[var(--primary-hover)] active:scale-95 disabled:opacity-70 transition-all duration-300 shadow-xl shadow-[var(--primary-green)]/30 mt-4 overflow-hidden"
+                        className="group relative flex w-full justify-center rounded-xl bg-[var(--primary-green)] px-4 py-4 text-[15px] font-black text-[var(--primary-foreground)] uppercase tracking-[0.3em] hover:bg-[var(--primary-hover)] active:scale-95 disabled:opacity-70 transition-all duration-300 shadow-xl shadow-[var(--primary-green)]/30 mt-4 overflow-hidden"
                     >
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                         {loading ? (
@@ -142,7 +142,7 @@ export default function LoginPage() {
                 </form>
 
                 <div className="text-center pt-2">
-                    <p className="text-[10px] font-black text-[var(--foreground)]/30 uppercase tracking-widest">
+                    <p className="text-[14px] font-black text-[var(--foreground)]/30 uppercase tracking-widest">
                         New to the network?{' '}
                         <Link
                             href="/register"

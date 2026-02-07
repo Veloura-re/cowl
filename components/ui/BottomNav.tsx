@@ -62,7 +62,7 @@ export const BottomNav = () => {
                             <div className="flex justify-between items-center mb-8">
                                 <div>
                                     <h3 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight">Management</h3>
-                                    <p className="text-[10px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mt-1">Advanced Controls</p>
+                                    <p className="text-[14px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mt-1">Advanced Controls</p>
                                 </div>
                                 <button
                                     onClick={() => setIsMenuOpen(false)}
@@ -93,7 +93,7 @@ export const BottomNav = () => {
                                             )}>
                                                 <item.icon size={22} strokeWidth={2.5} />
                                             </div>
-                                            <span className="text-[10px] font-black uppercase tracking-wider">{item.label}</span>
+                                            <span className="text-[14px] font-black uppercase tracking-wider">{item.label}</span>
                                         </Link>
                                     )
                                 })}
@@ -108,7 +108,7 @@ export const BottomNav = () => {
                                     <div className="p-3 rounded-2xl bg-rose-500/10 text-rose-600 group-hover:bg-white/10 group-hover:text-white transition-all shadow-lg">
                                         <LogOut size={22} strokeWidth={2.5} />
                                     </div>
-                                    <span className="text-[10px] font-black uppercase tracking-wider">Sign Out</span>
+                                    <span className="text-[14px] font-black uppercase tracking-wider">Sign Out</span>
                                 </button>
                             </div>
 
@@ -156,7 +156,7 @@ export const BottomNav = () => {
 
                                 {/* Tooltip on long press/hover could go here */}
                                 {!isActive && (
-                                    <div className="absolute -top-10 scale-0 group-hover:scale-100 transition-all px-2 py-1 rounded-lg bg-[var(--foreground)] text-[var(--background)] text-[8px] font-black uppercase tracking-wider pointer-events-none">
+                                    <div className="absolute -top-10 scale-0 group-hover:scale-100 transition-all px-2 py-1 rounded-lg bg-[var(--foreground)] text-[var(--background)] text-[12px] font-black uppercase tracking-wider pointer-events-none">
                                         {item.label}
                                     </div>
                                 )}

@@ -81,7 +81,7 @@ export default function Step3Review({ onComplete, onBack }: Step3Props) {
         <div className="glass rounded-[24px] border border-gray-200 overflow-hidden">
             <div className="px-6 py-4 border-b border-white/10 bg-[var(--primary-green)]/5">
                 <h2 className="text-sm font-bold text-[var(--deep-contrast)] uppercase tracking-tight">Review & Confirm</h2>
-                <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mt-0.5">Verify all details before saving</p>
+                <p className="text-[13px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mt-0.5">Verify all details before saving</p>
             </div>
 
             <div className="p-8 space-y-6">
@@ -94,11 +94,11 @@ export default function Step3Review({ onComplete, onBack }: Step3Props) {
                         <div className="flex-1">
                             <h3 className="text-lg font-bold text-[var(--deep-contrast)]">{data.name}</h3>
                             <div className="flex items-center gap-3 mt-1">
-                                <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-lg bg-white/40 text-[var(--foreground)]/60">
+                                <span className="text-[13px] font-bold uppercase tracking-wider px-2 py-1 rounded-lg bg-white/40 text-[var(--foreground)]/60">
                                     {data.type}
                                 </span>
                                 {data.category && (
-                                    <span className="text-[9px] font-bold text-[var(--foreground)]/40">{data.category}</span>
+                                    <span className="text-[13px] font-bold text-[var(--foreground)]/40">{data.category}</span>
                                 )}
                             </div>
                         </div>
@@ -114,15 +114,15 @@ export default function Step3Review({ onComplete, onBack }: Step3Props) {
                 {/* Details Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="glass rounded-xl p-4">
-                        <div className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">Unit</div>
+                        <div className="text-[13px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">Unit</div>
                         <div className="text-sm font-bold text-[var(--deep-contrast)]">{data.unit}</div>
                     </div>
                     <div className="glass rounded-xl p-4">
-                        <div className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">Selling Price</div>
+                        <div className="text-[13px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">Selling Price</div>
                         <div className="text-sm font-bold text-[var(--primary-green)]">{formatCurrency(data.selling_price)}/{data.unit}</div>
                     </div>
                     <div className="glass rounded-xl p-4">
-                        <div className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">Purchase Price</div>
+                        <div className="text-[13px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">Purchase Price</div>
                         <div className="text-sm font-bold text-[var(--deep-contrast)]">{formatCurrency(data.purchase_price)}/{data.unit}</div>
                     </div>
 
@@ -134,11 +134,11 @@ export default function Step3Review({ onComplete, onBack }: Step3Props) {
                         <h4 className="text-sm font-bold text-[var(--deep-contrast)] uppercase tracking-tight mb-4">Stock Information</h4>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <div className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">Initial Stock</div>
+                                <div className="text-[13px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">Initial Stock</div>
                                 <div className="text-lg font-bold text-[var(--deep-contrast)]">{data.stock_quantity} {data.unit}</div>
                             </div>
                             <div>
-                                <div className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">Low Stock Alert</div>
+                                <div className="text-[13px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mb-1">Low Stock Alert</div>
                                 <div className="text-lg font-bold text-[var(--deep-contrast)]">{data.min_stock} {data.unit}</div>
                             </div>
                         </div>
@@ -148,7 +148,7 @@ export default function Step3Review({ onComplete, onBack }: Step3Props) {
                 {/* SKU */}
                 {data.sku && (
                     <div className="p-4 rounded-xl bg-white/20 text-center">
-                        <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mr-2">SKU:</span>
+                        <span className="text-[13px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 mr-2">SKU:</span>
                         <span className="text-sm font-bold text-[var(--deep-contrast)]">{data.sku}</span>
                     </div>
                 )}

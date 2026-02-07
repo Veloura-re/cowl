@@ -283,15 +283,15 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                         <ArrowLeft className="h-3.5 w-3.5" />
                     </Link>
                     <div>
-                        <h1 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">New Purchase</h1>
-                        <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-wider leading-none">Record Bill</p>
+                        <h1 className="text-[14px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">New Purchase</h1>
+                        <p className="text-[12px] font-black text-[var(--foreground)]/40 uppercase tracking-wider leading-none">Record Bill</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-1.5">
                     <button
                         onClick={(e) => handleSubmit(e, true)}
                         disabled={loading}
-                        className="flex items-center justify-center rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 h-8 text-[9px] font-black uppercase tracking-wider text-[var(--deep-contrast)] hover:bg-[var(--foreground)]/10 transition-all disabled:opacity-50 shadow-sm active:scale-95"
+                        className="flex items-center justify-center rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 h-8 text-[13px] font-black uppercase tracking-wider text-[var(--deep-contrast)] hover:bg-[var(--foreground)]/10 transition-all disabled:opacity-50 shadow-sm active:scale-95"
                     >
                         <Printer className="mr-1.5 h-3 w-3" />
                         <span className="hidden sm:inline">Print</span>
@@ -299,7 +299,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                     <button
                         onClick={(e) => handleSubmit(e as any)}
                         disabled={loading}
-                        className="flex items-center justify-center rounded-lg bg-[var(--primary-green)] px-4 h-8 text-[9px] font-black uppercase tracking-wider text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] transition-all disabled:opacity-50 shadow-md active:scale-95"
+                        className="flex items-center justify-center rounded-lg bg-[var(--primary-green)] px-4 h-8 text-[13px] font-black uppercase tracking-wider text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] transition-all disabled:opacity-50 shadow-md active:scale-95"
                     >
                         {loading ? <Loader2 className="mr-1.5 h-3 w-3 animate-spin" /> : <Save className="mr-1.5 h-3 w-3" />}
                         Save Entry
@@ -315,12 +315,12 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                             <Building size={28} strokeWidth={2} />
                         </div>
                         <h2 className="text-sm font-black text-[var(--deep-contrast)] uppercase tracking-tight mb-1">Who is this for?</h2>
-                        <p className="text-[9px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.2em] mb-6 max-w-xs mx-auto leading-tight">Identify person to record entry</p>
+                        <p className="text-[13px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.2em] mb-6 max-w-xs mx-auto leading-tight">Identify person to record entry</p>
 
                         <button
                             type="button"
                             onClick={() => setIsPartyPickerOpen(true)}
-                            className="inline-flex items-center gap-3 px-8 py-3 rounded-xl bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[var(--deep-contrast-hover)] transition-all shadow-xl active:scale-95 group/btn"
+                            className="inline-flex items-center gap-3 px-8 py-3 rounded-xl bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] text-[14px] font-black uppercase tracking-[0.2em] hover:bg-[var(--deep-contrast-hover)] transition-all shadow-xl active:scale-95 group/btn"
                         >
                             Choose Person
                         </button>
@@ -335,7 +335,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                                 <Building size={20} />
                             </div>
                             <div className="min-w-0 flex-1">
-                                <p className="text-[7px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Person</p>
+                                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Person</p>
                                 <h3 className="text-sm font-black text-[var(--deep-contrast)] uppercase tracking-tight truncate leading-none mt-0.5">
                                     {filteredParties.find(p => p.id === partyId)?.name}
                                 </h3>
@@ -344,22 +344,22 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
 
                         <div className="flex gap-2 w-full md:w-auto relative z-10">
                             <div className="flex-1 md:flex-none">
-                                <p className="text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/20 mb-0.5 ml-1">Reference</p>
+                                <p className="text-[11px] font-black uppercase tracking-widest text-[var(--foreground)]/20 mb-0.5 ml-1">Reference</p>
                                 <input
                                     type="text"
                                     value={invoiceNumber}
                                     onChange={(e) => setInvoiceNumber(e.target.value)}
-                                    className="w-full md:w-32 h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[10px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all uppercase"
+                                    className="w-full md:w-32 h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[14px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all uppercase"
                                     placeholder="Number"
                                 />
                             </div>
                             <div className="flex-1 md:flex-none">
-                                <p className="text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/20 mb-0.5 ml-1">Date</p>
+                                <p className="text-[11px] font-black uppercase tracking-widest text-[var(--foreground)]/20 mb-0.5 ml-1">Date</p>
                                 <input
                                     type="date"
                                     value={date}
                                     onChange={(e) => setDate(e.target.value)}
-                                    className="w-full h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-2 text-[10px] font-black text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] transition-all"
+                                    className="w-full h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-2 text-[14px] font-black text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] transition-all"
                                 />
                             </div>
                             <button
@@ -376,13 +376,13 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                     <div className="glass rounded-[24px] border border-[var(--foreground)]/10 overflow-hidden shadow-lg">
                         <div className="px-4 py-2.5 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5 flex justify-between items-center relative overflow-hidden">
                             <div className="relative z-10">
-                                <h3 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">Items List</h3>
-                                <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest">{rows.length} ITEMS</p>
+                                <h3 className="text-[14px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">Items List</h3>
+                                <p className="text-[12px] font-black text-[var(--foreground)]/40 uppercase tracking-widest">{rows.length} ITEMS</p>
                             </div>
                             <button
                                 type="button"
                                 onClick={() => setIsItemModalOpen(true)}
-                                className="relative z-10 flex items-center gap-2 px-4 py-1.5 rounded-lg bg-[var(--primary-green)] text-[var(--primary-foreground)] text-[9px] font-black uppercase tracking-wider hover:bg-[var(--primary-hover)] transition-all shadow-md active:scale-95 group"
+                                className="relative z-10 flex items-center gap-2 px-4 py-1.5 rounded-lg bg-[var(--primary-green)] text-[var(--primary-foreground)] text-[13px] font-black uppercase tracking-wider hover:bg-[var(--primary-hover)] transition-all shadow-md active:scale-95 group"
                             >
                                 <Plus size={12} />
                                 ADD ITEM
@@ -393,7 +393,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                             {rows.length === 0 ? (
                                 <div className="py-20 text-center opacity-10">
                                     <Calculator className="h-8 w-8 mx-auto mb-3" />
-                                    <p className="text-[9px] font-black uppercase tracking-[0.4em]">Empty Cart</p>
+                                    <p className="text-[13px] font-black uppercase tracking-[0.4em]">Empty Cart</p>
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -408,9 +408,9 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                                                     <Calculator size={14} strokeWidth={2.5} />
                                                 </div>
                                                 <div>
-                                                    <h4 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">{row.name}</h4>
+                                                    <h4 className="text-[14px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">{row.name}</h4>
                                                     <div className="flex items-center gap-2 mt-0.5">
-                                                        <span className="text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40">
+                                                        <span className="text-[12px] font-black uppercase tracking-widest text-[var(--foreground)]/40">
                                                             {row.quantity} {row.unit} × {formatCurrency(row.rate)}
                                                         </span>
                                                     </div>
@@ -418,7 +418,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                                             </div>
                                             <div className="flex items-center gap-4">
                                                 <div className="text-right">
-                                                    <p className="text-[12px] font-black text-[var(--primary-green)] tabular-nums font-mono tracking-tighter">{formatCurrency(row.amount)}</p>
+                                                    <p className="text-[16px] font-black text-[var(--primary-green)] tabular-nums font-mono tracking-tighter">{formatCurrency(row.amount)}</p>
                                                 </div>
                                                 <button
                                                     type="button"
@@ -440,37 +440,37 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                         {/* Left: Metadata & Notes */}
                         <div className="space-y-2">
                             <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md space-y-3">
-                                <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Taxes & Discounts</label>
+                                <label className="block text-[12px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Taxes & Discounts</label>
                                 <div className="grid grid-cols-2 gap-2">
                                     <div className="p-2.5 rounded-xl bg-[var(--foreground)]/3 border border-white/5 space-y-1">
-                                        <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 font-mono">ADJ %</label>
+                                        <label className="block text-[11px] font-black uppercase tracking-widest text-[var(--foreground)]/30 font-mono">ADJ %</label>
                                         <input
                                             type="number"
                                             value={discount}
                                             onChange={(e) => setDiscount(e.target.value)}
-                                            className="w-full bg-transparent text-[11px] font-black text-[var(--deep-contrast)] focus:outline-none tabular-nums"
+                                            className="w-full bg-transparent text-[15px] font-black text-[var(--deep-contrast)] focus:outline-none tabular-nums"
                                             placeholder="0"
                                         />
                                     </div>
                                     <div className="p-2.5 rounded-xl bg-[var(--foreground)]/3 border border-white/5 space-y-1">
-                                        <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 font-mono">TAX %</label>
+                                        <label className="block text-[11px] font-black uppercase tracking-widest text-[var(--foreground)]/30 font-mono">TAX %</label>
                                         <input
                                             type="number"
                                             value={invoiceTax}
                                             onChange={(e) => setInvoiceTax(e.target.value)}
-                                            className="w-full bg-transparent text-[11px] font-black text-[var(--deep-contrast)] focus:outline-none tabular-nums"
+                                            className="w-full bg-transparent text-[15px] font-black text-[var(--deep-contrast)] focus:outline-none tabular-nums"
                                             placeholder="0"
                                         />
                                     </div>
                                 </div>
                             </div>
                             <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md flex flex-col min-h-[100px]">
-                                <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 mb-2">Notes</label>
+                                <label className="block text-[12px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 mb-2">Notes</label>
                                 <textarea
                                     value={notes}
                                     onChange={(e) => setNotes(e.target.value)}
                                     placeholder="SPECIFICATIONS..."
-                                    className="flex-1 w-full bg-transparent text-[10px] font-black text-[var(--deep-contrast)] focus:outline-none resize-none placeholder:opacity-10 custom-scrollbar"
+                                    className="flex-1 w-full bg-transparent text-[14px] font-black text-[var(--deep-contrast)] focus:outline-none resize-none placeholder:opacity-10 custom-scrollbar"
                                 />
                             </div>
                         </div>
@@ -478,13 +478,13 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                         {/* Center: Signature & Liquidation */}
                         <div className="space-y-2">
                             <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md space-y-2">
-                                <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Payment Status</label>
+                                <label className="block text-[12px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Payment Status</label>
                                 <div className="flex gap-2">
                                     <button
                                         type="button"
                                         onClick={() => setIsModePickerOpen(true)}
                                         className={clsx(
-                                            "flex-1 h-10 rounded-xl border px-3 text-[9px] font-black flex items-center justify-center transition-all shadow-sm",
+                                            "flex-1 h-10 rounded-xl border px-3 text-[13px] font-black flex items-center justify-center transition-all shadow-sm",
                                             paymentMode === 'UNPAID' ? "bg-rose-500/5 border-rose-500/10 text-rose-500" : "bg-[var(--primary-green)]/10 border-[var(--primary-green)]/40 text-[var(--primary-green)]"
                                         )}
                                     >
@@ -495,8 +495,8 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
 
                             <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md space-y-3 bg-gradient-to-br from-transparent to-[var(--primary-green)]/[0.02]">
                                 <div className="flex justify-between items-center">
-                                    <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Signature</label>
-                                    <div className="px-1.5 py-0.5 rounded-full bg-[var(--primary-green)]/10 border border-[var(--primary-green)]/20 text-[6px] font-black text-[var(--primary-green)] uppercase tracking-widest">
+                                    <label className="block text-[12px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Signature</label>
+                                    <div className="px-1.5 py-0.5 rounded-full bg-[var(--primary-green)]/10 border border-[var(--primary-green)]/20 text-[10px] font-black text-[var(--primary-green)] uppercase tracking-widest">
                                         SECURE
                                     </div>
                                 </div>
@@ -508,7 +508,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
 
                         {/* Right: Evidence (Attachments) */}
                         <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md flex flex-col">
-                            <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 mb-3">Bill Photo / Receipt</label>
+                            <label className="block text-[12px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 mb-3">Bill Photo / Receipt</label>
                             <div className="flex flex-wrap gap-2 flex-1 overflow-y-auto custom-scrollbar max-h-[160px]">
                                 {attachments.map((url, i) => (
                                     <div key={i} className="relative group/attachment h-12 w-12 rounded-lg border border-white/5 overflow-hidden shadow-sm cursor-pointer" onClick={() => setExpandedImage(url)}>
@@ -537,7 +537,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                         <div className="flex gap-3">
                             <button
                                 onClick={() => setExpandedImage(null)}
-                                className="h-12 px-6 rounded-2xl bg-white/10 text-white text-[10px] font-black uppercase tracking-widest hover:bg-white/20 transition-all"
+                                className="h-12 px-6 rounded-2xl bg-white/10 text-white text-[14px] font-black uppercase tracking-widest hover:bg-white/20 transition-all"
                             >
                                 Close
                             </button>
@@ -547,7 +547,7 @@ export default function PurchaseForm({ parties, items, paymentModes }: PurchaseF
                                     if (index > -1) removeAttachment(index);
                                     setExpandedImage(null);
                                 }}
-                                className="h-12 px-6 rounded-2xl bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest hover:bg-rose-600 transition-all shadow-xl shadow-rose-500/20 flex items-center gap-2"
+                                className="h-12 px-6 rounded-2xl bg-rose-500 text-white text-[14px] font-black uppercase tracking-widest hover:bg-rose-600 transition-all shadow-xl shadow-rose-500/20 flex items-center gap-2"
                             >
                                 <Trash2 size={14} />
                                 Delete Photo

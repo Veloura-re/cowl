@@ -121,7 +121,7 @@ export function generateInvoiceHTML(data: InvoiceData, theme: 'light' | 'dark' =
             position: relative;
             display: flex;
             flex-direction: column;
-            font-size: 9.5pt;
+            font-size: 12.5pt;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
@@ -139,7 +139,7 @@ export function generateInvoiceHTML(data: InvoiceData, theme: 'light' | 'dark' =
         }
         
         .document-title { 
-            font-size: 22pt; 
+            font-size: 25pt; 
             font-weight: 200; 
             letter-spacing: 4pt;
             text-transform: uppercase;
@@ -162,10 +162,10 @@ export function generateInvoiceHTML(data: InvoiceData, theme: 'light' | 'dark' =
 
         .company-info {
             text-align: right;
-            font-size: 9pt;
+            font-size: 12pt;
         }
         
-        .company-name { font-size: 12pt; font-weight: 200; text-transform: uppercase; }
+        .company-name { font-size: 15pt; font-weight: 200; text-transform: uppercase; }
 
         /* Meta & Parties Info Grid */
         .info-grid { 
@@ -188,8 +188,8 @@ export function generateInvoiceHTML(data: InvoiceData, theme: 'light' | 'dark' =
             background: ${colors.infoBg};
         }
         
-        .label { font-size: 7.5pt; font-weight: 200; text-transform: uppercase; color: var(--text-muted); margin-bottom: 2px; }
-        .content { font-size: 9pt; font-weight: 100; }
+        .label { font-size: 10.5pt; font-weight: 200; text-transform: uppercase; color: var(--text-muted); margin-bottom: 2px; }
+        .content { font-size: 12pt; font-weight: 100; }
         .content b { font-weight: 100; }
 
         /* Formal Table */
@@ -201,7 +201,7 @@ export function generateInvoiceHTML(data: InvoiceData, theme: 'light' | 'dark' =
         
         th { 
             text-align: left; 
-            font-size: 9pt; 
+            font-size: 12pt; 
             font-weight: 200;
             text-transform: uppercase; 
             border-bottom: 0.5pt solid var(--border-color);
@@ -210,7 +210,7 @@ export function generateInvoiceHTML(data: InvoiceData, theme: 'light' | 'dark' =
         
         td { 
             padding: 6px 4px;
-            font-size: 9pt; 
+            font-size: 12pt; 
             border-bottom: 0.15pt solid ${colors.tableBorder};
             vertical-align: top;
         }
@@ -234,14 +234,14 @@ export function generateInvoiceHTML(data: InvoiceData, theme: 'light' | 'dark' =
             justify-content: space-between;
             padding: 4px 0;
             border-bottom: 0.15pt solid ${colors.tableBorder};
-            font-size: 9pt;
+            font-size: 12pt;
         }
         
         .grand-total {
             border-top: 0.5pt solid var(--border-color);
             border-bottom: 0.5pt double var(--border-color);
             font-weight: 200;
-            font-size: 11pt;
+            font-size: 14pt;
             margin-top: 4px;
             padding: 8px 0;
         }
@@ -251,14 +251,14 @@ export function generateInvoiceHTML(data: InvoiceData, theme: 'light' | 'dark' =
             margin-top: 30px;
             border-top: 0.15pt solid ${colors.tableBorder};
             padding-top: 12px;
-            font-size: 8.5pt;
+            font-size: 11.5pt;
             display: flex;
             justify-content: space-between;
         }
         
         .notes-section { flex: 1; margin-right: 30px; }
         .signature-section { width: 180px; text-align: center; }
-        .signature-line { border-top: 0.15pt solid var(--border-color); margin-top: 35px; padding-top: 4px; font-weight: 200; text-transform: uppercase; font-size: 7.5pt; }
+        .signature-line { border-top: 0.15pt solid var(--border-color); margin-top: 35px; padding-top: 4px; font-weight: 200; text-transform: uppercase; font-size: 10.5pt; }
         .signature-img { max-height: 45px; margin-bottom: -30px; }
 
     </style>

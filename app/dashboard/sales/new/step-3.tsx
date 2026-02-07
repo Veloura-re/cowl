@@ -98,8 +98,8 @@ export default function Step3Review({ onNext, onBack }: Step3Props) {
     return (
         <div className="glass rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
             <div className="px-5 py-3 border-b border-white/10 dark:border-white/5 bg-[var(--primary-green)]/5">
-                <h2 className="text-[11px] font-bold text-[var(--deep-contrast)] uppercase tracking-tight">Review & Confirm</h2>
-                <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mt-0.5">Verify all details before saving</p>
+                <h2 className="text-[15px] font-bold text-[var(--deep-contrast)] uppercase tracking-tight">Review & Confirm</h2>
+                <p className="text-[12px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mt-0.5">Verify all details before saving</p>
             </div>
 
             <div className="p-5 space-y-4">
@@ -111,24 +111,24 @@ export default function Step3Review({ onNext, onBack }: Step3Props) {
                             <div className="h-7 w-7 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center">
                                 <Edit3 size={14} />
                             </div>
-                            <h3 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-widest">Document Header</h3>
+                            <h3 className="text-[14px] font-black text-[var(--deep-contrast)] uppercase tracking-widest">Document Header</h3>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <p className="text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1">Customer / Client</p>
-                                <p className="text-[12px] font-black text-[var(--deep-contrast)] truncate">{data.partyName}</p>
+                                <p className="text-[12px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1">Customer / Client</p>
+                                <p className="text-[16px] font-black text-[var(--deep-contrast)] truncate">{data.partyName}</p>
                             </div>
                             <div>
-                                <p className="text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1">Reference ID</p>
-                                <p className="text-[12px] font-black text-[var(--deep-contrast)]">{data.invoiceNumber}</p>
+                                <p className="text-[12px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1">Reference ID</p>
+                                <p className="text-[16px] font-black text-[var(--deep-contrast)]">{data.invoiceNumber}</p>
                             </div>
                             <div>
-                                <p className="text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1">Issue Date</p>
-                                <p className="text-[12px] font-black text-[var(--deep-contrast)]">{new Date(data.date).toLocaleDateString()}</p>
+                                <p className="text-[12px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1">Issue Date</p>
+                                <p className="text-[16px] font-black text-[var(--deep-contrast)]">{new Date(data.date).toLocaleDateString()}</p>
                             </div>
                             <div>
-                                <p className="text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1">Line Density</p>
-                                <p className="text-[12px] font-black text-[var(--deep-contrast)]">{data.items.length} RECORDED</p>
+                                <p className="text-[12px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1">Line Density</p>
+                                <p className="text-[16px] font-black text-[var(--deep-contrast)]">{data.items.length} RECORDED</p>
                             </div>
                         </div>
                     </div>
@@ -136,23 +136,23 @@ export default function Step3Review({ onNext, onBack }: Step3Props) {
                     {/* Financial Totals */}
                     <div className="glass rounded-[32px] border border-[var(--foreground)]/10 p-6 flex flex-col justify-between">
                         <div className="space-y-3">
-                            <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/30">
+                            <div className="flex justify-between items-center text-[14px] font-black uppercase tracking-widest text-[var(--foreground)]/30">
                                 <span>NET SUB-TOTAL</span>
                                 <span className="text-[var(--deep-contrast)] tabular-nums">{formatCurrency(subtotal)}</span>
                             </div>
-                            <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/30">
+                            <div className="flex justify-between items-center text-[14px] font-black uppercase tracking-widest text-[var(--foreground)]/30">
                                 <span>AGGREGATED TAX</span>
                                 <span className="text-[var(--deep-contrast)] tabular-nums">{formatCurrency(totalTax)}</span>
                             </div>
                         </div>
                         <div className="mt-4 pt-4 border-t border-[var(--foreground)]/10 flex justify-between items-end">
                             <div>
-                                <p className="text-[8px] font-black uppercase tracking-[0.3em] text-[var(--foreground)]/30 mb-1">Grand Valuation</p>
-                                <p className="text-[24px] font-black text-[var(--primary-green)] tabular-nums leading-none tracking-tighter">
+                                <p className="text-[12px] font-black uppercase tracking-[0.3em] text-[var(--foreground)]/30 mb-1">Grand Valuation</p>
+                                <p className="text-[28px] font-black text-[var(--primary-green)] tabular-nums leading-none tracking-tighter">
                                     {formatCurrency(grandTotal)}
                                 </p>
                             </div>
-                            <div className="px-3 py-1 rounded-lg bg-[var(--primary-green)]/10 text-[var(--primary-green)] text-[8px] font-black uppercase tracking-widest border border-[var(--primary-green)]/20">
+                            <div className="px-3 py-1 rounded-lg bg-[var(--primary-green)]/10 text-[var(--primary-green)] text-[12px] font-black uppercase tracking-widest border border-[var(--primary-green)]/20">
                                 PENDING SAVE
                             </div>
                         </div>
@@ -162,32 +162,32 @@ export default function Step3Review({ onNext, onBack }: Step3Props) {
                 {/* Items Manifest */}
                 <div className="glass rounded-[32px] border border-[var(--foreground)]/10 overflow-hidden shadow-xl">
                     <div className="px-6 py-4 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5">
-                        <h3 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-widest">Items Manifest</h3>
+                        <h3 className="text-[14px] font-black text-[var(--deep-contrast)] uppercase tracking-widest">Items Manifest</h3>
                     </div>
                     <div className="p-4 overflow-x-auto">
                         <table className="w-full text-left">
                             <thead>
                                 <tr className="border-b border-[var(--foreground)]/5">
-                                    <th className="px-4 py-3 text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Specification</th>
-                                    <th className="px-4 py-3 text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 text-center">Volume</th>
-                                    <th className="px-4 py-3 text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 text-center">Rate</th>
-                                    <th className="px-4 py-3 text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 text-right">Yield</th>
+                                    <th className="px-4 py-3 text-[12px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Specification</th>
+                                    <th className="px-4 py-3 text-[12px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 text-center">Volume</th>
+                                    <th className="px-4 py-3 text-[12px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 text-center">Rate</th>
+                                    <th className="px-4 py-3 text-[12px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 text-right">Yield</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-[var(--foreground)]/5">
                                 {data.items.map((item, index) => (
                                     <tr key={index} className="group hover:bg-[var(--foreground)]/5 transition-colors">
                                         <td className="px-4 py-4">
-                                            <p className="text-[12px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">{item.name}</p>
-                                            {item.tax > 0 && <span className="text-[8px] font-black text-[var(--foreground)]/30 uppercase">TAX: {item.tax}%</span>}
+                                            <p className="text-[16px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">{item.name}</p>
+                                            {item.tax > 0 && <span className="text-[12px] font-black text-[var(--foreground)]/30 uppercase">TAX: {item.tax}%</span>}
                                         </td>
                                         <td className="px-4 py-4 text-center">
-                                            <span className="px-2 py-1 rounded-lg bg-[var(--foreground)]/5 text-[10px] font-black text-[var(--deep-contrast)] uppercase">{item.quantity} {item.unit}</span>
+                                            <span className="px-2 py-1 rounded-lg bg-[var(--foreground)]/5 text-[14px] font-black text-[var(--deep-contrast)] uppercase">{item.quantity} {item.unit}</span>
                                         </td>
-                                        <td className="px-4 py-4 text-center text-[11px] font-black text-[var(--foreground)]/50 tabular-nums uppercase">
+                                        <td className="px-4 py-4 text-center text-[15px] font-black text-[var(--foreground)]/50 tabular-nums uppercase">
                                             {formatCurrency(item.rate)}
                                         </td>
-                                        <td className="px-4 py-4 text-right text-[12px] font-black text-[var(--primary-green)] tabular-nums font-mono">
+                                        <td className="px-4 py-4 text-right text-[16px] font-black text-[var(--primary-green)] tabular-nums font-mono">
                                             {formatCurrency(item.amount)}
                                         </td>
                                     </tr>
@@ -200,26 +200,26 @@ export default function Step3Review({ onNext, onBack }: Step3Props) {
                 {/* Bottom Section: Notes & Signature */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="glass rounded-[32px] border border-[var(--foreground)]/10 p-6 flex flex-col">
-                        <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-4 ml-1">Internal Provisions</label>
+                        <label className="block text-[13px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-4 ml-1">Internal Provisions</label>
                         <textarea
                             value={data.notes}
                             onChange={(e) => updateData({ notes: e.target.value })}
-                            className="flex-1 w-full bg-transparent text-[11px] font-black text-[var(--deep-contrast)] focus:outline-none resize-none placeholder:opacity-10 min-h-[120px]"
+                            className="flex-1 w-full bg-transparent text-[15px] font-black text-[var(--deep-contrast)] focus:outline-none resize-none placeholder:opacity-10 min-h-[120px]"
                             placeholder="APPEND MEMORANDUM..."
                         />
                     </div>
 
                     <div className="glass rounded-[32px] border border-[var(--foreground)]/10 p-6 space-y-4 shadow-2xl bg-gradient-to-br from-transparent to-[var(--primary-green)]/[0.02]">
                         <div className="flex items-center justify-between mb-2">
-                            <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/30 ml-1">Client Authentication</label>
-                            <div className="px-2 py-0.5 rounded-full bg-[var(--primary-green)]/10 border border-[var(--primary-green)]/20 text-[7px] font-black text-[var(--primary-green)] uppercase tracking-widest">
+                            <label className="block text-[13px] font-black uppercase tracking-widest text-[var(--foreground)]/30 ml-1">Client Authentication</label>
+                            <div className="px-2 py-0.5 rounded-full bg-[var(--primary-green)]/10 border border-[var(--primary-green)]/20 text-[11px] font-black text-[var(--primary-green)] uppercase tracking-widest">
                                 Required for validation
                             </div>
                         </div>
                         <div className="relative group">
                             <SignaturePad className="h-64" />
                         </div>
-                        <p className="text-[7px] font-bold text-[var(--foreground)]/30 text-center uppercase tracking-widest leading-relaxed px-4">
+                        <p className="text-[11px] font-bold text-[var(--foreground)]/30 text-center uppercase tracking-widest leading-relaxed px-4">
                             By signing above, the client acknowledges and accepts the terms of this transaction as documented in the items manifest.
                         </p>
                     </div>

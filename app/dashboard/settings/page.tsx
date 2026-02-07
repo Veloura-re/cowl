@@ -416,13 +416,13 @@ export default function SettingsPage() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-[var(--primary-green)]/10">
                 <div>
                     <h1 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight">System Control</h1>
-                    <p className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.2em] leading-none mt-1">Registry Configuration</p>
+                    <p className="text-[13px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.2em] leading-none mt-1">Registry Configuration</p>
                 </div>
                 <div className="flex gap-2">
                     <button
                         onClick={handleSave}
                         disabled={saving}
-                        className="flex items-center gap-2 px-5 py-2 rounded-xl bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] font-black text-[9px] uppercase tracking-[0.2em] hover:bg-[var(--deep-contrast-hover)] transition-all shadow-xl active:scale-95 disabled:opacity-50"
+                        className="flex items-center gap-2 px-5 py-2 rounded-xl bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] font-black text-[13px] uppercase tracking-[0.2em] hover:bg-[var(--deep-contrast-hover)] transition-all shadow-xl active:scale-95 disabled:opacity-50"
                     >
                         {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
                         Save All
@@ -433,7 +433,7 @@ export default function SettingsPage() {
                         title="Sign Out"
                     >
                         <LogOut className="h-3.5 w-3.5" />
-                        <span className="text-[9px] font-black uppercase tracking-widest hidden sm:inline">Logout</span>
+                        <span className="text-[13px] font-black uppercase tracking-widest hidden sm:inline">Logout</span>
                     </button>
                 </div>
             </div>
@@ -450,7 +450,7 @@ export default function SettingsPage() {
                     className="md:col-span-2 md:row-span-2"
                     action={
                         <div className="flex items-center gap-2">
-                            <button onClick={() => setIsSwitcherOpen(true)} className="px-2 py-1 rounded-lg bg-[var(--foreground)]/10 text-[8px] font-black uppercase tracking-wider hover:bg-[var(--foreground)]/20 transition-all">Switch</button>
+                            <button onClick={() => setIsSwitcherOpen(true)} className="px-2 py-1 rounded-lg bg-[var(--foreground)]/10 text-[12px] font-black uppercase tracking-wider hover:bg-[var(--foreground)]/20 transition-all">Switch</button>
                             <button onClick={() => setIsCreateModalOpen(true)} className="h-6 w-6 rounded-lg bg-[var(--primary-green)] text-white flex items-center justify-center hover:bg-[var(--primary-hover)]"><Plus size={12} /></button>
                         </div>
                     }
@@ -478,41 +478,41 @@ export default function SettingsPage() {
                                 )}
                             </div>
                             <div className="flex-1">
-                                <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1.5">Brand Logo</label>
-                                <label className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--primary-green)]/10 text-[var(--primary-green)] border border-[var(--primary-green)]/20 hover:bg-[var(--primary-green)] hover:text-white transition-all cursor-pointer text-[8px] font-black uppercase tracking-wider">
+                                <label className="block text-[11px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1.5">Brand Logo</label>
+                                <label className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--primary-green)]/10 text-[var(--primary-green)] border border-[var(--primary-green)]/20 hover:bg-[var(--primary-green)] hover:text-white transition-all cursor-pointer text-[12px] font-black uppercase tracking-wider">
                                     {uploadingLogo ? <Loader2 className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
                                     {uploadingLogo ? 'Uploading...' : (logoUrl ? 'Change' : 'Upload')}
                                     <input type="file" accept="image/png,image/jpeg,image/jpg,image/svg+xml" onChange={handleLogoUpload} disabled={uploadingLogo} className="hidden" />
                                 </label>
-                                <p className="text-[6px] text-[var(--foreground)]/30 mt-1">PNG, JPG, SVG • Max 2MB</p>
+                                <p className="text-[10px] text-[var(--foreground)]/30 mt-1">PNG, JPG, SVG • Max 2MB</p>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">
                             <div className="col-span-2">
-                                <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1.5 ml-1">Entity Name</label>
+                                <label className="block text-[11px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1.5 ml-1">Entity Name</label>
                                 <input
                                     type="text"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full h-9 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[10px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all"
+                                    className="w-full h-9 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[14px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all"
                                 />
                             </div>
                             <div>
-                                <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1.5 ml-1">Phone</label>
+                                <label className="block text-[11px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1.5 ml-1">Phone</label>
                                 <input
                                     type="text"
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                    className="w-full h-9 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[10px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all"
+                                    className="w-full h-9 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[14px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all"
                                 />
                             </div>
                             <div>
-                                <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1.5 ml-1 flex items-center gap-1"><Globe size={10} /> Currency</label>
+                                <label className="block text-[11px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1.5 ml-1 flex items-center gap-1"><Globe size={10} /> Currency</label>
                                 <button
                                     type="button"
                                     onClick={() => setIsCurrencyPickerOpen(true)}
-                                    className="w-full h-9 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[10px] font-black text-[var(--deep-contrast)] hover:border-[var(--primary-green)] transition-all flex items-center justify-between"
+                                    className="w-full h-9 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[14px] font-black text-[var(--deep-contrast)] hover:border-[var(--primary-green)] transition-all flex items-center justify-between"
                                 >
                                     <span className="truncate">{currencies.find(c => c.code === formData.currency)?.symbol} - {formData.currency}</span>
                                     <ChevronDown className="h-3 w-3 opacity-30" />
@@ -520,11 +520,11 @@ export default function SettingsPage() {
                             </div>
                         </div>
                         <div className="flex-1 min-h-[80px]">
-                            <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1.5 ml-1">Locus / Address</label>
+                            <label className="block text-[11px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1.5 ml-1">Locus / Address</label>
                             <textarea
                                 value={formData.address}
                                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                className="w-full h-full rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 p-3 text-[10px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all resize-none"
+                                className="w-full h-full rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 p-3 text-[14px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all resize-none"
                             />
                         </div>
                     </div>
@@ -541,23 +541,23 @@ export default function SettingsPage() {
                 >
                     <div className="space-y-3">
                         <div>
-                            <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1 ml-1">Full Name</label>
+                            <label className="block text-[11px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1 ml-1">Full Name</label>
                             <input
                                 type="text"
                                 value={formData.fullName}
                                 onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                                className="w-full h-9 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[10px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all"
+                                className="w-full h-9 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[14px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all"
                             />
                         </div>
                         <div>
-                            <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1 ml-1">Handle</label>
+                            <label className="block text-[11px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-1 ml-1">Handle</label>
                             <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--foreground)]/20 font-black text-[9px]">@</span>
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--foreground)]/20 font-black text-[13px]">@</span>
                                 <input
                                     type="text"
                                     value={formData.username}
                                     onChange={(e) => setFormData({ ...formData, username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '') })}
-                                    className="w-full h-9 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 pl-7 pr-3 text-[10px] font-black text-[var(--primary-green)] focus:border-[var(--primary-green)] focus:outline-none transition-all"
+                                    className="w-full h-9 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 pl-7 pr-3 text-[14px] font-black text-[var(--primary-green)] focus:border-[var(--primary-green)] focus:outline-none transition-all"
                                 />
                             </div>
                         </div>
@@ -574,8 +574,8 @@ export default function SettingsPage() {
                 >
                     <div className="flex items-center justify-between h-full">
                         <div>
-                            <p className="text-[9px] font-black text-[var(--deep-contrast)] uppercase">Mode</p>
-                            <p className="text-[7px] font-black text-[var(--foreground)]/30 uppercase mt-0.5">Toggle Day/Night</p>
+                            <p className="text-[13px] font-black text-[var(--deep-contrast)] uppercase">Mode</p>
+                            <p className="text-[11px] font-black text-[var(--foreground)]/30 uppercase mt-0.5">Toggle Day/Night</p>
                         </div>
                         <ThemeToggle />
                     </div>
@@ -596,13 +596,13 @@ export default function SettingsPage() {
                                 value={newModeName}
                                 onChange={(e) => setNewModeName(e.target.value.toUpperCase())}
                                 placeholder="NEW CHANNEL..."
-                                className="flex-1 h-9 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[10px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all uppercase"
+                                className="flex-1 h-9 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[14px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all uppercase"
                                 onKeyDown={(e) => e.key === 'Enter' && handleAddMode()}
                             />
                             <button
                                 onClick={handleAddMode}
                                 disabled={addingMode || !newModeName.trim()}
-                                className="px-4 h-9 rounded-lg bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] font-black text-[8px] uppercase tracking-widest hover:bg-[var(--deep-contrast-hover)] transition-all disabled:opacity-40"
+                                className="px-4 h-9 rounded-lg bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] font-black text-[12px] uppercase tracking-widest hover:bg-[var(--deep-contrast-hover)] transition-all disabled:opacity-40"
                             >
                                 {addingMode ? <Loader2 className="h-3 w-3 animate-spin" /> : 'ADD'}
                             </button>
@@ -610,7 +610,7 @@ export default function SettingsPage() {
                         <div className="flex flex-wrap gap-2 max-h-[100px] overflow-y-auto custom-scrollbar">
                             {paymentModes.map((mode) => (
                                 <div key={mode.id} className="group flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:border-[var(--primary-green)]/30 transition-all">
-                                    <span className="text-[8px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">{mode.name}</span>
+                                    <span className="text-[12px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">{mode.name}</span>
                                     <button onClick={() => handleDeleteMode(mode.id)} className="text-rose-500 opacity-0 group-hover:opacity-100 transition-all hover:scale-125"><X size={10} /></button>
                                 </div>
                             ))}
@@ -643,7 +643,7 @@ export default function SettingsPage() {
                                         : "bg-[var(--foreground)]/2 border-[var(--foreground)]/5 hover:bg-[var(--foreground)]/5"
                                 )}
                             >
-                                <span className={clsx("text-[8px] font-black uppercase tracking-widest", notifSettings[item.id as keyof typeof notifSettings] ? "text-[var(--primary-green)]" : "text-[var(--foreground)]/50")}>{item.label}</span>
+                                <span className={clsx("text-[12px] font-black uppercase tracking-widest", notifSettings[item.id as keyof typeof notifSettings] ? "text-[var(--primary-green)]" : "text-[var(--foreground)]/50")}>{item.label}</span>
                                 <div className={clsx("h-2 w-2 rounded-full transition-all", notifSettings[item.id as keyof typeof notifSettings] ? "bg-[var(--primary-green)]" : "bg-[var(--foreground)]/10")} />
                             </button>
                         ))}
@@ -665,7 +665,7 @@ export default function SettingsPage() {
                         >
                             <div className="flex items-center gap-2">
                                 <Key className="h-3.5 w-3.5 text-orange-500" />
-                                <span className="text-[9px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">Password</span>
+                                <span className="text-[13px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">Password</span>
                             </div>
                             <ChevronRight size={12} className="opacity-30 group-hover:opacity-100" />
                         </button>
@@ -675,7 +675,7 @@ export default function SettingsPage() {
                         >
                             <div className="flex items-center gap-2">
                                 <Users className="h-3.5 w-3.5 text-blue-500" />
-                                <span className="text-[9px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">Team</span>
+                                <span className="text-[13px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">Team</span>
                             </div>
                             <ChevronRight size={12} className="opacity-30 group-hover:opacity-100" />
                         </Link>
@@ -692,19 +692,19 @@ export default function SettingsPage() {
                 >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full items-center">
                         <div className="flex flex-col gap-2">
-                            <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mb-1">Export</p>
+                            <p className="text-[12px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mb-1">Export</p>
                             <button
                                 onClick={handleBackup}
                                 disabled={isBackupLoading}
-                                className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-[9px] font-black uppercase tracking-widest text-[var(--deep-contrast)] hover:bg-[var(--foreground)]/10 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+                                className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-[13px] font-black uppercase tracking-widest text-[var(--deep-contrast)] hover:bg-[var(--foreground)]/10 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
                             >
                                 {isBackupLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Download className="h-3 w-3" />}
                                 Download Snapshot
                             </button>
                         </div>
                         <div className="flex flex-col gap-2">
-                            <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mb-1">Import</p>
-                            <label className="w-full h-10 rounded-xl bg-[var(--primary-green)]/10 border border-[var(--primary-green)]/20 text-[9px] font-black uppercase tracking-widest text-[var(--primary-green)] hover:bg-[var(--primary-green)] hover:text-[var(--primary-foreground)] transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 relative overflow-hidden">
+                            <p className="text-[12px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mb-1">Import</p>
+                            <label className="w-full h-10 rounded-xl bg-[var(--primary-green)]/10 border border-[var(--primary-green)]/20 text-[13px] font-black uppercase tracking-widest text-[var(--primary-green)] hover:bg-[var(--primary-green)] hover:text-[var(--primary-foreground)] transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 relative overflow-hidden">
                                 {isRestoring ? <Loader2 className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
                                 <span>{isRestoring ? 'Restoring...' : 'Upload Backup'}</span>
                                 <input type="file" accept=".json" onChange={handleRestore} disabled={isRestoring} className="hidden" />
@@ -808,8 +808,8 @@ const BentoCard = ({ children, className, title, icon: Icon, subtitle, action }:
                         </div>
                     )}
                     <div>
-                        {title && <h3 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">{title}</h3>}
-                        {subtitle && <p className="text-[7px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">{subtitle}</p>}
+                        {title && <h3 className="text-[14px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">{title}</h3>}
+                        {subtitle && <p className="text-[11px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">{subtitle}</p>}
                     </div>
                 </div>
                 {action && <div>{action}</div>}

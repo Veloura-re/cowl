@@ -293,7 +293,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight">Purchase</h1>
-                        <p className="text-[10px] font-black text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Purchase Log</p>
+                        <p className="text-[14px] font-black text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Purchase Log</p>
                     </div>
                     <motion.button
                         id="new-purchase-btn"
@@ -302,7 +302,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                         whileHover={{ scale: 1.05, translateY: -2 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => router.push('/dashboard/purchases/new')}
-                        className="flex items-center justify-center rounded-xl bg-[var(--primary-green)] px-4 py-2 text-[11px] font-black uppercase tracking-wider text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] transition-all shadow-xl shadow-[var(--primary-green)]/20 active:scale-95 border border-[var(--primary-foreground)]/10 group"
+                        className="flex items-center justify-center rounded-xl bg-[var(--primary-green)] px-4 py-2 text-[15px] font-black uppercase tracking-wider text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] transition-all shadow-xl shadow-[var(--primary-green)]/20 active:scale-95 border border-[var(--primary-foreground)]/10 group"
                     >
                         <Plus className="mr-1.5 h-3.5 w-3.5 transition-transform group-hover:rotate-90 duration-300" />
                         <span>New Entry</span>
@@ -323,7 +323,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setStatusFilter(statusFilter === 'PAID' ? 'ALL' : 'PAID')}
                     className={clsx(
-                        "flex-1 glass p-2 rounded-xl border transition-all cursor-pointer group",
+                        "flex-1 glass p-3 rounded-xl border transition-all cursor-pointer group",
                         statusFilter === 'PAID'
                             ? "bg-[var(--status-success)] border-emerald-500 shadow-lg shadow-emerald-500/20 ring-2 ring-emerald-500/50 scale-[1.02]"
                             : "bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:bg-[var(--foreground)]/10"
@@ -331,12 +331,12 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                 >
                     <div className="flex justify-between items-center">
                         <div className="flex items-center gap-1.5">
-                            <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                            <span className="text-[7.5px] font-black uppercase tracking-widest text-[var(--status-success-foreground)]/60">Total Out</span>
+                            <div className="h-2 w-2 rounded-full bg-emerald-500" />
+                            <span className="text-[12px] font-black uppercase tracking-widest text-[var(--status-success-foreground)]/60">Total Out</span>
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full border border-[var(--status-success-border)] bg-[var(--status-success)] text-[var(--status-success-foreground)] shadow-sm">DONE</span>
+                        <span className="text-[16px] font-black uppercase tracking-widest px-2 py-1 rounded-full border border-[var(--status-success-border)] bg-[var(--status-success)] text-[var(--status-success-foreground)] shadow-sm">DONE</span>
                     </div>
-                    <p className="text-xs font-black text-[var(--status-success-foreground)] mt-1 tabular-nums">
+                    <p className="text-[18px] font-black text-[var(--status-success-foreground)] mt-2 tabular-nums">
                         {formatCurrency(invoices.filter(i => i.status === 'PAID').reduce((sum, i) => sum + i.total_amount, 0))}
                     </p>
                 </motion.div>
@@ -346,7 +346,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setStatusFilter(statusFilter === 'UNPAID' ? 'ALL' : 'UNPAID')}
                     className={clsx(
-                        "flex-1 glass p-2 rounded-xl border transition-all cursor-pointer group",
+                        "flex-1 glass p-3 rounded-xl border transition-all cursor-pointer group",
                         statusFilter === 'UNPAID'
                             ? "bg-[var(--status-danger)] border-rose-500 shadow-lg shadow-rose-500/20 ring-2 ring-rose-500/50 scale-[1.02]"
                             : "bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:bg-[var(--foreground)]/10"
@@ -354,12 +354,12 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                 >
                     <div className="flex justify-between items-center">
                         <div className="flex items-center gap-1.5">
-                            <div className="h-1.5 w-1.5 rounded-full bg-rose-500" />
-                            <span className="text-[7.5px] font-black uppercase tracking-widest text-[var(--status-danger-foreground)]/60">To Pay</span>
+                            <div className="h-2 w-2 rounded-full bg-rose-500" />
+                            <span className="text-[12px] font-black uppercase tracking-widest text-[var(--status-danger-foreground)]/60">To Pay</span>
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full border border-[var(--status-danger-border)] bg-[var(--status-danger)] text-[var(--status-danger-foreground)] shadow-sm">DUE</span>
+                        <span className="text-[16px] font-black uppercase tracking-widest px-2 py-1 rounded-full border border-[var(--status-danger-border)] bg-[var(--status-danger)] text-[var(--status-danger-foreground)] shadow-sm">DUE</span>
                     </div>
-                    <p className="text-xs font-black text-[var(--status-danger-foreground)] mt-1 tabular-nums">
+                    <p className="text-[18px] font-black text-[var(--status-danger-foreground)] mt-2 tabular-nums">
                         {formatCurrency(invoices.filter(i => i.status !== 'PAID').reduce((sum, i) => sum + i.total_amount, 0))}
                     </p>
                 </motion.div>
@@ -413,18 +413,18 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                             onMouseUp={handleTouchEnd}
                             onMouseLeave={handleTouchEnd}
                             onTouchStart={() => handleTouchStart(inv)}
-                            onTouchEnd={handleTouchEnd}
-                            className="group relative flex items-center glass-optimized rounded-[10px] border border-[var(--foreground)]/10 p-1.5 hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer overflow-hidden h-[44px] gap-2 select-none active:scale-[0.98]"
+                            onTouchEnd={() => handleTouchEnd()}
+                            className="group relative flex items-center glass-optimized rounded-[12px] border border-[var(--foreground)]/10 p-2 hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer overflow-hidden h-[56px] gap-3 select-none active:scale-[0.98]"
                         >
                             {/* Status Indicator Stripe */}
                             <div className={clsx(
-                                "absolute top-0 left-0 w-[2px] h-full transition-colors duration-300",
+                                "absolute top-0 left-0 w-[3px] h-full transition-colors duration-300",
                                 inv.status === 'PAID' ? "bg-emerald-500" : "bg-rose-500"
                             )} />
 
                             {/* Avatar */}
                             <div className={clsx(
-                                "h-6 w-6 rounded-lg flex items-center justify-center font-black text-[9px] transition-all duration-300 shadow-inner shrink-0 border uppercase",
+                                "h-8 w-8 rounded-xl flex items-center justify-center font-black text-[15px] transition-all duration-300 shadow-inner shrink-0 border uppercase",
                                 inv.status === 'UNPAID'
                                     ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
                                     : "bg-[var(--foreground)]/5 text-[var(--deep-contrast)]/60 border-[var(--foreground)]/10"
@@ -435,7 +435,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                             {/* Identity & Status Header - Compact */}
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between gap-1">
-                                    <h3 className="text-[9px] font-black text-[var(--deep-contrast)] truncate leading-none uppercase tracking-tight">{inv.party?.name || 'Supplier'}</h3>
+                                    <h3 className="text-[13px] font-black text-[var(--deep-contrast)] truncate leading-none uppercase tracking-tight">{inv.party?.name || 'Supplier'}</h3>
                                     <span className={clsx(
                                         "text-[5.5px] font-black uppercase tracking-widest px-1 py-0.5 rounded-md border shrink-0",
                                         inv.status === 'PAID' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/10" :
@@ -446,9 +446,9 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                                     </span>
                                 </div>
                                 <div className="flex items-center gap-1.5 mt-1.5">
-                                    <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">{inv.invoice_number}</span>
+                                    <span className="text-[10px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">{inv.invoice_number}</span>
                                     <div className="h-0.5 w-0.5 rounded-full bg-[var(--foreground)]/20" />
-                                    <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">
+                                    <span className="text-[10px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">
                                         {new Date(inv.date).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}
                                     </span>
                                 </div>
@@ -457,7 +457,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                             {/* Value & Actions Row */}
                             <div className="flex flex-col items-end gap-1 shrink-0">
                                 <p className={clsx(
-                                    "text-[11px] font-black tracking-tighter tabular-nums leading-none",
+                                    "text-[15px] font-black tracking-tighter tabular-nums leading-none",
                                     inv.balance_amount > 0 ? "text-rose-500" : "text-emerald-500"
                                 )}>
                                     {formatCurrency(inv.total_amount)}
@@ -491,7 +491,7 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
                 <div className="flex justify-center py-4">
                     <button
                         onClick={() => setVisibleCount(prev => prev + 50)}
-                        className="px-4 py-2 rounded-xl bg-[var(--foreground)]/5 text-[10px] font-black uppercase tracking-wider hover:bg-[var(--foreground)]/10 transition-all"
+                        className="px-4 py-2 rounded-xl bg-[var(--foreground)]/5 text-[14px] font-black uppercase tracking-wider hover:bg-[var(--foreground)]/10 transition-all"
                     >
                         Load More ({filteredPurchases.length - visibleCount} remaining)
                     </button>
@@ -510,13 +510,13 @@ export default function PurchasesClientView({ initialInvoices }: { initialInvoic
             {loading ? (
                 <div className="py-20 flex flex-col items-center justify-center">
                     <LoadingSpinner label="Fetching Bills..." />
-                    <p className="text-[8px] font-bold text-[var(--foreground)]/20 uppercase tracking-[0.3em] mt-3">Accessing Ledger Archives</p>
+                    <p className="text-[12px] font-bold text-[var(--foreground)]/20 uppercase tracking-[0.3em] mt-3">Accessing Ledger Archives</p>
                 </div>
             ) : filteredPurchases.length === 0 && (
                 <div className="text-center py-24 opacity-30 animate-in fade-in duration-300">
                     <ShoppingCart className="h-10 w-10 mx-auto mb-3 opacity-20" />
-                    <p className="text-[10px] font-bold uppercase tracking-wider">No bills found</p>
-                    <p className="text-[8px] font-bold uppercase tracking-widest mt-1 opacity-50">Record a purchase to update your inventory</p>
+                    <p className="text-[14px] font-bold uppercase tracking-wider">No bills found</p>
+                    <p className="text-[12px] font-bold uppercase tracking-widest mt-1 opacity-50">Record a purchase to update your inventory</p>
                 </div>
             )}
             {isPreviewOpen && previewData && (

@@ -50,7 +50,7 @@ export default function RegisterPage() {
                     <h2 className="text-xl font-black tracking-tight text-[var(--deep-contrast)] uppercase">
                         Create Account
                     </h2>
-                    <p className="mt-1 text-[10px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.2em]">
+                    <p className="mt-1 text-[14px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.2em]">
                         Start managing with Claire
                     </p>
                 </div>
@@ -60,7 +60,7 @@ export default function RegisterPage() {
                         <div>
                             <label
                                 htmlFor="fullName"
-                                className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1"
+                                className="block text-[13px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1"
                             >
                                 Full Name Identity
                             </label>
@@ -79,7 +79,7 @@ export default function RegisterPage() {
                         <div>
                             <label
                                 htmlFor="email"
-                                className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1"
+                                className="block text-[13px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1"
                             >
                                 System Email
                             </label>
@@ -98,7 +98,7 @@ export default function RegisterPage() {
                         <div>
                             <label
                                 htmlFor="password"
-                                className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1"
+                                className="block text-[13px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1"
                             >
                                 Secure Password
                             </label>
@@ -117,7 +117,7 @@ export default function RegisterPage() {
                     </div>
 
                     {error && (
-                        <div className="rounded-xl bg-rose-500/10 p-2.5 text-[10px] font-black text-rose-500 border border-rose-500/20 uppercase tracking-widest text-center animate-in shake duration-300">
+                        <div className="rounded-xl bg-rose-500/10 p-2.5 text-[14px] font-black text-rose-500 border border-rose-500/20 uppercase tracking-widest text-center animate-in shake duration-300">
                             {error}
                         </div>
                     )}
@@ -125,7 +125,7 @@ export default function RegisterPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="group relative flex w-full justify-center rounded-xl bg-[var(--primary-green)] px-4 py-3.5 text-[10px] font-black text-[var(--primary-foreground)] uppercase tracking-[0.2em] hover:bg-[var(--primary-hover)] active:scale-95 disabled:opacity-70 transition-all duration-300 shadow-xl shadow-[var(--primary-green)]/20 mt-6"
+                        className="group relative flex w-full justify-center rounded-xl bg-[var(--primary-green)] px-4 py-3.5 text-[14px] font-black text-[var(--primary-foreground)] uppercase tracking-[0.2em] hover:bg-[var(--primary-hover)] active:scale-95 disabled:opacity-70 transition-all duration-300 shadow-xl shadow-[var(--primary-green)]/20 mt-6"
                     >
                         {loading ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -139,7 +139,7 @@ export default function RegisterPage() {
                 </form>
 
                 <div className="text-center pt-2">
-                    <p className="text-[10px] font-black text-[var(--foreground)]/30 uppercase tracking-widest">
+                    <p className="text-[14px] font-black text-[var(--foreground)]/30 uppercase tracking-widest">
                         Already in the system?{' '}
                         <Link
                             href="/login"

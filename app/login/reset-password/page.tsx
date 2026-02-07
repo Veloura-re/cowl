@@ -65,7 +65,7 @@ export default function ResetPasswordPage() {
                     <h2 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight uppercase">
                         Password Updated
                     </h2>
-                    <p className="text-[10px] font-bold text-[var(--foreground)]/50 uppercase tracking-wider leading-relaxed">
+                    <p className="text-[14px] font-bold text-[var(--foreground)]/50 uppercase tracking-wider leading-relaxed">
                         Your security is our priority. Redirecting to dashboard...
                     </p>
                 </div>
@@ -83,7 +83,7 @@ export default function ResetPasswordPage() {
                     <h2 className="text-xl font-bold tracking-tight text-[var(--deep-contrast)] uppercase">
                         New Password
                     </h2>
-                    <p className="mt-1 text-[10px] font-bold text-[var(--foreground)]/50 uppercase tracking-wider">
+                    <p className="mt-1 text-[14px] font-bold text-[var(--foreground)]/50 uppercase tracking-wider">
                         Set a strong new password
                     </p>
                 </div>
@@ -91,7 +91,7 @@ export default function ResetPasswordPage() {
                 <form className="space-y-4" onSubmit={handleUpdatePassword}>
                     <div className="space-y-3">
                         <div>
-                            <label className="block text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-1.5 ml-1">
+                            <label className="block text-[13px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-1.5 ml-1">
                                 New Password
                             </label>
                             <input
@@ -104,7 +104,7 @@ export default function ResetPasswordPage() {
                             />
                         </div>
                         <div>
-                            <label className="block text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-1.5 ml-1">
+                            <label className="block text-[13px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-1.5 ml-1">
                                 Confirm New Password
                             </label>
                             <input
@@ -119,7 +119,7 @@ export default function ResetPasswordPage() {
                     </div>
 
                     {error && (
-                        <div className="rounded-xl bg-red-50 p-2.5 text-[10px] font-bold text-red-600 border border-red-100 uppercase tracking-wider text-center">
+                        <div className="rounded-xl bg-red-50 p-2.5 text-[14px] font-bold text-red-600 border border-red-100 uppercase tracking-wider text-center">
                             {error}
                         </div>
                     )}
@@ -127,7 +127,7 @@ export default function ResetPasswordPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="group relative flex w-full justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-3 text-[10px] font-bold text-white uppercase tracking-wider hover:bg-[var(--primary-green)] active:scale-95 disabled:opacity-70 transition-all duration-300 shadow-xl shadow-[var(--deep-contrast)]/20"
+                        className="group relative flex w-full justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-3 text-[14px] font-bold text-white uppercase tracking-wider hover:bg-[var(--primary-green)] active:scale-95 disabled:opacity-70 transition-all duration-300 shadow-xl shadow-[var(--deep-contrast)]/20"
                     >
                         {loading ? (
                             <Loader2 className="h-4 w-4 animate-spin" />

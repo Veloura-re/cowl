@@ -420,7 +420,7 @@ export default function ReportsPage() {
             <div className="flex items-center justify-between pb-2 border-b border-neutral-200 dark:border-white/5">
                 <div>
                     <h1 className="text-xl font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)] tracking-tight">Business Reports</h1>
-                    <p className="text-[10px] font-bold text-[var(--foreground)]/60 dark:text-neutral-500 uppercase tracking-wider leading-none">How your business is doing</p>
+                    <p className="text-[14px] font-bold text-[var(--foreground)]/60 dark:text-neutral-500 uppercase tracking-wider leading-none">How your business is doing</p>
                 </div>
                 {loading && <Activity className="h-4 w-4 text-[var(--primary-green)] animate-spin" />}
             </div>
@@ -439,7 +439,7 @@ export default function ReportsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                     {/* Report Type */}
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Focus Area</label>
+                        <label className="text-[14px] font-black text-neutral-400 uppercase tracking-widest ml-1">Focus Area</label>
                         <Dropdown
                             value={selectedReport}
                             onChange={(val) => setSelectedReport(val as ReportType)}
@@ -459,7 +459,7 @@ export default function ReportsPage() {
 
                     {/* Start Date */}
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">From</label>
+                        <label className="text-[14px] font-black text-neutral-400 uppercase tracking-widest ml-1">From</label>
                         <button
                             type="button"
                             onClick={() => setIsStartOpen(true)}
@@ -474,7 +474,7 @@ export default function ReportsPage() {
 
                     {/* End Date */}
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">To</label>
+                        <label className="text-[14px] font-black text-neutral-400 uppercase tracking-widest ml-1">To</label>
                         <button
                             type="button"
                             onClick={() => setIsEndOpen(true)}
@@ -508,7 +508,7 @@ export default function ReportsPage() {
                         <button
                             onClick={() => handleExport('PDF')}
                             disabled={exporting}
-                            className="flex-1 flex items-center justify-center gap-2 bg-neutral-900 dark:bg-white text-white dark:text-black h-10 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-70 shadow-lg shadow-black/10"
+                            className="flex-1 flex items-center justify-center gap-2 bg-neutral-900 dark:bg-white text-white dark:text-black h-10 rounded-xl text-[14px] font-black uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-70 shadow-lg shadow-black/10"
                         >
                             {exporting ? <Activity className="h-3.5 w-3.5 animate-spin" /> : <FileText className="h-3.5 w-3.5" />}
                             PDF
@@ -516,7 +516,7 @@ export default function ReportsPage() {
                         <button
                             onClick={() => handleExport('EXCEL')}
                             disabled={exporting}
-                            className="flex-1 flex items-center justify-center gap-2 bg-emerald-500 text-white h-10 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-70 shadow-lg shadow-emerald-500/20"
+                            className="flex-1 flex items-center justify-center gap-2 bg-emerald-500 text-white h-10 rounded-xl text-[14px] font-black uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-70 shadow-lg shadow-emerald-500/20"
                         >
                             {exporting ? <Activity className="h-3.5 w-3.5 animate-spin" /> : <FileSpreadsheet className="h-3.5 w-3.5" />}
                             XLSX
@@ -525,10 +525,10 @@ export default function ReportsPage() {
                 </div>
 
                 <div className="mt-6 pt-6 border-t border-neutral-100 dark:border-white/5 space-y-3">
-                    <label className="text-[11px] font-black text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.2em] ml-1">OFFICIAL AUTHORIZATION SIGNATURE</label>
+                    <label className="text-[15px] font-black text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.2em] ml-1">OFFICIAL AUTHORIZATION SIGNATURE</label>
                     <div className="relative group rounded-2xl overflow-hidden border border-neutral-200 dark:border-white/10 bg-white dark:bg-black/20 shadow-inner group-hover:border-indigo-500/30 transition-colors">
                         <SignaturePad ref={sigPadRef} className="h-44" />
-                        <div className="absolute top-2 right-2 px-2 py-1 rounded-md bg-neutral-100 dark:bg-white/5 text-[8px] font-black text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-widest">SIGN HERE</div>
+                        <div className="absolute top-2 right-2 px-2 py-1 rounded-md bg-neutral-100 dark:bg-white/5 text-[12px] font-black text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-widest">SIGN HERE</div>
                     </div>
                 </div>
             </div>
@@ -551,20 +551,20 @@ export default function ReportsPage() {
                     <div className="space-y-3">
                         <div className="flex justify-between items-center group/item p-1.5 hover:bg-neutral-50 dark:hover:bg-white/5 rounded-lg transition-colors">
                             <div className="flex flex-col">
-                                <span className="text-[9px] font-black text-neutral-400 uppercase tracking-widest">Inflow</span>
+                                <span className="text-[13px] font-black text-neutral-400 uppercase tracking-widest">Inflow</span>
                                 <span className="text-xs font-bold text-neutral-900 dark:text-white">{formatCurrency(data.revenue)}</span>
                             </div>
                             <ArrowUpRight className="h-3.5 w-3.5 text-emerald-500" />
                         </div>
                         <div className="flex justify-between items-center group/item p-1.5 hover:bg-neutral-50 dark:hover:bg-white/5 rounded-lg transition-colors">
                             <div className="flex flex-col">
-                                <span className="text-[9px] font-black text-neutral-400 uppercase tracking-widest">Outflow</span>
+                                <span className="text-[13px] font-black text-neutral-400 uppercase tracking-widest">Outflow</span>
                                 <span className="text-xs font-bold text-neutral-900 dark:text-white">{formatCurrency(data.expenses)}</span>
                             </div>
                             <ArrowDownRight className="h-3.5 w-3.5 text-rose-500" />
                         </div>
                         <div className="pt-3 border-t border-neutral-100 dark:border-white/10 flex flex-col items-center justify-center py-2 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-xl">
-                            <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Net</span>
+                            <span className="text-[13px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Net</span>
                             <span className="text-xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">{formatCurrency(data.revenue - data.expenses)}</span>
                         </div>
                     </div>
@@ -587,13 +587,13 @@ export default function ReportsPage() {
                                 style={{ height: `${Math.max(15, (val / maxTrend) * 100)}%` }}
                             >
                                 <div className="absolute inset-x-0 bottom-0 h-1 bg-indigo-500 rounded-full" />
-                                <div className="hidden group-hover:flex absolute -top-8 left-1/2 -translate-x-1/2 px-1.5 py-0.5 bg-neutral-900 text-white text-[8px] font-black rounded shadow-xl whitespace-nowrap z-10 items-center justify-center border border-white/10">
+                                <div className="hidden group-hover:flex absolute -top-8 left-1/2 -translate-x-1/2 px-1.5 py-0.5 bg-neutral-900 text-white text-[12px] font-black rounded shadow-xl whitespace-nowrap z-10 items-center justify-center border border-white/10">
                                     {formatCurrency(val)}
                                 </div>
                             </div>
                         ))}
                     </div>
-                    <div className="flex justify-between text-[8px] font-black uppercase tracking-widest text-neutral-400 px-1 pt-1.5 border-t border-neutral-50 dark:border-white/5">
+                    <div className="flex justify-between text-[12px] font-black uppercase tracking-widest text-neutral-400 px-1 pt-1.5 border-t border-neutral-50 dark:border-white/5">
                         <span>L7D</span>
                         <span>Now</span>
                     </div>
@@ -610,7 +610,7 @@ export default function ReportsPage() {
                     <div className="space-y-3">
                         {data.expenseBreakdown.map((item, i) => (
                             <div key={i} className="space-y-1.5">
-                                <div className="flex justify-between text-[9px] font-black uppercase tracking-widest leading-none">
+                                <div className="flex justify-between text-[13px] font-black uppercase tracking-widest leading-none">
                                     <span className="text-neutral-400">{item.label}</span>
                                     <span className="text-neutral-900 dark:text-neutral-200">{item.value}%</span>
                                 </div>
@@ -632,24 +632,24 @@ export default function ReportsPage() {
                     <div className="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] bg-gradient-to-br from-indigo-500 via-emerald-500 to-sky-500 blur-[100px] animate-pulse" />
                 </div>
 
-                <h3 className="text-[9px] font-black text-[var(--foreground)]/40 tracking-[0.3em] uppercase mb-4 text-center">Insights Intelligence</h3>
+                <h3 className="text-[13px] font-black text-[var(--foreground)]/40 tracking-[0.3em] uppercase mb-4 text-center">Insights Intelligence</h3>
 
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
                     <div className="p-3.5 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 backdrop-blur-sm transition-all hover:scale-[1.03] hover:bg-[var(--foreground)]/10">
-                        <p className="text-[8px] font-black text-indigo-500 dark:text-indigo-400 uppercase tracking-widest mb-1">Top Item</p>
-                        <p className="text-[11px] font-black text-[var(--deep-contrast)] truncate">{data.topItem}</p>
+                        <p className="text-[12px] font-black text-indigo-500 dark:text-indigo-400 uppercase tracking-widest mb-1">Top Item</p>
+                        <p className="text-[15px] font-black text-[var(--deep-contrast)] truncate">{data.topItem}</p>
                     </div>
                     <div className="p-3.5 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 backdrop-blur-sm transition-all hover:scale-[1.03] hover:bg-[var(--foreground)]/10">
-                        <p className="text-[8px] font-black text-rose-500 dark:text-rose-400 uppercase tracking-widest mb-1">Restock</p>
-                        <p className="text-[11px] font-black text-[var(--deep-contrast)]">{data.lowStockCount} Items Low</p>
+                        <p className="text-[12px] font-black text-rose-500 dark:text-rose-400 uppercase tracking-widest mb-1">Restock</p>
+                        <p className="text-[15px] font-black text-[var(--deep-contrast)]">{data.lowStockCount} Items Low</p>
                     </div>
                     <div className="p-3.5 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 backdrop-blur-sm transition-all hover:scale-[1.03] hover:bg-[var(--foreground)]/10">
-                        <p className="text-[8px] font-black text-sky-500 dark:text-sky-400 uppercase tracking-widest mb-1">Top Customer</p>
-                        <p className="text-[11px] font-black text-[var(--deep-contrast)] truncate">{data.topParty}</p>
+                        <p className="text-[12px] font-black text-sky-500 dark:text-sky-400 uppercase tracking-widest mb-1">Top Customer</p>
+                        <p className="text-[15px] font-black text-[var(--deep-contrast)] truncate">{data.topParty}</p>
                     </div>
                     <div className="p-3.5 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 backdrop-blur-sm transition-all hover:scale-[1.03] hover:bg-[var(--foreground)]/10">
-                        <p className="text-[8px] font-black text-emerald-500 dark:text-emerald-400 uppercase tracking-widest mb-1">7D Velocity</p>
-                        <p className="text-[11px] font-black text-[var(--deep-contrast)]">{data.growth}</p>
+                        <p className="text-[12px] font-black text-emerald-500 dark:text-emerald-400 uppercase tracking-widest mb-1">7D Velocity</p>
+                        <p className="text-[15px] font-black text-[var(--deep-contrast)]">{data.growth}</p>
                     </div>
                 </div>
             </div>
@@ -659,7 +659,7 @@ export default function ReportsPage() {
                 <div className="flex items-center justify-between mb-4">
                     <div>
                         <h3 className="text-sm font-black text-[var(--deep-contrast)] tracking-tight">Report Preview</h3>
-                        <p className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Live Data View</p>
+                        <p className="text-[13px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Live Data View</p>
                     </div>
                     {previewLoading && <Activity className="h-4 w-4 text-[var(--primary-green)] animate-spin" />}
                 </div>
@@ -676,10 +676,10 @@ export default function ReportsPage() {
                         <div className="text-center">
                             <AlertTriangle className="h-12 w-12 mx-auto mb-3 opacity-20" />
                             <p className="text-xs font-black uppercase tracking-widest text-rose-500">Retrieval Failed</p>
-                            <p className="text-[9px] mt-1 opacity-50 max-w-xs mx-auto leading-relaxed">{reportError}</p>
+                            <p className="text-[13px] mt-1 opacity-50 max-w-xs mx-auto leading-relaxed">{reportError}</p>
                             <button
                                 onClick={() => window.location.reload()}
-                                className="mt-4 px-4 py-2 rounded-xl bg-rose-500/5 border border-rose-500/10 text-[8px] font-black uppercase tracking-widest hover:bg-rose-500/10 transition-all"
+                                className="mt-4 px-4 py-2 rounded-xl bg-rose-500/5 border border-rose-500/10 text-[12px] font-black uppercase tracking-widest hover:bg-rose-500/10 transition-all"
                             >
                                 Force Reset System
                             </button>
@@ -690,7 +690,7 @@ export default function ReportsPage() {
                         <div className="text-center">
                             <FileText className="h-12 w-12 mx-auto mb-3 opacity-20" />
                             <p className="text-xs font-black uppercase tracking-widest">No data available for this report</p>
-                            <p className="text-[9px] text-[var(--foreground)]/20 mt-1">Try adjusting your date range</p>
+                            <p className="text-[13px] text-[var(--foreground)]/20 mt-1">Try adjusting your date range</p>
                         </div>
                     </div>
                 ) : (
@@ -701,7 +701,7 @@ export default function ReportsPage() {
                                 <thead>
                                     <tr className="bg-[var(--foreground)]/5 border-b border-[var(--foreground)]/10">
                                         {previewHeaders.map((header, i) => (
-                                            <th key={i} className="px-4 py-3 text-[9px] font-black text-[var(--foreground)]/60 uppercase tracking-widest">
+                                            <th key={i} className="px-4 py-3 text-[13px] font-black text-[var(--foreground)]/60 uppercase tracking-widest">
                                                 {header}
                                             </th>
                                         ))}
@@ -714,7 +714,7 @@ export default function ReportsPage() {
                                             className="border-b border-[var(--foreground)]/5 hover:bg-[var(--foreground)]/[0.02] transition-colors"
                                         >
                                             {row.map((cell: any, j: number) => (
-                                                <td key={j} className="px-4 py-2.5 text-[10px] font-bold text-[var(--deep-contrast)]">
+                                                <td key={j} className="px-4 py-2.5 text-[14px] font-bold text-[var(--deep-contrast)]">
                                                     {cell}
                                                 </td>
                                             ))}
@@ -725,7 +725,7 @@ export default function ReportsPage() {
                         </div>
 
                         {previewData.length > 50 && (
-                            <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-3 text-center">
+                            <p className="text-[12px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-3 text-center">
                                 Showing first 50 of {previewData.length} records • Export to see all
                             </p>
                         )}
@@ -733,11 +733,11 @@ export default function ReportsPage() {
                         {/* Summary KPIs */}
                         {previewSummary.length > 0 && (
                             <div className="mt-6 pt-6 border-t border-[var(--foreground)]/10">
-                                <h4 className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.3em] mb-4">Key Performance Indicators</h4>
+                                <h4 className="text-[13px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.3em] mb-4">Key Performance Indicators</h4>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                     {previewSummary.map((item, i) => (
                                         <div key={i} className="p-3 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10">
-                                            <p className="text-[8px] font-black text-[var(--foreground)]/50 uppercase tracking-widest mb-1">{item.label}</p>
+                                            <p className="text-[12px] font-black text-[var(--foreground)]/50 uppercase tracking-widest mb-1">{item.label}</p>
                                             <p className="text-sm font-black text-[var(--deep-contrast)]">{item.value}</p>
                                         </div>
                                     ))}

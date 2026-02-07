@@ -126,8 +126,8 @@ export default function CreatePartyModal({ isOpen, onClose, onSuccess, onDelete,
             >
                 <div className="flex items-center justify-between border-b border-[var(--foreground)]/10 px-5 py-4 bg-[var(--foreground)]/5">
                     <div>
-                        <h2 className="text-[12px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">Person Details</h2>
-                        <p className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Add Contact</p>
+                        <h2 className="text-[16px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">Person Details</h2>
+                        <p className="text-[13px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Add Contact</p>
                     </div>
                     <button
                         onClick={onClose}
@@ -139,34 +139,34 @@ export default function CreatePartyModal({ isOpen, onClose, onSuccess, onDelete,
 
                 <form onSubmit={handleSubmit} className="p-5 space-y-4">
                     <div>
-                        <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Full Name *</label>
+                        <label className="block text-[13px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Full Name *</label>
                         <input
                             required
                             type="text"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-black text-[var(--deep-contrast)] placeholder:text-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner"
+                            className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[15px] font-black text-[var(--deep-contrast)] placeholder:text-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner"
                             placeholder="e.g. Acme Corp"
                         />
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Phone Number</label>
+                            <label className="block text-[13px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Phone Number</label>
                             <input
                                 type="text"
                                 value={formData.phone}
                                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-black text-[var(--deep-contrast)] placeholder:text-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner"
+                                className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[15px] font-black text-[var(--deep-contrast)] placeholder:text-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner"
                                 placeholder="+123..."
                             />
                         </div>
                         <div>
-                            <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Type</label>
+                            <label className="block text-[13px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Type</label>
                             <button
                                 type="button"
                                 onClick={() => setIsTypePickerOpen(true)}
-                                className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[10px] font-black text-[var(--deep-contrast)] hover:border-[var(--primary-green)] transition-all flex items-center justify-between shadow-inner"
+                                className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[14px] font-black text-[var(--deep-contrast)] hover:border-[var(--primary-green)] transition-all flex items-center justify-between shadow-inner"
                             >
                                 <span className="truncate">{formData.type}</span>
                                 <Plus className="h-3.5 w-3.5 opacity-20" />
@@ -187,43 +187,43 @@ export default function CreatePartyModal({ isOpen, onClose, onSuccess, onDelete,
 
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Starting Bal</label>
+                            <label className="block text-[13px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Starting Bal</label>
                             <input
                                 type="number"
                                 value={formData.opening_balance}
                                 onChange={(e) => setFormData({ ...formData, opening_balance: Number(e.target.value) })}
-                                className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none shadow-inner tabular-nums"
+                                className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[15px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none shadow-inner tabular-nums"
                             />
                         </div>
                         <div>
-                            <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Email (Ops)</label>
+                            <label className="block text-[13px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Email (Ops)</label>
                             <input
                                 type="email"
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-black text-[var(--deep-contrast)] placeholder:text-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none shadow-inner"
+                                className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[15px] font-black text-[var(--deep-contrast)] placeholder:text-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none shadow-inner"
                                 placeholder="..."
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Address</label>
+                        <label className="block text-[13px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Address</label>
                         <textarea
                             value={formData.address}
                             onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                            className="w-full h-20 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 p-3 text-[11px] font-black text-[var(--deep-contrast)] placeholder:text-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none shadow-inner resize-none"
+                            className="w-full h-20 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 p-3 text-[15px] font-black text-[var(--deep-contrast)] placeholder:text-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none shadow-inner resize-none"
                             placeholder="Full Address..."
                         />
                     </div>
 
                     <div>
-                        <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Google Location (URL)</label>
+                        <label className="block text-[13px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Google Location (URL)</label>
                         <input
                             type="text"
                             value={formData.google_location}
                             onChange={(e) => setFormData({ ...formData, google_location: e.target.value })}
-                            className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-black text-[var(--deep-contrast)] placeholder:text-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none shadow-inner"
+                            className="w-full h-10 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[15px] font-black text-[var(--deep-contrast)] placeholder:text-[var(--foreground)]/20 focus:border-[var(--primary-green)] focus:outline-none shadow-inner"
                             placeholder="https://maps.google.com/..."
                         />
                     </div>
@@ -245,7 +245,7 @@ export default function CreatePartyModal({ isOpen, onClose, onSuccess, onDelete,
                             <button
                                 type="button"
                                 onClick={onClose}
-                                className="px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/40 hover:bg-[var(--foreground)]/5 transition-all"
+                                className="px-5 py-2 rounded-xl text-[14px] font-black uppercase tracking-widest text-[var(--foreground)]/40 hover:bg-[var(--foreground)]/5 transition-all"
                             >
                                 Cancel
                             </button>
@@ -254,7 +254,7 @@ export default function CreatePartyModal({ isOpen, onClose, onSuccess, onDelete,
                                 whileTap={{ scale: 0.98 }}
                                 type="submit"
                                 disabled={loading}
-                                className="flex items-center px-6 py-2 rounded-xl bg-[var(--primary-green)] text-[var(--primary-foreground)] text-[10px] font-black uppercase tracking-widest hover:bg-[var(--primary-hover)] transition-all disabled:opacity-50 shadow-lg shadow-[var(--primary-green)]/20 active:scale-95"
+                                className="flex items-center px-6 py-2 rounded-xl bg-[var(--primary-green)] text-[var(--primary-foreground)] text-[14px] font-black uppercase tracking-widest hover:bg-[var(--primary-hover)] transition-all disabled:opacity-50 shadow-lg shadow-[var(--primary-green)]/20 active:scale-95"
                             >
                                 {loading && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
                                 Save

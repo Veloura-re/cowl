@@ -46,7 +46,7 @@ export default function ProgressStepper({ currentStep, steps, onStepClick }: Pro
                         >
                             {/* Circle */}
                             <div className={clsx(
-                                "w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold transition-all border-2",
+                                "w-6 h-6 rounded-full flex items-center justify-center text-[13px] font-bold transition-all border-2",
                                 isCompleted && "bg-[var(--primary-green)] border-[var(--primary-green)] text-white",
                                 isCurrent && "bg-white border-[var(--primary-green)] text-[var(--primary-green)] shadow-lg shadow-[var(--primary-green)]/20",
                                 !isCompleted && !isCurrent && "bg-white/10 border-white/30 text-white/40"
@@ -56,7 +56,7 @@ export default function ProgressStepper({ currentStep, steps, onStepClick }: Pro
 
                             {/* Label */}
                             <span className={clsx(
-                                "text-[8px] font-bold uppercase tracking-wider whitespace-nowrap",
+                                "text-[12px] font-bold uppercase tracking-wider whitespace-nowrap",
                                 isCurrent && "text-[var(--primary-green)]",
                                 isCompleted && "text-white/80",
                                 !isCompleted && !isCurrent && "text-white/30"

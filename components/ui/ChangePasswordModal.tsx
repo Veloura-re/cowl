@@ -96,8 +96,8 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
                                     <KeyRound className="h-5 w-5" />
                                 </div>
                                 <div>
-                                    <h2 className="text-[13px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">Access Control</h2>
-                                    <p className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Crypto Cycle Update</p>
+                                    <h2 className="text-[17px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">Access Control</h2>
+                                    <p className="text-[13px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Crypto Cycle Update</p>
                                 </div>
                             </div>
                             <button
@@ -110,13 +110,13 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
 
                         <form onSubmit={handleSubmit} className="p-6 space-y-5">
                             {error && (
-                                <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-[10px] font-black uppercase tracking-widest text-center animate-shake">
+                                <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-[14px] font-black uppercase tracking-widest text-center animate-shake">
                                     {error}
                                 </div>
                             )}
 
                             {success && (
-                                <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2">
+                                <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-[14px] font-black uppercase tracking-widest flex items-center justify-center gap-2">
                                     <ShieldCheck className="h-4 w-4" />
                                     SECURED
                                 </div>
@@ -124,7 +124,7 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
 
                             <div className="space-y-4">
                                 <div>
-                                    <label className="text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1 block">
+                                    <label className="text-[13px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1 block">
                                         Active Terminal Key
                                     </label>
                                     <input
@@ -132,13 +132,13 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
                                         required
                                         value={currentPassword}
                                         onChange={(e) => setCurrentPassword(e.target.value)}
-                                        className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[13px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner placeholder:text-[var(--foreground)]/10"
+                                        className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[17px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner placeholder:text-[var(--foreground)]/10"
                                         placeholder="••••••••"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1 block">
+                                    <label className="text-[13px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1 block">
                                         Target Access Key
                                     </label>
                                     <input
@@ -146,13 +146,13 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
                                         required
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[13px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner placeholder:text-[var(--foreground)]/10"
+                                        className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[17px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner placeholder:text-[var(--foreground)]/10"
                                         placeholder="••••••••"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1 block">
+                                    <label className="text-[13px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1 block">
                                         Verify Target Key
                                     </label>
                                     <input
@@ -160,7 +160,7 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
                                         required
                                         value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}
-                                        className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[13px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner placeholder:text-[var(--foreground)]/10"
+                                        className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[17px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner placeholder:text-[var(--foreground)]/10"
                                         placeholder="••••••••"
                                     />
                                 </div>
@@ -171,7 +171,7 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
                                     type="submit"
                                     disabled={loading || success}
                                     className={clsx(
-                                        "w-full h-12 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2",
+                                        "w-full h-12 rounded-xl font-black uppercase tracking-widest text-[14px] shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2",
                                         success
                                             ? "bg-emerald-500 text-white shadow-emerald-500/20"
                                             : "bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] hover:bg-[var(--deep-contrast-hover)] shadow-[var(--deep-contrast)]/20"

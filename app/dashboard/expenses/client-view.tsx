@@ -80,7 +80,7 @@ const ExpenseCard = React.memo(({
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
             onClick={() => openEditModal(expense)}
-            className="glass-optimized rounded-[24px] border border-[var(--foreground)]/5 p-4 flex items-center justify-between group hover:border-[var(--primary-green)]/20 transition-all cursor-pointer bg-white/[0.02] will-change-transform"
+            className="glass-optimized rounded-[28px] border border-[var(--foreground)]/5 p-5 flex items-center justify-between group hover:border-[var(--primary-green)]/20 transition-all cursor-pointer bg-white/[0.02] will-change-transform"
         >
             <div className="flex items-center gap-4">
                 <div className={clsx(
@@ -93,15 +93,15 @@ const ExpenseCard = React.memo(({
                     }
                 </div>
                 <div>
-                    <h4 className="text-[11px] font-black text-[var(--deep-contrast)] uppercase tracking-tight leading-none mb-1.5">
+                    <h4 className="text-[15px] font-black text-[var(--deep-contrast)] uppercase tracking-tight leading-none mb-1.5">
                         {expense.description || expense.expense_categories?.name || 'Unlabeled Transaction'}
                     </h4>
                     <div className="flex items-center gap-2">
-                        <span className="text-[8px] font-black text-[var(--foreground)]/30 uppercase tracking-widest">
+                        <span className="text-[12px] font-black text-[var(--foreground)]/30 uppercase tracking-widest">
                             {new Date(expense.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         </span>
                         {expense.expense_categories && (
-                            <span className="px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest border border-current" style={{ color: expense.expense_categories.color, opacity: 0.7 }}>
+                            <span className="px-2 py-0.5 rounded-full text-[11px] font-black uppercase tracking-widest border border-current" style={{ color: expense.expense_categories.color, opacity: 0.7 }}>
                                 {expense.expense_categories.name}
                             </span>
                         )}
@@ -431,21 +431,21 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
 
                                     <div className="relative flex items-start justify-between mb-5">
                                         <div className="flex-1">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <div className="h-10 w-10 rounded-[16px] bg-gradient-to-br from-rose-500 to-rose-600 flex items-center justify-center shadow-lg shadow-rose-500/20">
-                                                    <ArrowDownRight size={20} className="text-white" />
+                                            <div className="flex items-center gap-3 mb-3">
+                                                <div className="h-12 w-12 rounded-[18px] bg-gradient-to-br from-rose-500 to-rose-600 flex items-center justify-center shadow-lg shadow-rose-500/20">
+                                                    <ArrowDownRight size={24} className="text-white" />
                                                 </div>
                                                 <div>
-                                                    <span className="block text-[8px] font-black uppercase tracking-[0.25em] text-rose-500/80">
+                                                    <span className="block text-[16px] font-black uppercase tracking-[0.25em] text-rose-500/80">
                                                         Resource Drain
                                                     </span>
-                                                    <span className="block text-[7px] font-bold uppercase tracking-wider text-[var(--foreground)]/30">
+                                                    <span className="block text-[14px] font-bold uppercase tracking-wider text-[var(--foreground)]/30">
                                                         {businessExpenses.length} Transactions
                                                     </span>
                                                 </div>
                                             </div>
 
-                                            <h2 className="text-3xl font-black text-[var(--deep-contrast)] tabular-nums tracking-tight">
+                                            <h2 className="text-4xl font-black text-[var(--deep-contrast)] tabular-nums tracking-tight tracking-tighter">
                                                 {formatCurrency(totalOut)}
                                             </h2>
                                         </div>
@@ -461,7 +461,7 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                             <div className="relative flex items-center justify-center gap-2">
                                                 <Plus size={14} />
-                                                <span className="text-[9px] font-black uppercase tracking-widest">Record</span>
+                                                <span className="text-[13px] font-black uppercase tracking-widest">Record</span>
                                             </div>
                                         </button>
                                         <button
@@ -470,7 +470,7 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                                         >
                                             <div className="relative flex items-center justify-center gap-2">
                                                 <Settings2 size={14} className="opacity-60" />
-                                                <span className="text-[9px] font-black uppercase tracking-widest">Types</span>
+                                                <span className="text-[13px] font-black uppercase tracking-widest">Types</span>
                                             </div>
                                         </button>
                                     </div>
@@ -487,7 +487,7 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder="Query ledger..."
-                                className="w-full h-12 pl-11 pr-4 rounded-[20px] bg-white/[0.03] border border-white/5 text-[10px] font-black uppercase tracking-widest focus:outline-none focus:border-[var(--primary-green)] focus:bg-white/[0.06] transition-all placeholder:text-[var(--foreground)]/10"
+                                className="w-full h-12 pl-11 pr-4 rounded-[20px] bg-white/[0.03] border border-white/5 text-[14px] font-black uppercase tracking-widest focus:outline-none focus:border-[var(--primary-green)] focus:bg-white/[0.06] transition-all placeholder:text-[var(--foreground)]/10"
                             />
                         </div>
                         <button
@@ -503,7 +503,7 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
 
                     <div id="expenses-list" className="space-y-3 mt-6">
                         <div className="flex items-center justify-between px-2 mb-2">
-                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40">Chronicle</h4>
+                            <h4 className="text-[14px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40">Chronicle</h4>
                             <div className="h-px flex-1 mx-4 bg-[var(--foreground)]/5" />
                         </div>
 
@@ -512,8 +512,8 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                                 <div className="h-16 w-16 rounded-[24px] bg-[var(--foreground)]/5 flex items-center justify-center mx-auto mb-4 border border-white/5">
                                     <TrendingUp className="h-8 w-8 text-[var(--foreground)]/10" />
                                 </div>
-                                <p className="text-[11px] font-black uppercase tracking-widest text-[var(--foreground)]/40">Clear Horizon</p>
-                                <p className="text-[9px] font-black text-[var(--foreground)]/20 uppercase tracking-widest mt-2">Ready for inputs</p>
+                                <p className="text-[15px] font-black uppercase tracking-widest text-[var(--foreground)]/40">Clear Horizon</p>
+                                <p className="text-[13px] font-black text-[var(--foreground)]/20 uppercase tracking-widest mt-2">Ready for inputs</p>
                             </div>
                         ) : (
                             filteredExpenses.map((expense) => (
@@ -535,13 +535,13 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                             <h2 className="text-xl font-black text-[var(--deep-contrast)] uppercase tracking-tight">
                                 Classifications
                             </h2>
-                            <p className="text-[10px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.2em] mt-0.5">
+                            <p className="text-[14px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.2em] mt-0.5">
                                 Manage ledger types
                             </p>
                         </div>
                         <button
                             onClick={() => { resetCatForm(); setIsAddingCategory(true); }}
-                            className="h-12 px-6 rounded-[20px] bg-[var(--primary-green)] text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-[var(--primary-green)]/20 hover:brightness-110 active:scale-95 transition-all flex items-center gap-2"
+                            className="h-12 px-6 rounded-[20px] bg-[var(--primary-green)] text-white text-[14px] font-black uppercase tracking-widest shadow-lg shadow-[var(--primary-green)]/20 hover:brightness-110 active:scale-95 transition-all flex items-center gap-2"
                         >
                             <Plus size={16} />
                             New Type
@@ -551,7 +551,7 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                     <div className="flex gap-2 px-1">
                         <button
                             onClick={() => setActiveTab('expenses')}
-                            className="flex-1 h-12 rounded-[20px] bg-[var(--foreground)]/5 text-[var(--foreground)] text-[10px] font-black uppercase tracking-widest hover:bg-[var(--foreground)]/10 transition-all flex items-center justify-center gap-2"
+                            className="flex-1 h-12 rounded-[20px] bg-[var(--foreground)]/5 text-[var(--foreground)] text-[14px] font-black uppercase tracking-widest hover:bg-[var(--foreground)]/10 transition-all flex items-center justify-center gap-2"
                         >
                             Back to Ledger
                         </button>
@@ -591,19 +591,19 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                                         </div>
 
                                         <div className="space-y-1.5">
-                                            <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 ml-1">Name</label>
+                                            <label className="block text-[12px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 ml-1">Name</label>
                                             <input
                                                 type="text"
                                                 value={catFormName}
                                                 onChange={(e) => setCatFormName(e.target.value)}
                                                 placeholder="e.g. Office Supplies"
-                                                className="w-full h-12 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-bold text-[var(--foreground)] placeholder:text-[var(--foreground)]/20 focus:outline-none focus:border-[var(--primary-green)]/30 transition-all"
+                                                className="w-full h-12 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[15px] font-bold text-[var(--foreground)] placeholder:text-[var(--foreground)]/20 focus:outline-none focus:border-[var(--primary-green)]/30 transition-all"
                                             />
                                         </div>
 
                                         <div className="space-y-4">
                                             <div>
-                                                <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 mb-2 ml-1">Color Palette</label>
+                                                <label className="block text-[12px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 mb-2 ml-1">Color Palette</label>
                                                 <div className="flex gap-2 flex-wrap">
                                                     {COLORS.map((color) => (
                                                         <button
@@ -620,7 +620,7 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                                             </div>
 
                                             <div>
-                                                <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 mb-2 ml-1">Iconography</label>
+                                                <label className="block text-[12px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 mb-2 ml-1">Iconography</label>
                                                 <div className="grid grid-cols-5 gap-2">
                                                     {CATEGORY_ICONS.map(({ id, icon: Icon }) => (
                                                         <button
@@ -644,7 +644,7 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                                             <button
                                                 onClick={handleSaveCategory}
                                                 disabled={categoryLoading || !catFormName.trim()}
-                                                className="w-full h-14 rounded-2xl bg-[var(--primary-green)] text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-[var(--primary-green)]/20 disabled:opacity-50 hover:brightness-110 transition-all flex items-center justify-center gap-2"
+                                                className="w-full h-14 rounded-2xl bg-[var(--primary-green)] text-white text-[14px] font-black uppercase tracking-widest shadow-lg shadow-[var(--primary-green)]/20 disabled:opacity-50 hover:brightness-110 transition-all flex items-center justify-center gap-2"
                                             >
                                                 {categoryLoading ? (
                                                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -664,8 +664,8 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                     <div className="grid grid-cols-2 gap-4 mt-6">
                         {businessCategories.length === 0 && !isAddingCategory ? (
                             <div className="col-span-2 glass rounded-[32px] border border-[var(--foreground)]/10 p-16 text-center bg-white/5">
-                                <p className="text-[11px] font-black uppercase tracking-widest text-[var(--foreground)]/40">No Classifications</p>
-                                <p className="text-[9px] font-black text-[var(--foreground)]/20 uppercase tracking-widest mt-2">Tap "Categories" above to view list</p>
+                                <p className="text-[15px] font-black uppercase tracking-widest text-[var(--foreground)]/40">No Classifications</p>
+                                <p className="text-[13px] font-black text-[var(--foreground)]/20 uppercase tracking-widest mt-2">Tap "Categories" above to view list</p>
                             </div>
                         ) : (
                             businessCategories.map((category) => {
@@ -698,8 +698,8 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                                             </button>
                                         </div>
                                         <div className="relative z-10">
-                                            <h4 className="text-[12px] font-black text-[var(--deep-contrast)] uppercase tracking-tight truncate">{category.name}</h4>
-                                            <p className="text-[9px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.2em] mt-1.5 flex items-center gap-2">
+                                            <h4 className="text-[16px] font-black text-[var(--deep-contrast)] uppercase tracking-tight truncate">{category.name}</h4>
+                                            <p className="text-[13px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.2em] mt-1.5 flex items-center gap-2">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
                                                 {expenses.filter(e => e.category_id === category.id).length} Entries
                                             </p>
@@ -745,7 +745,7 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                                         <h2 className="text-xl font-black uppercase tracking-tight text-[var(--deep-contrast)]">
                                             {editTarget ? 'Edit' : 'New'} <span className={addType === 'IN' ? "text-emerald-500" : "text-rose-500"}>{addType === 'IN' ? 'Income' : 'Expense'}</span>
                                         </h2>
-                                        <p className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.2em] mt-1">
+                                        <p className="text-[13px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.2em] mt-1">
                                             {editTarget ? 'Update Record' : 'Create Entry'}
                                         </p>
                                     </div>
@@ -760,7 +760,7 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
 
                             <div className="relative p-6 space-y-5">
                                 <div className="relative group">
-                                    <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 mb-2 ml-1">Amount</label>
+                                    <label className="block text-[12px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 mb-2 ml-1">Amount</label>
                                     <div className="relative">
                                         <input
                                             type="number"
@@ -775,24 +775,24 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
 
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="space-y-1.5">
-                                        <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 ml-1">Date</label>
+                                        <label className="block text-[12px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 ml-1">Date</label>
                                         <button
                                             onClick={() => setIsDatePickerOpen(true)}
                                             className="w-full h-12 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 flex items-center gap-2 hover:bg-[var(--foreground)]/10 transition-all group"
                                         >
                                             <Calendar className="h-4 w-4 text-[var(--foreground)]/40 group-hover:text-[var(--foreground)]/60" />
-                                            <span className="text-[10px] font-bold text-[var(--foreground)]/80">
+                                            <span className="text-[14px] font-bold text-[var(--foreground)]/80">
                                                 {new Date(formDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                             </span>
                                         </button>
                                     </div>
                                     <div className="space-y-1.5">
-                                        <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 ml-1">Category</label>
+                                        <label className="block text-[12px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 ml-1">Category</label>
                                         <button
                                             onClick={() => setIsCategoryPickerOpen(true)}
                                             className="w-full h-12 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 flex items-center justify-between hover:bg-[var(--foreground)]/10 transition-all group"
                                         >
-                                            <span className="text-[10px] font-bold text-[var(--foreground)]/80 truncate">
+                                            <span className="text-[14px] font-bold text-[var(--foreground)]/80 truncate">
                                                 {businessCategories.find(c => c.id === formCategory)?.name || 'Select...'}
                                             </span>
                                             <div className="h-5 w-5 rounded-full bg-[var(--foreground)]/10 flex items-center justify-center">
@@ -803,13 +803,13 @@ export default function ExpensesClientView({ initialCategories, initialExpenses 
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 ml-1">Description</label>
+                                    <label className="block text-[12px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 ml-1">Description</label>
                                     <input
                                         type="text"
                                         value={formDescription}
                                         onChange={(e) => setFormDescription(e.target.value)}
                                         placeholder="What was this for?"
-                                        className="w-full h-12 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-bold text-[var(--foreground)] placeholder:text-[var(--foreground)]/20 focus:outline-none focus:border-[var(--primary-green)]/30 transition-all"
+                                        className="w-full h-12 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[15px] font-bold text-[var(--foreground)] placeholder:text-[var(--foreground)]/20 focus:outline-none focus:border-[var(--primary-green)]/30 transition-all"
                                     />
                                 </div>
 

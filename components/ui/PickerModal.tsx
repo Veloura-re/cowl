@@ -67,8 +67,8 @@ export default function PickerModal({
                 {/* Header with subtle gradient */}
                 <div className="flex items-center justify-between border-b border-[var(--foreground)]/10 px-6 py-4 bg-gradient-to-b from-[var(--foreground)]/5 to-transparent">
                     <div>
-                        <h2 className="text-[13px] font-black text-[var(--deep-contrast)] uppercase tracking-tight leading-none">{title}</h2>
-                        <p className="text-[8px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.2em] mt-1">Registry Selector</p>
+                        <h2 className="text-[17px] font-black text-[var(--deep-contrast)] uppercase tracking-tight leading-none">{title}</h2>
+                        <p className="text-[12px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.2em] mt-1">Registry Selector</p>
                     </div>
                     <button
                         onClick={onClose}
@@ -88,7 +88,7 @@ export default function PickerModal({
                                 placeholder="Search the index..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full h-11 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 pl-11 pr-4 text-[11px] font-black focus:outline-none focus:border-[var(--primary-green)] focus:ring-4 focus:ring-[var(--primary-green)]/10 transition-all shadow-inner text-[var(--deep-contrast)] placeholder:text-[var(--foreground)]/20 uppercase tracking-wider"
+                                className="w-full h-11 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 pl-11 pr-4 text-[15px] font-black focus:outline-none focus:border-[var(--primary-green)] focus:ring-4 focus:ring-[var(--primary-green)]/10 transition-all shadow-inner text-[var(--deep-contrast)] placeholder:text-[var(--foreground)]/20 uppercase tracking-wider"
                             />
                         </div>
                     )}
@@ -118,7 +118,7 @@ export default function PickerModal({
                                         )}
                                     >
                                         <div className="relative z-10">
-                                            <p className="text-[11px] font-black uppercase tracking-tight leading-tight">{opt.label}</p>
+                                            <p className="text-[15px] font-black uppercase tracking-tight leading-tight">{opt.label}</p>
                                             {opt.subLabel && (
                                                 <p className={clsx(
                                                     "text-[7.5px] font-black uppercase tracking-widest leading-none mt-1.5 transition-all tabular-nums",
@@ -151,7 +151,7 @@ export default function PickerModal({
                                     className="py-12 text-center"
                                 >
                                     <Search className="h-8 w-8 mx-auto mb-3 opacity-10" />
-                                    <p className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--foreground)]/20">Zero Matches found</p>
+                                    <p className="text-[13px] font-black uppercase tracking-[0.3em] text-[var(--foreground)]/20">Zero Matches found</p>
                                 </motion.div>
                             )}
                         </AnimatePresence>
@@ -166,7 +166,7 @@ export default function PickerModal({
                                     e.stopPropagation()
                                     action.onClick()
                                 }}
-                                className="w-full h-12 flex items-center justify-center gap-3 rounded-[20px] bg-[var(--primary-green)] text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-[var(--primary-green)]/20 hover:bg-[var(--primary-hover)] transition-all active:scale-95 border border-white/10 group/action"
+                                className="w-full h-12 flex items-center justify-center gap-3 rounded-[20px] bg-[var(--primary-green)] text-white text-[14px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-[var(--primary-green)]/20 hover:bg-[var(--primary-hover)] transition-all active:scale-95 border border-white/10 group/action"
                             >
                                 <div className="p-1 rounded-md bg-white/10 group-hover/action:scale-110 transition-transform">
                                     {action.icon}

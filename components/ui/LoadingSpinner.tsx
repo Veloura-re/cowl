@@ -23,7 +23,7 @@ export default function LoadingSpinner({ className, size = 'md', label }: Loadin
                 <div className={clsx("absolute inset-0 animate-ping opacity-20 bg-[var(--primary-green)] rounded-full", sizeClasses[size])} />
             </div>
             {label && (
-                <p className="mt-4 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 animate-pulse">
+                <p className="mt-4 text-[14px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/40 animate-pulse">
                     {label}
                 </p>
             )}

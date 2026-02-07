@@ -58,8 +58,8 @@ export default function FilterSortModal({
                 {/* Header */}
                 <div className="flex items-center justify-between border-b border-white/5 px-6 py-4 bg-white/5">
                     <div>
-                        <h2 className="text-[13px] font-black text-white uppercase tracking-tight leading-none">{title}</h2>
-                        <p className="text-[8px] font-black text-white/30 uppercase tracking-[0.2em] mt-1">Refine Display</p>
+                        <h2 className="text-[17px] font-black text-white uppercase tracking-tight leading-none">{title}</h2>
+                        <p className="text-[12px] font-black text-white/30 uppercase tracking-[0.2em] mt-1">Refine Display</p>
                     </div>
                     <button
                         onClick={onClose}
@@ -75,7 +75,7 @@ export default function FilterSortModal({
                         <button
                             onClick={() => setActiveTab('sort')}
                             className={clsx(
-                                "flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                "flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-[14px] font-black uppercase tracking-widest transition-all",
                                 activeTab === 'sort' ? "bg-white text-black shadow-lg" : "text-white/40 hover:text-white"
                             )}
                         >
@@ -85,7 +85,7 @@ export default function FilterSortModal({
                         <button
                             onClick={() => setActiveTab('filter')}
                             className={clsx(
-                                "flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                "flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-[14px] font-black uppercase tracking-widest transition-all",
                                 activeTab === 'filter' ? "bg-white text-black shadow-lg" : "text-white/40 hover:text-white"
                             )}
                         >
@@ -103,7 +103,7 @@ export default function FilterSortModal({
                                 transition={{ duration: 0.15 }}
                                 className="space-y-1.5"
                             >
-                                <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.3em] ml-1 mb-3">Sort Direction & Logic</p>
+                                <p className="text-[12px] font-black text-white/20 uppercase tracking-[0.3em] ml-1 mb-3">Sort Direction & Logic</p>
                                 {sortOptions.map((opt) => (
                                     <button
                                         key={opt.id}
@@ -122,7 +122,7 @@ export default function FilterSortModal({
                                             )}>
                                                 {opt.id.includes('date') ? <Calendar className="h-4 w-4" /> : <DollarSign className="h-4 w-4" />}
                                             </div>
-                                            <span className="text-[11px] font-black uppercase tracking-tight">{opt.label}</span>
+                                            <span className="text-[15px] font-black uppercase tracking-tight">{opt.label}</span>
                                         </div>
                                         {selectedSort === opt.id && <Check className="h-4 w-4" strokeWidth={3} />}
                                     </button>
@@ -134,7 +134,7 @@ export default function FilterSortModal({
                                 transition={{ duration: 0.15 }}
                                 className="space-y-1.5"
                             >
-                                <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.3em] ml-1 mb-3">Group by Status</p>
+                                <p className="text-[12px] font-black text-white/20 uppercase tracking-[0.3em] ml-1 mb-3">Group by Status</p>
                                 {filterOptions.map((opt) => (
                                     <button
                                         key={opt.id}
@@ -153,7 +153,7 @@ export default function FilterSortModal({
                                             )}>
                                                 <Tag className="h-4 w-4" />
                                             </div>
-                                            <span className="text-[11px] font-black uppercase tracking-tight">{opt.label}</span>
+                                            <span className="text-[15px] font-black uppercase tracking-tight">{opt.label}</span>
                                         </div>
                                         {selectedFilter === opt.id && <Check className="h-4 w-4" strokeWidth={3} />}
                                     </button>
@@ -166,7 +166,7 @@ export default function FilterSortModal({
                 <div className="p-4 bg-white/5 flex gap-2">
                     <button
                         onClick={onClose}
-                        className="flex-1 py-3 rounded-2xl text-[10px] font-black uppercase tracking-wider text-white/40 hover:bg-white/10 hover:text-white transition-all"
+                        className="flex-1 py-3 rounded-2xl text-[14px] font-black uppercase tracking-wider text-white/40 hover:bg-white/10 hover:text-white transition-all"
                     >
                         Close
                     </button>

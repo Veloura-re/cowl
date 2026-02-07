@@ -113,7 +113,7 @@ export const ConfirmationModal = ({
 
                                     <button
                                         onClick={onClose}
-                                        className="w-full py-4 rounded-[24px] bg-[var(--foreground)]/5 hover:bg-[var(--foreground)]/10 text-[var(--foreground)]/40 hover:text-[var(--deep-contrast)] text-[10px] font-black uppercase tracking-widest transition-all active:scale-[0.98]"
+                                        className="w-full py-4 rounded-[24px] bg-[var(--foreground)]/5 hover:bg-[var(--foreground)]/10 text-[var(--foreground)]/40 hover:text-[var(--deep-contrast)] text-[14px] font-black uppercase tracking-widest transition-all active:scale-[0.98]"
                                     >
                                         {cancelLabel}
                                     </button>

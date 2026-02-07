@@ -183,7 +183,7 @@ export default function NotificationCenter() {
                                 <div className="px-6 py-5 border-b border-[var(--foreground)]/5 flex items-center justify-between">
                                     <div>
                                         <h3 className="text-sm font-bold text-[var(--deep-contrast)]">Alert Center</h3>
-                                        <p className="text-[10px] font-black text-[var(--foreground)]/40 uppercase tracking-widest leading-none mt-1">Activities & Updates</p>
+                                        <p className="text-[14px] font-black text-[var(--foreground)]/40 uppercase tracking-widest leading-none mt-1">Activities & Updates</p>
                                     </div>
                                     <div className="flex items-center gap-1.5 pr-2">
                                         {unreadCount > 0 && (
@@ -193,7 +193,7 @@ export default function NotificationCenter() {
                                                 title="Mark all as read"
                                             >
                                                 <CheckCheck className="h-4 w-4" />
-                                                <span className="text-[10px] font-black uppercase tracking-wider hidden sm:inline">Flush All</span>
+                                                <span className="text-[14px] font-black uppercase tracking-wider hidden sm:inline">Flush All</span>
                                             </button>
                                         )}
                                         <button
@@ -210,7 +210,7 @@ export default function NotificationCenter() {
                                     {loading ? (
                                         <div className="p-12 flex flex-col items-center justify-center space-y-3">
                                             <Loader2 className="h-6 w-6 animate-spin text-emerald-500" />
-                                            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/20">Syncing...</span>
+                                            <span className="text-[14px] font-bold uppercase tracking-wider text-[var(--foreground)]/20">Syncing...</span>
                                         </div>
                                     ) : notifications.length > 0 ? (
                                         <div className="divide-y divide-slate-50">
@@ -232,16 +232,16 @@ export default function NotificationCenter() {
                                                         </div>
                                                         <div className="min-w-0 flex-1 pr-4">
                                                             <p className={clsx(
-                                                                "text-[12px] font-bold leading-tight",
+                                                                "text-[16px] font-bold leading-tight",
                                                                 !notif.is_read ? "text-[var(--deep-contrast)]" : "text-[var(--foreground)]/60"
                                                             )}>
                                                                 {notif.title}
                                                             </p>
-                                                            <p className="text-[11px] text-[var(--foreground)]/40 mt-1 line-clamp-2 leading-relaxed font-medium">
+                                                            <p className="text-[15px] text-[var(--foreground)]/40 mt-1 line-clamp-2 leading-relaxed font-medium">
                                                                 {notif.message}
                                                             </p>
                                                             <div className="flex items-center gap-2 mt-2">
-                                                                <p className="text-[9px] font-bold text-[var(--foreground)]/20 uppercase tracking-tight">
+                                                                <p className="text-[13px] font-bold text-[var(--foreground)]/20 uppercase tracking-tight">
                                                                     {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true })}
                                                                 </p>
                                                                 {!notif.is_read && (
@@ -258,14 +258,14 @@ export default function NotificationCenter() {
                                             <div className="h-16 w-16 rounded-full bg-[var(--foreground)]/5 flex items-center justify-center text-[var(--foreground)]/20">
                                                 <Bell className="h-8 w-8" />
                                             </div>
-                                            <p className="text-[11px] font-bold uppercase tracking-widest text-[var(--foreground)]/20">No Alerts Yet</p>
+                                            <p className="text-[15px] font-bold uppercase tracking-widest text-[var(--foreground)]/20">No Alerts Yet</p>
                                         </div>
                                     )}
                                 </div>
 
                                 {notifications.length > 0 && (
                                     <div className="p-4 border-t border-[var(--foreground)]/5 bg-[var(--background)]">
-                                        <button className="w-full py-3 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-[var(--foreground)]/40 hover:bg-[var(--foreground)]/5 hover:text-[var(--deep-contrast)] transition-all">
+                                        <button className="w-full py-3 rounded-2xl text-[14px] font-bold uppercase tracking-widest text-[var(--foreground)]/40 hover:bg-[var(--foreground)]/5 hover:text-[var(--deep-contrast)] transition-all">
                                             View Detailed History
                                         </button>
                                     </div>

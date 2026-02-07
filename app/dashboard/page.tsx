@@ -207,13 +207,13 @@ export default function DashboardPage() {
             <div className="flex items-end justify-between gap-4">
                 <div>
                     <h1 className="text-lg font-black text-[var(--deep-contrast)] dark:text-white tracking-tight leading-none mb-1">DASHBOARD</h1>
-                    <p className="text-[10px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest">Live Operations Center</p>
+                    <p className="text-[14px] font-bold text-[var(--foreground)]/40 uppercase tracking-widest">Live Operations Center</p>
                 </div>
                 <div id="quick-actions" className="flex gap-2">
-                    <Link href="/dashboard/sales/new" className="h-8 px-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white flex items-center gap-2 text-[10px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-lg shadow-emerald-500/20">
+                    <Link href="/dashboard/sales/new" className="h-8 px-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white flex items-center gap-2 text-[14px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-lg shadow-emerald-500/20">
                         <Plus className="h-3 w-3" /> Sale
                     </Link>
-                    <Link href="/dashboard/purchases/new" className="h-8 px-3 rounded-lg bg-blue-500 hover:bg-blue-600 text-white flex items-center gap-2 text-[10px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-lg shadow-blue-500/20">
+                    <Link href="/dashboard/purchases/new" className="h-8 px-3 rounded-lg bg-blue-500 hover:bg-blue-600 text-white flex items-center gap-2 text-[14px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-lg shadow-blue-500/20">
                         <Plus className="h-3 w-3" /> Purchase
                     </Link>
                 </div>
@@ -237,22 +237,22 @@ export default function DashboardPage() {
                 <div id="money-status" className="glass p-3 rounded-xl border border-[var(--foreground)]/5 dark:border-white/5 space-y-3">
                     <div className="flex items-center gap-2 border-b border-[var(--foreground)]/5 pb-2">
                         <Wallet className="h-3.5 w-3.5 text-[var(--foreground)]/40" />
-                        <h3 className="text-[10px] font-black text-[var(--foreground)]/70 uppercase tracking-widest">Money Status</h3>
+                        <h3 className="text-[14px] font-black text-[var(--foreground)]/70 uppercase tracking-widest">Money Status</h3>
                     </div>
                     <div className="grid grid-cols-3 gap-2">
                         <div className="bg-[var(--foreground)]/5 rounded-lg p-2 text-center relative overflow-hidden group hover:bg-[var(--foreground)]/10 transition-colors">
-                            <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mb-1">Cash</p>
-                            <p className="text-[10px] font-black text-[var(--deep-contrast)] truncate">{formatCurrency(stats.cashBalance)}</p>
+                            <p className="text-[12px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mb-1">Cash</p>
+                            <p className="text-[14px] font-black text-[var(--deep-contrast)] truncate">{formatCurrency(stats.cashBalance)}</p>
                             <div className="absolute inset-x-0 bottom-0 h-0.5 bg-emerald-500 opacity-50"></div>
                         </div>
                         <div className="bg-[var(--foreground)]/5 rounded-lg p-2 text-center relative overflow-hidden group hover:bg-[var(--foreground)]/10 transition-colors">
-                            <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mb-1">Bank</p>
-                            <p className="text-[10px] font-black text-[var(--deep-contrast)] truncate">{formatCurrency(stats.bankBalance)}</p>
+                            <p className="text-[12px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mb-1">Bank</p>
+                            <p className="text-[14px] font-black text-[var(--deep-contrast)] truncate">{formatCurrency(stats.bankBalance)}</p>
                             <div className="absolute inset-x-0 bottom-0 h-0.5 bg-blue-500 opacity-50"></div>
                         </div>
                         <div className="bg-[var(--foreground)]/5 rounded-lg p-2 text-center relative overflow-hidden group hover:bg-[var(--foreground)]/10 transition-colors">
-                            <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mb-1">Online</p>
-                            <p className="text-[10px] font-black text-[var(--deep-contrast)] truncate">{formatCurrency(stats.onlineBalance)}</p>
+                            <p className="text-[12px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mb-1">Online</p>
+                            <p className="text-[14px] font-black text-[var(--deep-contrast)] truncate">{formatCurrency(stats.onlineBalance)}</p>
                             <div className="absolute inset-x-0 bottom-0 h-0.5 bg-purple-500 opacity-50"></div>
                         </div>
                     </div>
@@ -262,20 +262,20 @@ export default function DashboardPage() {
                 <div className="glass p-3 rounded-xl border border-[var(--foreground)]/5 dark:border-white/5 space-y-3">
                     <div className="flex items-center gap-2 border-b border-[var(--foreground)]/5 pb-2">
                         <Users className="h-3.5 w-3.5 text-[var(--foreground)]/40" />
-                        <h3 className="text-[10px] font-black text-[var(--foreground)]/70 uppercase tracking-widest">People Balances</h3>
+                        <h3 className="text-[14px] font-black text-[var(--foreground)]/70 uppercase tracking-widest">People Balances</h3>
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                         <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-2 flex items-center justify-between group hover:bg-emerald-500/10 transition-colors">
                             <div>
-                                <p className="text-[8px] font-bold text-emerald-600/60 uppercase tracking-wider">Get from others</p>
-                                <p className="text-[11px] font-black text-emerald-600 truncate">{formatCurrency(stats.totalReceivables)}</p>
+                                <p className="text-[12px] font-bold text-emerald-600/60 uppercase tracking-wider">Get from others</p>
+                                <p className="text-[15px] font-black text-emerald-600 truncate">{formatCurrency(stats.totalReceivables)}</p>
                             </div>
                             <ArrowDownRight className="h-4 w-4 text-emerald-500/40 group-hover:text-emerald-500 transition-colors" />
                         </div>
                         <div className="bg-rose-500/5 border border-rose-500/10 rounded-lg p-2 flex items-center justify-between group hover:bg-rose-500/10 transition-colors">
                             <div>
-                                <p className="text-[8px] font-bold text-rose-600/60 uppercase tracking-wider">Give to others</p>
-                                <p className="text-[11px] font-black text-rose-600 truncate">{formatCurrency(stats.totalPayables)}</p>
+                                <p className="text-[12px] font-bold text-rose-600/60 uppercase tracking-wider">Give to others</p>
+                                <p className="text-[15px] font-black text-rose-600 truncate">{formatCurrency(stats.totalPayables)}</p>
                             </div>
                             <ArrowUpRight className="h-4 w-4 text-rose-500/40 group-hover:text-rose-500 transition-colors" />
                         </div>
@@ -289,13 +289,13 @@ export default function DashboardPage() {
                     <div className="h-12 border-b border-[var(--foreground)]/5 px-4 flex items-center justify-between bg-[var(--foreground)]/[0.02]">
                         <div className="flex items-center gap-2">
                             <Activity className="h-3.5 w-3.5 text-[var(--foreground)]/40" />
-                            <h3 className="text-[10px] font-black text-[var(--foreground)]/70 uppercase tracking-widest">Recent Activity</h3>
+                            <h3 className="text-[14px] font-black text-[var(--foreground)]/70 uppercase tracking-widest">Recent Activity</h3>
                         </div>
                     </div>
                     <div className="divide-y divide-[var(--foreground)]/5">
                         {stats.recentActivity.length === 0 ? (
                             <div className="p-8 text-center opacity-50">
-                                <p className="text-[9px] font-bold text-[var(--foreground)]/30 uppercase tracking-widest">No recent activity</p>
+                                <p className="text-[13px] font-bold text-[var(--foreground)]/30 uppercase tracking-widest">No recent activity</p>
                             </div>
                         ) : (
                             stats.recentActivity.map((activity) => (
@@ -317,12 +317,12 @@ export default function DashboardPage() {
                             <AlertCircle className="h-24 w-24 text-rose-500" />
                         </div>
                         <div className="relative z-10">
-                            <h3 className="text-[10px] font-black text-rose-500/60 uppercase tracking-widest mb-2">Stock Alert</h3>
+                            <h3 className="text-[14px] font-black text-rose-500/60 uppercase tracking-widest mb-2">Stock Alert</h3>
                             <div className="flex items-baseline gap-2">
                                 <span className="text-3xl font-black text-rose-500">{stats.lowStockCount}</span>
-                                <span className="text-[10px] font-bold text-rose-500/40 uppercase tracking-wider">Low Stock</span>
+                                <span className="text-[14px] font-bold text-rose-500/40 uppercase tracking-wider">Low Stock</span>
                             </div>
-                            <Link href="/dashboard/inventory" className="mt-3 inline-flex items-center text-[9px] font-bold text-rose-500 hover:text-rose-600 uppercase tracking-wider gap-1">
+                            <Link href="/dashboard/inventory" className="mt-3 inline-flex items-center text-[13px] font-bold text-rose-500 hover:text-rose-600 uppercase tracking-wider gap-1">
                                 Check Stock <ArrowRight className="h-3 w-3" />
                             </Link>
                         </div>
@@ -330,18 +330,18 @@ export default function DashboardPage() {
 
                     <div className="glass rounded-2xl border border-[var(--foreground)]/5 dark:border-white/5 overflow-hidden flex-1">
                         <div className="h-10 border-b border-[var(--foreground)]/5 px-4 flex items-center justify-between bg-[var(--foreground)]/[0.02]">
-                            <h3 className="text-[9px] font-black text-[var(--foreground)]/60 uppercase tracking-widest">Top Movers</h3>
+                            <h3 className="text-[13px] font-black text-[var(--foreground)]/60 uppercase tracking-widest">Top Movers</h3>
                         </div>
                         <div className="p-2 space-y-1">
                             {stats.topItems.map((item, i) => (
                                 <div key={item.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-[var(--foreground)]/5 transition-colors">
                                     <div className="flex items-center gap-2 min-w-0">
-                                        <div className="h-5 w-5 rounded bg-[var(--foreground)]/5 flex items-center justify-center text-[9px] font-bold text-[var(--foreground)]/40">
+                                        <div className="h-5 w-5 rounded bg-[var(--foreground)]/5 flex items-center justify-center text-[13px] font-bold text-[var(--foreground)]/40">
                                             {i + 1}
                                         </div>
-                                        <span className="text-[10px] font-bold text-[var(--deep-contrast)] truncate">{item.name}</span>
+                                        <span className="text-[14px] font-bold text-[var(--deep-contrast)] truncate">{item.name}</span>
                                     </div>
-                                    <span className="text-[9px] font-bold text-[var(--primary-green)] bg-[var(--primary-green)]/10 px-1.5 py-0.5 rounded">
+                                    <span className="text-[13px] font-bold text-[var(--primary-green)] bg-[var(--primary-green)]/10 px-1.5 py-0.5 rounded">
                                         {item.stock_quantity}
                                     </span>
                                 </div>
@@ -364,8 +364,8 @@ export default function DashboardPage() {
                             <item.icon className="h-4 w-4" />
                         </div>
                         <div>
-                            <h4 className={`text-[10px] font-black text-${item.color}-900 dark:text-${item.color}-100 uppercase tracking-wider`}>{item.label}</h4>
-                            <p className={`text-[9px] font-medium text-${item.color}-900/40 dark:text-${item.color}-100/40`}>{item.start}</p>
+                            <h4 className={`text-[14px] font-black text-${item.color}-900 dark:text-${item.color}-100 uppercase tracking-wider`}>{item.label}</h4>
+                            <p className={`text-[13px] font-medium text-${item.color}-900/40 dark:text-${item.color}-100/40`}>{item.start}</p>
                         </div>
                     </Link>
                 ))}
@@ -382,7 +382,7 @@ const MetricCard = memo(({ item, index, formatCurrency }: any) => (
         className="glass p-3 rounded-xl border border-[var(--foreground)]/5 dark:border-white/5 flex items-center justify-between group hover:border-[var(--foreground)]/10 transition-colors"
     >
         <div>
-            <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mb-0.5">{item.label}</p>
+            <p className="text-[13px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mb-0.5">{item.label}</p>
             <h3 className="text-sm font-black text-[var(--deep-contrast)] tracking-tight">{formatCurrency(item.val)}</h3>
         </div>
         <div className={clsx("h-8 w-8 rounded-lg flex items-center justify-center transition-colors", item.bg, item.color)}>
@@ -399,7 +399,7 @@ const ActivityItem = memo(({ activity, formatCurrency, onClick }: any) => (
     >
         <div className="flex items-center gap-3">
             <div className={clsx(
-                "h-8 w-8 rounded-lg flex items-center justify-center text-[10px] font-black shrink-0",
+                "h-8 w-8 rounded-lg flex items-center justify-center text-[14px] font-black shrink-0",
                 activity.category === 'INVOICE'
                     ? (activity.type === 'SALE' ? "bg-emerald-500/10 text-emerald-600" : "bg-blue-500/10 text-blue-600")
                     : (activity.type === 'RECEIPT' ? "bg-teal-500/10 text-teal-600" : "bg-rose-500/10 text-rose-600")
@@ -412,11 +412,11 @@ const ActivityItem = memo(({ activity, formatCurrency, onClick }: any) => (
 
             <div>
                 <div className="flex items-center gap-1.5 mb-1">
-                    <p className="text-[11px] font-bold text-[var(--deep-contrast)] leading-none">
+                    <p className="text-[15px] font-bold text-[var(--deep-contrast)] leading-none">
                         {activity.party_name}
                     </p>
                     <span className={clsx(
-                        "text-[6px] px-1 py-0.5 rounded-[3px] font-black uppercase tracking-widest border",
+                        "text-[10px] px-1 py-0.5 rounded-[3px] font-black uppercase tracking-widest border",
                         activity.category === 'INVOICE'
                             ? "border-[var(--foreground)]/10 text-[var(--foreground)]/50"
                             : "border-purple-500/20 text-purple-600 bg-purple-500/5"
@@ -425,7 +425,7 @@ const ActivityItem = memo(({ activity, formatCurrency, onClick }: any) => (
                     </span>
                 </div>
 
-                <p className="text-[9px] font-medium text-[var(--foreground)]/40 flex items-center gap-1.5">
+                <p className="text-[13px] font-medium text-[var(--foreground)]/40 flex items-center gap-1.5">
                     <span>{format(new Date(activity.date), 'h:mm a')}</span>
                     <span className="w-0.5 h-0.5 rounded-full bg-[var(--foreground)]/20" />
                     <span>{activity.number ? `#${activity.number}` : 'Transaction'}</span>
@@ -435,20 +435,20 @@ const ActivityItem = memo(({ activity, formatCurrency, onClick }: any) => (
 
         <div className="text-right">
             <p className={clsx(
-                "text-[11px] font-black mb-0.5",
+                "text-[15px] font-black mb-0.5",
                 (activity.type === 'SALE' || activity.type === 'RECEIPT') ? "text-emerald-600" : "text-[var(--deep-contrast)]"
             )}>
                 {(activity.type === 'SALE' || activity.type === 'RECEIPT') ? '+' : '-'} {formatCurrency(activity.amount)}
             </p>
             {activity.category === 'INVOICE' ? (
                 <span className={clsx(
-                    "inline-flex px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider",
+                    "inline-flex px-1.5 py-0.5 rounded text-[12px] font-bold uppercase tracking-wider",
                     activity.status === 'PAID' ? "bg-emerald-500/10 text-emerald-600" : "bg-amber-500/10 text-amber-600"
                 )}>
                     {activity.status}
                 </span>
             ) : (
-                <span className="inline-flex items-center gap-0.5 text-[8px] font-bold uppercase tracking-wider text-teal-600/60">
+                <span className="inline-flex items-center gap-0.5 text-[12px] font-bold uppercase tracking-wider text-teal-600/60">
                     <BadgeCheck className="h-2.5 w-2.5" /> Done
                 </span>
             )}

@@ -205,14 +205,14 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                     </Link>
                     <div>
                         <h1 className="text-sm font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)] uppercase tracking-tight">New Sale</h1>
-                        <p className="text-[9px] font-bold text-[var(--foreground)]/40 dark:text-neutral-500 uppercase tracking-wider leading-none mt-0.5">Create Invoice</p>
+                        <p className="text-[13px] font-bold text-[var(--foreground)]/40 dark:text-neutral-500 uppercase tracking-wider leading-none mt-0.5">Create Invoice</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
                     <button
                         onClick={(e) => handleSubmit(e, true)}
                         disabled={loading}
-                        className="flex items-center justify-center rounded-xl bg-white/50 dark:bg-white/10 border border-gray-200 dark:border-white/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--deep-contrast)] hover:bg-white dark:hover:bg-white/20 transition-all disabled:opacity-50 shadow-sm active:scale-95"
+                        className="flex items-center justify-center rounded-xl bg-white/50 dark:bg-white/10 border border-gray-200 dark:border-white/10 px-4 py-1.5 text-[14px] font-bold uppercase tracking-wider text-[var(--deep-contrast)] hover:bg-white dark:hover:bg-white/20 transition-all disabled:opacity-50 shadow-sm active:scale-95"
                     >
                         <Printer className="mr-1.5 h-3 w-3" />
                         Save & Print
@@ -220,7 +220,7 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                     <button
                         onClick={(e) => handleSubmit(e as any)}
                         disabled={loading}
-                        className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--primary-foreground)] hover:bg-[var(--primary-green)] transition-all disabled:opacity-50 shadow-lg active:scale-95"
+                        className="flex items-center justify-center rounded-xl bg-[var(--deep-contrast)] px-4 py-1.5 text-[14px] font-bold uppercase tracking-wider text-[var(--primary-foreground)] hover:bg-[var(--primary-green)] transition-all disabled:opacity-50 shadow-lg active:scale-95"
                     >
                         <Save className="mr-1.5 h-3 w-3" />
                         Save Entry
@@ -233,15 +233,15 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                 <div className="md:col-span-1 space-y-3">
                     <div className="glass rounded-[24px] border border-gray-200 dark:border-white/10 overflow-hidden">
                         <div className="px-4 py-2 border-b border-white/10 dark:border-white/5 bg-white/40 dark:bg-white/5">
-                            <h3 className="text-[9px] font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)] uppercase tracking-wider">Information</h3>
+                            <h3 className="text-[13px] font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)] uppercase tracking-wider">Information</h3>
                         </div>
                         <div className="p-4 space-y-3">
                             <div>
-                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Person</label>
+                                <label className="block text-[12px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Person</label>
                                 <button
                                     type="button"
                                     onClick={() => setIsPartyPickerOpen(true)}
-                                    className="w-full h-8 rounded-xl bg-white/50 dark:bg-white/5 border border-white/20 dark:border-white/10 px-3 text-[10px] font-bold text-[var(--deep-contrast)] hover:border-[var(--primary-green)] transition-all shadow-inner text-left flex items-center justify-between"
+                                    className="w-full h-8 rounded-xl bg-white/50 dark:bg-white/5 border border-white/20 dark:border-white/10 px-3 text-[14px] font-bold text-[var(--deep-contrast)] hover:border-[var(--primary-green)] transition-all shadow-inner text-left flex items-center justify-between"
                                 >
                                     <span className="truncate">{parties.find(p => p.id === partyId)?.name || 'Choose Person'}</span>
                                     <Plus className="h-3 w-3 opacity-20" />
@@ -256,29 +256,29 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                                 />
                             </div>
                             <div>
-                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Entry Number</label>
+                                <label className="block text-[12px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Entry Number</label>
                                 <input
                                     type="text"
                                     value={invoiceNumber}
                                     onChange={(e) => setInvoiceNumber(e.target.value)}
-                                    className="w-full h-8 rounded-xl bg-white/50 dark:bg-white/5 border border-white/20 dark:border-white/10 px-3 text-[10px] font-bold text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none shadow-inner"
+                                    className="w-full h-8 rounded-xl bg-white/50 dark:bg-white/5 border border-white/20 dark:border-white/10 px-3 text-[14px] font-bold text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none shadow-inner"
                                 />
                             </div>
                             <div>
-                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Date</label>
+                                <label className="block text-[12px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Date</label>
                                 <input
                                     type="date"
                                     value={date}
                                     onChange={(e) => setDate(e.target.value)}
-                                    className="w-full h-8 rounded-xl bg-white/50 dark:bg-white/5 border border-white/20 dark:border-white/10 px-3 text-[10px] font-bold text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none shadow-inner"
+                                    className="w-full h-8 rounded-xl bg-white/50 dark:bg-white/5 border border-white/20 dark:border-white/10 px-3 text-[14px] font-bold text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none shadow-inner"
                                 />
                             </div>
                             <div>
-                                <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Entry Notes</label>
+                                <label className="block text-[12px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-1 ml-1">Entry Notes</label>
                                 <textarea
                                     value={notes}
                                     onChange={(e) => setNotes(e.target.value)}
-                                    className="w-full min-h-[60px] rounded-xl bg-white/50 dark:bg-white/5 border border-white/20 dark:border-white/10 p-2.5 text-[10px] font-bold text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none shadow-inner resize-none placeholder-[var(--foreground)]/10"
+                                    className="w-full min-h-[60px] rounded-xl bg-white/50 dark:bg-white/5 border border-white/20 dark:border-white/10 p-2.5 text-[14px] font-bold text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none shadow-inner resize-none placeholder-[var(--foreground)]/10"
                                     placeholder="Add payment terms or notes..."
                                 />
                             </div>
@@ -286,16 +286,16 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                     </div>
 
                     <div className="glass rounded-[24px] border border-gray-200 dark:border-white/10 p-4 space-y-1.5">
-                        <div className="flex justify-between text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 px-1">
+                        <div className="flex justify-between text-[13px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 px-1">
                             <span>Subtotal</span>
                             <span>{formatCurrency(subtotal)}</span>
                         </div>
-                        <div className="flex justify-between text-[9px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 px-1">
+                        <div className="flex justify-between text-[13px] font-bold uppercase tracking-wider text-[var(--foreground)]/40 px-1">
                             <span>Tax</span>
                             <span>{formatCurrency(totalTax)}</span>
                         </div>
                         <div className="flex justify-between text-base font-bold text-[var(--deep-contrast)] pt-2 border-t border-[var(--primary-green)]/5 mt-1 px-1">
-                            <span className="text-[10px] uppercase tracking-wider pt-1">Total</span>
+                            <span className="text-[14px] uppercase tracking-wider pt-1">Total</span>
                             <span>{formatCurrency(totalAmount)}</span>
                         </div>
                     </div>
@@ -305,8 +305,8 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                 <div className="md:col-span-3">
                     <div className="glass rounded-[24px] border border-gray-200 dark:border-white/10 overflow-hidden">
                         <div className="px-5 py-2.5 border-b border-white/10 dark:border-white/5 bg-[var(--primary-green)]/5 flex justify-between items-center">
-                            <h3 className="text-[9px] font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)] uppercase tracking-wider">Items List</h3>
-                            <button onClick={addRow} className="flex items-center text-[9px] font-bold uppercase tracking-wider text-[var(--primary-green)] hover:text-[var(--deep-contrast)] transition-all bg-white/40 dark:bg-white/5 px-3 py-1 rounded-full border border-white/50 dark:border-white/10">
+                            <h3 className="text-[13px] font-bold text-[var(--deep-contrast)] dark:text-[var(--foreground)] uppercase tracking-wider">Items List</h3>
+                            <button onClick={addRow} className="flex items-center text-[13px] font-bold uppercase tracking-wider text-[var(--primary-green)] hover:text-[var(--deep-contrast)] transition-all bg-white/40 dark:bg-white/5 px-3 py-1 rounded-full border border-white/50 dark:border-white/10">
                                 <Plus className="h-3 w-3 mr-1" /> Add Row
                             </button>
                         </div>
@@ -322,14 +322,14 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
                                     </button>
 
                                     <div className="flex-1 min-w-[200px]">
-                                        <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/30 mb-1">Product</label>
+                                        <label className="block text-[12px] font-bold uppercase tracking-wider text-[var(--foreground)]/30 mb-1">Product</label>
                                         <button
                                             type="button"
                                             onClick={() => {
                                                 setActiveRowIndex(index)
                                                 setIsItemPickerOpen(true)
                                             }}
-                                            className="w-full h-8 rounded-xl bg-white/40 dark:bg-white/5 border border-white/10 dark:border-white/5 px-3 text-[10px] font-bold text-[var(--deep-contrast)] hover:border-[var(--primary-green)] transition-all text-left flex items-center justify-between"
+                                            className="w-full h-8 rounded-xl bg-white/40 dark:bg-white/5 border border-white/10 dark:border-white/5 px-3 text-[14px] font-bold text-[var(--deep-contrast)] hover:border-[var(--primary-green)] transition-all text-left flex items-center justify-between"
                                         >
                                             <span className="truncate">{row.name || 'Choose Product'}</span>
                                             <Plus className="h-3 w-3 opacity-20" />
@@ -338,33 +338,33 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
 
                                     <div className="grid grid-cols-4 gap-2 sm:w-[320px]">
                                         <div className="col-span-1">
-                                            <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/30 mb-1 text-center">Qty {row.unit && `(${row.unit})`}</label>
+                                            <label className="block text-[12px] font-bold uppercase tracking-wider text-[var(--foreground)]/30 mb-1 text-center">Qty {row.unit && `(${row.unit})`}</label>
                                             <input
                                                 type="number"
                                                 step="any"
                                                 value={row.quantity}
                                                 onChange={(e) => updateRow(index, 'quantity', Number(e.target.value))}
-                                                className="w-full h-8 rounded-xl bg-white/40 dark:bg-white/5 border border-white/10 dark:border-white/5 px-2 text-[10px] font-bold text-[var(--deep-contrast)] text-center focus:border-[var(--primary-green)] focus:outline-none"
+                                                className="w-full h-8 rounded-xl bg-white/40 dark:bg-white/5 border border-white/10 dark:border-white/5 px-2 text-[14px] font-bold text-[var(--deep-contrast)] text-center focus:border-[var(--primary-green)] focus:outline-none"
                                             />
                                         </div>
                                         <div className="col-span-1">
-                                            <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/30 mb-1 text-center">Rate</label>
+                                            <label className="block text-[12px] font-bold uppercase tracking-wider text-[var(--foreground)]/30 mb-1 text-center">Rate</label>
                                             <input
                                                 type="number"
                                                 value={row.rate}
                                                 onChange={(e) => updateRow(index, 'rate', Number(e.target.value))}
-                                                className="w-full h-8 rounded-xl bg-white/40 dark:bg-white/5 border border-white/10 dark:border-white/5 px-2 text-[10px] font-bold text-[var(--deep-contrast)] text-center focus:border-[var(--primary-green)] focus:outline-none"
+                                                className="w-full h-8 rounded-xl bg-white/40 dark:bg-white/5 border border-white/10 dark:border-white/5 px-2 text-[14px] font-bold text-[var(--deep-contrast)] text-center focus:border-[var(--primary-green)] focus:outline-none"
                                             />
                                         </div>
                                         <div className="col-span-1">
-                                            <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/30 mb-1 text-center">Tax %</label>
-                                            <div className="h-8 flex items-center justify-center text-[10px] font-bold text-[var(--foreground)]/40">
+                                            <label className="block text-[12px] font-bold uppercase tracking-wider text-[var(--foreground)]/30 mb-1 text-center">Tax %</label>
+                                            <div className="h-8 flex items-center justify-center text-[14px] font-bold text-[var(--foreground)]/40">
                                                 {row.tax}%
                                             </div>
                                         </div>
                                         <div className="col-span-1">
-                                            <label className="block text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/30 mb-1 text-right">Sum</label>
-                                            <div className="h-8 flex items-center justify-end px-1 text-[10px] font-bold text-[var(--primary-green)]">
+                                            <label className="block text-[12px] font-bold uppercase tracking-wider text-[var(--foreground)]/30 mb-1 text-right">Sum</label>
+                                            <div className="h-8 flex items-center justify-end px-1 text-[14px] font-bold text-[var(--primary-green)]">
                                                 {formatCurrency(row.amount)}
                                             </div>
                                         </div>
@@ -375,7 +375,7 @@ export default function InvoiceForm({ parties, items }: InvoiceFormProps) {
 
                         {rows.length === 0 && (
                             <div className="p-10 text-center opacity-30">
-                                <p className="text-[10px] font-bold uppercase tracking-wider">No line items added</p>
+                                <p className="text-[14px] font-bold uppercase tracking-wider">No line items added</p>
                             </div>
                         )}
                     </div>

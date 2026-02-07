@@ -263,7 +263,7 @@ export default function PaymentForm({
                 <div className="glass rounded-[32px] border border-[var(--foreground)]/10 p-8 text-center shadow-2xl">
                     <CheckCircle2 className="h-12 w-12 text-[var(--primary-green)] mx-auto mb-3 animate-in zoom-in" />
                     <h2 className="text-lg font-black text-[var(--deep-contrast)] uppercase tracking-tight">Sync {isEdit ? 'Modified' : 'Authenticated'}</h2>
-                    <p className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-1">Executing Ledger Update...</p>
+                    <p className="text-[13px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-1">Executing Ledger Update...</p>
                 </div>
             </div>
         )
@@ -281,7 +281,7 @@ export default function PaymentForm({
                         <h1 className="text-xs font-black text-[var(--deep-contrast)] uppercase tracking-tight">
                             {isEdit ? 'Modify' : 'Log'} {isReceipt ? 'Receipt' : 'Payment'}
                         </h1>
-                        <p className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">
+                        <p className="text-[13px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">
                             Financial Authenticator
                         </p>
                     </div>
@@ -291,7 +291,7 @@ export default function PaymentForm({
                         <button
                             type="button"
                             onClick={() => setIsConfirmOpen(true)}
-                            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-500/5 text-rose-500 text-[10px] font-black uppercase tracking-widest hover:bg-rose-500 hover:text-white border border-rose-500/10 transition-all shadow-sm active:scale-95"
+                            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-500/5 text-rose-500 text-[14px] font-black uppercase tracking-widest hover:bg-rose-500 hover:text-white border border-rose-500/10 transition-all shadow-sm active:scale-95"
                         >
                             <Trash2 className="h-4 w-4" />
                             <span className="hidden sm:inline">Purge</span>
@@ -301,7 +301,7 @@ export default function PaymentForm({
                         type="submit"
                         disabled={loading || formData.amount <= 0}
                         className={clsx(
-                            "flex items-center gap-1.5 px-6 py-2 rounded-xl text-[var(--primary-foreground)] text-[10px] font-black uppercase tracking-widest transition-all shadow-lg active:scale-95 disabled:opacity-50",
+                            "flex items-center gap-1.5 px-6 py-2 rounded-xl text-[var(--primary-foreground)] text-[14px] font-black uppercase tracking-widest transition-all shadow-lg active:scale-95 disabled:opacity-50",
                             isReceipt ? "bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20" : "bg-rose-500 hover:bg-rose-600 shadow-rose-500/20"
                         )}
                     >
@@ -315,13 +315,13 @@ export default function PaymentForm({
                 {/* Left Side: Basic Info */}
                 <div className="space-y-4">
                     <div className="glass rounded-[24px] border border-[var(--foreground)]/10 p-5 space-y-4 shadow-lg">
-                        <h3 className="text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-3 border-b border-[var(--foreground)]/5 pb-2">Entry Metadata</h3>
+                        <h3 className="text-[13px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-3 border-b border-[var(--foreground)]/5 pb-2">Entry Metadata</h3>
                         <div>
-                            <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-2 ml-1">Entity Reference</label>
+                            <label className="block text-[12px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-2 ml-1">Entity Reference</label>
                             <button
                                 type="button"
                                 onClick={() => setIsPartyPickerOpen(true)}
-                                className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[11px] font-black text-left flex items-center justify-between hover:border-[var(--primary-green)] transition-all shadow-inner"
+                                className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[15px] font-black text-left flex items-center justify-between hover:border-[var(--primary-green)] transition-all shadow-inner"
                             >
                                 <span className="truncate">{displayParties.find(p => p.id === formData.party_id)?.name.toUpperCase() || 'GENERAL TRANSACTION...'}</span>
                                 <User className="h-5 w-5 lg:h-4 lg:w-4 opacity-20" />
@@ -330,23 +330,23 @@ export default function PaymentForm({
 
                         <div className="grid grid-cols-2 gap-3">
                             <div>
-                                <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-2 ml-1">Entry Date</label>
+                                <label className="block text-[12px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-2 ml-1">Entry Date</label>
                                 <input
                                     type="date"
                                     value={formData.date}
                                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                    className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[10px] font-black focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner"
+                                    className="w-full h-11 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-4 text-[14px] font-black focus:border-[var(--primary-green)] focus:outline-none transition-all shadow-inner"
                                 />
                             </div>
                             <div>
-                                <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-2 ml-1">Valuation ({activeCurrencySymbol})</label>
+                                <label className="block text-[12px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-2 ml-1">Valuation ({activeCurrencySymbol})</label>
                                 <input
                                     type="number"
                                     required
                                     value={formData.amount === 0 ? '' : formData.amount}
                                     onChange={(e) => setFormData({ ...formData, amount: Number(e.target.value) })}
                                     className={clsx(
-                                        "w-full h-11 rounded-xl border px-4 text-[14px] font-black text-center focus:outline-none transition-all shadow-inner tabular-nums",
+                                        "w-full h-11 rounded-xl border px-4 text-[18px] font-black text-center focus:outline-none transition-all shadow-inner tabular-nums",
                                         isReceipt ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600 focus:border-emerald-500" : "bg-rose-500/5 border-rose-500/20 text-rose-600 focus:border-rose-500"
                                     )}
                                     placeholder="0.00"
@@ -355,11 +355,11 @@ export default function PaymentForm({
                         </div>
 
                         <div>
-                            <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-2 ml-1">Transaction Memorandum</label>
+                            <label className="block text-[12px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-2 ml-1">Transaction Memorandum</label>
                             <textarea
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                className="w-full h-24 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 p-4 text-[11px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all placeholder:text-[var(--foreground)]/10 resize-none shadow-inner"
+                                className="w-full h-24 rounded-xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 p-4 text-[15px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all placeholder:text-[var(--foreground)]/10 resize-none shadow-inner"
                                 placeholder="Details / Notes..."
                             />
                         </div>
@@ -367,7 +367,7 @@ export default function PaymentForm({
 
                     <div className="glass rounded-[24px] border border-[var(--foreground)]/10 p-5 space-y-4 shadow-lg">
                         <div className="flex items-center justify-between px-1">
-                            <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30">Liquidation Mode</label>
+                            <label className="block text-[12px] font-black uppercase tracking-widest text-[var(--foreground)]/30">Liquidation Mode</label>
                             <button
                                 type="button"
                                 onClick={() => setIsAddBankOpen(!isAddBankOpen)}
@@ -379,21 +379,21 @@ export default function PaymentForm({
 
                         {isAddBankOpen && (
                             <div className="p-3 rounded-xl bg-blue-500/5 border border-blue-500/20 animate-in slide-in-from-top-2">
-                                <label className="block text-[7px] font-black uppercase tracking-widest text-blue-500/60 mb-2 ml-1">Define New Registry</label>
+                                <label className="block text-[11px] font-black uppercase tracking-widest text-blue-500/60 mb-2 ml-1">Define New Registry</label>
                                 <div className="flex gap-2">
                                     <input
                                         type="text"
                                         value={newBankName}
                                         onChange={(e) => setNewBankName(e.target.value)}
                                         placeholder="Name..."
-                                        className="flex-1 h-8 rounded-lg bg-[var(--background)]/50 border border-blue-500/20 px-3 text-[10px] font-black uppercase focus:outline-none"
+                                        className="flex-1 h-8 rounded-lg bg-[var(--background)]/50 border border-blue-500/20 px-3 text-[14px] font-black uppercase focus:outline-none"
                                         onKeyDown={(e) => e.key === 'Enter' && handleAddBank()}
                                     />
                                     <button
                                         type="button"
                                         onClick={handleAddBank}
                                         disabled={addingBank || !newBankName}
-                                        className="px-3 h-8 rounded-lg bg-blue-500 text-white text-[8px] font-black uppercase disabled:opacity-50 active:scale-95 shadow-sm"
+                                        className="px-3 h-8 rounded-lg bg-blue-500 text-white text-[12px] font-black uppercase disabled:opacity-50 active:scale-95 shadow-sm"
                                     >
                                         {addingBank ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Set'}
                                     </button>
@@ -408,9 +408,9 @@ export default function PaymentForm({
                         >
                             <div className="flex items-center gap-2">
                                 <Wallet className="h-4 w-4 opacity-20" />
-                                <span className="text-[10px] font-black uppercase tracking-widest text-[var(--deep-contrast)]">{formData.mode}</span>
+                                <span className="text-[14px] font-black uppercase tracking-widest text-[var(--deep-contrast)]">{formData.mode}</span>
                             </div>
-                            <div className="px-2 py-0.5 rounded-lg bg-[var(--primary-green)]/10 text-[8px] font-black text-[var(--primary-green)] border border-[var(--primary-green)]/10 tabular-nums">
+                            <div className="px-2 py-0.5 rounded-lg bg-[var(--primary-green)]/10 text-[12px] font-black text-[var(--primary-green)] border border-[var(--primary-green)]/10 tabular-nums">
                                 {formatCurrency(modeBalances[formData.mode] || 0)}
                             </div>
                         </button>
@@ -421,21 +421,21 @@ export default function PaymentForm({
                 <div className="space-y-4">
                     <div className="glass rounded-[24px] border border-[var(--foreground)]/10 p-5 space-y-4 bg-[var(--foreground)]/5 shadow-lg relative overflow-hidden group">
                         <div className="absolute -top-6 -right-6 h-24 w-24 bg-[var(--primary-green)]/5 rounded-full blur-2xl group-hover:bg-[var(--primary-green)]/10 transition-colors" />
-                        <h3 className="text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 ml-1">Fiscal Calculator</h3>
+                        <h3 className="text-[13px] font-black uppercase tracking-widest text-[var(--foreground)]/40 ml-1">Fiscal Calculator</h3>
                         <div className="space-y-3">
                             <div>
-                                <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-2 ml-1">Lump Sum {isReceipt ? 'Tendered' : 'Paid'}</label>
+                                <label className="block text-[12px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-2 ml-1">Lump Sum {isReceipt ? 'Tendered' : 'Paid'}</label>
                                 <input
                                     type="number"
                                     value={givenAmount}
                                     onChange={(e) => setGivenAmount(e.target.value)}
-                                    className="w-full h-11 rounded-xl bg-[var(--background)]/40 border border-[var(--foreground)]/10 px-4 text-[16px] font-black text-center focus:border-[var(--primary-green)] transition-all shadow-inner tabular-nums"
+                                    className="w-full h-11 rounded-xl bg-[var(--background)]/40 border border-[var(--foreground)]/10 px-4 text-[20px] font-black text-center focus:border-[var(--primary-green)] transition-all shadow-inner tabular-nums"
                                     placeholder="0.00"
                                 />
                             </div>
                             {Number(givenAmount) > formData.amount && (
                                 <div className="p-4 rounded-2xl bg-[var(--primary-green)]/10 border border-[var(--primary-green)]/20 text-center animate-in zoom-in-95 shadow-sm">
-                                    <p className="text-[8px] font-black text-[var(--primary-green)] uppercase tracking-[0.2em] mb-1">Fiscal Change</p>
+                                    <p className="text-[12px] font-black text-[var(--primary-green)] uppercase tracking-[0.2em] mb-1">Fiscal Change</p>
                                     <p className="text-2xl font-black text-[var(--primary-green)] tracking-tighter tabular-nums drop-shadow-sm">
                                         {formatCurrency(Number(givenAmount) - formData.amount)}
                                     </p>
@@ -447,11 +447,11 @@ export default function PaymentForm({
                     {(initialData?.invoice_id || billingEntries.length > 0) && (
                         <div className="glass rounded-[24px] border border-[var(--foreground)]/10 p-5 space-y-4 shadow-lg min-h-[300px]">
                             <div className="flex items-center justify-between px-1">
-                                <h3 className="text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40">Active Feed</h3>
+                                <h3 className="text-[13px] font-black uppercase tracking-widest text-[var(--foreground)]/40">Active Feed</h3>
                                 <button
                                     type="button"
                                     onClick={() => { setEditingEntryIndex(null); setIsItemModalOpen(true); }}
-                                    className="px-3 py-1.5 rounded-xl bg-[var(--primary-green)] text-[8px] font-black uppercase tracking-widest text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] transition-all shadow-lg shadow-[var(--primary-green)]/10 active:scale-95"
+                                    className="px-3 py-1.5 rounded-xl bg-[var(--primary-green)] text-[12px] font-black uppercase tracking-widest text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] transition-all shadow-lg shadow-[var(--primary-green)]/10 active:scale-95"
                                 >
                                     + ADD LINE
                                 </button>
@@ -468,14 +468,14 @@ export default function PaymentForm({
                                                 <Calculator size={14} />
                                             </div>
                                             <div className="min-w-0">
-                                                <p className="text-[10px] font-black uppercase text-[var(--deep-contrast)] truncate">{e.name}</p>
-                                                <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">
+                                                <p className="text-[14px] font-black uppercase text-[var(--deep-contrast)] truncate">{e.name}</p>
+                                                <p className="text-[12px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">
                                                     {e.quantity} {e.unit} × {formatCurrency(e.rate)}
                                                 </p>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-4">
-                                            <span className="text-[11px] font-black text-[var(--primary-green)] tabular-nums">{formatCurrency(e.amount)}</span>
+                                            <span className="text-[15px] font-black text-[var(--primary-green)] tabular-nums">{formatCurrency(e.amount)}</span>
                                             <button
                                                 type="button"
                                                 onClick={(e) => { e.stopPropagation(); setItemToRemoveIndex(idx); }}
@@ -489,7 +489,7 @@ export default function PaymentForm({
                                 {billingEntries.length === 0 && (
                                     <div className="flex flex-col items-center justify-center py-20 text-[var(--foreground)]/20 border-2 border-dashed border-[var(--foreground)]/5 rounded-2xl opacity-40">
                                         <Receipt className="h-8 w-8 mb-2" strokeWidth={1.5} />
-                                        <p className="text-[8px] font-black uppercase tracking-[0.3em]">No Recorded Details</p>
+                                        <p className="text-[12px] font-black uppercase tracking-[0.3em]">No Recorded Details</p>
                                     </div>
                                 )}
                             </div>

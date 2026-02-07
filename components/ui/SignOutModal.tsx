@@ -88,7 +88,7 @@ export const SignOutModal = ({
                                     <button
                                         onClick={onClose}
                                         disabled={isLoading}
-                                        className="w-full py-4 rounded-[24px] bg-[var(--foreground)]/5 hover:bg-[var(--foreground)]/10 text-[var(--foreground)]/40 hover:text-[var(--deep-contrast)] text-[10px] font-black uppercase tracking-widest transition-all active:scale-[0.98] disabled:opacity-50"
+                                        className="w-full py-4 rounded-[24px] bg-[var(--foreground)]/5 hover:bg-[var(--foreground)]/10 text-[var(--foreground)]/40 hover:text-[var(--deep-contrast)] text-[14px] font-black uppercase tracking-widest transition-all active:scale-[0.98] disabled:opacity-50"
                                     >
                                         Continue Working
                                     </button>

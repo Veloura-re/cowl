@@ -89,7 +89,7 @@ export default function InvoiceSettingsModal({ isOpen, onClose, businessId, init
                 <div className="relative px-6 py-5 border-b border-white/10 flex items-center justify-between">
                     <div>
                         <h2 className="text-xl font-black uppercase tracking-tight text-white/90">Invoice Design</h2>
-                        <p className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em] mt-1">Customize Appearance</p>
+                        <p className="text-[13px] font-black text-white/40 uppercase tracking-[0.2em] mt-1">Customize Appearance</p>
                     </div>
                     <button onClick={onClose} className="h-8 w-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-all">
                         <X className="h-4 w-4 text-white/60" />
@@ -99,7 +99,7 @@ export default function InvoiceSettingsModal({ isOpen, onClose, businessId, init
                 <div className="relative p-6 space-y-6">
                     {/* Size Selector */}
                     <div className="space-y-3">
-                        <label className="flex items-center gap-2 text-[8px] font-black uppercase tracking-[0.2em] text-white/40 ml-1">
+                        <label className="flex items-center gap-2 text-[12px] font-black uppercase tracking-[0.2em] text-white/40 ml-1">
                             <LayoutTemplate className="h-3 w-3" />
                             Paper Format
                         </label>
@@ -114,7 +114,7 @@ export default function InvoiceSettingsModal({ isOpen, onClose, businessId, init
                                 )}
                             >
                                 <div className="w-8 h-10 border border-current rounded-sm bg-current/10" />
-                                <span className="text-[9px] font-black uppercase tracking-widest">A4 Standard</span>
+                                <span className="text-[13px] font-black uppercase tracking-widest">A4 Standard</span>
                                 {size === 'A4' && (
                                     <motion.div
                                         layoutId="check"
@@ -138,7 +138,7 @@ export default function InvoiceSettingsModal({ isOpen, onClose, businessId, init
                                     <div className="h-0.5 w-full bg-current/40" />
                                     <div className="h-0.5 w-3/4 bg-current/40" />
                                 </div>
-                                <span className="text-[9px] font-black uppercase tracking-widest">Thermal (80mm)</span>
+                                <span className="text-[13px] font-black uppercase tracking-widest">Thermal (80mm)</span>
                                 {size === 'THERMAL' && (
                                     <motion.div
                                         layoutId="check"
@@ -161,7 +161,7 @@ export default function InvoiceSettingsModal({ isOpen, onClose, businessId, init
                                     <div className="h-0.5 w-full bg-current/60" />
                                     <div className="h-0.5 w-full bg-current/60" />
                                 </div>
-                                <span className="text-[9px] font-black uppercase tracking-widest text-center px-1">Nano (58mm)</span>
+                                <span className="text-[13px] font-black uppercase tracking-widest text-center px-1">Nano (58mm)</span>
                                 {size === 'NANO' && (
                                     <motion.div
                                         layoutId="check"
@@ -176,7 +176,7 @@ export default function InvoiceSettingsModal({ isOpen, onClose, businessId, init
 
                     {/* Color Picker */}
                     <div className="space-y-3">
-                        <label className="flex items-center gap-2 text-[8px] font-black uppercase tracking-[0.2em] text-white/40 ml-1">
+                        <label className="flex items-center gap-2 text-[12px] font-black uppercase tracking-[0.2em] text-white/40 ml-1">
                             <Palette className="h-3 w-3" />
                             Brand Accent
                         </label>
@@ -200,7 +200,7 @@ export default function InvoiceSettingsModal({ isOpen, onClose, businessId, init
 
                     {/* Footer Note */}
                     <div className="space-y-3">
-                        <label className="flex items-center gap-2 text-[8px] font-black uppercase tracking-[0.2em] text-white/40 ml-1">
+                        <label className="flex items-center gap-2 text-[12px] font-black uppercase tracking-[0.2em] text-white/40 ml-1">
                             <Type className="h-3 w-3" />
                             Footer / Terms
                         </label>
@@ -208,7 +208,7 @@ export default function InvoiceSettingsModal({ isOpen, onClose, businessId, init
                             value={footerNote}
                             onChange={(e) => setFooterNote(e.target.value)}
                             placeholder="e.g. Thank you for your business! Payments are due within 14 days."
-                            className="w-full h-32 rounded-2xl bg-white/5 border border-white/10 p-4 text-[11px] font-bold text-white placeholder:text-white/20 focus:border-white/30 focus:bg-white/10 focus:outline-none transition-all resize-none"
+                            className="w-full h-32 rounded-2xl bg-white/5 border border-white/10 p-4 text-[15px] font-bold text-white placeholder:text-white/20 focus:border-white/30 focus:bg-white/10 focus:outline-none transition-all resize-none"
                         />
                     </div>
                 </div>

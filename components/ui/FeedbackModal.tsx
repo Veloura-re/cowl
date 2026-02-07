@@ -54,7 +54,7 @@ export default function FeedbackModal({
                             <h3 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight uppercase">
                                 {title || (isError ? 'Action Denied' : 'Verification Success')}
                             </h3>
-                            <p className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.2em] leading-relaxed max-w-[220px] mx-auto">
+                            <p className="text-[13px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.2em] leading-relaxed max-w-[220px] mx-auto">
                                 {message}
                             </p>
                         </div>
@@ -62,7 +62,7 @@ export default function FeedbackModal({
                         <button
                             onClick={onClose}
                             className={clsx(
-                                "w-full h-12 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl transition-all active:scale-95",
+                                "w-full h-12 rounded-xl text-[14px] font-black uppercase tracking-[0.2em] shadow-xl transition-all active:scale-95",
                                 isError
                                     ? "bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] hover:bg-rose-500 hover:text-white shadow-black/10"
                                     : "bg-[var(--primary-green)] text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] shadow-[var(--primary-green)]/20"

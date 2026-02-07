@@ -39,8 +39,8 @@ export default function Step1PartyInfo({ parties, onNext, onBack }: Step1Props) 
         <div className="glass rounded-[32px] border border-[var(--foreground)]/10 overflow-hidden shadow-2xl animate-in fade-in duration-500">
             <div className="px-8 py-6 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5 flex justify-between items-center relative overflow-hidden">
                 <div className="relative z-10">
-                    <h2 className="text-[12px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">Identity & Logistics</h2>
-                    <p className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Specify commercial entities and temporal markers</p>
+                    <h2 className="text-[16px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">Identity & Logistics</h2>
+                    <p className="text-[13px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Specify commercial entities and temporal markers</p>
                 </div>
                 <div className="h-8 w-8 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center relative z-10">
                     <Calendar size={18} />
@@ -51,7 +51,7 @@ export default function Step1PartyInfo({ parties, onNext, onBack }: Step1Props) 
             <div className="p-8 space-y-8">
                 {/* Customer Selection - Large Card */}
                 <div className="space-y-4">
-                    <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 ml-2">
+                    <label className="block text-[14px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 ml-2">
                         Target Recipient Account *
                     </label>
                     <button
@@ -75,15 +75,15 @@ export default function Step1PartyInfo({ parties, onNext, onBack }: Step1Props) 
                         <div className="ml-6 min-w-0 flex-1">
                             {data.partyId ? (
                                 <>
-                                    <div className="text-[14px] font-black text-[var(--deep-contrast)] uppercase tracking-tight truncate leading-none mb-1.5">
+                                    <div className="text-[18px] font-black text-[var(--deep-contrast)] uppercase tracking-tight truncate leading-none mb-1.5">
                                         {data.partyName}
                                     </div>
-                                    <div className="text-[9px] font-black text-[var(--primary-green)] uppercase tracking-[0.2em]">
+                                    <div className="text-[13px] font-black text-[var(--primary-green)] uppercase tracking-[0.2em]">
                                         AUTHENTICATED CLIENT
                                     </div>
                                 </>
                             ) : (
-                                <div className="text-[11px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.2em]">
+                                <div className="text-[15px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.2em]">
                                     SELECT RECIPIENT...
                                 </div>
                             )}
@@ -97,14 +97,14 @@ export default function Step1PartyInfo({ parties, onNext, onBack }: Step1Props) 
                         <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-transparent via-[var(--primary-green)]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                     </button>
                     {error && !data.partyId && (
-                        <p className="text-[9px] font-black text-rose-500 mt-2 ml-4 animate-bounce uppercase tracking-widest">{error}</p>
+                        <p className="text-[13px] font-black text-rose-500 mt-2 ml-4 animate-bounce uppercase tracking-widest">{error}</p>
                     )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Invoice Number */}
                     <div className="space-y-3">
-                        <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 ml-2">
+                        <label className="flex items-center gap-2 text-[14px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 ml-2">
                             <Hash className="h-3.5 w-3.5 opacity-40" />
                             Internal Identifier
                         </label>
@@ -112,14 +112,14 @@ export default function Step1PartyInfo({ parties, onNext, onBack }: Step1Props) 
                             type="text"
                             value={data.invoiceNumber}
                             onChange={(e) => updateData({ invoiceNumber: e.target.value })}
-                            className="w-full h-14 rounded-[24px] bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-6 text-[13px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:ring-4 focus:ring-[var(--primary-green)]/10 focus:outline-none shadow-inner transition-all uppercase placeholder:opacity-10"
+                            className="w-full h-14 rounded-[24px] bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-6 text-[17px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:ring-4 focus:ring-[var(--primary-green)]/10 focus:outline-none shadow-inner transition-all uppercase placeholder:opacity-10"
                             placeholder="REF-XXXXXX"
                         />
                     </div>
 
                     {/* Date */}
                     <div className="space-y-3">
-                        <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 ml-2">
+                        <label className="flex items-center gap-2 text-[14px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 ml-2">
                             <Calendar className="h-3.5 w-3.5 opacity-40" />
                             Temporal Marker
                         </label>
@@ -127,7 +127,7 @@ export default function Step1PartyInfo({ parties, onNext, onBack }: Step1Props) 
                             type="date"
                             value={data.date}
                             onChange={(e) => updateData({ date: e.target.value })}
-                            className="w-full h-14 rounded-[24px] bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-6 text-[13px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:ring-4 focus:ring-[var(--primary-green)]/10 focus:outline-none shadow-inner transition-all"
+                            className="w-full h-14 rounded-[24px] bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-6 text-[17px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:ring-4 focus:ring-[var(--primary-green)]/10 focus:outline-none shadow-inner transition-all"
                         />
                     </div>
                 </div>
@@ -136,7 +136,7 @@ export default function Step1PartyInfo({ parties, onNext, onBack }: Step1Props) 
                 <div className="flex flex-col sm:flex-row gap-4 pt-4">
                     <button
                         onClick={onBack}
-                        className="flex-1 h-14 flex items-center justify-center gap-3 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-[var(--deep-contrast)] font-black text-[10px] uppercase tracking-[0.2em] hover:bg-[var(--foreground)]/10 transition-all active:scale-95"
+                        className="flex-1 h-14 flex items-center justify-center gap-3 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-[var(--deep-contrast)] font-black text-[14px] uppercase tracking-[0.2em] hover:bg-[var(--foreground)]/10 transition-all active:scale-95"
                     >
                         <div className="h-6 w-6 rounded-full bg-[var(--foreground)]/10 flex items-center justify-center">
                             <ArrowRight className="h-3.5 w-3.5 rotate-180" />
@@ -145,7 +145,7 @@ export default function Step1PartyInfo({ parties, onNext, onBack }: Step1Props) 
                     </button>
                     <button
                         onClick={handleNext}
-                        className="flex-[2] h-14 flex items-center justify-center gap-4 rounded-2xl bg-[var(--primary-green)] text-white font-black text-[11px] uppercase tracking-[0.25em] hover:bg-[var(--primary-hover)] transition-all shadow-xl shadow-[var(--primary-green)]/20 active:scale-95 group"
+                        className="flex-[2] h-14 flex items-center justify-center gap-4 rounded-2xl bg-[var(--primary-green)] text-white font-black text-[15px] uppercase tracking-[0.25em] hover:bg-[var(--primary-hover)] transition-all shadow-xl shadow-[var(--primary-green)]/20 active:scale-95 group"
                     >
                         EXECUTE REVIEW
                         <div className="h-7 w-7 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white group-hover:text-[var(--primary-green)] transition-all group-hover:scale-110">

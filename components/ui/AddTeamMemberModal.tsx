@@ -146,7 +146,7 @@ export default function AddTeamMemberModal({ isOpen, onClose, businessId, onSucc
                         </div>
                         <div>
                             <h3 className="text-sm font-black text-[var(--deep-contrast)] dark:text-[var(--foreground)] tracking-tight">Invite Member</h3>
-                            <p className="text-[9px] font-bold text-[var(--foreground)]/40 dark:text-neutral-500 uppercase tracking-wider leading-none">Add by email or username</p>
+                            <p className="text-[13px] font-bold text-[var(--foreground)]/40 dark:text-neutral-500 uppercase tracking-wider leading-none">Add by email or username</p>
                         </div>
                     </div>
                     <button onClick={onClose} className="p-2 rounded-xl hover:bg-[var(--foreground)]/5 transition-colors text-[var(--foreground)]/40">
@@ -160,7 +160,7 @@ export default function AddTeamMemberModal({ isOpen, onClose, businessId, onSucc
                             <button
                                 onClick={() => setSearchMode('email')}
                                 className={clsx(
-                                    "px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all",
+                                    "px-5 py-2 rounded-xl text-[14px] font-black uppercase tracking-wider transition-all",
                                     searchMode === 'email' ? "bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] shadow-md shadow-black/10" : "text-[var(--foreground)]/40 hover:text-[var(--deep-contrast)]"
                                 )}
                             >
@@ -169,7 +169,7 @@ export default function AddTeamMemberModal({ isOpen, onClose, businessId, onSucc
                             <button
                                 onClick={() => setSearchMode('username')}
                                 className={clsx(
-                                    "px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all",
+                                    "px-5 py-2 rounded-xl text-[14px] font-black uppercase tracking-wider transition-all",
                                     searchMode === 'username' ? "bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] shadow-md shadow-black/10" : "text-[var(--foreground)]/40 hover:text-[var(--deep-contrast)]"
                                 )}
                             >
@@ -197,7 +197,7 @@ export default function AddTeamMemberModal({ isOpen, onClose, businessId, onSucc
                             <button
                                 onClick={handleSearch}
                                 disabled={searching || !searchQuery.trim()}
-                                className="px-6 h-12 rounded-[20px] bg-[var(--primary-green)] text-[var(--primary-foreground)] font-black text-[10px] uppercase tracking-wider hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] transition-all shadow-lg active:scale-95 disabled:opacity-50 flex items-center gap-2 border border-[var(--primary-foreground)]/10"
+                                className="px-6 h-12 rounded-[20px] bg-[var(--primary-green)] text-[var(--primary-foreground)] font-black text-[14px] uppercase tracking-wider hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] transition-all shadow-lg active:scale-95 disabled:opacity-50 flex items-center gap-2 border border-[var(--primary-foreground)]/10"
                             >
                                 {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
                                 Locate
@@ -223,7 +223,7 @@ export default function AddTeamMemberModal({ isOpen, onClose, businessId, onSucc
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="text-sm font-black text-[var(--deep-contrast)] truncate">{foundUser.full_name || 'System User'}</p>
-                                        <p className="text-[10px] font-bold text-[var(--foreground)]/50 lowercase tracking-tight">
+                                        <p className="text-[14px] font-bold text-[var(--foreground)]/50 lowercase tracking-tight">
                                             {foundUser.username ? `@${foundUser.username}` : foundUser.email}
                                         </p>
                                     </div>
@@ -231,7 +231,7 @@ export default function AddTeamMemberModal({ isOpen, onClose, businessId, onSucc
 
                                 <div className="space-y-4">
                                     <div className="space-y-2">
-                                        <label className="block text-[9px] font-black uppercase tracking-wider text-[var(--foreground)]/40 ml-1">Assign Business Role</label>
+                                        <label className="block text-[13px] font-black uppercase tracking-wider text-[var(--foreground)]/40 ml-1">Assign Business Role</label>
                                         <button
                                             onClick={() => setIsRolePickerOpen(true)}
                                             className="w-full h-12 rounded-[18px] bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-5 text-xs font-bold text-[var(--deep-contrast)] flex items-center justify-between hover:border-[var(--primary-green)] transition-all shadow-sm"
@@ -240,14 +240,14 @@ export default function AddTeamMemberModal({ isOpen, onClose, businessId, onSucc
                                                 <Shield className="h-4 w-4 text-[var(--primary-green)] opacity-50" />
                                                 <span>{selectedRole}</span>
                                             </div>
-                                            <div className="text-[10px] opacity-40">Change</div>
+                                            <div className="text-[14px] opacity-40">Change</div>
                                         </button>
                                     </div>
 
                                     <button
                                         onClick={handleAddMember}
                                         disabled={addingMember}
-                                        className="w-full h-14 rounded-2xl bg-[var(--primary-green)] text-[var(--primary-foreground)] font-black text-[12px] uppercase tracking-[0.1em] hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] transition-all shadow-xl shadow-[var(--primary-green)]/20 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3 border border-[var(--primary-foreground)]/10"
+                                        className="w-full h-14 rounded-2xl bg-[var(--primary-green)] text-[var(--primary-foreground)] font-black text-[16px] uppercase tracking-[0.1em] hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] transition-all shadow-xl shadow-[var(--primary-green)]/20 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3 border border-[var(--primary-foreground)]/10"
                                     >
                                         {addingMember ? <Loader2 className="h-5 w-5 animate-spin" /> : <Check className="h-5 w-5" />}
                                         Register Team Member

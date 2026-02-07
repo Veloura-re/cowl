@@ -138,8 +138,8 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                             <Plus className="h-4 w-4" />
                         </div>
                         <div>
-                            <h2 className="text-[13px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">{isSale ? 'Sales Entry' : 'Purchase Record'}</h2>
-                            <p className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-widest leading-none mt-0.5">Line Specification</p>
+                            <h2 className="text-[17px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">{isSale ? 'Sales Entry' : 'Purchase Record'}</h2>
+                            <p className="text-[13px] font-black text-[var(--foreground)]/40 uppercase tracking-widest leading-none mt-0.5">Line Specification</p>
                         </div>
                     </div>
                     <button
@@ -153,7 +153,7 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                 <form onSubmit={handleSubmit} className="p-6 space-y-5">
                     {/* Item Selection */}
                     <div className="relative group">
-                        <label className="block text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Inventory Resource *</label>
+                        <label className="block text-[13px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 ml-1">Inventory Resource *</label>
                         <button
                             type="button"
                             onClick={() => setIsItemPickerOpen(true)}
@@ -173,12 +173,12 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                                 </div>
                                 <div className="min-w-0">
                                     <p className={clsx(
-                                        "text-[12px] font-black uppercase truncate tracking-tight transition-colors",
+                                        "text-[16px] font-black uppercase truncate tracking-tight transition-colors",
                                         selectedItem ? "text-[var(--primary-green)]" : "text-[var(--foreground)]/30"
                                     )}>
                                         {selectedItem ? selectedItem.name : 'Choose Item'}
                                     </p>
-                                    <p className="text-[8px] font-black opacity-40 uppercase tracking-widest">
+                                    <p className="text-[12px] font-black opacity-40 uppercase tracking-widest">
                                         {selectedItem ? `${selectedItem.stock_quantity ?? 0} in stock • ${isSale ? 'Price' : 'Cost'}: ${formatCurrency(isSale ? selectedItem.selling_price : selectedItem.purchase_price)}` : 'Select from inventory'}
                                     </p>
                                 </div>
@@ -194,7 +194,7 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                             <div className="grid grid-cols-2 gap-3">
                                 {/* Quantity */}
                                 <div className="space-y-1.5">
-                                    <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 ml-1">Volume ({selectedItem.unit})</label>
+                                    <label className="block text-[12px] font-black uppercase tracking-widest text-[var(--foreground)]/40 ml-1">Volume ({selectedItem.unit})</label>
                                     <input
                                         type="number"
                                         step="any"
@@ -202,19 +202,19 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                                         autoFocus
                                         value={quantity === 0 ? '' : quantity}
                                         onChange={(e) => setQuantity(e.target.value)}
-                                        className="w-full h-12 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-5 text-[14px] font-black text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] focus:ring-4 focus:ring-[var(--primary-green)]/10 transition-all shadow-inner tabular-nums"
+                                        className="w-full h-12 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-5 text-[18px] font-black text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] focus:ring-4 focus:ring-[var(--primary-green)]/10 transition-all shadow-inner tabular-nums"
                                     />
                                 </div>
                                 {/* Rate */}
                                 <div className="space-y-1.5">
-                                    <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 ml-1">Rate / {selectedItem.unit}</label>
+                                    <label className="block text-[12px] font-black uppercase tracking-widest text-[var(--foreground)]/40 ml-1">Rate / {selectedItem.unit}</label>
                                     <input
                                         type="number"
                                         step="any"
                                         required
                                         value={rate === 0 ? '' : rate}
                                         onChange={(e) => setRate(e.target.value)}
-                                        className="w-full h-12 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-5 text-[14px] font-black text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] focus:ring-4 focus:ring-[var(--primary-green)]/10 transition-all shadow-inner tabular-nums"
+                                        className="w-full h-12 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-5 text-[18px] font-black text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] focus:ring-4 focus:ring-[var(--primary-green)]/10 transition-all shadow-inner tabular-nums"
                                     />
                                 </div>
                             </div>
@@ -224,20 +224,20 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                                 <div className="relative z-10 flex flex-col gap-4">
                                     <div className="flex justify-between items-end border-b border-white/5 pb-3">
                                         <div>
-                                            <p className="text-[8px] font-black uppercase tracking-[0.2em] text-white/40 mb-1">Extended Total</p>
-                                            <p className="text-[20px] font-black text-white tabular-nums leading-none tracking-tighter">
+                                            <p className="text-[12px] font-black uppercase tracking-[0.2em] text-white/40 mb-1">Extended Total</p>
+                                            <p className="text-[24px] font-black text-white tabular-nums leading-none tracking-tighter">
                                                 {formatCurrency(total)}
                                             </p>
                                         </div>
                                         <div className="text-right">
                                             <p className={clsx(
-                                                "text-[8px] font-black uppercase tracking-[0.2em] mb-1",
+                                                "text-[12px] font-black uppercase tracking-[0.2em] mb-1",
                                                 isSale ? (isLoss ? "text-rose-400" : "text-[var(--primary-green)]") : "text-blue-400"
                                             )}>
                                                 {isSale ? (isLoss ? 'Net Deficit' : 'Potential Yield') : 'Inventory Value'}
                                             </p>
                                             <p className={clsx(
-                                                "text-[14px] font-black tabular-nums tracking-tighter",
+                                                "text-[18px] font-black tabular-nums tracking-tighter",
                                                 isSale ? (isLoss ? "text-rose-400" : "text-[var(--primary-green)]") : "text-blue-400"
                                             )}>
                                                 {isSale ? (isLoss ? '-' : '+') : ''}{formatCurrency(isSale ? Math.abs(totalProfit) : total)}
@@ -245,7 +245,7 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center justify-between text-[8px] font-black uppercase tracking-widest text-white/20">
+                                    <div className="flex items-center justify-between text-[12px] font-black uppercase tracking-widest text-white/20">
                                         <span>Unit {isSale ? 'Cost' : 'Landed'}: {formatCurrency(purchasePrice)}</span>
                                         {isSale && <span>Margin: {total > 0 ? ((totalProfit / total) * 100).toFixed(1) : 0}%</span>}
                                     </div>
@@ -274,14 +274,14 @@ export default function AddSalesItemModal({ isOpen, onClose, onAdd, items, initi
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 h-12 rounded-2xl text-[10px] font-black uppercase tracking-widest text-[var(--foreground)]/30 hover:bg-[var(--foreground)]/5 hover:text-[var(--foreground)]/60 transition-all active:scale-95 border border-transparent hover:border-[var(--foreground)]/10"
+                            className="flex-1 h-12 rounded-2xl text-[14px] font-black uppercase tracking-widest text-[var(--foreground)]/30 hover:bg-[var(--foreground)]/5 hover:text-[var(--foreground)]/60 transition-all active:scale-95 border border-transparent hover:border-[var(--foreground)]/10"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={!selectedItem || !numQty || numQty <= 0}
-                            className="flex-[2] h-12 flex items-center justify-center rounded-2xl bg-[var(--primary-green)] text-white shadow-xl shadow-[var(--primary-green)]/20 text-[10px] font-black uppercase tracking-[0.2em] transition-all active:scale-95 disabled:opacity-50 hover:bg-[var(--primary-hover)] ring-offset-2 focus:ring-2 ring-[var(--primary-green)]"
+                            className="flex-[2] h-12 flex items-center justify-center rounded-2xl bg-[var(--primary-green)] text-white shadow-xl shadow-[var(--primary-green)]/20 text-[14px] font-black uppercase tracking-[0.2em] transition-all active:scale-95 disabled:opacity-50 hover:bg-[var(--primary-hover)] ring-offset-2 focus:ring-2 ring-[var(--primary-green)]"
                         >
                             {initialData ? 'Update Record' : 'Add to Ledger'}
                         </button>

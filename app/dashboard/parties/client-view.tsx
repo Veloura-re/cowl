@@ -131,7 +131,7 @@ export default function PartiesClientView() {
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight">People</h1>
-                        <p className="text-[10px] font-black text-[var(--foreground)]/60 uppercase tracking-wider leading-none">People You Deal With</p>
+                        <p className="text-[14px] font-black text-[var(--foreground)]/60 uppercase tracking-wider leading-none">People You Deal With</p>
                     </div>
                     <motion.button
                         id="add-person-btn"
@@ -140,7 +140,7 @@ export default function PartiesClientView() {
                         whileHover={{ scale: 1.05, translateY: -2 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => setIsCreateModalOpen(true)}
-                        className="flex items-center justify-center rounded-xl bg-[var(--primary-green)] px-4 py-2 text-[11px] font-black uppercase tracking-wider text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] transition-all shadow-xl shadow-[var(--primary-green)]/20 active:scale-95 border border-[var(--primary-foreground)]/10 group"
+                        className="flex items-center justify-center rounded-xl bg-[var(--primary-green)] px-4 py-2 text-[15px] font-black uppercase tracking-wider text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] transition-all shadow-xl shadow-[var(--primary-green)]/20 active:scale-95 border border-[var(--primary-foreground)]/10 group"
                     >
                         <Plus className="mr-1.5 h-3.5 w-3.5 transition-transform group-hover:rotate-90 duration-300" />
                         Add Person
@@ -160,7 +160,7 @@ export default function PartiesClientView() {
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setTypeFilter(typeFilter === 'CUSTOMER' ? 'ALL' : 'CUSTOMER')}
                     className={clsx(
-                        "flex-1 glass p-2 rounded-xl border transition-all cursor-pointer group",
+                        "flex-1 glass p-3 rounded-xl border transition-all cursor-pointer group",
                         typeFilter === 'CUSTOMER'
                             ? "bg-[var(--status-info)] border-blue-500 shadow-lg shadow-blue-500/20 ring-2 ring-blue-500/50 scale-[1.02]"
                             : "bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:bg-[var(--foreground)]/10"
@@ -168,12 +168,12 @@ export default function PartiesClientView() {
                 >
                     <div className="flex justify-between items-center">
                         <div className="flex items-center gap-1.5">
-                            <div className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-                            <span className="text-[7.5px] font-black uppercase tracking-widest text-[var(--status-info-foreground)]/60">Receivables</span>
+                            <div className="h-2 w-2 rounded-full bg-blue-500" />
+                            <span className="text-[12px] font-black uppercase tracking-widest text-[var(--status-info-foreground)]/60">Receivables</span>
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full border border-[var(--status-info-border)] bg-[var(--status-info)] text-[var(--status-info-foreground)] shadow-sm">IN</span>
+                        <span className="text-[16px] font-black uppercase tracking-widest px-2 py-1 rounded-full border border-[var(--status-info-border)] bg-[var(--status-info)] text-[var(--status-info-foreground)] shadow-sm">IN</span>
                     </div>
-                    <p className="text-xs font-black text-[var(--status-info-foreground)] mt-1 tabular-nums">
+                    <p className="text-[18px] font-black text-[var(--status-info-foreground)] mt-2 tabular-nums">
                         {formatCurrency(parties.filter(p => p.type === 'CUSTOMER').reduce((sum, p) => sum + (p.opening_balance || 0), 0))}
                     </p>
                 </motion.div>
@@ -183,7 +183,7 @@ export default function PartiesClientView() {
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setTypeFilter(typeFilter === 'SUPPLIER' ? 'ALL' : 'SUPPLIER')}
                     className={clsx(
-                        "flex-1 glass p-2 rounded-xl border transition-all cursor-pointer group",
+                        "flex-1 glass p-3 rounded-xl border transition-all cursor-pointer group",
                         typeFilter === 'SUPPLIER'
                             ? "bg-[var(--status-warning)] border-orange-500 shadow-lg shadow-orange-500/20 ring-2 ring-orange-500/50 scale-[1.02]"
                             : "bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:bg-[var(--foreground)]/10",
@@ -192,12 +192,12 @@ export default function PartiesClientView() {
                 >
                     <div className="flex justify-between items-center">
                         <div className="flex items-center gap-1.5">
-                            <div className="h-1.5 w-1.5 rounded-full bg-orange-500" />
-                            <span className="text-[7.5px] font-black uppercase tracking-widest text-[var(--status-warning-foreground)]/60">Payables</span>
+                            <div className="h-2 w-2 rounded-full bg-orange-500" />
+                            <span className="text-[12px] font-black uppercase tracking-widest text-[var(--status-warning-foreground)]/60">Payables</span>
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full border border-[var(--status-warning-border)] bg-[var(--status-warning)] text-[var(--status-warning-foreground)] shadow-sm">OUT</span>
+                        <span className="text-[16px] font-black uppercase tracking-widest px-2 py-1 rounded-full border border-[var(--status-warning-border)] bg-[var(--status-warning)] text-[var(--status-warning-foreground)] shadow-sm">OUT</span>
                     </div>
-                    <p className="text-xs font-black text-[var(--status-warning-foreground)] mt-1 tabular-nums">
+                    <p className="text-[18px] font-black text-[var(--status-warning-foreground)] mt-2 tabular-nums">
                         {formatCurrency(Math.abs(parties.filter(p => p.type === 'SUPPLIER').reduce((sum, p) => sum + (p.opening_balance || 0), 0)))}
                     </p>
                 </motion.div>
@@ -222,22 +222,22 @@ export default function PartiesClientView() {
                             transition={{ duration: 0.2 }}
                             onClick={(e: React.MouseEvent) => handleEdit(e, party)}
                             className={clsx(
-                                "glass-optimized p-2 rounded-[12px] border border-[var(--foreground)]/10 group hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer relative overflow-hidden min-h-[55px] flex flex-col justify-center",
+                                "glass-optimized p-3 rounded-[16px] border border-[var(--foreground)]/10 group hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer relative overflow-hidden min-h-[64px] flex flex-col justify-center",
                                 party.opening_balance < -5000 && "critical-glow"
                             )}
                         >
                             {/* Indicator Stripe */}
                             <div className={clsx(
-                                "absolute top-0 left-0 w-[2px] h-full transition-colors duration-300",
+                                "absolute top-0 left-0 w-[3px] h-full transition-colors duration-300",
                                 party.opening_balance >= 0 ? "bg-emerald-500" : "bg-rose-500"
                             )} />
 
                             {/* Header Row - Name & Balance */}
-                            <div className="flex items-center justify-between gap-1.5 mb-0.5">
-                                <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                            <div className="flex items-center justify-between gap-2 mb-0.5">
+                                <div className="flex items-center gap-2 min-w-0 flex-1">
                                     {/* Avatar */}
                                     <div className={clsx(
-                                        "h-6 w-6 rounded-lg flex items-center justify-center font-black text-[9px] transition-all duration-300 shadow-inner shrink-0 border uppercase",
+                                        "h-8 w-8 rounded-xl flex items-center justify-center font-black text-[15px] transition-all duration-300 shadow-inner shrink-0 border uppercase",
                                         party.opening_balance < -5000
                                             ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
                                             : "bg-[var(--foreground)]/5 text-[var(--deep-contrast)]/60 border-[var(--foreground)]/10"
@@ -245,16 +245,16 @@ export default function PartiesClientView() {
                                         {party.name.charAt(0)}
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                        <h3 className="text-[9px] font-black text-[var(--deep-contrast)] leading-tight uppercase tracking-tight truncate">{party.name}</h3>
+                                        <h3 className="text-[13px] font-black text-[var(--deep-contrast)] leading-tight uppercase tracking-tight truncate">{party.name}</h3>
                                         <span className={clsx(
-                                            "text-[6px] font-black uppercase tracking-widest leading-none",
+                                            "text-[10px] font-black uppercase tracking-widest leading-none",
                                             party.type === 'CUSTOMER' ? "text-blue-500" : "text-orange-500"
                                         )}>{party.type}</span>
                                     </div>
                                 </div>
                                 {/* Balance */}
                                 <p className={clsx(
-                                    "text-[9px] font-black tracking-tight tabular-nums shrink-0 leading-none",
+                                    "text-[13px] font-black tracking-tight tabular-nums shrink-0 leading-none",
                                     party.opening_balance > 0 ? "text-emerald-500" :
                                         party.opening_balance < 0 ? "text-rose-500" : "text-[var(--foreground)]/30"
                                 )}>
@@ -292,7 +292,7 @@ export default function PartiesClientView() {
                 <div className="flex justify-center py-4">
                     <button
                         onClick={() => setVisibleCount(prev => prev + 50)}
-                        className="px-4 py-2 rounded-xl bg-[var(--foreground)]/5 text-[10px] font-black uppercase tracking-wider hover:bg-[var(--foreground)]/10 transition-all"
+                        className="px-4 py-2 rounded-xl bg-[var(--foreground)]/5 text-[14px] font-black uppercase tracking-wider hover:bg-[var(--foreground)]/10 transition-all"
                     >
                         Load More ({filteredParties.length - visibleCount} remaining)
                     </button>
@@ -302,13 +302,13 @@ export default function PartiesClientView() {
             {loading ? (
                 <div className="py-20 flex flex-col items-center justify-center">
                     <LoadingSpinner label="Compiling Directory..." />
-                    <p className="text-[8px] font-bold text-[var(--foreground)]/20 uppercase tracking-[0.3em] mt-3">Accessing Secure Vault</p>
+                    <p className="text-[12px] font-bold text-[var(--foreground)]/20 uppercase tracking-[0.3em] mt-3">Accessing Secure Vault</p>
                 </div>
             ) : filteredParties.length === 0 ? (
                 <div className="text-center py-24 opacity-30 animate-in fade-in duration-300">
                     <UserIcon className="h-10 w-10 mx-auto mb-3 opacity-20" />
-                    <p className="text-[10px] font-bold uppercase tracking-wider">No contacts found</p>
-                    <p className="text-[8px] font-bold uppercase tracking-widest mt-1 opacity-50">Add a customer or supplier to get started</p>
+                    <p className="text-[14px] font-bold uppercase tracking-wider">No contacts found</p>
+                    <p className="text-[12px] font-bold uppercase tracking-widest mt-1 opacity-50">Add a customer or supplier to get started</p>
                 </div>
             ) : null}
 

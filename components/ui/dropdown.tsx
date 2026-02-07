@@ -46,7 +46,7 @@ export default function Dropdown({ options, value, onChange, placeholder, classN
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
                 className={clsx(
-                    "flex items-center justify-between gap-2 px-3 py-2 text-[10px] font-bold rounded-xl glass border border-white/40 dark:border-white/10 transition-all uppercase tracking-wider min-w-[140px]",
+                    "flex items-center justify-between gap-2 px-3 py-2 text-[14px] font-bold rounded-xl glass border border-white/40 dark:border-white/10 transition-all uppercase tracking-wider min-w-[140px]",
                     isOpen ? "border-[var(--primary-green)] bg-white/60 dark:bg-white/10" : "hover:border-[var(--primary-green)]/50"
                 )}
             >
@@ -73,7 +73,7 @@ export default function Dropdown({ options, value, onChange, placeholder, classN
                                         setIsOpen(false)
                                     }}
                                     className={clsx(
-                                        "w-full px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-left transition-all flex items-center justify-between group",
+                                        "w-full px-3 py-2 text-[14px] font-bold uppercase tracking-wider text-left transition-all flex items-center justify-between group",
                                         option.value === value
                                             ? "bg-[var(--primary-green)]/10 text-[var(--primary-green)]"
                                             : "text-[var(--deep-contrast)] hover:bg-white/60 dark:hover:bg-white/10"

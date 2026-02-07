@@ -43,8 +43,8 @@ export default function ErrorModal({
                                     <ShieldAlert className="h-5 w-5" />
                                 </div>
                                 <div className="min-w-0">
-                                    <h2 className="text-[12px] font-black text-rose-500 uppercase tracking-tight truncate">{title}</h2>
-                                    <p className="text-[8px] font-black text-rose-500/40 uppercase tracking-widest mt-0.5">Critical Protocol</p>
+                                    <h2 className="text-[16px] font-black text-rose-500 uppercase tracking-tight truncate">{title}</h2>
+                                    <p className="text-[12px] font-black text-rose-500/40 uppercase tracking-widest mt-0.5">Critical Protocol</p>
                                 </div>
                             </div>
                             <button
@@ -60,14 +60,14 @@ export default function ErrorModal({
                                 <h4 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight leading-none uppercase">
                                     Process Interrupted
                                 </h4>
-                                <p className="text-[10px] font-black text-[var(--foreground)]/40 tracking-widest leading-relaxed uppercase max-w-[240px] mx-auto">
+                                <p className="text-[14px] font-black text-[var(--foreground)]/40 tracking-widest leading-relaxed uppercase max-w-[240px] mx-auto">
                                     {message}
                                 </p>
                             </div>
 
                             <button
                                 onClick={onClose}
-                                className="w-full h-12 rounded-xl bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] text-[11px] font-black uppercase tracking-[0.2em] shadow-xl shadow-[var(--deep-contrast)]/20 hover:bg-rose-500 hover:text-white transition-all active:scale-95"
+                                className="w-full h-12 rounded-xl bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] text-[15px] font-black uppercase tracking-[0.2em] shadow-xl shadow-[var(--deep-contrast)]/20 hover:bg-rose-500 hover:text-white transition-all active:scale-95"
                             >
                                 Dismiss Report
                             </button>

@@ -55,7 +55,7 @@ export default function BusinessSwitcherModal({
                                 <BrandLogo size="xl" />
                             </div>
                             <h2 className="text-lg font-black text-[var(--deep-contrast)] tracking-tight uppercase">Claire</h2>
-                            <p className="text-[10px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.2em] mt-1">Identity Gateway</p>
+                            <p className="text-[14px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.2em] mt-1">Identity Gateway</p>
 
                             <button
                                 onClick={onClose}
@@ -95,9 +95,9 @@ export default function BusinessSwitcherModal({
                                                 {biz.name.charAt(0).toUpperCase()}
                                             </div>
                                             <div className="text-left">
-                                                <p className="text-[11px] font-black uppercase tracking-tight truncate max-w-[150px]">{biz.name}</p>
+                                                <p className="text-[15px] font-black uppercase tracking-tight truncate max-w-[150px]">{biz.name}</p>
                                                 <p className={clsx(
-                                                    "text-[8px] font-black uppercase tracking-widest mt-1",
+                                                    "text-[12px] font-black uppercase tracking-widest mt-1",
                                                     isActive ? "opacity-60" : "opacity-30"
                                                 )}>
                                                     {biz.isOwner ? 'Principal Owner' : 'Associate Member'}
@@ -122,7 +122,7 @@ export default function BusinessSwitcherModal({
                                     onCreateNew()
                                     onClose()
                                 }}
-                                className="w-full h-14 flex items-center justify-center gap-2 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-[0.15em] text-[var(--primary-green)] bg-[var(--primary-green)]/5 border border-[var(--primary-green)]/10 hover:bg-[var(--primary-green)] hover:text-[var(--primary-foreground)] transition-all active:scale-95 shadow-sm group"
+                                className="w-full h-14 flex items-center justify-center gap-2 py-3.5 rounded-2xl text-[14px] font-black uppercase tracking-[0.15em] text-[var(--primary-green)] bg-[var(--primary-green)]/5 border border-[var(--primary-green)]/10 hover:bg-[var(--primary-green)] hover:text-[var(--primary-foreground)] transition-all active:scale-95 shadow-sm group"
                             >
                                 <Plus className="h-4 w-4 transition-transform group-hover:rotate-90 duration-500" />
                                 Create New Identity

@@ -64,7 +64,7 @@ export default function DatePickerModal({
                 <div className="flex items-center justify-between border-b border-white/10 dark:border-white/5 px-6 py-4 bg-white/40 dark:bg-white/5">
                     <div>
                         <h2 className="text-sm font-bold text-[var(--deep-contrast)] tracking-tight">{title}</h2>
-                        <p className="text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-none mt-0.5">Choose a Day</p>
+                        <p className="text-[13px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider leading-none mt-0.5">Choose a Day</p>
                     </div>
                     <button onClick={onClose} className="p-1.5 rounded-full hover:bg-white/50 dark:hover:bg-white/10 transition-all opacity-40 hover:opacity-100">
                         <X className="h-4 w-4" />
@@ -96,7 +96,7 @@ export default function DatePickerModal({
                     {/* Weekdays */}
                     <div className="grid grid-cols-7 mb-2">
                         {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
-                            <div key={day} className="text-[9px] font-bold text-center text-[var(--foreground)]/30 uppercase">
+                            <div key={day} className="text-[13px] font-bold text-center text-[var(--foreground)]/30 uppercase">
                                 {day}
                             </div>
                         ))}
@@ -118,7 +118,7 @@ export default function DatePickerModal({
                                         onClose()
                                     }}
                                     className={clsx(
-                                        "h-10 w-full rounded-xl flex items-center justify-center text-[11px] font-bold transition-all relative",
+                                        "h-10 w-full rounded-xl flex items-center justify-center text-[15px] font-bold transition-all relative",
                                         isSelected
                                             ? "bg-[var(--primary-green)] text-white shadow-lg scale-105 z-10"
                                             : isCurrentMonth
@@ -139,7 +139,7 @@ export default function DatePickerModal({
 
                 {/* Footer Info */}
                 <div className="p-3 border-t border-white/10 dark:border-white/5 bg-white/20 dark:bg-white/5 text-center">
-                    <div className="flex items-center justify-center gap-1.5 text-[8px] font-bold uppercase tracking-wider text-[var(--foreground)]/40">
+                    <div className="flex items-center justify-center gap-1.5 text-[12px] font-bold uppercase tracking-wider text-[var(--foreground)]/40">
                         <CalendarIcon className="h-3 w-3" />
                         Today: {format(new Date(), 'MMM do, yyyy')}
                     </div>

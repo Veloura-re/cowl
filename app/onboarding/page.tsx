@@ -107,7 +107,7 @@ export default function OnboardingPage() {
                         <div>
                             <label
                                 htmlFor="businessName"
-                                className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-2 ml-1"
+                                className="block text-[14px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-2 ml-1"
                             >
                                 <Building2 className="inline h-3 w-3 mr-1" />
                                 Business Name *
@@ -128,7 +128,7 @@ export default function OnboardingPage() {
                         <div>
                             <label
                                 htmlFor="address"
-                                className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-2 ml-1"
+                                className="block text-[14px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-2 ml-1"
                             >
                                 <MapPin className="inline h-3 w-3 mr-1" />
                                 Business Address
@@ -149,7 +149,7 @@ export default function OnboardingPage() {
                             <div>
                                 <label
                                     htmlFor="phone"
-                                    className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-2 ml-1"
+                                    className="block text-[14px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-2 ml-1"
                                 >
                                     <Phone className="inline h-3 w-3 mr-1" />
                                     Phone Number
@@ -168,7 +168,7 @@ export default function OnboardingPage() {
                             <div>
                                 <label
                                     htmlFor="currency"
-                                    className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-2 ml-1"
+                                    className="block text-[14px] font-bold uppercase tracking-wider text-[var(--foreground)]/60 mb-2 ml-1"
                                 >
                                     <DollarSign className="inline h-3 w-3 mr-1" />
                                     Currency *
@@ -203,7 +203,7 @@ export default function OnboardingPage() {
                         )}
                     </button>
 
-                    <p className="text-center text-[9px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider">
+                    <p className="text-center text-[13px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider">
                         You can add more businesses later from the dashboard
                     </p>
                 </form>

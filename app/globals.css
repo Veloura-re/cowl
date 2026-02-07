@@ -12,6 +12,8 @@
   --font-serif: var(--font-inter), Georgia, "Times New Roman", Times, serif;
   --font-display: var(--font-inter), "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  --font-scale: 1.15;
 }
 
 :root {
@@ -148,6 +150,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: "cv02", "cv05", "cv08", "cv09", "cv11", "lnum";
+
+  /* Apply global font scaling */
+  font-size: calc(22px * var(--font-scale));
 
   transition: background-color 0.1s ease, color 0.1s ease;
   padding-bottom: env(safe-area-inset-bottom);
@@ -363,11 +368,11 @@ h6 {
 
 
   .text-mobile-xs {
-    font-size: 10px;
+    font-size: calc(14px * var(--font-scale));
   }
 
   .text-mobile-sm {
-    font-size: 12px;
+    font-size: calc(16px * var(--font-scale));
   }
 
   .h-mobile-touch {

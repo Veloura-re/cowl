@@ -57,14 +57,14 @@ const SignaturePad = forwardRef<SignaturePadHandle, { className?: string }>(({ c
                     {!hasSignature && (
                         <div className="absolute inset-0 flex flex-col items-center justify-center space-y-2 opacity-30">
                             <PenTool className="h-8 w-8 text-[var(--foreground)]/20 animate-pulse" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--foreground)]">Place Signature Above Line</span>
+                            <span className="text-[14px] font-black uppercase tracking-[0.3em] text-[var(--foreground)]">Place Signature Above Line</span>
                         </div>
                     )}
 
                     {/* Authentication Badge */}
                     <div className="mt-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--foreground)]/5 border border-[var(--foreground)]/5">
                         <ShieldCheck className={`h-3 w-3 ${hasSignature ? 'text-[var(--primary-green)]' : 'text-[var(--foreground)]/20'}`} />
-                        <span className="text-[8px] font-black uppercase tracking-wider text-[var(--foreground)]/40">Secured Digital Verification</span>
+                        <span className="text-[12px] font-black uppercase tracking-wider text-[var(--foreground)]/40">Secured Digital Verification</span>
                     </div>
                 </div>
             </div>
@@ -72,7 +72,7 @@ const SignaturePad = forwardRef<SignaturePadHandle, { className?: string }>(({ c
             <div className="flex justify-between items-center px-1 shrink-0">
                 <div className="flex items-center gap-2">
                     <div className={`h-1.5 w-1.5 rounded-full transition-all duration-500 ${hasSignature ? 'bg-[var(--primary-green)] shadow-[0_0_8px_var(--primary-green)]' : 'bg-gray-300 animate-pulse'}`} />
-                    <span className="text-[9px] font-black uppercase tracking-widest text-[var(--foreground)]/40">
+                    <span className="text-[13px] font-black uppercase tracking-widest text-[var(--foreground)]/40">
                         {hasSignature ? 'Reviewing Signature' : 'Awaiting Input'}
                     </span>
                 </div>
@@ -86,7 +86,7 @@ const SignaturePad = forwardRef<SignaturePadHandle, { className?: string }>(({ c
                     type="button"
                 >
                     <Eraser className="h-3.5 w-3.5 group-hover:rotate-12 transition-transform" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">Wipe Clear</span>
+                    <span className="text-[14px] font-black uppercase tracking-widest">Wipe Clear</span>
                 </button>
             </div>
         </div>

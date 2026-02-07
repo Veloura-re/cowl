@@ -25,14 +25,14 @@ export default function Step1BasicInfo({ onNext }: Step1Props) {
     return (
         <div className="glass rounded-2xl border border-white/40 overflow-hidden">
             <div className="px-5 py-3 border-b border-white/10 bg-[var(--primary-green)]/5">
-                <h2 className="text-[11px] font-bold text-[var(--deep-contrast)] uppercase tracking-tight">Basic Information</h2>
-                <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mt-0.5">Item details and classification</p>
+                <h2 className="text-[15px] font-bold text-[var(--deep-contrast)] uppercase tracking-tight">Basic Information</h2>
+                <p className="text-[12px] font-bold text-[var(--foreground)]/40 uppercase tracking-wider mt-0.5">Item details and classification</p>
             </div>
 
             <div className="p-5 space-y-4">
                 {/* Item Name - Large Input */}
                 <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-2">
+                    <label className="block text-[14px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-2">
                         Item Name *
                     </label>
                     <input
@@ -49,13 +49,13 @@ export default function Step1BasicInfo({ onNext }: Step1Props) {
                         placeholder="e.g., Premium Cotton Fabric"
                     />
                     {error && (
-                        <p className="text-[9px] font-bold text-red-500 mt-2 ml-1">{error}</p>
+                        <p className="text-[13px] font-bold text-red-500 mt-2 ml-1">{error}</p>
                     )}
                 </div>
 
                 {/* Type Selection */}
                 <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-3">
+                    <label className="block text-[14px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-3">
                         Item Type
                     </label>
                     <div className="grid grid-cols-2 gap-3">
@@ -74,7 +74,7 @@ export default function Step1BasicInfo({ onNext }: Step1Props) {
                                 data.type === 'PRODUCT' ? "text-[var(--primary-green)]" : "text-[var(--foreground)]/40"
                             )} />
                             <div className="text-sm font-bold text-[var(--deep-contrast)]">Product</div>
-                            <div className="text-[9px] font-bold text-[var(--foreground)]/40 mt-0.5">Physical goods with stock</div>
+                            <div className="text-[13px] font-bold text-[var(--foreground)]/40 mt-0.5">Physical goods with stock</div>
                         </button>
 
                         <button
@@ -92,7 +92,7 @@ export default function Step1BasicInfo({ onNext }: Step1Props) {
                                 data.type === 'SERVICE' ? "text-[var(--primary-green)]" : "text-[var(--foreground)]/40"
                             )} />
                             <div className="text-sm font-bold text-[var(--deep-contrast)]">Service</div>
-                            <div className="text-[9px] font-bold text-[var(--foreground)]/40 mt-0.5">Non-physical offerings</div>
+                            <div className="text-[13px] font-bold text-[var(--foreground)]/40 mt-0.5">Non-physical offerings</div>
                         </button>
                     </div>
                 </div>
@@ -100,7 +100,7 @@ export default function Step1BasicInfo({ onNext }: Step1Props) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Category */}
                     <div>
-                        <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-2">
+                        <label className="block text-[14px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-2">
                             Category
                         </label>
                         <input
@@ -114,7 +114,7 @@ export default function Step1BasicInfo({ onNext }: Step1Props) {
 
                     {/* SKU */}
                     <div>
-                        <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-2">
+                        <label className="block text-[14px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-2">
                             SKU / Reference ID
                         </label>
                         <input
@@ -129,7 +129,7 @@ export default function Step1BasicInfo({ onNext }: Step1Props) {
 
                 {/* Description */}
                 <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-2">
+                    <label className="block text-[14px] font-bold uppercase tracking-wider text-[var(--foreground)]/50 mb-2">
                         Description (Optional)
                     </label>
                     <textarea

@@ -43,15 +43,15 @@ export default function Step4Success({ onComplete }: Step4Props) {
                 <div className="glass rounded-2xl border border-white/30 p-6 max-w-md mx-auto">
                     <div className="space-y-3">
                         <div className="flex justify-between">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/50">Invoice Number</span>
+                            <span className="text-[14px] font-bold uppercase tracking-wider text-[var(--foreground)]/50">Invoice Number</span>
                             <span className="text-sm font-bold text-[var(--deep-contrast)]">{data.invoiceNumber}</span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/50">Customer</span>
+                            <span className="text-[14px] font-bold uppercase tracking-wider text-[var(--foreground)]/50">Customer</span>
                             <span className="text-sm font-bold text-[var(--deep-contrast)]">{data.partyName}</span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--foreground)]/50">Items</span>
+                            <span className="text-[14px] font-bold uppercase tracking-wider text-[var(--foreground)]/50">Items</span>
                             <span className="text-sm font-bold text-[var(--deep-contrast)]">{data.items.length}</span>
                         </div>
                         <div className="flex justify-between pt-3 border-t border-white/20">
@@ -68,7 +68,7 @@ export default function Step4Success({ onComplete }: Step4Props) {
                         className="flex flex-col items-center gap-2 p-4 rounded-xl bg-white/50 border border-white/30 hover:bg-white/10 hover:border-[var(--primary-green)] transition-all group"
                     >
                         <List className="h-6 w-6 text-[var(--primary-green)] group-hover:scale-110 transition-transform" />
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--deep-contrast)]">View All Sales</span>
+                        <span className="text-[14px] font-bold uppercase tracking-wider text-[var(--deep-contrast)]">View All Sales</span>
                     </Link>
 
                     <button
@@ -76,7 +76,7 @@ export default function Step4Success({ onComplete }: Step4Props) {
                         className="flex flex-col items-center gap-2 p-4 rounded-xl bg-[var(--primary-green)] text-white hover:bg-[var(--primary-hover)] transition-all group shadow-lg shadow-[var(--primary-green)]/20"
                     >
                         <Plus className="h-6 w-6 group-hover:scale-110 transition-transform" />
-                        <span className="text-[10px] font-bold uppercase tracking-wider">Create Another</span>
+                        <span className="text-[14px] font-bold uppercase tracking-wider">Create Another</span>
                     </button>
 
                     <button
@@ -84,7 +84,7 @@ export default function Step4Success({ onComplete }: Step4Props) {
                         className="flex flex-col items-center gap-2 p-4 rounded-xl bg-white/50 border border-white/30 hover:bg-white/10 hover:border-[var(--primary-green)] transition-all group"
                     >
                         <FileText className="h-6 w-6 text-[var(--primary-green)] group-hover:scale-110 transition-transform" />
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--deep-contrast)]">Done</span>
+                        <span className="text-[14px] font-bold uppercase tracking-wider text-[var(--deep-contrast)]">Done</span>
                     </button>
                 </div>
             </div>

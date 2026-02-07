@@ -164,7 +164,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight">Stock</h1>
-                        <p className="text-[10px] font-black text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Manage Items</p>
+                        <p className="text-[14px] font-black text-[var(--foreground)]/60 uppercase tracking-wider leading-none">Manage Items</p>
                     </div>
                     <motion.button
                         id="add-item-btn"
@@ -173,7 +173,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                         whileHover={{ scale: 1.05, translateY: -2 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => router.push('/dashboard/inventory/new')}
-                        className="flex items-center justify-center rounded-xl bg-[var(--primary-green)] px-4 py-2 text-[11px] font-black uppercase tracking-wider text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] transition-all shadow-xl shadow-[var(--primary-green)]/20 active:scale-95 border border-[var(--primary-foreground)]/10 group"
+                        className="flex items-center justify-center rounded-xl bg-[var(--primary-green)] px-4 py-2 text-[15px] font-black uppercase tracking-wider text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] transition-all shadow-xl shadow-[var(--primary-green)]/20 active:scale-95 border border-[var(--primary-foreground)]/10 group"
                     >
                         <Plus className="mr-1.5 h-3.5 w-3.5 transition-transform group-hover:rotate-90 duration-300" />
                         <span>Add Item</span>
@@ -191,16 +191,16 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
             {/* Quick Stats Bar */}
             <div id="inventory-stats" className="flex gap-2">
                 <div
-                    className="flex-1 glass p-2 rounded-xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 group hover:bg-[var(--foreground)]/10 transition-all cursor-default"
+                    className="flex-1 glass p-3 rounded-xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 group hover:bg-[var(--foreground)]/10 transition-all cursor-default"
                 >
                     <div className="flex justify-between items-center">
                         <div className="flex items-center gap-1.5">
-                            <div className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-                            <span className="text-[7.5px] font-black uppercase tracking-widest text-blue-600/60">Value of Stock</span>
+                            <div className="h-2 w-2 rounded-full bg-blue-500" />
+                            <span className="text-[12px] font-black uppercase tracking-widest text-blue-600/60">Value of Stock</span>
                         </div>
-                        <span className="text-[9px] font-black text-blue-600 bg-blue-500/10 px-2 py-0.5 rounded uppercase tracking-tighter shadow-sm border border-blue-500/10">ASSETS</span>
+                        <span className="text-[16px] font-black text-blue-600 bg-blue-500/10 px-2 py-1 rounded uppercase tracking-tighter shadow-sm border border-blue-500/10">ASSETS</span>
                     </div>
-                    <p className="text-xs font-black text-blue-600 mt-1 tabular-nums">
+                    <p className="text-[18px] font-black text-blue-600 mt-2 tabular-nums">
                         {formatCurrency(items.reduce((sum, i) => sum + (i.stock_quantity * i.selling_price), 0))}
                     </p>
                 </div>
@@ -210,20 +210,20 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setFilterLowStock(!filterLowStock)}
                     className={clsx(
-                        "flex-1 glass p-2 rounded-xl border transition-all cursor-pointer group",
+                        "flex-1 glass p-3 rounded-xl border transition-all cursor-pointer group",
                         filterLowStock ? "bg-[var(--status-danger)] border-[var(--status-danger-border)]" : "bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 hover:bg-[var(--foreground)]/10",
                         items.some(i => i.stock_quantity <= i.min_stock) && "critical-glow-red"
                     )}
                 >
                     <div className="flex justify-between items-center">
                         <div className="flex items-center gap-1.5">
-                            <div className="h-1.5 w-1.5 rounded-full bg-rose-500" />
-                            <span className="text-[7.5px] font-black uppercase tracking-widest text-[var(--status-danger-foreground)]/60">Low Stock</span>
+                            <div className="h-2 w-2 rounded-full bg-rose-500" />
+                            <span className="text-[12px] font-black uppercase tracking-widest text-[var(--status-danger-foreground)]/60">Low Stock</span>
                         </div>
-                        <span className="text-[9px] font-black text-[var(--status-danger-foreground)] bg-[var(--status-danger)] px-2 py-0.5 rounded uppercase tracking-tighter shadow-sm border border-[var(--status-danger-border)]">ALERTS</span>
+                        <span className="text-[16px] font-black text-[var(--status-danger-foreground)] bg-[var(--status-danger)] px-2 py-1 rounded uppercase tracking-tighter shadow-sm border border-[var(--status-danger-border)]">ALERTS</span>
                     </div>
-                    <p className="text-xs font-black text-[var(--status-danger-foreground)] mt-1 tabular-nums">
-                        {items.filter(i => i.stock_quantity <= i.min_stock).length} <span className="text-[8px] opacity-40 uppercase">Low</span>
+                    <p className="text-[18px] font-black text-[var(--status-danger-foreground)] mt-2 tabular-nums">
+                        {items.filter(i => i.stock_quantity <= i.min_stock).length} <span className="text-[14px] opacity-40 uppercase">Low</span>
                     </p>
                 </motion.div>
             </div>
@@ -255,15 +255,15 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                                 onMouseUp={handleTouchEnd}
                                 onMouseLeave={handleTouchEnd}
                                 onTouchStart={() => handleTouchStart(item)}
-                                onTouchEnd={handleTouchEnd}
+                                onTouchEnd={() => handleTouchEnd()}
                                 className={clsx(
-                                    "group relative flex items-center glass-optimized rounded-[10px] border border-[var(--foreground)]/10 p-1.5 hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer overflow-hidden h-[44px] gap-2",
+                                    "group relative flex items-center glass-optimized rounded-[12px] border border-[var(--foreground)]/10 p-2 hover:bg-[var(--foreground)]/10 transition-all duration-300 cursor-pointer overflow-hidden h-[56px] gap-3",
                                     item.stock_quantity <= (item.min_stock || 0) && "critical-glow"
                                 )}
                             >
                                 {/* Stock Level Indicator */}
                                 <div className={clsx(
-                                    "absolute top-0 left-0 w-[2px] h-full transition-colors duration-300",
+                                    "absolute top-0 left-0 w-[3px] h-full transition-colors duration-300",
                                     item.stock_quantity <= 0 ? "bg-rose-500" :
                                         item.stock_quantity <= (item.min_stock || 0) ? "bg-amber-500" :
                                             "bg-emerald-500"
@@ -271,7 +271,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
 
                                 {/* Inventory Icon */}
                                 <div className={clsx(
-                                    "h-6 w-6 rounded-lg flex items-center justify-center font-black text-[9px] transition-all duration-300 shadow-inner shrink-0 border uppercase",
+                                    "h-8 w-8 rounded-xl flex items-center justify-center font-black text-[15px] transition-all duration-300 shadow-inner shrink-0 border uppercase",
                                     item.stock_quantity <= (item.min_stock || 0)
                                         ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
                                         : "bg-[var(--foreground)]/5 text-[var(--deep-contrast)]/60 border-[var(--foreground)]/10"
@@ -281,23 +281,23 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
 
                                 {/* Name & ID */}
                                 <div className="flex-1 min-w-0">
-                                    <h3 className="text-[9px] font-black text-[var(--deep-contrast)] truncate leading-none uppercase tracking-tight">{item.name}</h3>
+                                    <h3 className="text-[13px] font-black text-[var(--deep-contrast)] truncate leading-none uppercase tracking-tight">{item.name}</h3>
                                     <div className="flex items-center gap-1.5 mt-1.5">
-                                        <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">{item.unit || 'Units'}</span>
+                                        <span className="text-[10px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">{item.unit || 'Units'}</span>
                                         <div className="h-0.5 w-0.5 rounded-full bg-[var(--foreground)]/20" />
-                                        <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">SP: {formatCurrency(item.selling_price)}</span>
+                                        <span className="text-[10px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.1em]">SP: {formatCurrency(item.selling_price)}</span>
                                     </div>
                                 </div>
 
                                 {/* Stock Metric */}
                                 <div className="flex flex-col items-end shrink-0">
                                     <div className="flex items-center gap-1.5">
-                                        <span className="text-[6px] font-black text-[var(--foreground)]/30 uppercase tracking-widest opacity-40">Stock</span>
+                                        <span className="text-[10px] font-black text-[var(--foreground)]/30 uppercase tracking-widest opacity-40">Stock</span>
                                         <p className={clsx(
-                                            "text-[11px] font-black tracking-tighter tabular-nums leading-none",
+                                            "text-[15px] font-black tracking-tighter tabular-nums leading-none",
                                             item.stock_quantity <= (item.min_stock || 0) ? "text-rose-500" : "text-emerald-500"
                                         )}>
-                                            {item.stock_quantity} <span className="text-[8px] opacity-40 lowercase">{item.unit || 'units'}</span>
+                                            {item.stock_quantity} <span className="text-[12px] opacity-40 lowercase">{item.unit || 'units'}</span>
                                         </p>
                                     </div>
                                     <div className="flex items-center gap-1 mt-1 transition-opacity">
@@ -342,7 +342,7 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
                 <div className="flex justify-center py-4">
                     <button
                         onClick={() => setVisibleCount(prev => prev + 50)}
-                        className="px-4 py-2 rounded-xl bg-[var(--foreground)]/5 text-[10px] font-black uppercase tracking-wider hover:bg-[var(--foreground)]/10 transition-all"
+                        className="px-4 py-2 rounded-xl bg-[var(--foreground)]/5 text-[14px] font-black uppercase tracking-wider hover:bg-[var(--foreground)]/10 transition-all"
                     >
                         Load More ({filteredItems.length - visibleCount} remaining)
                     </button>
@@ -352,19 +352,19 @@ export default function InventoryClientView({ initialItems }: { initialItems?: a
             {(loading || isContextLoading) ? (
                 <div className="flex flex-col items-center justify-center py-32 animate-in fade-in zoom-in duration-300">
                     <LoadingSpinner size="lg" label="Synchronizing Inventory..." />
-                    <p className="text-[8px] font-black text-[var(--foreground)]/20 uppercase tracking-[0.3em] mt-2">Checking your secure vault</p>
+                    <p className="text-[12px] font-black text-[var(--foreground)]/20 uppercase tracking-[0.3em] mt-2">Checking your secure vault</p>
                 </div>
             ) : (!activeBusinessId) ? (
                 <div className="text-center py-24 opacity-30 animate-in fade-in duration-700">
                     <AlertTriangle className="h-10 w-10 mx-auto mb-3 text-amber-500 opacity-20" />
-                    <p className="text-[10px] font-black uppercase tracking-wider">No active business</p>
-                    <p className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-50">Please select a business from the sidebar</p>
+                    <p className="text-[14px] font-black uppercase tracking-wider">No active business</p>
+                    <p className="text-[12px] font-black uppercase tracking-widest mt-1 opacity-50">Please select a business from the sidebar</p>
                 </div>
             ) : filteredItems.length === 0 ? (
                 <div className="text-center py-24 opacity-30 animate-in fade-in duration-700">
                     <Package className="h-10 w-10 mx-auto mb-3 opacity-20" />
-                    <p className="text-[10px] font-black uppercase tracking-wider">No items in this warehouse</p>
-                    <p className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-50">Add a new item to get started</p>
+                    <p className="text-[14px] font-black uppercase tracking-wider">No items in this warehouse</p>
+                    <p className="text-[12px] font-black uppercase tracking-widest mt-1 opacity-50">Add a new item to get started</p>
                 </div>
             ) : null}
 

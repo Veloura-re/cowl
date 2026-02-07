@@ -614,7 +614,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                 <div className="glass rounded-[32px] border border-[var(--foreground)]/10 p-8 text-center shadow-2xl">
                     <CheckCircle2 className="h-12 w-12 text-[var(--primary-green)] mx-auto mb-3 animate-in zoom-in" />
                     <h2 className="text-lg font-black text-[var(--deep-contrast)] uppercase tracking-tight">{isSale ? 'Invoice' : 'Bill'} {isEdit ? 'Updated' : 'Created'}</h2>
-                    <p className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-1">Executing Redirection...</p>
+                    <p className="text-[13px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-1">Executing Redirection...</p>
                 </div>
             </div>
         )
@@ -633,14 +633,14 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                             <h1 className="text-xl font-black text-[var(--deep-contrast)] tracking-tight">
                                 {isEdit ? 'Edit' : 'New'} {isSale ? 'Ledger' : 'Purchase'}
                             </h1>
-                            <p className="text-[8px] font-black text-[var(--foreground)]/60 uppercase tracking-widest leading-none mt-0.5">Specifications Gateway</p>
+                            <p className="text-[12px] font-black text-[var(--foreground)]/60 uppercase tracking-widest leading-none mt-0.5">Specifications Gateway</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-1.5">
                         <button
                             type="button"
                             onClick={handlePreview}
-                            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-[var(--deep-contrast)] text-[8px] font-black uppercase tracking-widest hover:bg-[var(--foreground)]/10 transition-all shadow-sm active:scale-95"
+                            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 text-[var(--deep-contrast)] text-[12px] font-black uppercase tracking-widest hover:bg-[var(--foreground)]/10 transition-all shadow-sm active:scale-95"
                         >
                             <Printer className="h-3 w-3" />
                             <span className="hidden sm:inline">Preview</span>
@@ -649,7 +649,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                         <button
                             type="submit"
                             disabled={loading || !partyId || rows.length === 0}
-                            className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[var(--primary-green)] text-[var(--primary-foreground)] text-[8px] font-black uppercase tracking-widest hover:bg-[var(--primary-hover)] transition-all disabled:opacity-50 shadow-md active:scale-95"
+                            className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[var(--primary-green)] text-[var(--primary-foreground)] text-[12px] font-black uppercase tracking-widest hover:bg-[var(--primary-hover)] transition-all disabled:opacity-50 shadow-md active:scale-95"
                         >
                             {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
                             <span>{isSale ? 'Commit' : 'Record'}</span>
@@ -665,12 +665,12 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                 <Building size={32} strokeWidth={1.5} />
                             </div>
                             <h2 className="text-sm font-black text-[var(--deep-contrast)] uppercase tracking-tight mb-2">Party Resolution</h2>
-                            <p className="text-[9px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.2em] mb-4 leading-tight">Identify party to reveal specifications</p>
+                            <p className="text-[13px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.2em] mb-4 leading-tight">Identify party to reveal specifications</p>
 
                             <button
                                 type="button"
                                 onClick={() => setIsPartyPickerOpen(true)}
-                                className="inline-flex items-center gap-3 px-8 py-3.5 rounded-xl bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] text-[9px] font-black uppercase tracking-[0.2em] hover:bg-[var(--deep-contrast-hover)] transition-all shadow-md active:scale-95 group/btn"
+                                className="inline-flex items-center gap-3 px-8 py-3.5 rounded-xl bg-[var(--deep-contrast)] text-[var(--deep-contrast-foreground)] text-[13px] font-black uppercase tracking-[0.2em] hover:bg-[var(--deep-contrast-hover)] transition-all shadow-md active:scale-95 group/btn"
                             >
                                 Select Party
                             </button>
@@ -682,14 +682,14 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                             {/* Left: Basic Info */}
                             <div className="lg:col-span-1 space-y-3">
                                 <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-3 shadow-md">
-                                    <h3 className="text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 border-b border-[var(--foreground)]/5 pb-1">Metadata</h3>
+                                    <h3 className="text-[11px] font-black uppercase tracking-widest text-[var(--foreground)]/40 mb-2 border-b border-[var(--foreground)]/5 pb-1">Metadata</h3>
                                     <div className="space-y-3">
                                         <div>
-                                            <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1 ml-0.5">Account</label>
+                                            <label className="block text-[11px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1 ml-0.5">Account</label>
                                             <button
                                                 type="button"
                                                 onClick={() => setIsPartyPickerOpen(true)}
-                                                className="w-full h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[9px] font-black text-left hover:border-[var(--primary-green)] transition-all flex items-center justify-between shadow-inner"
+                                                className="w-full h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[13px] font-black text-left hover:border-[var(--primary-green)] transition-all flex items-center justify-between shadow-inner"
                                             >
                                                 <span className="truncate">{filteredParties.find(p => p.id === partyId)?.name || 'SELECT...'}</span>
                                             </button>
@@ -698,7 +698,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                             <button
                                                 type="button"
                                                 onClick={() => setShowTopMore(!showTopMore)}
-                                                className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[var(--foreground)]/3 hover:bg-[var(--foreground)]/8 text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/40 transition-all border border-[var(--foreground)]/5"
+                                                className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[var(--foreground)]/3 hover:bg-[var(--foreground)]/8 text-[11px] font-black uppercase tracking-widest text-[var(--foreground)]/40 transition-all border border-[var(--foreground)]/5"
                                             >
                                                 {showTopMore ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
                                                 {showTopMore ? 'Less' : 'More Details'}
@@ -715,12 +715,12 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                                     className="overflow-hidden space-y-2 pt-2"
                                                 >
                                                     <div>
-                                                        <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1 ml-0.5">UID</label>
+                                                        <label className="block text-[11px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1 ml-0.5">UID</label>
                                                         <input
                                                             type="text"
                                                             value={invoiceNumber}
                                                             onChange={(e) => setInvoiceNumber(e.target.value)}
-                                                            className="w-full h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[10px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all"
+                                                            className="w-full h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-3 text-[14px] font-black text-[var(--deep-contrast)] focus:border-[var(--primary-green)] focus:outline-none transition-all"
                                                         />
                                                     </div>
                                                     <div className="grid grid-cols-1 gap-1.5">
@@ -728,21 +728,21 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                                     </div>
                                                     <div className="grid grid-cols-2 gap-1.5">
                                                         <div>
-                                                            <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1 ml-0.5">Date</label>
+                                                            <label className="block text-[11px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1 ml-0.5">Date</label>
                                                             <input
                                                                 type="date"
                                                                 value={date}
                                                                 onChange={(e) => setDate(e.target.value)}
-                                                                className="w-full h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-2 text-[8px] font-black focus:border-[var(--primary-green)] focus:outline-none transition-all"
+                                                                className="w-full h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-2 text-[12px] font-black focus:border-[var(--primary-green)] focus:outline-none transition-all"
                                                             />
                                                         </div>
                                                         <div>
-                                                            <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1 ml-0.5">Due</label>
+                                                            <label className="block text-[11px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-1 ml-0.5">Due</label>
                                                             <input
                                                                 type="date"
                                                                 value={dueDate}
                                                                 onChange={(e) => setDueDate(e.target.value)}
-                                                                className="w-full h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-2 text-[8px] font-black focus:border-[var(--primary-green)] focus:outline-none transition-all"
+                                                                className="w-full h-8 rounded-lg bg-[var(--foreground)]/5 border border-[var(--foreground)]/10 px-2 text-[12px] font-black focus:border-[var(--primary-green)] focus:outline-none transition-all"
                                                             />
                                                         </div>
                                                     </div>
@@ -757,19 +757,19 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                         <div className="h-5 w-5 rounded-md bg-[var(--primary-green)] text-white flex items-center justify-center">
                                             <Calculator size={12} />
                                         </div>
-                                        <h3 className="text-[8px] font-black uppercase tracking-widest text-[var(--deep-contrast)]">Summary</h3>
+                                        <h3 className="text-[12px] font-black uppercase tracking-widest text-[var(--deep-contrast)]">Summary</h3>
                                     </div>
                                     <div className="space-y-2">
-                                        <div className="flex justify-between text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 px-0.5">
+                                        <div className="flex justify-between text-[12px] font-black uppercase tracking-widest text-[var(--foreground)]/40 px-0.5">
                                             <span>Subtotal</span>
                                             <span className="text-[var(--deep-contrast)] tabular-nums">{formatCurrency(subtotal)}</span>
                                         </div>
-                                        <div className="flex justify-between text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 px-0.5">
+                                        <div className="flex justify-between text-[12px] font-black uppercase tracking-widest text-[var(--foreground)]/40 px-0.5">
                                             <span>Tax</span>
                                             <span className="text-[var(--deep-contrast)] tabular-nums">{formatCurrency(totalTax)}</span>
                                         </div>
                                         {discountAmount > 0 && (
-                                            <div className="flex justify-between text-[8px] font-black uppercase tracking-widest text-orange-600 px-0.5">
+                                            <div className="flex justify-between text-[12px] font-black uppercase tracking-widest text-orange-600 px-0.5">
                                                 <span>Rebate</span>
                                                 <span className="tabular-nums">-{formatCurrency(discountAmount)}</span>
                                             </div>
@@ -777,9 +777,9 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                     </div>
                                     <div className="pt-2 border-t border-[var(--primary-green)]/20 mt-1">
                                         <div className="flex justify-between items-center mb-0.5">
-                                            <span className="text-[7px] font-black uppercase tracking-[0.2em] opacity-30">Total</span>
+                                            <span className="text-[11px] font-black uppercase tracking-[0.2em] opacity-30">Total</span>
                                             {paymentMode !== 'UNPAID' && (
-                                                <span className="text-[6px] font-black px-1.5 py-0.5 rounded-full bg-[var(--primary-green)]/10 text-[var(--primary-green)] uppercase">Paid</span>
+                                                <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-[var(--primary-green)]/10 text-[var(--primary-green)] uppercase">Paid</span>
                                             )}
                                         </div>
                                         <div className={clsx(
@@ -797,13 +797,13 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                 <div className="glass rounded-[24px] border border-[var(--foreground)]/10 overflow-hidden min-h-[400px] shadow-xl">
                                     <div className="px-4 py-3 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5 flex justify-between items-center relative overflow-hidden">
                                         <div className="relative z-10">
-                                            <h3 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">Inventory Log</h3>
-                                            <p className="text-[7px] font-black text-[var(--foreground)]/40 uppercase tracking-widest">{rows.length} ENTRIES</p>
+                                            <h3 className="text-[14px] font-black text-[var(--deep-contrast)] uppercase tracking-wider">Inventory Log</h3>
+                                            <p className="text-[11px] font-black text-[var(--foreground)]/40 uppercase tracking-widest">{rows.length} ENTRIES</p>
                                         </div>
                                         <button
                                             type="button"
                                             onClick={() => setIsAddModalOpen(true)}
-                                            className="relative z-10 flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--primary-green)] text-[var(--primary-foreground)] text-[9px] font-black uppercase tracking-wider hover:bg-[var(--primary-hover)] transition-all shadow-md active:scale-95 group"
+                                            className="relative z-10 flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--primary-green)] text-[var(--primary-foreground)] text-[13px] font-black uppercase tracking-wider hover:bg-[var(--primary-hover)] transition-all shadow-md active:scale-95 group"
                                         >
                                             <Plus size={12} />
                                             {isSale ? 'ADD PRODUCT' : 'ADD ITEM'}
@@ -814,7 +814,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                         {rows.length === 0 ? (
                                             <div className="text-center py-24 opacity-10">
                                                 <Calculator className="h-8 w-8 mx-auto mb-3" />
-                                                <p className="text-[8px] font-black uppercase tracking-[0.3em]">Empty</p>
+                                                <p className="text-[12px] font-black uppercase tracking-[0.3em]">Empty</p>
                                             </div>
                                         ) : (
                                             rows.map((row, index) => (
@@ -831,8 +831,8 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                                             <Calculator size={14} strokeWidth={2.5} />
                                                         </div>
                                                         <div className="min-w-0 flex-1">
-                                                            <h4 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase truncate tracking-tight">{row.name}</h4>
-                                                            <p className="text-[7px] font-black uppercase tracking-wider text-blue-500 mt-0.5">
+                                                            <h4 className="text-[14px] font-black text-[var(--deep-contrast)] uppercase truncate tracking-tight">{row.name}</h4>
+                                                            <p className="text-[11px] font-black uppercase tracking-wider text-blue-500 mt-0.5">
                                                                 P/U: {formatCurrency(Number(row.rate) - (Number(row.purchasePrice) || 0))}
                                                             </p>
                                                         </div>
@@ -840,10 +840,10 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
 
                                                     <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
                                                         <div className="text-right">
-                                                            <p className="text-[10px] font-black text-[var(--deep-contrast)] tabular-nums">{Number(row.quantity) || 0} {row.unit} × {formatCurrency(Number(row.rate))}</p>
+                                                            <p className="text-[14px] font-black text-[var(--deep-contrast)] tabular-nums">{Number(row.quantity) || 0} {row.unit} × {formatCurrency(Number(row.rate))}</p>
                                                         </div>
                                                         <div className="text-right pl-3 border-l border-[var(--foreground)]/10">
-                                                            <p className="text-[12px] font-black text-[var(--primary-green)] tabular-nums font-mono tracking-tighter">{formatCurrency(row.amount)}</p>
+                                                            <p className="text-[16px] font-black text-[var(--primary-green)] tabular-nums font-mono tracking-tighter">{formatCurrency(row.amount)}</p>
                                                         </div>
                                                         <button
                                                             type="button"
@@ -867,27 +867,27 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                             {/* 1. Documentation & Metadata */}
                             <div className="space-y-2">
                                 <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md space-y-2">
-                                    <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Adjustments</label>
+                                    <label className="block text-[12px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Adjustments</label>
                                     <div className="grid grid-cols-2 gap-2">
                                         <div className="p-2.5 rounded-xl bg-[var(--foreground)]/3 border border-white/5 space-y-1">
-                                            <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 font-mono">DIS %</label>
+                                            <label className="block text-[11px] font-black uppercase tracking-widest text-[var(--foreground)]/30 font-mono">DIS %</label>
                                             <div className="flex items-center">
                                                 <input
                                                     type="number"
                                                     value={discount === 0 ? '' : discount}
                                                     onChange={(e) => setDiscount(e.target.value)}
-                                                    className="w-full bg-transparent text-[11px] font-black text-[var(--deep-contrast)] focus:outline-none tabular-nums"
+                                                    className="w-full bg-transparent text-[15px] font-black text-[var(--deep-contrast)] focus:outline-none tabular-nums"
                                                 />
                                             </div>
                                         </div>
                                         <div className="p-2.5 rounded-xl bg-[var(--foreground)]/3 border border-white/5 space-y-1">
-                                            <label className="block text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30 font-mono">TAX %</label>
+                                            <label className="block text-[11px] font-black uppercase tracking-widest text-[var(--foreground)]/30 font-mono">TAX %</label>
                                             <div className="flex items-center">
                                                 <input
                                                     type="number"
                                                     value={invoiceTax === 0 ? '' : invoiceTax}
                                                     onChange={(e) => setInvoiceTax(e.target.value)}
-                                                    className="w-full bg-transparent text-[11px] font-black text-[var(--deep-contrast)] focus:outline-none tabular-nums"
+                                                    className="w-full bg-transparent text-[15px] font-black text-[var(--deep-contrast)] focus:outline-none tabular-nums"
                                                 />
                                             </div>
                                         </div>
@@ -895,12 +895,12 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                 </div>
 
                                 <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md flex flex-col min-h-[100px]">
-                                    <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 mb-2">Internal Memo</label>
+                                    <label className="block text-[12px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 mb-2">Internal Memo</label>
                                     <textarea
                                         value={notes}
                                         onChange={(e) => setNotes(e.target.value)}
                                         placeholder="SPECIFICATIONS..."
-                                        className="flex-1 w-full bg-transparent text-[10px] font-black text-[var(--deep-contrast)] focus:outline-none resize-none placeholder:opacity-10 custom-scrollbar"
+                                        className="flex-1 w-full bg-transparent text-[14px] font-black text-[var(--deep-contrast)] focus:outline-none resize-none placeholder:opacity-10 custom-scrollbar"
                                     />
                                 </div>
                             </div>
@@ -910,7 +910,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                     <button
                                         type="button"
                                         onClick={() => setShowBottomMore(!showBottomMore)}
-                                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--foreground)]/5 hover:bg-[var(--foreground)]/10 text-[9px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/60 transition-all border border-[var(--foreground)]/10 shadow-sm"
+                                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--foreground)]/5 hover:bg-[var(--foreground)]/10 text-[13px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/60 transition-all border border-[var(--foreground)]/10 shadow-sm"
                                     >
                                         {showBottomMore ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
                                         {showBottomMore ? 'Less Options' : 'More Options'}
@@ -930,14 +930,14 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                                 {/* 2. Authentication & Liquidation */}
                                                 <div className="space-y-2">
                                                     <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md space-y-2">
-                                                        <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Liquidation</label>
+                                                        <label className="block text-[12px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Liquidation</label>
                                                         <div className="space-y-2">
                                                             <div className="flex gap-2">
                                                                 <button
                                                                     type="button"
                                                                     onClick={() => setIsModePickerOpen(true)}
                                                                     className={clsx(
-                                                                        "flex-1 h-10 rounded-xl border px-3 text-[9px] font-black flex items-center justify-center transition-all",
+                                                                        "flex-1 h-10 rounded-xl border px-3 text-[13px] font-black flex items-center justify-center transition-all",
                                                                         paymentMode === 'UNPAID' ? "bg-rose-500/5 border-rose-500/10 text-rose-500" : "bg-[var(--primary-green)]/10 border-[var(--primary-green)]/40 text-[var(--primary-green)]"
                                                                     )}
                                                                 >
@@ -955,7 +955,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                                             {paymentMode !== 'UNPAID' && (
                                                                 <div className="p-2.5 rounded-xl bg-[var(--foreground)]/3 border border-white/5 space-y-2">
                                                                     <div className="flex items-center justify-between">
-                                                                        <label className="text-[7px] font-black uppercase tracking-widest text-[var(--foreground)]/30">{isSale ? 'Receipt' : 'Disbursement'}</label>
+                                                                        <label className="text-[11px] font-black uppercase tracking-widest text-[var(--foreground)]/30">{isSale ? 'Receipt' : 'Disbursement'}</label>
                                                                         <button
                                                                             type="button"
                                                                             onClick={() => {
@@ -964,7 +964,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                                                                 if (newState) setReceivedAmount(totalAmount)
                                                                             }}
                                                                             className={clsx(
-                                                                                "px-1.5 py-0.5 rounded text-[6px] font-black uppercase transition-all",
+                                                                                "px-1.5 py-0.5 rounded text-[10px] font-black uppercase transition-all",
                                                                                 isFullyReceived ? "bg-[var(--primary-green)] text-white" : "bg-[var(--foreground)]/10 text-[var(--foreground)]/40"
                                                                             )}
                                                                         >
@@ -984,7 +984,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                                                                         />
                                                                         <div className="text-right">
                                                                             <p className={clsx(
-                                                                                "text-[10px] font-black tabular-nums font-mono leading-none",
+                                                                                "text-[14px] font-black tabular-nums font-mono leading-none",
                                                                                 balanceDue > 0 ? "text-rose-500" : "text-[var(--primary-green)]"
                                                                             )}>{formatCurrency(balanceDue)}</p>
                                                                         </div>
@@ -996,8 +996,8 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
 
                                                     <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md space-y-3 bg-gradient-to-br from-transparent to-[var(--primary-green)]/[0.02]">
                                                         <div className="flex justify-between items-center">
-                                                            <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Auth</label>
-                                                            <div className="px-1.5 py-0.5 rounded-full bg-[var(--primary-green)]/10 border border-[var(--primary-green)]/20 text-[6px] font-black text-[var(--primary-green)] uppercase tracking-widest">
+                                                            <label className="block text-[12px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30">Auth</label>
+                                                            <div className="px-1.5 py-0.5 rounded-full bg-[var(--primary-green)]/10 border border-[var(--primary-green)]/20 text-[10px] font-black text-[var(--primary-green)] uppercase tracking-widest">
                                                                 Signature
                                                             </div>
                                                         </div>
@@ -1009,7 +1009,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
 
                                                 {/* 3. Evidence & Media */}
                                                 <div className="glass rounded-[20px] border border-[var(--foreground)]/10 p-4 shadow-md flex flex-col">
-                                                    <label className="block text-[8px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 mb-3 ml-1">Evidence</label>
+                                                    <label className="block text-[12px] font-black uppercase tracking-[0.2em] text-[var(--foreground)]/30 mb-3 ml-1">Evidence</label>
                                                     <div className="flex flex-wrap gap-2 flex-1 overflow-y-auto custom-scrollbar max-h-[160px]">
                                                         {attachments.map((url, i) => (
                                                             <div key={i} className="relative group/attachment h-12 w-12 rounded-lg border border-white/5 overflow-hidden shadow-sm">
@@ -1053,7 +1053,7 @@ export default function CompactInvoiceForm({ parties = [], items = [], paymentMo
                             setIsPartyPickerOpen(false)
                             setIsCreatePartyOpen(true)
                         }}
-                        className="w-full py-2 rounded-xl bg-[var(--primary-green)]/10 text-[var(--primary-green)] text-[10px] font-black uppercase tracking-widest hover:bg-[var(--primary-green)] hover:text-white transition-all"
+                        className="w-full py-2 rounded-xl bg-[var(--primary-green)]/10 text-[var(--primary-green)] text-[14px] font-black uppercase tracking-widest hover:bg-[var(--primary-green)] hover:text-white transition-all"
                     >
                         + Create New Party
                     </button>

@@ -53,12 +53,12 @@ export default function Step2AddItems({ items, onNext, onBack }: Step2Props) {
         <div className="glass rounded-[32px] border border-[var(--foreground)]/10 overflow-hidden shadow-2xl animate-in fade-in duration-500">
             <div className="px-8 py-6 border-b border-[var(--foreground)]/10 bg-[var(--foreground)]/5 flex justify-between items-center relative overflow-hidden">
                 <div className="relative z-10">
-                    <h2 className="text-[12px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">Line Specification</h2>
-                    <p className="text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Define assets for this ledger event</p>
+                    <h2 className="text-[16px] font-black text-[var(--deep-contrast)] uppercase tracking-tight">Line Specification</h2>
+                    <p className="text-[13px] font-black text-[var(--foreground)]/40 uppercase tracking-widest mt-0.5">Define assets for this ledger event</p>
                 </div>
                 <button
                     onClick={() => setIsAddModalOpen(true)}
-                    className="relative z-10 flex items-center gap-3 px-6 py-3 rounded-2xl bg-[var(--primary-green)] text-white font-black text-[11px] uppercase tracking-[0.15em] hover:bg-[var(--primary-hover)] transition-all shadow-xl shadow-[var(--primary-green)]/30 active:scale-95 group"
+                    className="relative z-10 flex items-center gap-3 px-6 py-3 rounded-2xl bg-[var(--primary-green)] text-white font-black text-[15px] uppercase tracking-[0.15em] hover:bg-[var(--primary-hover)] transition-all shadow-xl shadow-[var(--primary-green)]/30 active:scale-95 group"
                 >
                     <div className="h-6 w-6 rounded-xl bg-white/20 flex items-center justify-center group-hover:rotate-90 transition-transform duration-500">
                         <Plus className="h-4 w-4" />
@@ -74,7 +74,7 @@ export default function Step2AddItems({ items, onNext, onBack }: Step2Props) {
                         <div className="h-20 w-20 bg-[var(--foreground)]/5 rounded-[40px] flex items-center justify-center mb-6 border border-[var(--foreground)]/5">
                             <Package size={40} strokeWidth={1.5} />
                         </div>
-                        <p className="text-[11px] font-black uppercase tracking-[0.4em]">Inventory Manifest is Empty</p>
+                        <p className="text-[15px] font-black uppercase tracking-[0.4em]">Inventory Manifest is Empty</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -92,36 +92,36 @@ export default function Step2AddItems({ items, onNext, onBack }: Step2Props) {
                                         <Package size={22} />
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                        <div className="text-[13px] font-black text-[var(--deep-contrast)] uppercase tracking-tight truncate">{item.name}</div>
-                                        <div className="text-[9px] font-black text-[var(--foreground)]/30 uppercase tracking-widest mt-0.5">Asset Ref-0{index + 1}</div>
+                                        <div className="text-[17px] font-black text-[var(--deep-contrast)] uppercase tracking-tight truncate">{item.name}</div>
+                                        <div className="text-[13px] font-black text-[var(--foreground)]/30 uppercase tracking-widest mt-0.5">Asset Ref-0{index + 1}</div>
                                     </div>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1.5">
-                                        <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 ml-1">Volume</label>
+                                        <label className="block text-[12px] font-black uppercase tracking-widest text-[var(--foreground)]/40 ml-1">Volume</label>
                                         <div className="relative">
                                             <input
                                                 type="number"
                                                 step="any"
                                                 value={item.quantity}
                                                 onChange={(e) => handleQuantityChange(index, e.target.value)}
-                                                className="w-full h-11 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/5 px-4 text-[13px] font-black text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] focus:ring-4 focus:ring-[var(--primary-green)]/10 transition-all shadow-inner tabular-nums"
+                                                className="w-full h-11 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/5 px-4 text-[17px] font-black text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] focus:ring-4 focus:ring-[var(--primary-green)]/10 transition-all shadow-inner tabular-nums"
                                             />
-                                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-[var(--foreground)]/20 uppercase tracking-widest">{item.unit}</span>
+                                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[13px] font-black text-[var(--foreground)]/20 uppercase tracking-widest">{item.unit}</span>
                                         </div>
                                     </div>
                                     <div className="space-y-1.5">
-                                        <label className="block text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/40 ml-1">Yield / Unit</label>
+                                        <label className="block text-[12px] font-black uppercase tracking-widest text-[var(--foreground)]/40 ml-1">Yield / Unit</label>
                                         <div className="relative">
                                             <input
                                                 type="number"
                                                 step="any"
                                                 value={item.rate}
                                                 onChange={(e) => handleRateChange(index, e.target.value)}
-                                                className="w-full h-11 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/5 px-4 text-[13px] font-black text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] focus:ring-4 focus:ring-[var(--primary-green)]/10 transition-all shadow-inner tabular-nums"
+                                                className="w-full h-11 rounded-2xl bg-[var(--foreground)]/5 border border-[var(--foreground)]/5 px-4 text-[17px] font-black text-[var(--deep-contrast)] focus:outline-none focus:border-[var(--primary-green)] focus:ring-4 focus:ring-[var(--primary-green)]/10 transition-all shadow-inner tabular-nums"
                                             />
-                                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-[var(--foreground)]/20 uppercase">/ {item.unit}</span>
+                                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[13px] font-black text-[var(--foreground)]/20 uppercase">/ {item.unit}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -129,14 +129,14 @@ export default function Step2AddItems({ items, onNext, onBack }: Step2Props) {
                                 <div className="mt-5 pt-4 border-t border-[var(--foreground)]/5 flex justify-between items-center">
                                     <div>
                                         {item.tax > 0 && (
-                                            <p className="text-[8px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.2em]">
+                                            <p className="text-[12px] font-black text-[var(--foreground)]/30 uppercase tracking-[0.2em]">
                                                 Taxation Impact: {item.tax}%
                                             </p>
                                         )}
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-[8px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-0.5">Asset Valuation</p>
-                                        <p className="text-[16px] font-black text-[var(--primary-green)] tabular-nums font-mono tracking-tighter">{formatCurrency(item.amount)}</p>
+                                        <p className="text-[12px] font-black uppercase tracking-widest text-[var(--foreground)]/30 mb-0.5">Asset Valuation</p>
+                                        <p className="text-[20px] font-black text-[var(--primary-green)] tabular-nums font-mono tracking-tighter">{formatCurrency(item.amount)}</p>
                                     </div>
                                 </div>
                             </div>
@@ -146,7 +146,7 @@ export default function Step2AddItems({ items, onNext, onBack }: Step2Props) {
 
                 {error && (
                     <div className="p-4 rounded-[20px] bg-rose-500/5 border border-rose-500/10 text-center animate-bounce">
-                        <p className="text-[9px] font-black text-rose-500 uppercase tracking-widest">{error}</p>
+                        <p className="text-[13px] font-black text-rose-500 uppercase tracking-widest">{error}</p>
                     </div>
                 )}
             </div>
@@ -155,12 +155,12 @@ export default function Step2AddItems({ items, onNext, onBack }: Step2Props) {
             <div className="px-8 py-6 border-t border-[var(--foreground)]/10 flex flex-col sm:flex-row items-center justify-between gap-6 bg-white/5 backdrop-blur-md">
                 <div className="flex items-end gap-1.5 order-2 sm:order-1">
                     <div>
-                        <p className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--foreground)]/30 mb-0.5 ml-1">Aggregate Estimation</p>
-                        <p className="text-[32px] font-black text-[var(--deep-contrast)] tabular-nums tracking-tighter leading-none">
+                        <p className="text-[13px] font-black uppercase tracking-[0.3em] text-[var(--foreground)]/30 mb-0.5 ml-1">Aggregate Estimation</p>
+                        <p className="text-[36px] font-black text-[var(--deep-contrast)] tabular-nums tracking-tighter leading-none">
                             {formatCurrency(subtotal)}
                         </p>
                     </div>
-                    <span className="px-3 py-1 rounded-lg bg-[var(--foreground)]/5 text-[9px] font-black text-[var(--foreground)]/40 uppercase tracking-widest border border-[var(--foreground)]/10 mb-1">
+                    <span className="px-3 py-1 rounded-lg bg-[var(--foreground)]/5 text-[13px] font-black text-[var(--foreground)]/40 uppercase tracking-widest border border-[var(--foreground)]/10 mb-1">
                         {data.items.length} ASSETS
                     </span>
                 </div>

@@ -98,7 +98,7 @@ const MagneticButton = ({ children, onClick, className, primary = false }: any) 
             style={{ x: springX, y: springY }}
             whileTap={{ scale: 0.9 }}
             className={clsx(
-                "relative flex items-center justify-center transition-colors overflow-hidden group font-black uppercase tracking-widest text-[10px]",
+                "relative flex items-center justify-center transition-colors overflow-hidden group font-black uppercase tracking-widest text-[14px]",
                 primary
                     ? "text-white h-12 px-8 rounded-2xl border border-white/20"
                     : "bg-white/5 text-white/80 h-12 w-12 rounded-2xl border border-white/10 hover:bg-white/10 hover:text-white",
@@ -120,7 +120,7 @@ const MagneticButton = ({ children, onClick, className, primary = false }: any) 
                     className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"
                 />
             )}
-            <span className="relative z-10 flex items-center gap-2 font-black uppercase tracking-widest text-[10px]">
+            <span className="relative z-10 flex items-center gap-2 font-black uppercase tracking-widest text-[14px]">
                 {children}
             </span>
         </motion.button>
@@ -374,9 +374,9 @@ export default function VisualTutorial({ steps, isOpen, onClose, accentColor = '
                                             </motion.h3>
                                         </AnimatePresence>
                                         <div className="flex items-center gap-2 mt-1">
-                                            <span className="text-[8px] font-black text-white/40 uppercase tracking-[0.3em]">Module</span>
+                                            <span className="text-[12px] font-black text-white/40 uppercase tracking-[0.3em]">Module</span>
                                             <div className="h-1 w-1 rounded-full bg-[var(--primary-color)]" />
-                                            <span className="text-[8px] font-black text-[var(--primary-color)] uppercase tracking-[0.3em]">{currentStep + 1} / {steps.length}</span>
+                                            <span className="text-[12px] font-black text-[var(--primary-color)] uppercase tracking-[0.3em]">{currentStep + 1} / {steps.length}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -486,7 +486,7 @@ function MouseFollower({ isOpen, label }: { isOpen: boolean, label: string }) {
                     exit={{ opacity: 0, scale: 0 }}
                     className="fixed top-0 left-0 pointer-events-none z-[10000] ml-6 mt-6 flex flex-col items-center"
                 >
-                    <div className="glass-optimized px-3 py-1.5 rounded-full border border-white/30 text-[9px] font-black uppercase text-white/90 tracking-tighter whitespace-nowrap shadow-2xl">
+                    <div className="glass-optimized px-3 py-1.5 rounded-full border border-white/30 text-[13px] font-black uppercase text-white/90 tracking-tighter whitespace-nowrap shadow-2xl">
                         {label}
                     </div>
                 </motion.div>

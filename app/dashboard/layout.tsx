@@ -284,7 +284,7 @@ const NavItem = memo(({ item, pathname }: { item: any, pathname: string }) => {
         <Link
             href={item.href}
             className={clsx(
-                'group flex items-center px-3 py-2.5 text-[11px] font-black rounded-xl transition-all duration-200 relative overflow-hidden uppercase tracking-tighter',
+                'group flex items-center px-3 py-2.5 text-[15px] font-black rounded-xl transition-all duration-200 relative overflow-hidden uppercase tracking-tighter',
                 isActive
                     ? 'text-[var(--primary-foreground)] shadow-md shadow-[var(--primary-green)]/20 translate-x-1'
                     : 'text-[var(--foreground)]/40 hover:bg-[var(--foreground)]/5 hover:text-[var(--deep-contrast)] hover:translate-x-1'
@@ -384,7 +384,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                             </div>
                             <div className="flex-1 text-left min-w-0">
                                 <h1 className="text-sm font-black text-[var(--deep-contrast)] tracking-tight truncate uppercase">{activeBusiness?.name || 'SELECT BIZ'}</h1>
-                                <p className="text-[8px] font-black text-[var(--foreground)]/40 uppercase tracking-widest leading-none mt-0.5">Switch Identity</p>
+                                <p className="text-[12px] font-black text-[var(--foreground)]/40 uppercase tracking-widest leading-none mt-0.5">Switch Identity</p>
                             </div>
                         </button>
 
@@ -410,7 +410,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                         <div className="flex gap-2">
                             <button
                                 onClick={startTutorial}
-                                className="flex-1 flex items-center justify-center px-3 py-2.5 text-[10px] font-black rounded-xl text-[var(--foreground)]/40 hover:bg-[var(--foreground)]/5 hover:text-[var(--deep-contrast)] border border-[var(--foreground)]/5 transition-all uppercase tracking-widest"
+                                className="flex-1 flex items-center justify-center px-3 py-2.5 text-[14px] font-black rounded-xl text-[var(--foreground)]/40 hover:bg-[var(--foreground)]/5 hover:text-[var(--deep-contrast)] border border-[var(--foreground)]/5 transition-all uppercase tracking-widest"
                                 title="Start Tutorial"
                             >
                                 <HelpCircle className="h-4 w-4" />
@@ -419,7 +419,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                                 id="settings-btn"
                                 href="/dashboard/settings"
                                 className={clsx(
-                                    'flex-1 flex items-center justify-center px-3 py-2.5 text-[10px] font-black rounded-xl transition-all uppercase tracking-widest',
+                                    'flex-1 flex items-center justify-center px-3 py-2.5 text-[14px] font-black rounded-xl transition-all uppercase tracking-widest',
                                     pathname === '/dashboard/settings'
                                         ? 'bg-[var(--primary-green)] text-[var(--primary-foreground)] shadow-lg'
                                         : 'text-[var(--foreground)]/40 hover:bg-[var(--foreground)]/5 hover:text-[var(--deep-contrast)] border border-[var(--foreground)]/5'
@@ -429,7 +429,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                             </Link>
                             <button
                                 onClick={() => setIsSignOutModalOpen(true)}
-                                className="flex-1 h-10 flex items-center justify-center px-3 py-2.5 text-[10px] font-black text-rose-500/60 hover:bg-rose-500 hover:text-white rounded-xl transition-all uppercase tracking-widest active:scale-95 group shadow-sm border border-rose-500/10"
+                                className="flex-1 h-10 flex items-center justify-center px-3 py-2.5 text-[14px] font-black text-rose-500/60 hover:bg-rose-500 hover:text-white rounded-xl transition-all uppercase tracking-widest active:scale-95 group shadow-sm border border-rose-500/10"
                             >
                                 <LogOut className="h-4 w-4 opacity-40 group-hover:opacity-100 transition-opacity" />
                             </button>
@@ -437,7 +437,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                         <button
                             id="invite-btn"
                             onClick={() => setIsInviteModalOpen(true)}
-                            className="w-full mt-2 flex items-center justify-center px-4 py-2 text-[9px] font-black text-[var(--primary-green)] bg-[var(--primary-green)]/5 hover:bg-[var(--primary-green)] hover:text-[var(--primary-foreground)] active:bg-[var(--primary-active)] rounded-xl transition-all border border-[var(--primary-green)]/10 uppercase tracking-widest shadow-sm active:scale-95"
+                            className="w-full mt-2 flex items-center justify-center px-4 py-2 text-[13px] font-black text-[var(--primary-green)] bg-[var(--primary-green)]/5 hover:bg-[var(--primary-green)] hover:text-[var(--primary-foreground)] active:bg-[var(--primary-active)] rounded-xl transition-all border border-[var(--primary-green)]/10 uppercase tracking-widest shadow-sm active:scale-95"
                         >
                             <UserPlus className="mr-2 h-3.5 w-3.5" />
                             Invite
@@ -468,12 +468,12 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                             </div>
                             <div className="flex flex-col items-start min-w-0">
                                 <div className="flex items-center gap-1.5 min-w-0">
-                                    <h2 className="text-[10px] font-black text-[var(--deep-contrast)] uppercase tracking-wider truncate">
+                                    <h2 className="text-[14px] font-black text-[var(--deep-contrast)] uppercase tracking-wider truncate">
                                         {activeBusiness ? activeBusiness.name : (businesses.length > 0 ? businesses[0].name : 'Loading...')}
                                     </h2>
                                     <ChevronDown className="h-2.5 w-2.5 text-[var(--foreground)]/40 group-hover:text-[var(--primary-green)] transition-colors shrink-0" />
                                 </div>
-                                <p className="text-[7px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.2em] leading-none mt-0.5">Switch Identity</p>
+                                <p className="text-[11px] font-black text-[var(--foreground)]/40 uppercase tracking-[0.2em] leading-none mt-0.5">Switch Identity</p>
                             </div>
                         </button>
                         <div className="flex items-center gap-1">
@@ -587,7 +587,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     >
                         <div className="glass p-8 rounded-3xl border border-[var(--foreground)]/10 dark:border-white/50 flex flex-col items-center gap-4">
                             <LoadingSpinner size="lg" label="Processing..." />
-                            <p className="text-[8px] font-bold text-[var(--foreground)]/40 uppercase tracking-[0.3em] animate-pulse">Claire is working</p>
+                            <p className="text-[12px] font-bold text-[var(--foreground)]/40 uppercase tracking-[0.3em] animate-pulse">Claire is working</p>
                         </div>
                     </motion.div>
                 )}
