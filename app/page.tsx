@@ -11,6 +11,17 @@ export default function Home() {
 
   useEffect(() => {
     const checkSession = async () => {
+      // 1. Check if we have auth params in the URL (processing a login/redirect)
+      const hasAuthParams =
+        window.location.hash.includes('access_token=') ||
+        window.location.search.includes('code=') ||
+        window.location.hash.includes('type=recovery');
+
+      if (hasAuthParams) {
+        console.log("Auth params detected on home page, skipping immediate redirect");
+        return;
+      }
+
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         router.replace("/dashboard");

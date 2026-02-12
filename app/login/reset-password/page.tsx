@@ -30,33 +30,37 @@ export default function ResetPasswordPage() {
             // This means Supabase is in the middle of processing the redirect
             const hasHashParams = window.location.hash.includes('access_token=')
             const hasQueryParams = window.location.search.includes('code=')
+            const isRecovery = window.location.hash.includes('type=recovery')
 
-            if (hasHashParams || hasQueryParams) {
+            if (hasHashParams || hasQueryParams || isRecovery) {
+                console.log("Password reset tokens detected, waiting for session...")
                 // Wait for Supabase to process the URL and set the session
                 const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+                    console.log("Auth state change event:", event)
                     if (session) {
                         setIsVerifying(false)
                         subscription.unsubscribe()
                     }
                 })
 
-                // Safety timeout: if after 5 seconds we still don't have a session, redirect
+                // Safety timeout: if after 8 seconds we still don't have a session, redirect
                 const timeoutId = setTimeout(async () => {
                     subscription.unsubscribe()
                     const { data: { session } } = await supabase.auth.getSession()
                     if (!session) {
+                        console.error("Session verification timed out. No session found.")
                         router.replace('/login')
                     } else {
                         setIsVerifying(false)
                     }
-                }, 5000)
+                }, 8000)
 
                 return () => {
                     subscription.unsubscribe()
                     clearTimeout(timeoutId)
                 }
             } else {
-                // No session and no auth params = truly not authenticated
+                console.warn("No authentication tokens found in URL. Redirecting to login.")
                 router.replace('/login')
             }
         }
