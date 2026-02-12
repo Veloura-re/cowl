@@ -13,7 +13,7 @@
   --font-display: var(--font-inter), "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
-  --font-scale: 1.15;
+  --font-scale: 1.10;
 }
 
 :root {
@@ -168,19 +168,19 @@ body {
 /* Standardize Weights - Force all bolds thinner than default but heavier for buttons */
 .font-bold,
 [class*="font-bold"] {
-  font-weight: 600 !important;
+  font-weight: 500 !important;
 }
 
 .font-black,
 [class*="font-black"] {
-  font-weight: 800 !important;
+  font-weight: 700 !important;
 }
 
 .font-semibold,
 [class*="font-semibold"],
 .font-medium,
 [class*="font-medium"] {
-  font-weight: 600 !important;
+  font-weight: 500 !important;
 }
 
 b,
