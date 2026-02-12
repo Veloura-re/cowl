@@ -11,14 +11,25 @@ export default function Home() {
 
   useEffect(() => {
     const checkSession = async () => {
-      // 1. Check if we have auth params in the URL (processing a login/redirect)
+      const hash = window.location.hash;
+      const search = window.location.search;
+
+      // 1. Check if we have auth params in the URL
       const hasAuthParams =
-        window.location.hash.includes('access_token=') ||
-        window.location.search.includes('code=') ||
-        window.location.hash.includes('type=recovery');
+        hash.includes('access_token=') ||
+        search.includes('code=') ||
+        hash.includes('type=recovery');
 
       if (hasAuthParams) {
-        console.log("Auth params detected on home page, skipping immediate redirect");
+        console.log("Auth params detected on home page, redirecting to appropriate handler");
+
+        // If it's a recovery/password reset flow, send to the reset page
+        if (hash.includes('type=recovery')) {
+          router.replace(`/login/reset-password${hash}${search}`);
+        } else {
+          // Otherwise send to login page to handle the redirection
+          router.replace(`/login${hash}${search}`);
+        }
         return;
       }
 

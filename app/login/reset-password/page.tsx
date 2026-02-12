@@ -18,6 +18,9 @@ export default function ResetPasswordPage() {
 
     // Ensure user is authenticated (via the callback session)
     useEffect(() => {
+        let subscription: any = null
+        let timeoutId: any = null
+
         const checkSession = async () => {
             // 1. Initial check
             const { data: { session: initialSession } } = await supabase.auth.getSession()
@@ -27,25 +30,26 @@ export default function ResetPasswordPage() {
             }
 
             // 2. If no initial session, check if we have auth params in the URL
-            // This means Supabase is in the middle of processing the redirect
-            const hasHashParams = window.location.hash.includes('access_token=')
-            const hasQueryParams = window.location.search.includes('code=')
-            const isRecovery = window.location.hash.includes('type=recovery')
+            const hash = window.location.hash
+            const search = window.location.search
+            const hasHashParams = hash.includes('access_token=')
+            const hasQueryParams = search.includes('code=')
+            const isRecovery = hash.includes('type=recovery')
 
             if (hasHashParams || hasQueryParams || isRecovery) {
                 console.log("Password reset tokens detected, waiting for session...")
-                // Wait for Supabase to process the URL and set the session
-                const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+
+                // Wait for Supabase to process the URL
+                const { data } = supabase.auth.onAuthStateChange((event, session) => {
                     console.log("Auth state change event:", event)
                     if (session) {
                         setIsVerifying(false)
-                        subscription.unsubscribe()
                     }
                 })
+                subscription = data.subscription
 
-                // Safety timeout: if after 8 seconds we still don't have a session, redirect
-                const timeoutId = setTimeout(async () => {
-                    subscription.unsubscribe()
+                // Safety timeout
+                timeoutId = setTimeout(async () => {
                     const { data: { session } } = await supabase.auth.getSession()
                     if (!session) {
                         console.error("Session verification timed out. No session found.")
@@ -54,17 +58,18 @@ export default function ResetPasswordPage() {
                         setIsVerifying(false)
                     }
                 }, 8000)
-
-                return () => {
-                    subscription.unsubscribe()
-                    clearTimeout(timeoutId)
-                }
             } else {
                 console.warn("No authentication tokens found in URL. Redirecting to login.")
                 router.replace('/login')
             }
         }
+
         checkSession()
+
+        return () => {
+            if (subscription) subscription.unsubscribe()
+            if (timeoutId) clearTimeout(timeoutId)
+        }
     }, [router, supabase.auth])
 
     const handleUpdatePassword = async (e: React.FormEvent) => {
