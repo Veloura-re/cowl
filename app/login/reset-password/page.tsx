@@ -32,14 +32,27 @@ export default function ResetPasswordPage() {
             // 2. If no initial session, check if we have auth params in the URL
             const hash = window.location.hash
             const search = window.location.search
+            const urlParams = new URLSearchParams(search)
+            const code = urlParams.get('code')
+
             const hasHashParams = hash.includes('access_token=')
-            const hasQueryParams = search.includes('code=')
             const isRecovery = hash.includes('type=recovery')
 
-            if (hasHashParams || hasQueryParams || isRecovery) {
-                console.log("Password reset tokens detected, waiting for session...")
+            if (code || hasHashParams || isRecovery) {
+                console.log("Password reset tokens detected, processing...")
 
-                // Wait for Supabase to process the URL
+                // If we have a PKCE code, we SHOULD exchange it manually 
+                // because static exports might not handle the automatic version well
+                if (code) {
+                    console.log("PKCE code detected, exchanging for session...");
+                    const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+                    if (exchangeError) {
+                        console.error("Code exchange failed:", exchangeError.message);
+                        // Don't return yet, onAuthStateChange might still catch it
+                    }
+                }
+
+                // Wait for Supabase to process the URL or for the manual exchange to trigger a session
                 const { data } = supabase.auth.onAuthStateChange((event, session) => {
                     console.log("Auth state change event:", event)
                     if (session) {
@@ -48,16 +61,16 @@ export default function ResetPasswordPage() {
                 })
                 subscription = data.subscription
 
-                // Safety timeout
+                // Safety timeout: if after 10 seconds we still don't have a session, redirect
                 timeoutId = setTimeout(async () => {
                     const { data: { session } } = await supabase.auth.getSession()
                     if (!session) {
-                        console.error("Session verification timed out. No session found.")
+                        console.error("Session verification timed out. No session found after 10s.")
                         router.replace('/login')
                     } else {
                         setIsVerifying(false)
                     }
-                }, 8000)
+                }, 10000)
             } else {
                 console.warn("No authentication tokens found in URL. Redirecting to login.")
                 router.replace('/login')

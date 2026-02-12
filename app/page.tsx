@@ -23,11 +23,16 @@ export default function Home() {
       if (hasAuthParams) {
         console.log("Auth params detected on home page, redirecting to appropriate handler");
 
-        // If it's a recovery/password reset flow, send to the reset page
-        if (hash.includes('type=recovery')) {
+        // Check if it's a recovery/password reset flow
+        // PKCE links usually have ?code= and may have &type=recovery in query or hash
+        const isRecoveryFlow =
+          hash.includes('type=recovery') ||
+          search.includes('type=recovery');
+
+        if (isRecoveryFlow) {
           router.replace(`/login/reset-password${hash}${search}`);
         } else {
-          // Otherwise send to login page to handle the redirection
+          // Otherwise send to login page to handle the authentication/redirection
           router.replace(`/login${hash}${search}`);
         }
         return;
