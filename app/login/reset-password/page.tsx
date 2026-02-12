@@ -14,11 +14,49 @@ export default function ResetPasswordPage() {
     const router = useRouter()
     const supabase = createClient()
 
+    const [isVerifying, setIsVerifying] = useState(true)
+
     // Ensure user is authenticated (via the callback session)
     useEffect(() => {
         const checkSession = async () => {
-            const { data: { session } } = await supabase.auth.getSession()
-            if (!session) {
+            // 1. Initial check
+            const { data: { session: initialSession } } = await supabase.auth.getSession()
+            if (initialSession) {
+                setIsVerifying(false)
+                return
+            }
+
+            // 2. If no initial session, check if we have auth params in the URL
+            // This means Supabase is in the middle of processing the redirect
+            const hasHashParams = window.location.hash.includes('access_token=')
+            const hasQueryParams = window.location.search.includes('code=')
+
+            if (hasHashParams || hasQueryParams) {
+                // Wait for Supabase to process the URL and set the session
+                const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+                    if (session) {
+                        setIsVerifying(false)
+                        subscription.unsubscribe()
+                    }
+                })
+
+                // Safety timeout: if after 5 seconds we still don't have a session, redirect
+                const timeoutId = setTimeout(async () => {
+                    subscription.unsubscribe()
+                    const { data: { session } } = await supabase.auth.getSession()
+                    if (!session) {
+                        router.replace('/login')
+                    } else {
+                        setIsVerifying(false)
+                    }
+                }, 5000)
+
+                return () => {
+                    subscription.unsubscribe()
+                    clearTimeout(timeoutId)
+                }
+            } else {
+                // No session and no auth params = truly not authenticated
                 router.replace('/login')
             }
         }
@@ -55,7 +93,23 @@ export default function ResetPasswordPage() {
         }
     }
 
+    if (isVerifying) {
+        return (
+            <div className="flex min-h-screen items-center justify-center p-6 sm:p-4">
+                <div className="glass w-full max-w-sm space-y-6 rounded-[32px] p-12 text-center border border-white/40 dark:border-white/10 shadow-2xl">
+                    <div className="flex flex-col items-center gap-4">
+                        <Loader2 className="h-10 w-10 animate-spin text-[var(--primary-green)]" />
+                        <p className="text-[14px] font-black text-[var(--foreground)]/50 uppercase tracking-[0.2em] animate-pulse">
+                            Verifying Security Token...
+                        </p>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
     if (success) {
+
         return (
             <div className="flex min-h-screen items-center justify-center p-6">
                 <div className="glass w-full max-w-sm space-y-6 rounded-[32px] p-8 text-center border border-white/40 dark:border-white/10 shadow-2xl">
