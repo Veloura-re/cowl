@@ -17,22 +17,30 @@ export default function Home() {
       // 1. Check if we have auth params in the URL
       const hasAuthParams =
         hash.includes('access_token=') ||
-        search.includes('code=') ||
-        hash.includes('type=recovery');
+        search.includes('code=');
+
+      // 2. Check explicitly for recovery/password reset flow
+      const isRecoveryFlow =
+        hash.includes('type=recovery') ||
+        search.includes('type=recovery') ||
+        hash.includes('type=signup') || // In some cases, signup confirmation might hit here
+        search.includes('type=signup');
 
       if (hasAuthParams) {
         console.log("Auth params detected on home page, redirecting to appropriate handler");
 
-        // Check if it's a recovery/password reset flow
-        // PKCE links usually have ?code= and may have &type=recovery in query or hash
-        const isRecoveryFlow =
-          hash.includes('type=recovery') ||
-          search.includes('type=recovery');
-
-        if (isRecoveryFlow) {
-          router.replace(`/login/reset-password${hash}${search}`);
+        // If we have auth params, and either it's explicitly recovery OR we just have a code/token
+        // we should favor reset-password if we're in a "forgot password" context, 
+        // but generally, if a code is present, sending it to reset-password is safer for recovery flows
+        if (isRecoveryFlow || hasAuthParams) {
+          // If it's a signup (confirmation), we might want to go to login or onboarding
+          if (hash.includes('type=signup') || search.includes('type=signup')) {
+            router.replace(`/login${hash}${search}`);
+          } else {
+            // Default to reset-password for codes/tokens to catch recovery flows that might drop keywords
+            router.replace(`/login/reset-password${hash}${search}`);
+          }
         } else {
-          // Otherwise send to login page to handle the authentication/redirection
           router.replace(`/login${hash}${search}`);
         }
         return;
